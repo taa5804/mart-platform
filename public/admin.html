@@ -1,0 +1,10 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>차량 QR 본사관리</title><link rel="stylesheet" href="/app.css"></head>
+<body><main class="wrap"><div class="brand"><h1>차량 QR 본사관리</h1><p>QR번호 검색 및 사용 여부 확인</p></div>
+<section id="loginBox" class="card"><label>관리자 비밀번호<input id="password" type="password"></label><button id="loginBtn" class="primary">로그인</button><div id="loginMsg" class="msg"></div></section>
+<section id="adminBox" class="card hidden"><label>QR번호 검색<input id="search" placeholder="예: GJ-GK-001-STORE0001"></label><button id="searchBtn" class="primary">검색</button><div id="result"></div><a class="btn ghost" href="/qr100.csv">QR 100개 CSV 다운로드</a></section>
+</main><script>
+const $=id=>document.getElementById(id);let pw='';
+function show(text,ok){$('loginMsg').textContent=text;$('loginMsg').className='msg show '+(ok?'ok':'err')}
+$('loginBtn').onclick=async()=>{pw=$('password').value;const r=await fetch('/api/admin-search?code=GJ-GK-001-STORE0001',{headers:{'x-admin-password':pw}});if(r.ok){$('loginBox').classList.add('hidden');$('adminBox').classList.remove('hidden')}else show('비밀번호가 올바르지 않습니다.',false)};
+$('searchBtn').onclick=async()=>{const code=$('search').value.trim();const r=await fetch('/api/admin-search?code='+encodeURIComponent(code),{headers:{'x-admin-password':pw}});const j=await r.json();$('result').innerHTML=r.ok?`<table class="admin-table"><tr><th>QR번호</th><td>${j.code}</td></tr><tr><th>발급 여부</th><td>${j.valid?'발급':'미발급'}</td></tr><tr><th>사용 여부</th><td>${j.registered?'등록':'미등록'}</td></tr><tr><th>전화번호</th><td>${j.maskedPhone||'-'}</td></tr></table>`:`<div class="msg show err">${j.error||'검색 실패'}</div>`};
+</script></body></html>

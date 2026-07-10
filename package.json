@@ -1,0 +1,11 @@
+{
+  "name": "mart-platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
+  }
+}

@@ -1,0 +1,602 @@
+[
+  {
+    "seq": 1,
+    "code": "GJ-GK-001-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-001-STORE0001",
+    "filename": "GJ-GK-001-STORE0001.png"
+  },
+  {
+    "seq": 2,
+    "code": "GJ-GK-002-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-002-STORE0001",
+    "filename": "GJ-GK-002-STORE0001.png"
+  },
+  {
+    "seq": 3,
+    "code": "GJ-GK-003-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-003-STORE0001",
+    "filename": "GJ-GK-003-STORE0001.png"
+  },
+  {
+    "seq": 4,
+    "code": "GJ-GK-004-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-004-STORE0001",
+    "filename": "GJ-GK-004-STORE0001.png"
+  },
+  {
+    "seq": 5,
+    "code": "GJ-GK-005-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-005-STORE0001",
+    "filename": "GJ-GK-005-STORE0001.png"
+  },
+  {
+    "seq": 6,
+    "code": "GJ-GK-006-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-006-STORE0001",
+    "filename": "GJ-GK-006-STORE0001.png"
+  },
+  {
+    "seq": 7,
+    "code": "GJ-GK-007-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-007-STORE0001",
+    "filename": "GJ-GK-007-STORE0001.png"
+  },
+  {
+    "seq": 8,
+    "code": "GJ-GK-008-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-008-STORE0001",
+    "filename": "GJ-GK-008-STORE0001.png"
+  },
+  {
+    "seq": 9,
+    "code": "GJ-GK-009-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-009-STORE0001",
+    "filename": "GJ-GK-009-STORE0001.png"
+  },
+  {
+    "seq": 10,
+    "code": "GJ-GK-010-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-010-STORE0001",
+    "filename": "GJ-GK-010-STORE0001.png"
+  },
+  {
+    "seq": 11,
+    "code": "GJ-GK-011-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-011-STORE0001",
+    "filename": "GJ-GK-011-STORE0001.png"
+  },
+  {
+    "seq": 12,
+    "code": "GJ-GK-012-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-012-STORE0001",
+    "filename": "GJ-GK-012-STORE0001.png"
+  },
+  {
+    "seq": 13,
+    "code": "GJ-GK-013-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-013-STORE0001",
+    "filename": "GJ-GK-013-STORE0001.png"
+  },
+  {
+    "seq": 14,
+    "code": "GJ-GK-014-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-014-STORE0001",
+    "filename": "GJ-GK-014-STORE0001.png"
+  },
+  {
+    "seq": 15,
+    "code": "GJ-GK-015-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-015-STORE0001",
+    "filename": "GJ-GK-015-STORE0001.png"
+  },
+  {
+    "seq": 16,
+    "code": "GJ-GK-016-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-016-STORE0001",
+    "filename": "GJ-GK-016-STORE0001.png"
+  },
+  {
+    "seq": 17,
+    "code": "GJ-GK-017-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-017-STORE0001",
+    "filename": "GJ-GK-017-STORE0001.png"
+  },
+  {
+    "seq": 18,
+    "code": "GJ-GK-018-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-018-STORE0001",
+    "filename": "GJ-GK-018-STORE0001.png"
+  },
+  {
+    "seq": 19,
+    "code": "GJ-GK-019-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-019-STORE0001",
+    "filename": "GJ-GK-019-STORE0001.png"
+  },
+  {
+    "seq": 20,
+    "code": "GJ-GK-020-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-020-STORE0001",
+    "filename": "GJ-GK-020-STORE0001.png"
+  },
+  {
+    "seq": 21,
+    "code": "GJ-GK-021-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-021-STORE0001",
+    "filename": "GJ-GK-021-STORE0001.png"
+  },
+  {
+    "seq": 22,
+    "code": "GJ-GK-022-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-022-STORE0001",
+    "filename": "GJ-GK-022-STORE0001.png"
+  },
+  {
+    "seq": 23,
+    "code": "GJ-GK-023-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-023-STORE0001",
+    "filename": "GJ-GK-023-STORE0001.png"
+  },
+  {
+    "seq": 24,
+    "code": "GJ-GK-024-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-024-STORE0001",
+    "filename": "GJ-GK-024-STORE0001.png"
+  },
+  {
+    "seq": 25,
+    "code": "GJ-GK-025-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-025-STORE0001",
+    "filename": "GJ-GK-025-STORE0001.png"
+  },
+  {
+    "seq": 26,
+    "code": "GJ-GK-026-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-026-STORE0001",
+    "filename": "GJ-GK-026-STORE0001.png"
+  },
+  {
+    "seq": 27,
+    "code": "GJ-GK-027-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-027-STORE0001",
+    "filename": "GJ-GK-027-STORE0001.png"
+  },
+  {
+    "seq": 28,
+    "code": "GJ-GK-028-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-028-STORE0001",
+    "filename": "GJ-GK-028-STORE0001.png"
+  },
+  {
+    "seq": 29,
+    "code": "GJ-GK-029-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-029-STORE0001",
+    "filename": "GJ-GK-029-STORE0001.png"
+  },
+  {
+    "seq": 30,
+    "code": "GJ-GK-030-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-030-STORE0001",
+    "filename": "GJ-GK-030-STORE0001.png"
+  },
+  {
+    "seq": 31,
+    "code": "GJ-GK-031-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-031-STORE0001",
+    "filename": "GJ-GK-031-STORE0001.png"
+  },
+  {
+    "seq": 32,
+    "code": "GJ-GK-032-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-032-STORE0001",
+    "filename": "GJ-GK-032-STORE0001.png"
+  },
+  {
+    "seq": 33,
+    "code": "GJ-GK-033-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-033-STORE0001",
+    "filename": "GJ-GK-033-STORE0001.png"
+  },
+  {
+    "seq": 34,
+    "code": "GJ-GK-034-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-034-STORE0001",
+    "filename": "GJ-GK-034-STORE0001.png"
+  },
+  {
+    "seq": 35,
+    "code": "GJ-GK-035-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-035-STORE0001",
+    "filename": "GJ-GK-035-STORE0001.png"
+  },
+  {
+    "seq": 36,
+    "code": "GJ-GK-036-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-036-STORE0001",
+    "filename": "GJ-GK-036-STORE0001.png"
+  },
+  {
+    "seq": 37,
+    "code": "GJ-GK-037-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-037-STORE0001",
+    "filename": "GJ-GK-037-STORE0001.png"
+  },
+  {
+    "seq": 38,
+    "code": "GJ-GK-038-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-038-STORE0001",
+    "filename": "GJ-GK-038-STORE0001.png"
+  },
+  {
+    "seq": 39,
+    "code": "GJ-GK-039-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-039-STORE0001",
+    "filename": "GJ-GK-039-STORE0001.png"
+  },
+  {
+    "seq": 40,
+    "code": "GJ-GK-040-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-040-STORE0001",
+    "filename": "GJ-GK-040-STORE0001.png"
+  },
+  {
+    "seq": 41,
+    "code": "GJ-GK-041-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-041-STORE0001",
+    "filename": "GJ-GK-041-STORE0001.png"
+  },
+  {
+    "seq": 42,
+    "code": "GJ-GK-042-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-042-STORE0001",
+    "filename": "GJ-GK-042-STORE0001.png"
+  },
+  {
+    "seq": 43,
+    "code": "GJ-GK-043-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-043-STORE0001",
+    "filename": "GJ-GK-043-STORE0001.png"
+  },
+  {
+    "seq": 44,
+    "code": "GJ-GK-044-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-044-STORE0001",
+    "filename": "GJ-GK-044-STORE0001.png"
+  },
+  {
+    "seq": 45,
+    "code": "GJ-GK-045-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-045-STORE0001",
+    "filename": "GJ-GK-045-STORE0001.png"
+  },
+  {
+    "seq": 46,
+    "code": "GJ-GK-046-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-046-STORE0001",
+    "filename": "GJ-GK-046-STORE0001.png"
+  },
+  {
+    "seq": 47,
+    "code": "GJ-GK-047-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-047-STORE0001",
+    "filename": "GJ-GK-047-STORE0001.png"
+  },
+  {
+    "seq": 48,
+    "code": "GJ-GK-048-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-048-STORE0001",
+    "filename": "GJ-GK-048-STORE0001.png"
+  },
+  {
+    "seq": 49,
+    "code": "GJ-GK-049-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-049-STORE0001",
+    "filename": "GJ-GK-049-STORE0001.png"
+  },
+  {
+    "seq": 50,
+    "code": "GJ-GK-050-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-050-STORE0001",
+    "filename": "GJ-GK-050-STORE0001.png"
+  },
+  {
+    "seq": 51,
+    "code": "GJ-GK-051-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-051-STORE0001",
+    "filename": "GJ-GK-051-STORE0001.png"
+  },
+  {
+    "seq": 52,
+    "code": "GJ-GK-052-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-052-STORE0001",
+    "filename": "GJ-GK-052-STORE0001.png"
+  },
+  {
+    "seq": 53,
+    "code": "GJ-GK-053-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-053-STORE0001",
+    "filename": "GJ-GK-053-STORE0001.png"
+  },
+  {
+    "seq": 54,
+    "code": "GJ-GK-054-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-054-STORE0001",
+    "filename": "GJ-GK-054-STORE0001.png"
+  },
+  {
+    "seq": 55,
+    "code": "GJ-GK-055-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-055-STORE0001",
+    "filename": "GJ-GK-055-STORE0001.png"
+  },
+  {
+    "seq": 56,
+    "code": "GJ-GK-056-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-056-STORE0001",
+    "filename": "GJ-GK-056-STORE0001.png"
+  },
+  {
+    "seq": 57,
+    "code": "GJ-GK-057-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-057-STORE0001",
+    "filename": "GJ-GK-057-STORE0001.png"
+  },
+  {
+    "seq": 58,
+    "code": "GJ-GK-058-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-058-STORE0001",
+    "filename": "GJ-GK-058-STORE0001.png"
+  },
+  {
+    "seq": 59,
+    "code": "GJ-GK-059-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-059-STORE0001",
+    "filename": "GJ-GK-059-STORE0001.png"
+  },
+  {
+    "seq": 60,
+    "code": "GJ-GK-060-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-060-STORE0001",
+    "filename": "GJ-GK-060-STORE0001.png"
+  },
+  {
+    "seq": 61,
+    "code": "GJ-GK-061-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-061-STORE0001",
+    "filename": "GJ-GK-061-STORE0001.png"
+  },
+  {
+    "seq": 62,
+    "code": "GJ-GK-062-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-062-STORE0001",
+    "filename": "GJ-GK-062-STORE0001.png"
+  },
+  {
+    "seq": 63,
+    "code": "GJ-GK-063-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-063-STORE0001",
+    "filename": "GJ-GK-063-STORE0001.png"
+  },
+  {
+    "seq": 64,
+    "code": "GJ-GK-064-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-064-STORE0001",
+    "filename": "GJ-GK-064-STORE0001.png"
+  },
+  {
+    "seq": 65,
+    "code": "GJ-GK-065-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-065-STORE0001",
+    "filename": "GJ-GK-065-STORE0001.png"
+  },
+  {
+    "seq": 66,
+    "code": "GJ-GK-066-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-066-STORE0001",
+    "filename": "GJ-GK-066-STORE0001.png"
+  },
+  {
+    "seq": 67,
+    "code": "GJ-GK-067-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-067-STORE0001",
+    "filename": "GJ-GK-067-STORE0001.png"
+  },
+  {
+    "seq": 68,
+    "code": "GJ-GK-068-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-068-STORE0001",
+    "filename": "GJ-GK-068-STORE0001.png"
+  },
+  {
+    "seq": 69,
+    "code": "GJ-GK-069-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-069-STORE0001",
+    "filename": "GJ-GK-069-STORE0001.png"
+  },
+  {
+    "seq": 70,
+    "code": "GJ-GK-070-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-070-STORE0001",
+    "filename": "GJ-GK-070-STORE0001.png"
+  },
+  {
+    "seq": 71,
+    "code": "GJ-GK-071-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-071-STORE0001",
+    "filename": "GJ-GK-071-STORE0001.png"
+  },
+  {
+    "seq": 72,
+    "code": "GJ-GK-072-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-072-STORE0001",
+    "filename": "GJ-GK-072-STORE0001.png"
+  },
+  {
+    "seq": 73,
+    "code": "GJ-GK-073-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-073-STORE0001",
+    "filename": "GJ-GK-073-STORE0001.png"
+  },
+  {
+    "seq": 74,
+    "code": "GJ-GK-074-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-074-STORE0001",
+    "filename": "GJ-GK-074-STORE0001.png"
+  },
+  {
+    "seq": 75,
+    "code": "GJ-GK-075-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-075-STORE0001",
+    "filename": "GJ-GK-075-STORE0001.png"
+  },
+  {
+    "seq": 76,
+    "code": "GJ-GK-076-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-076-STORE0001",
+    "filename": "GJ-GK-076-STORE0001.png"
+  },
+  {
+    "seq": 77,
+    "code": "GJ-GK-077-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-077-STORE0001",
+    "filename": "GJ-GK-077-STORE0001.png"
+  },
+  {
+    "seq": 78,
+    "code": "GJ-GK-078-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-078-STORE0001",
+    "filename": "GJ-GK-078-STORE0001.png"
+  },
+  {
+    "seq": 79,
+    "code": "GJ-GK-079-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-079-STORE0001",
+    "filename": "GJ-GK-079-STORE0001.png"
+  },
+  {
+    "seq": 80,
+    "code": "GJ-GK-080-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-080-STORE0001",
+    "filename": "GJ-GK-080-STORE0001.png"
+  },
+  {
+    "seq": 81,
+    "code": "GJ-GK-081-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-081-STORE0001",
+    "filename": "GJ-GK-081-STORE0001.png"
+  },
+  {
+    "seq": 82,
+    "code": "GJ-GK-082-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-082-STORE0001",
+    "filename": "GJ-GK-082-STORE0001.png"
+  },
+  {
+    "seq": 83,
+    "code": "GJ-GK-083-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-083-STORE0001",
+    "filename": "GJ-GK-083-STORE0001.png"
+  },
+  {
+    "seq": 84,
+    "code": "GJ-GK-084-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-084-STORE0001",
+    "filename": "GJ-GK-084-STORE0001.png"
+  },
+  {
+    "seq": 85,
+    "code": "GJ-GK-085-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-085-STORE0001",
+    "filename": "GJ-GK-085-STORE0001.png"
+  },
+  {
+    "seq": 86,
+    "code": "GJ-GK-086-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-086-STORE0001",
+    "filename": "GJ-GK-086-STORE0001.png"
+  },
+  {
+    "seq": 87,
+    "code": "GJ-GK-087-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-087-STORE0001",
+    "filename": "GJ-GK-087-STORE0001.png"
+  },
+  {
+    "seq": 88,
+    "code": "GJ-GK-088-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-088-STORE0001",
+    "filename": "GJ-GK-088-STORE0001.png"
+  },
+  {
+    "seq": 89,
+    "code": "GJ-GK-089-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-089-STORE0001",
+    "filename": "GJ-GK-089-STORE0001.png"
+  },
+  {
+    "seq": 90,
+    "code": "GJ-GK-090-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-090-STORE0001",
+    "filename": "GJ-GK-090-STORE0001.png"
+  },
+  {
+    "seq": 91,
+    "code": "GJ-GK-091-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-091-STORE0001",
+    "filename": "GJ-GK-091-STORE0001.png"
+  },
+  {
+    "seq": 92,
+    "code": "GJ-GK-092-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-092-STORE0001",
+    "filename": "GJ-GK-092-STORE0001.png"
+  },
+  {
+    "seq": 93,
+    "code": "GJ-GK-093-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-093-STORE0001",
+    "filename": "GJ-GK-093-STORE0001.png"
+  },
+  {
+    "seq": 94,
+    "code": "GJ-GK-094-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-094-STORE0001",
+    "filename": "GJ-GK-094-STORE0001.png"
+  },
+  {
+    "seq": 95,
+    "code": "GJ-GK-095-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-095-STORE0001",
+    "filename": "GJ-GK-095-STORE0001.png"
+  },
+  {
+    "seq": 96,
+    "code": "GJ-GK-096-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-096-STORE0001",
+    "filename": "GJ-GK-096-STORE0001.png"
+  },
+  {
+    "seq": 97,
+    "code": "GJ-GK-097-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-097-STORE0001",
+    "filename": "GJ-GK-097-STORE0001.png"
+  },
+  {
+    "seq": 98,
+    "code": "GJ-GK-098-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-098-STORE0001",
+    "filename": "GJ-GK-098-STORE0001.png"
+  },
+  {
+    "seq": 99,
+    "code": "GJ-GK-099-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-099-STORE0001",
+    "filename": "GJ-GK-099-STORE0001.png"
+  },
+  {
+    "seq": 100,
+    "code": "GJ-GK-100-STORE0001",
+    "url": "https://wooriapt.ai.kr/72?qr=GJ-GK-100-STORE0001",
+    "filename": "GJ-GK-100-STORE0001.png"
+  }
+]
