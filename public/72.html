@@ -473,6 +473,44 @@
   let registrationSaving = false;
   let timer = null;
 
+  /* 전화번호가 URL 또는 임시저장에 있으면
+     등록 화면을 다시 보여주지 않고 즉시 앱 설치 단계로 이동 */
+  const savedPendingPhone =
+    localStorage.getItem(pendingPhoneKey) || "";
+
+  if (validPhone(incomingPhone)) {
+    localStorage.setItem(
+      pendingPhoneKey,
+      incomingPhone
+    );
+
+    localStorage.setItem(
+      "pendingVehicleQrCode",
+      qrCode
+    );
+
+    phoneInput.value =
+      formatPhone(incomingPhone);
+
+    if (isStandalone()) {
+      showScreen(pushScreen);
+    } else {
+      showScreen(installScreen);
+    }
+  } else if (validPhone(savedPendingPhone)) {
+    phoneInput.value =
+      formatPhone(savedPendingPhone);
+
+    if (isStandalone()) {
+      showScreen(pushScreen);
+    } else if (
+      window.location.hostname.toLowerCase() ===
+      "mart-platform.vercel.app"
+    ) {
+      showScreen(installScreen);
+    }
+  }
+
 
   function showScreen(screen) {
     [
@@ -1283,10 +1321,15 @@
 
   async function initializePage() {
     try {
-      if (validPhone(incomingPhone)) {
+      const pendingPhone =
+        localStorage.getItem(
+          pendingPhoneKey
+        ) || incomingPhone;
+
+      if (validPhone(pendingPhone)) {
         localStorage.setItem(
           pendingPhoneKey,
-          incomingPhone
+          cleanPhone(pendingPhone)
         );
 
         localStorage.setItem(
@@ -1294,9 +1337,12 @@
           qrCode
         );
 
-        /* 아임웹에서 전화번호 입력을 끝내고 넘어온 경우
-           같은 전화번호를 다시 묻지 않고 즉시 앱 설치 화면 표시 */
-        if (!isStandalone()) {
+        phoneInput.value =
+          formatPhone(pendingPhone);
+
+        if (isStandalone()) {
+          showScreen(pushScreen);
+        } else {
           showScreen(installScreen);
         }
       }
@@ -1313,31 +1359,11 @@
         return;
       }
 
-      const pendingPhone =
-        localStorage.getItem(
-          pendingPhoneKey
-        );
-
-      if (pendingPhone) {
-        phoneInput.value =
-          formatPhone(pendingPhone);
-      }
-
-      if (
-        pendingPhone &&
-        isStandalone()
-      ) {
-        showScreen(pushScreen);
+      if (validPhone(pendingPhone)) {
         return;
       }
 
-      if (
-        pendingPhone &&
-        window.location.hostname.toLowerCase() ===
-          "mart-platform.vercel.app"
-      ) {
-        showScreen(installScreen);
-      }
+      showScreen(registerScreen);
 
     } catch (error) {
       showMessage(
