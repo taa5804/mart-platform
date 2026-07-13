@@ -1281,12 +1281,16 @@
     }
 
     if (!deferredInstallPrompt) {
-      showMessage(
-        installMessage,
-        "크롬 오른쪽 위 메뉴에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 눌러 주세요.",
-        "info"
+      /*
+       * 이미 앱을 설치했거나 Chrome이 설치 이벤트를 다시 주지 않는 경우에도
+       * 계속하기 버튼이 멈추지 않도록 푸시 허용 단계로 진행합니다.
+       */
+      localStorage.setItem(
+        "vehiclePwaInstalled",
+        "true"
       );
 
+      showScreen(pushScreen);
       return;
     }
 
@@ -1340,7 +1344,10 @@
         phoneInput.value =
           formatPhone(pendingPhone);
 
-        if (isStandalone()) {
+        if (
+          isStandalone() ||
+          localStorage.getItem("vehiclePwaInstalled") === "true"
+        ) {
           showScreen(pushScreen);
         } else {
           showScreen(installScreen);
