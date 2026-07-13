@@ -1114,12 +1114,12 @@
         );
       }
 
-      if (!isStandalone()) {
-        throw new Error(
-          "앱 설치 후 설치된 앱에서 다시 진행해 주세요."
-        );
-      }
-
+      /*
+       * 설치된 앱 창에서도 일부 Chrome 환경은 display-mode 값을
+       * 즉시 standalone으로 돌려주지 않을 수 있습니다.
+       * 푸시 알림 지원 여부와 서비스워커 등록으로 실제 사용 가능 여부를
+       * 확인하므로, 설치 여부 오판으로 등록을 막지 않습니다.
+       */
       await verifyQr();
 
       const pushToken =
@@ -1436,6 +1436,11 @@
     "appinstalled",
     () => {
       deferredInstallPrompt = null;
+
+      localStorage.setItem(
+        "vehiclePwaInstalled",
+        "true"
+      );
 
       showMessage(
         installMessage,
