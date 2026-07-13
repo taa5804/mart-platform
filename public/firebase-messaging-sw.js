@@ -7,7 +7,7 @@ importScripts(
 );
 
 firebase.initializeApp({
-  apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dLso7i17fZo0Hc",
+  apiKey: "AIzaSyBZVOIuNzaQg0WgxlocJ--LfeR03mJeoE0",
   authDomain: "wooriapt-carqr.firebaseapp.com",
   projectId: "wooriapt-carqr",
   storageBucket: "wooriapt-carqr.firebasestorage.app",
