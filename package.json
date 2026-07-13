@@ -1,4 +1,4 @@
-{
+.{
   "name": "mart-platform",
   "version": "1.0.0",
   "private": true,
@@ -6,6 +6,6 @@
     "dev": "vercel dev"
   },
   "dependencies": {
-    "web-push": "^3.6.7"
+    "firebase-admin": "^14.1.0"
   }
 }
