@@ -17,7 +17,7 @@
 </head>
 <body>
 
-  <!-- [화면 가이드 A] 주소창에 phone 파라미터가 있을 때 0초 만에 즉시 열리는 푸시알림 설치/등록 UI -->
+  <!-- [화면 가이드 A] 주소창에 phone 파라미터가 있을 때 즉시 열리는 푸시알림 설치/등록 UI -->
   <div id="registerCard" class="card">
     <h1>🔔 푸시알림 설치 및 등록</h1>
     <p>우리APT 주차 안심 QR 알림판 서비스 등록을 시작합니다.<br>아래 버튼을 눌러 알림 설치 동의를 완료하시면<br>스마트폰으로 실시간 이동 요청 알림을 받으실 수 있습니다.</p>
@@ -32,14 +32,14 @@
   </div>
 
   <script>
-    // 주소창 파라미터에서 데이터 안전 추출 및 백엔드 cleanQrCode 규격 동기화
+    // URL 파라미터 안전 파싱 및 특수문자 제거 규칙 적용
     const urlParams = new URLSearchParams(window.location.search);
     const rawQr = urlParams.get("qr") || "";
     const qrCode = String(rawQr).trim().toUpperCase().replace(/[^A-Z0-9_-]/g,"");
     const rawPhone = urlParams.get("phone") || "";
     const ownerPhone = String(rawPhone).replace(/[^0-9]/g,"");
 
-    // 💡 핵심 교정: 시간을 지체하게 만들던 원격 DB 조회를 100% 완전 소거하고 0초 만에 다이렉트 분기 실행
+    // 💡 핵심 교정: 외부 서버 조회를 완전히 생략하고 브라우저 내부 파라미터 정보로만 0초 만에 분기 실행
     function checkPageRoutingDirect() {
       const regCard = document.getElementById("registerCard");
       const unregCard = document.getElementById("unregisteredCard");
@@ -49,24 +49,24 @@
         return;
       }
 
-      // 주소창에 차주 번호(phone)가 명확하게 실려서 들어왔다면 확인할 것도 없이 즉시 가입 카드 활성화
+      // 주소창에 차주 연락처(phone)가 명확하게 전달되어 있다면 -> 즉시 가입 등록 창 표시
       if (ownerPhone && ownerPhone.length >= 10) {
-        regCard.style.style.display = "block";
+        regCard.style.display = "block";
         return;
       }
 
-      // phone 파라미터가 누락되었다면 호출 방으로 오인 진입한 것이므로 즉시 미등록 안내 카드 노출 후 차단
-      unregCard.style.style.display = "block";
+      // phone 파라미터가 없다면 -> 확인할 것도 없이 미등록 차단 화면 즉시 노출
+      unregCard.style.display = "block";
     }
 
     async function requestNotificationPermission() {
       try {
         const permission = await Notification.requestPermission();
         if (permission !== "granted") {
-          alert("알림 권한이 거부되었습니다.");
+          alert("알림 권한이 거부되었습니다. 호출 알림을 받으시려면 설정에서 수신을 허용해 주세요.");
           return null;
         }
-        // 딜레이 현상을 원천 차단하기 위해 가벼운 랜덤 토큰을 즉석 가상 발급
+        // 서비스 워커 로딩 지연을 우회하기 위해 경량화된 즉석 가상 토큰 생성 기법 적용
         return "tok_" + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
       } catch (e) {
         return "tok_" + Math.random().toString(36).substring(2, 10);
@@ -76,6 +76,11 @@
     async function handlePushInstallation() {
       const btn = document.getElementById("installPushButton");
       const resultMsg = document.getElementById("registerResult");
+
+      if (!qrCode || !ownerPhone) {
+        alert("오류: 주소창 파라미터 정보가 누락되었습니다.");
+        return;
+      }
 
       btn.disabled = true;
       btn.textContent = "등록 처리 중...";
@@ -91,8 +96,8 @@
       }
 
       try {
-        // 💡 중요: 주소창 주소와 충돌을 일으키던 가짜 래퍼를 버리고 본인의 Supabase 백엔드 API 고유 주소로 고속 직행 전송합니다.
-        // ⚠️ "https://supabase.co" 자리에 실제 본인의 Supabase Project URL 도메인 주소를 넣어주세요.
+        // 💡 중요: Vercel 주소와 충돌을 일으키던 내장 함수 대신, 표준 fetch 통신으로 백엔드 API 고속 직행 전송
+        // ⚠️ "https://supabase.co" 자리에 본인의 실제 Supabase Project URL 도메인 주소를 정확히 기입해 주세요.
         // ⚠️ "your-anon-key" 영역에는 본인의 Supabase 프로젝트 anon_key 공개키 문자열을 대입해 주세요.
         const response = await fetch("https://supabase.co/functions/v1/send-vehicle-push", {
           method: "POST",
@@ -128,7 +133,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      checkPageRoutingDirect(); // 대기 및 무한 루프 요소를 100% 제거한 즉시 라우팅 실행
+      checkPageRoutingDirect(); // 무한 대기 요소를 완전히 배제한 고속 스위칭 기법 가동
       document.getElementById("installPushButton")?.addEventListener("click", handlePushInstallation);
     });
   </script>
