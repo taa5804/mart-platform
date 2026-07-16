@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  />
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+  >
 
-  <meta name="theme-color" content="#16a34a" />
+  <meta name="theme-color" content="#16a34a">
 
-  <link rel="manifest" href="/manifest.json" />
+  <link rel="manifest" href="/manifest.webmanifest">
 
   <title>우리APT 자동차 QR</title>
 
@@ -19,21 +19,22 @@
       box-sizing: border-box;
     }
 
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
     body {
       min-height: 100vh;
-      margin: 0;
       padding: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: #f4f7fb;
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Arial, sans-serif;
       color: #111827;
     }
 
@@ -53,14 +54,8 @@
     }
 
     h1 {
-      margin: 0 0 12px;
+      margin: 0 0 14px;
       font-size: 24px;
-      line-height: 1.35;
-    }
-
-    h2 {
-      margin: 0 0 12px;
-      font-size: 21px;
       line-height: 1.4;
     }
 
@@ -71,20 +66,9 @@
       line-height: 1.7;
     }
 
-    .notice {
-      margin: 16px 0 20px;
-      padding: 16px;
-      border-radius: 12px;
-      background: #f8fafc;
-      color: #334155;
-      font-size: 15px;
-      line-height: 1.7;
-      text-align: left;
-    }
-
     input {
       width: 100%;
-      height: 52px;
+      height: 54px;
       margin-bottom: 12px;
       padding: 0 15px;
       border: 1px solid #cbd5e1;
@@ -96,12 +80,11 @@
 
     input:focus {
       border-color: #16a34a;
-      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
     }
 
     button {
       width: 100%;
-      min-height: 52px;
+      min-height: 54px;
       padding: 13px 16px;
       border: 0;
       border-radius: 11px;
@@ -122,12 +105,18 @@
       cursor: not-allowed;
     }
 
-    .emergency-button {
+    .emergency {
       background: #dc2626;
     }
 
-    .secondary-button {
-      background: #2563eb;
+    .guide {
+      margin: 16px 0 20px;
+      padding: 18px;
+      border-radius: 12px;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 16px;
+      line-height: 1.8;
     }
 
     .status {
@@ -136,6 +125,7 @@
       font-size: 14px;
       font-weight: 700;
       line-height: 1.5;
+      word-break: keep-all;
     }
 
     .success {
@@ -151,6 +141,7 @@
     }
 
     .countdown {
+      display: none;
       margin: 16px 0;
       padding: 14px;
       border-radius: 12px;
@@ -161,28 +152,26 @@
     }
 
     .small {
-      margin-top: 14px;
-      color: #94a3b8;
-      font-size: 12px;
-      line-height: 1.5;
+      margin-top: 15px;
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.6;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- 확인 중 -->
   <section id="loadingCard" class="card active">
     <h1>자동차 QR 확인 중</h1>
     <p>잠시만 기다려 주세요.</p>
   </section>
 
-  <!-- 등록 화면 -->
   <section id="registerCard" class="card">
     <h1>자동차 QR 등록</h1>
 
     <p>
-      차량 이동요청을 받을<br />
+      차량이동 요청을 받을<br>
       휴대전화번호를 입력해 주세요.
     </p>
 
@@ -190,10 +179,10 @@
       id="phoneInput"
       type="tel"
       inputmode="numeric"
-      maxlength="13"
       autocomplete="tel"
+      maxlength="13"
       placeholder="010-0000-0000"
-    />
+    >
 
     <button id="registerButton" type="button">
       등록하기
@@ -202,16 +191,15 @@
     <div id="registerStatus" class="status"></div>
   </section>
 
-  <!-- 앱 설치 안내 -->
-  <section id="installGuideCard" class="card">
+  <section id="installCard" class="card">
     <h1>앱 설치가 필요합니다</h1>
 
-    <div class="notice">
-      앱 설치와 푸시 알림은<br />
-      차량이동 요청을 받기 위해<br />
-      반드시 필요합니다.<br /><br />
+    <div class="guide">
+      앱 설치와 푸시 알림은<br>
+      차량이동 요청을 받기 위해<br>
+      반드시 필요합니다.<br><br>
 
-      계속하기를 누르면<br />
+      계속하기를 누르면<br>
       앱 설치가 시작됩니다.
     </div>
 
@@ -222,12 +210,11 @@
     <div id="installStatus" class="status"></div>
   </section>
 
-  <!-- 등록 완료 -->
   <section id="completeCard" class="card">
     <h1>등록 완료</h1>
 
     <p>
-      자동차 QR 등록과<br />
+      자동차 QR 등록과<br>
       푸시 알림 설정이 완료되었습니다.
     </p>
 
@@ -236,24 +223,23 @@
     </div>
   </section>
 
-  <!-- 차량 이동요청 -->
   <section id="requestCard" class="card">
-    <h1>차량 이동요청</h1>
+    <h1>차량이동 요청</h1>
 
     <p>
-      차주에게 차량 이동요청<br />
+      차주에게 차량이동 요청<br>
       푸시 알림을 보냅니다.
     </p>
 
-    <button id="moveRequestButton" type="button">
+    <button id="moveButton" type="button">
       차량이동요청
     </button>
 
-    <div id="countdownBox" class="countdown" style="display:none;"></div>
+    <div id="countdownBox" class="countdown"></div>
 
     <button
-      id="emergencyCallButton"
-      class="emergency-button"
+      id="emergencyButton"
+      class="emergency"
       type="button"
       disabled
     >
@@ -267,22 +253,19 @@
     </div>
   </section>
 
-  <!-- 오류 화면 -->
   <section id="errorCard" class="card">
     <h1>접속할 수 없습니다</h1>
-    <p id="errorMessage">
-      QR 정보를 확인할 수 없습니다.
-    </p>
+    <p id="errorMessage">QR 정보를 확인할 수 없습니다.</p>
   </section>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 
   <script>
-    const SUPABASE_FUNCTION_URL =
+    const API_URL =
       "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/send-vehicle-push";
 
-    const SUPABASE_ANON_KEY =
+    const SUPABASE_KEY =
       "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
 
     const firebaseConfig = {
@@ -294,72 +277,73 @@
       appId: "1:101299637796:web:cb69372592026b7aa192b1"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    let messaging = null;
+    let deferredInstallPrompt = null;
+    let enteredPhone = "";
+    let countdownTimer = null;
+    let emergencyPhone = "";
 
-    const messaging = firebase.messaging();
+    const params = new URLSearchParams(window.location.search);
 
-    const urlParams = new URLSearchParams(window.location.search);
-
-    const qrCode = String(
-      urlParams.get("qr") || ""
-    )
+    const qrCode = String(params.get("qr") || "")
       .trim()
       .toUpperCase()
       .replace(/[^A-Z0-9_-]/g, "");
 
-    let enteredPhone = "";
-    let deferredInstallPrompt = null;
-    let countdownTimer = null;
-    let ownerPhoneForEmergency = "";
+    const phoneFromUrl = String(params.get("phone") || "")
+      .replace(/[^0-9]/g, "");
 
-    const loadingCard = document.getElementById("loadingCard");
-    const registerCard = document.getElementById("registerCard");
-    const installGuideCard = document.getElementById("installGuideCard");
-    const completeCard = document.getElementById("completeCard");
-    const requestCard = document.getElementById("requestCard");
-    const errorCard = document.getElementById("errorCard");
+    const cards = {
+      loading: document.getElementById("loadingCard"),
+      register: document.getElementById("registerCard"),
+      install: document.getElementById("installCard"),
+      complete: document.getElementById("completeCard"),
+      request: document.getElementById("requestCard"),
+      error: document.getElementById("errorCard")
+    };
 
-    const phoneInput = document.getElementById("phoneInput");
-    const registerButton = document.getElementById("registerButton");
-    const continueButton = document.getElementById("continueButton");
-    const moveRequestButton =
-      document.getElementById("moveRequestButton");
-    const emergencyCallButton =
-      document.getElementById("emergencyCallButton");
+    const phoneInput =
+      document.getElementById("phoneInput");
+
+    const registerButton =
+      document.getElementById("registerButton");
+
+    const continueButton =
+      document.getElementById("continueButton");
+
+    const moveButton =
+      document.getElementById("moveButton");
+
+    const emergencyButton =
+      document.getElementById("emergencyButton");
 
     const registerStatus =
       document.getElementById("registerStatus");
+
     const installStatus =
       document.getElementById("installStatus");
+
     const requestStatus =
       document.getElementById("requestStatus");
+
     const countdownBox =
       document.getElementById("countdownBox");
+
     const errorMessage =
       document.getElementById("errorMessage");
 
-    function showCard(card) {
-      [
-        loadingCard,
-        registerCard,
-        installGuideCard,
-        completeCard,
-        requestCard,
-        errorCard
-      ].forEach((item) => {
-        item.classList.remove("active");
+    function showCard(name) {
+      Object.values(cards).forEach(function(card) {
+        card.classList.remove("active");
       });
 
-      card.classList.add("active");
+      cards[name].classList.add("active");
+
+      window.scrollTo(0, 0);
     }
 
-    function showError(message) {
-      errorMessage.textContent = message;
-      showCard(errorCard);
-    }
-
-    function setStatus(element, message, type = "") {
-      element.textContent = message;
+    function setStatus(element, message, type) {
+      element.textContent = message || "";
       element.className = "status";
 
       if (type) {
@@ -367,52 +351,73 @@
       }
     }
 
+    function showError(message) {
+      errorMessage.textContent = message;
+      showCard("error");
+    }
+
     function formatPhone(value) {
-      const numbers = value.replace(/[^0-9]/g, "").slice(0, 11);
+      const numbers = String(value)
+        .replace(/[^0-9]/g, "")
+        .slice(0, 11);
 
       if (numbers.length <= 3) {
         return numbers;
       }
 
       if (numbers.length <= 7) {
-        return (
-          numbers.slice(0, 3) +
-          "-" +
-          numbers.slice(3)
-        );
+        return numbers.slice(0, 3) + "-" +
+          numbers.slice(3);
       }
 
-      return (
-        numbers.slice(0, 3) +
-        "-" +
-        numbers.slice(3, 7) +
-        "-" +
-        numbers.slice(7)
-      );
+      return numbers.slice(0, 3) + "-" +
+        numbers.slice(3, 7) + "-" +
+        numbers.slice(7);
     }
 
     function normalizePhone(value) {
-      return value.replace(/[^0-9]/g, "");
+      return String(value).replace(/[^0-9]/g, "");
     }
 
     function isValidPhone(phone) {
       return /^01[016789][0-9]{7,8}$/.test(phone);
     }
 
-    async function callVehicleApi(payload) {
-      const response = await fetch(SUPABASE_FUNCTION_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-          "apikey": SUPABASE_ANON_KEY
-        },
-        body: JSON.stringify(payload)
-      });
+    function withTimeout(promise, milliseconds, message) {
+      return Promise.race([
+        promise,
+        new Promise(function(_, reject) {
+          setTimeout(function() {
+            reject(new Error(message));
+          }, milliseconds);
+        })
+      ]);
+    }
 
-      const data = await response
-        .json()
-        .catch(() => ({}));
+    async function callApi(payload) {
+      const response = await withTimeout(
+        fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + SUPABASE_KEY,
+            "apikey": SUPABASE_KEY
+          },
+          body: JSON.stringify(payload)
+        }),
+        15000,
+        "서버 응답이 없습니다. 다시 눌러 주세요."
+      );
+
+      const text = await response.text();
+
+      let data = {};
+
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (error) {
+        data = {};
+      }
 
       if (!response.ok || data.ok === false) {
         throw new Error(
@@ -425,52 +430,67 @@
       return data;
     }
 
-    function isStandaloneApp() {
-      return (
-        window.matchMedia(
-          "(display-mode: standalone)"
-        ).matches ||
-        window.navigator.standalone === true
-      );
+    function initializeFirebase() {
+      if (!window.firebase) {
+        throw new Error(
+          "푸시 알림 프로그램을 불러오지 못했습니다."
+        );
+      }
+
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+
+      messaging = firebase.messaging();
     }
 
     async function registerServiceWorker() {
       if (!("serviceWorker" in navigator)) {
         throw new Error(
-          "이 휴대전화에서는 앱 알림을 사용할 수 없습니다."
+          "이 브라우저에서는 푸시 알림을 사용할 수 없습니다."
         );
       }
 
-      return await navigator.serviceWorker.register(
-        "/firebase-messaging-sw.js",
-        {
-          scope: "/"
-        }
+      const registration = await withTimeout(
+        navigator.serviceWorker.register(
+          "/firebase-messaging-sw.js",
+          { scope: "/" }
+        ),
+        15000,
+        "푸시 알림 설치 시간이 초과되었습니다."
       );
+
+      await navigator.serviceWorker.ready;
+
+      return registration;
     }
 
-    async function getRealFcmToken() {
+    async function getFcmToken() {
       if (!("Notification" in window)) {
         throw new Error(
-          "이 브라우저에서는 푸시 알림을 지원하지 않습니다."
+          "이 브라우저에서는 알림을 지원하지 않습니다."
         );
       }
 
-      const permission =
-        await Notification.requestPermission();
+      const permission = await Notification.requestPermission();
 
       if (permission !== "granted") {
         throw new Error(
-          "푸시 알림을 허용해 주세요."
+          "알림을 허용해야 등록할 수 있습니다."
         );
       }
 
       const serviceWorkerRegistration =
         await registerServiceWorker();
 
-      const token = await messaging.getToken({
-        serviceWorkerRegistration
-      });
+      const token = await withTimeout(
+        messaging.getToken({
+          serviceWorkerRegistration:
+            serviceWorkerRegistration
+        }),
+        20000,
+        "푸시 알림 등록 시간이 초과되었습니다."
+      );
 
       if (!token) {
         throw new Error(
@@ -481,58 +501,80 @@
       return token;
     }
 
-    async function checkQrStatus() {
+    function isInstalledApp() {
+      return (
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true
+      );
+    }
+
+    async function runInstallPrompt() {
+      if (isInstalledApp()) {
+        return;
+      }
+
+      if (!deferredInstallPrompt) {
+        return;
+      }
+
+      deferredInstallPrompt.prompt();
+
+      await withTimeout(
+        deferredInstallPrompt.userChoice,
+        30000,
+        "앱 설치 시간이 초과되었습니다."
+      );
+
+      deferredInstallPrompt = null;
+    }
+
+    async function checkStatus() {
       if (!qrCode) {
-        showError(
-          "올바른 자동차 QR 주소가 아닙니다."
-        );
+        showError("올바른 자동차 QR 주소가 아닙니다.");
         return;
       }
 
       try {
-        const data = await callVehicleApi({
+        const data = await callApi({
           action: "status",
           qr_code: qrCode
         });
 
         if (data.registered === true) {
-          updateRequestScreen(data);
-          showCard(requestCard);
+          updateRequestState(data);
+          showCard("request");
           return;
         }
 
-        showCard(registerCard);
-      } catch (error) {
-        setStatus(
-          registerStatus,
-          "",
-          ""
-        );
+        if (phoneFromUrl && isValidPhone(phoneFromUrl)) {
+          phoneInput.value = formatPhone(phoneFromUrl);
+        }
 
-        showCard(registerCard);
+        showCard("register");
+      } catch (error) {
+        if (phoneFromUrl && isValidPhone(phoneFromUrl)) {
+          phoneInput.value = formatPhone(phoneFromUrl);
+        }
+
+        showCard("register");
       }
     }
 
-    function updateRequestScreen(data) {
-      const requestCount =
-        Number(
-          data.request_count ??
-          data.stage ??
-          0
-        );
+    function updateRequestState(data) {
+      const requestCount = Number(
+        data.request_count ??
+        data.stage ??
+        0
+      );
 
-      ownerPhoneForEmergency =
-        String(data.owner_phone || "")
-          .replace(/[^0-9]/g, "");
+      emergencyPhone = String(
+        data.owner_phone || ""
+      ).replace(/[^0-9]/g, "");
 
-      if (
+      emergencyButton.disabled = !(
         data.emergency_enabled === true ||
         requestCount >= 3
-      ) {
-        emergencyCallButton.disabled = false;
-      } else {
-        emergencyCallButton.disabled = true;
-      }
+      );
 
       if (data.next_allowed_at) {
         startCountdown(data.next_allowed_at);
@@ -544,21 +586,18 @@
         clearInterval(countdownTimer);
       }
 
-      const targetTime =
-        new Date(nextAllowedAt).getTime();
+      const target = new Date(nextAllowedAt).getTime();
 
-      function update() {
-        const remaining =
-          targetTime - Date.now();
+      function updateCountdown() {
+        const remaining = target - Date.now();
 
         if (remaining <= 0) {
           clearInterval(countdownTimer);
           countdownTimer = null;
 
           countdownBox.style.display = "none";
-          moveRequestButton.disabled = false;
-          moveRequestButton.textContent =
-            "차량이동요청";
+          moveButton.disabled = false;
+          moveButton.textContent = "차량이동요청";
 
           setStatus(
             requestStatus,
@@ -576,60 +615,55 @@
           Math.floor(totalSeconds / 60);
 
         const seconds =
-          String(totalSeconds % 60).padStart(
-            2,
-            "0"
-          );
+          String(totalSeconds % 60).padStart(2, "0");
 
         countdownBox.style.display = "block";
+
         countdownBox.textContent =
           "다음 요청까지 " +
           minutes +
           ":" +
           seconds;
 
-        moveRequestButton.disabled = true;
+        moveButton.disabled = true;
       }
 
-      update();
+      updateCountdown();
 
       countdownTimer =
-        setInterval(update, 1000);
+        setInterval(updateCountdown, 1000);
     }
 
-    phoneInput.addEventListener("input", (event) => {
+    phoneInput.addEventListener("input", function(event) {
       event.target.value =
         formatPhone(event.target.value);
     });
 
-    registerButton.addEventListener(
-      "click",
-      () => {
-        const phone =
-          normalizePhone(phoneInput.value);
+    registerButton.addEventListener("click", function() {
+      const phone =
+        normalizePhone(phoneInput.value);
 
-        if (!isValidPhone(phone)) {
-          setStatus(
-            registerStatus,
-            "휴대전화번호를 정확히 입력해 주세요.",
-            "error"
-          );
+      if (!isValidPhone(phone)) {
+        setStatus(
+          registerStatus,
+          "휴대전화번호를 정확히 입력해 주세요.",
+          "error"
+        );
 
-          phoneInput.focus();
-          return;
-        }
-
-        enteredPhone = phone;
-
-        setStatus(registerStatus, "", "");
-
-        showCard(installGuideCard);
+        phoneInput.focus();
+        return;
       }
-    );
+
+      enteredPhone = phone;
+
+      setStatus(registerStatus, "", "");
+
+      showCard("install");
+    });
 
     window.addEventListener(
       "beforeinstallprompt",
-      (event) => {
+      function(event) {
         event.preventDefault();
         deferredInstallPrompt = event;
       }
@@ -637,7 +671,7 @@
 
     continueButton.addEventListener(
       "click",
-      async () => {
+      async function() {
         continueButton.disabled = true;
         continueButton.textContent =
           "설치 및 등록 중...";
@@ -649,37 +683,32 @@
         );
 
         try {
-          if (
-            deferredInstallPrompt &&
-            !isStandaloneApp()
-          ) {
-            deferredInstallPrompt.prompt();
+          if (!enteredPhone) {
+            const phone =
+              normalizePhone(phoneInput.value);
 
-            await deferredInstallPrompt.userChoice;
+            if (!isValidPhone(phone)) {
+              throw new Error(
+                "휴대전화번호를 다시 입력해 주세요."
+              );
+            }
 
-            deferredInstallPrompt = null;
+            enteredPhone = phone;
           }
+
+          await runInstallPrompt();
 
           const fcmToken =
-            await getRealFcmToken();
+            await getFcmToken();
 
-          const data =
-            await callVehicleApi({
-              action: "register",
-              qr_code: qrCode,
-              owner_phone: enteredPhone,
-              push_token: fcmToken,
-              platform: "web",
-              user_agent:
-                navigator.userAgent
-            });
-
-          if (data.ok === false) {
-            throw new Error(
-              data.message ||
-              "등록에 실패했습니다."
-            );
-          }
+          await callApi({
+            action: "register",
+            qr_code: qrCode,
+            owner_phone: enteredPhone,
+            push_token: fcmToken,
+            platform: "web",
+            user_agent: navigator.userAgent
+          });
 
           setStatus(
             installStatus,
@@ -687,27 +716,26 @@
             "success"
           );
 
-          showCard(completeCard);
+          showCard("complete");
         } catch (error) {
           setStatus(
             installStatus,
-            error.message,
+            error.message ||
+            "등록에 실패했습니다.",
             "error"
           );
 
           continueButton.disabled = false;
-          continueButton.textContent =
-            "계속하기";
+          continueButton.textContent = "계속하기";
         }
       }
     );
 
-    moveRequestButton.addEventListener(
+    moveButton.addEventListener(
       "click",
-      async () => {
-        moveRequestButton.disabled = true;
-        moveRequestButton.textContent =
-          "요청 전송 중...";
+      async function() {
+        moveButton.disabled = true;
+        moveButton.textContent = "요청 전송 중...";
 
         setStatus(
           requestStatus,
@@ -716,36 +744,32 @@
         );
 
         try {
-          const data =
-            await callVehicleApi({
-              action: "request",
-              qr_code: qrCode
-            });
+          const data = await callApi({
+            action: "request",
+            qr_code: qrCode
+          });
 
-          const requestCount =
-            Number(
-              data.request_count ??
-              data.stage ??
-              1
-            );
+          const requestCount = Number(
+            data.request_count ??
+            data.stage ??
+            1
+          );
 
           setStatus(
             requestStatus,
             requestCount +
-              "차 차량이동요청을 보냈습니다.",
+            "차 차량이동요청을 보냈습니다.",
             "success"
           );
 
-          moveRequestButton.textContent =
-            "차량이동요청";
+          moveButton.textContent = "차량이동요청";
 
-          updateRequestScreen(data);
+          updateRequestState(data);
 
-          if (data.next_allowed_at) {
-            startCountdown(
-              data.next_allowed_at
-            );
-          } else if (requestCount < 3) {
+          if (
+            !data.next_allowed_at &&
+            requestCount < 3
+          ) {
             startCountdown(
               new Date(
                 Date.now() + 3 * 60 * 1000
@@ -757,44 +781,26 @@
             requestCount >= 3 ||
             data.emergency_enabled === true
           ) {
-            emergencyCallButton.disabled =
-              false;
+            emergencyButton.disabled = false;
           }
         } catch (error) {
           setStatus(
             requestStatus,
-            error.message,
+            error.message ||
+            "요청 전송에 실패했습니다.",
             "error"
           );
 
-          moveRequestButton.disabled = false;
-          moveRequestButton.textContent =
-            "차량이동요청";
-
-          if (error.message.includes("3분")) {
-            await refreshRequestStatus();
-          }
+          moveButton.disabled = false;
+          moveButton.textContent = "차량이동요청";
         }
       }
     );
 
-    async function refreshRequestStatus() {
-      try {
-        const data = await callVehicleApi({
-          action: "status",
-          qr_code: qrCode
-        });
-
-        updateRequestScreen(data);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    emergencyCallButton.addEventListener(
+    emergencyButton.addEventListener(
       "click",
-      async () => {
-        emergencyCallButton.disabled = true;
+      async function() {
+        emergencyButton.disabled = true;
 
         setStatus(
           requestStatus,
@@ -803,15 +809,13 @@
         );
 
         try {
-          let phone =
-            ownerPhoneForEmergency;
+          let phone = emergencyPhone;
 
           if (!phone) {
-            const data =
-              await callVehicleApi({
-                action: "emergency",
-                qr_code: qrCode
-              });
+            const data = await callApi({
+              action: "emergency",
+              qr_code: qrCode
+            });
 
             phone = String(
               data.owner_phone || ""
@@ -824,26 +828,65 @@
             );
           }
 
-          emergencyCallButton.disabled = false;
+          emergencyButton.disabled = false;
 
-          window.location.href =
-            "tel:" + phone;
+          window.location.href = "tel:" + phone;
         } catch (error) {
           setStatus(
             requestStatus,
-            error.message,
+            error.message ||
+            "긴급통화를 연결하지 못했습니다.",
             "error"
           );
 
-          emergencyCallButton.disabled = false;
+          emergencyButton.disabled = false;
         }
       }
     );
 
+    window.addEventListener("error", function(event) {
+      if (
+        !cards.register.classList.contains("active") &&
+        !cards.install.classList.contains("active") &&
+        !cards.complete.classList.contains("active") &&
+        !cards.request.classList.contains("active")
+      ) {
+        showError(
+          event.message ||
+          "화면 실행 중 오류가 발생했습니다."
+        );
+      }
+    });
+
     document.addEventListener(
       "DOMContentLoaded",
-      checkQrStatus
+      async function() {
+        try {
+          initializeFirebase();
+          await checkStatus();
+        } catch (error) {
+          showError(
+            error.message ||
+            "자동차 QR 화면을 실행하지 못했습니다."
+          );
+        }
+      }
     );
+
+    setTimeout(function() {
+      const activeCard =
+        document.querySelector(".card.active");
+
+      if (!activeCard) {
+        showCard("register");
+      }
+
+      if (
+        cards.loading.classList.contains("active")
+      ) {
+        showCard("register");
+      }
+    }, 10000);
   </script>
 </body>
 </html>
