@@ -3,7 +3,6 @@
 // ==========================================
 function getOrCreateSessionId() {
   let sessionId = localStorage.getItem("caller_session_id");
-  // 호출자 세션 정보 검증을 통과하기 위해 최소 12자리 이상으로 생성합니다.
   if (!sessionId || sessionId.length < 12) {
     sessionId = "sess_" + Math.random().toString(36).substring(2, 14);
     localStorage.setItem("caller_session_id", sessionId);
@@ -12,7 +11,6 @@ function getOrCreateSessionId() {
 }
 
 const callerSessionId = getOrCreateSessionId();
-// const qrCode = "..."; // 💡 기존 html 상단에 선언된 qrCode 변수를 그대로 참조합니다.
 
 // ==========================================
 // 2. 실시간 호출 상태 조회 및 UI 제어
@@ -36,7 +34,6 @@ async function checkCallStatus() {
       return;
     }
 
-    // [일반 호출 버튼] 3회 미만이고 다음 호출 가능 시간이 되었을 때만 활성화
     if (data.next_call_available) {
       pushButton.disabled = false;
       pushButton.textContent = data.call_count === 0 ? "푸시알림 보내기" : `${data.call_count}차 요청 완료 (추가 가능)`;
@@ -49,7 +46,6 @@ async function checkCallStatus() {
       }
     }
 
-    // [긴급통화 버튼] 3차 호출이 완료되었고 3분 대기가 끝난 시점에만 활성화
     if (emergencyButton) {
       if (data.emergency_available) {
         emergencyButton.style.display = "block";
@@ -65,7 +61,6 @@ async function checkCallStatus() {
           emergencyButton.disabled = true;
           emergencyButton.textContent = "⏳ 잠시 후 긴급통화 가능";
         } else {
-          // 3차 호출 전에는 화면에서 숨김 처리합니다.
           emergencyButton.style.display = "none";
         }
       }
@@ -90,7 +85,7 @@ async function sendVehicleCall() {
   try {
     const { data, error } = await db.functions.invoke("send-vehicle-push", {
       body: {
-        action: "call", // 백엔드 분기 조건에 맞는 호출 액션 지정
+        action: "call",
         qr_code: qrCode,
         caller_session_id: callerSessionId
       }
@@ -104,7 +99,6 @@ async function sendVehicleCall() {
     resultMessage.style.color = "green";
     resultMessage.textContent = `🎉 ${data.call_count}차 차량이동 요청이 차주에게 전송되었습니다.`;
     
-    // 상태가 변경되었으므로 버튼 UI 갱신
     await checkCallStatus();
 
   } catch (error) {
@@ -143,7 +137,6 @@ async function startEmergencyCall() {
     resultMessage.style.color = "blue";
     resultMessage.textContent = "차주 연락처로 전화를 연결합니다.";
 
-    // 💡 스마트폰 웹 환경인 경우, 백엔드가 리턴한 tel_url을 이용해 전화 앱 화면을 다이렉트로 열어줍니다.
     if (data.tel_url) {
       window.location.href = data.tel_url;
     }
@@ -159,10 +152,7 @@ async function startEmergencyCall() {
 // 5. 초기 이벤트 바인딩 및 자동 로드
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-  // 화면 진입 시 즉시 차주의 기존 호출 누적 상태를 확인하여 UI를 변경합니다.
   checkCallStatus();
-  
-  // 버튼 클릭 이벤트 리스너를 매핑합니다.
   document.getElementById("pushButton")?.addEventListener("click", sendVehicleCall);
   document.getElementById("emergencyButton")?.addEventListener("click", startEmergencyCall);
 });
