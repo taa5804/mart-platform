@@ -1,20 +1,25 @@
 {
-  "name": "자동차 안심연락 QR",
-  "short_name": "안심QR",
-  "start_url": "/",
+  "id": "/72.html",
+  "name": "우리APT 자동차 QR",
+  "short_name": "자동차QR",
+  "start_url": "/72.html",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#f5f7fb",
-  "theme_color": "#155eef",
+  "theme_color": "#16a34a",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
