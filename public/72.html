@@ -1,4 +1,10 @@
 // ==========================================
+// 0. 주소창 URL 파라미터에서 QR 코드 자동 추출
+// ==========================================
+const urlParams = new URLSearchParams(window.location.search);
+const qrCode = urlParams.get("qr") || ""; // URL의 ?qr=... 값을 읽어옵니다.
+
+// ==========================================
 // 1. 고유 세션 ID 관리 (LocalStorage 활용)
 // ==========================================
 function getOrCreateSessionId() {
@@ -19,6 +25,11 @@ async function checkCallStatus() {
   const pushButton = document.getElementById("pushButton");
   const emergencyButton = document.getElementById("emergencyButton");
   const resultMessage = document.getElementById("pushResult");
+
+  if (!qrCode) {
+    if (resultMessage) resultMessage.textContent = "오류: 올바르지 않은 QR 접근입니다.";
+    return;
+  }
 
   try {
     const { data, error } = await db.functions.invoke("send-vehicle-push", {
@@ -78,6 +89,8 @@ async function sendVehicleCall() {
   const pushButton = document.getElementById("pushButton");
   const resultMessage = document.getElementById("pushResult");
 
+  if (!qrCode) return alert("QR 코드 정보가 부족합니다.");
+
   pushButton.disabled = true;
   pushButton.textContent = "전송 중...";
   resultMessage.textContent = "";
@@ -118,6 +131,7 @@ async function startEmergencyCall() {
   const callerPhone = prompt("차주와 전화를 연결하기 위해 본인의 휴대전화 번호를 입력해 주세요.\n(숫자만 입력)");
   
   if (!callerPhone) return;
+  if (!qrCode) return alert("QR 코드 정보가 누락되었습니다.");
 
   try {
     const { data, error } = await db.functions.invoke("send-vehicle-push", {
