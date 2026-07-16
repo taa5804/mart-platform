@@ -2,184 +2,35 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#1677ff">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">
-  <title>자동차 QR 등록</title>
-  <script src="https://jsdelivr.net"></script>
-  <script src="https://gstatic.com"></script>
-  <script src="https://gstatic.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>우리APT 차주 최초 등록</title>
   <style>
-    * { box-sizing: border-box; }
-    html, body { min-height: 100%; }
-    body { margin: 0; padding: 20px; background: #f3f5f7; color: #222; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif; }
-    button, input { font-family: inherit; }
-    .container { width: 100%; max-width: 460px; margin: 0 auto; }
-    .card { margin-top: 30px; padding: 28px 20px; background: #fff; border-radius: 20px; box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08); }
-    .screen { display: none; }
-    .screen.active { display: block; }
-    h1, h2 { margin: 0; text-align: center; line-height: 1.4; }
-    h1 { font-size: 26px; }
-    h2 { font-size: 24px; }
-    .description { margin: 12px 0 26px; color: #666; text-align: center; font-size: 15px; line-height: 1.7; }
-    label { display: block; margin-bottom: 8px; font-size: 15px; font-weight: 700; }
-    #phoneNumber { width: 100%; height: 56px; padding: 0 16px; border: 1px solid #d7dce2; border-radius: 12px; background: #fff; font-size: 18px; outline: none; }
-    #phoneNumber:focus { border-color: #1677ff; box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.12); }
-    .main-button { width: 100%; min-height: 56px; margin-top: 18px; padding: 10px; border: 0; border-radius: 13px; background: #1677ff; color: #fff; font-size: 18px; font-weight: 800; cursor: pointer; }
-    button:disabled { background: #aeb5bd !important; cursor: not-allowed; }
-    .guide-box { margin-top: 18px; padding: 16px; border-radius: 12px; background: #f5f7fa; color: #444; text-align: center; font-size: 15px; line-height: 1.8; }
-    .message { display: none; margin-top: 16px; padding: 14px; border-radius: 11px; font-size: 14px; font-weight: 600; line-height: 1.6; text-align: center; }
-    .message.show { display: block; }
-    .message.info { background: #eef5ff; color: #1558b0; }
-    .message.success { background: #ecfff5; color: #087846; }
-    .message.error { background: #fff0f0; color: #c62828; }
-    .notice { margin-top: 20px; color: #777; font-size: 12px; line-height: 1.7; text-align: center; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background-color: #f5f7fa; padding: 20px; box-sizing: border-box; }
+    .card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; max-width: 400px; width: 100%; box-sizing: border-box; }
+    h1 { font-size: 22px; color: #1a202c; margin-bottom: 8px; }
+    p { font-size: 14px; color: #718096; margin-bottom: 24px; line-height: 1.5; }
+    input { width: 100%; padding: 14px; border: 1px solid #cbd5e0; border-radius: 10px; font-size: 16px; margin-bottom: 16px; box-sizing: border-box; text-align: center; }
+    button { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s; background-color: #38a169; color: white; }
+    button:disabled { background-color: #cbd5e0; color: #718096; cursor: not-allowed; }
+    #registerResult { margin-top: 16px; font-size: 14px; font-weight: 500; min-height: 20px; line-height: 1.4; }
   </style>
+  <script src="https://jsdelivr.net"></script>
 </head>
 <body>
-  <main class="container">
-    <section class="card">
 
-      <!-- 1. 차량 등록 화면 -->
-      <div id="registerScreen" class="screen active">
-        <h1>자동차 QR 등록</h1>
-        <p class="description">차량이동 요청을 받을<br>휴дзен화번호를 입력해 주세요.</p>
-        <label for="phoneNumber">휴대전화번호</label>
-        <input type="tel" id="phoneNumber" maxlength="13" inputmode="numeric" autocomplete="tel" placeholder="010-0000-0000">
-        <button type="button" id="registerButton" class="main-button">등록하기</button>
-        <div id="registerMessage" class="message"></div>
-        <div class="notice">등록된 휴대전화로 차량이동 요청 알림이 전달됩니다.</div>
-      </div>
+  <div class="card">
+    <h1>⚙️ 차주 최초 등록</h1>
+    <p>안내판의 QR 코드를 활성화하기 위해<br>연락처 등록 및 푸시 알림 수신을 허용해 주세요.</p>
+    
+    <!-- 차주 등록 정보 입력 폼 -->
+    <input type="tel" id="ownerPhoneInput" placeholder="휴대전화 번호 입력 (숫자만)" maxlength="11">
+    <button id="registerButton">차량 QR 등록 완료하기</button>
+    
+    <div id="registerResult"></div>
+  </div>
 
-      <!-- 2. 앱 설치 안내 화면 -->
-      <div id="installScreen" class="screen">
-        <h2>앱 설치가 필요합니다</h2>
-        <p class="description">앱 설치와 푸시 알림은<br>차량이동 요청을 받기 위해<br>반드시 필요합니다.</p>
-        <div class="guide-box">계속하기를 누르면<br>앱 설치가 시작됩니다.</div>
-        <button type="button" id="installButton" class="main-button">계속하기</button>
-        <div id="installMessage" class="message"></div>
-      </div>
-
-      <!-- 3. 푸시 알림 허용 화면 -->
-      <div id="pushScreen" class="screen">
-        <h2>푸시 알림을 허용해 주세요</h2>
-        <p class="description">차량이동 요청을 받으려면<br>푸시 알림을 반드시 허용해야 합니다.</p>
-        <button type="button" id="pushButton" class="main-button">푸시 알림 허용하기</button>
-        <div id="pushMessage" class="message"></div>
-      </div>
-
-    </section>
-  </main>
-
-<script>
-(() => {
-  "use strict";
-
-  const SUPABASE_URL = "https://supabase.co";
-  const SUPABASE_KEY = "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
-  const VAPID_KEY = "BDeVeUPEh-pooMUUU4Bd2f5x7EHuWyx4TeunbaQvR8WQs6SqWNaryhhORyoSSmxxWMnDGogdgDs1Qod93Vj0jM";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dLso7i17fZo0Hc",
-    authDomain: "://firebaseapp.com",
-    projectId: "wooriapt-carqr",
-    storageBucket: "wooriapt-carqr.firebasestorage.app",
-    messagingSenderId: "101299637796",
-    appId: "1:101299637796:web:cb69372592026b7aa192b1"
-  };
-
-  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-  const messaging = firebase.messaging();
-
-  const registerScreen = document.getElementById("registerScreen");
-  const installScreen = document.getElementById("installScreen");
-  const pushScreen = document.getElementById("pushScreen");
-  const phoneInput = document.getElementById("phoneNumber");
-  const registerButton = document.getElementById("registerButton");
-  const installButton = document.getElementById("installButton");
-  const pushButton = document.getElementById("pushButton");
-
-  let userPhoneNumber = "";
-
-  // 1. 등록하기 버튼 클릭 이벤트
-  if (registerButton) {
-    registerButton.addEventListener("click", () => {
-      const registerMessage = document.getElementById("registerMessage");
-      const phoneValue = phoneInput ? phoneInput.value.trim() : "";
-
-      if (!phoneValue) {
-        if (registerMessage) {
-          registerMessage.className = "message error show";
-          registerMessage.textContent = "휴대전화번호를 입력해 주세요.";
-        }
-        return;
-      }
-      userPhoneNumber = phoneValue;
-      registerScreen.classList.remove("active");
-      installScreen.classList.add("active");
-    });
-  }
-
-  // 2. 앱 설치 계속하기 버튼 클릭 이벤트
-  if (installButton) {
-    installButton.addEventListener("click", () => {
-      installScreen.classList.remove("active");
-      pushScreen.classList.add("active");
-    });
-  }
-
-  // 3. 푸시 알림 허용하기 및 최종 DB 저장
-  if (pushButton) {
-    pushButton.addEventListener("click", () => {
-      const pushMessage = document.getElementById("pushMessage");
-      if (pushMessage) {
-        pushMessage.className = "message info show";
-        pushMessage.textContent = "푸시 알림 권한을 요청 중입니다...";
-      }
-
-      messaging.getToken({ vapidKey: VAPID_KEY })
-        .then(async (currentToken) => {
-          if (currentToken) {
-            if (pushMessage) {
-              pushMessage.className = "message info show";
-              pushMessage.textContent = "데이터베이스에 차주 정보를 저장 중입니다...";
-            }
-
-            // Supabase 데이터베이스의차주 정보 테이블(예: car_owners)에 최종 저장 연동
-            const { data, error } = await db
-              .from('profiles') // ⚠️ 기존 테이블명에 맞게 필요시 변경 가능
-              .insert([{ phone_number: userPhoneNumber, fcm_token: currentToken }]);
-
-            if (error) {
-              throw new Error("DB 저장 실패: " + error.message);
-            }
-
-            if (pushMessage) {
-              pushMessage.className = "message success show";
-              pushMessage.textContent = "푸시 알림 및 차주 등록이 완벽하게 완료되었습니다!";
-            }
-          } else {
-            if (pushMessage) {
-              pushMessage.className = "message error show";
-              pushMessage.textContent = "토큰을 가져올 수 없습니다. 권한을 확인하세요.";
-            }
-          }
-        })
-        .catch((err) => {
-          if (pushMessage) {
-            pushMessage.className = "message error show";
-            pushMessage.textContent = "오류 발생: " + err.message;
-          }
-          console.error(err);
-        });
-    });
-  }
-})();
-</script>
+  <script type="module">
+    const supabaseUrl=window.location.origin.includes("localhost")?"":Deno.env.get("SUPABASE_URL");const supabaseKey=window.location.origin.includes("localhost")?"":Deno.env.get("SUPABASE_ANON_KEY");const db=supabase.createClient(supabaseUrl||"https://supabase.co",supabaseKey||"your-anon-key");const urlParams=new URLSearchParams(window.location.search);const rawQr=urlParams.get("qr")||window.location.pathname.split("/").pop()?.replace(".html","")||"";const qrCode=String(rawQr).trim().toUpperCase().replace(/[^A-Z0-9_-]/g,"");async function requestNotificationPermission(){try{const permission=await Notification.requestPermission();if(permission!=="granted"){alert("알림 권한이 거부되었습니다. 브라우저 설정에서 알림을 허용해야 호출 푸시를 받으실 수 있습니다.");return null}if("serviceWorker"in navigator){const reg=await navigator.serviceWorker.register("/firebase-messaging-sw.js").catch(()=>null);if(reg&&"pushManager"in reg){const subscription=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:"YOUR_VAPID_PUBLIC_KEY"});if(subscription){return btoa(JSON.stringify(subscription))}}}return"mock_push_token_for_test"}catch(e){console.error(e);return"mock_push_token_for_test"}}async function handleRegistration(){const phoneInput=document.getElementById("ownerPhoneInput");const regButton=document.getElementById("registerButton");const resultMsg=document.getElementById("registerResult");const phone=String(phoneInput?.value||"").replace(/[^0-9]/g,"");if(!phone||phone.length<10){alert("올바른 휴대전화 번호를 입력해 주세요.");return}if(!qrCode){alert("QR 코드 정보가 인식되지 않았습니다.");return}regButton.disabled=true;regButton.textContent="등록 처리 중...";resultMsg.textContent="";const pushToken=await requestNotificationPermission();if(!pushToken){resultMsg.style.color="red";resultMsg.textContent="오류: 알림 권한 허용이 필요합니다.";regButton.disabled=false;regButton.textContent="차량 QR 등록 완료하기";return}try{const{data,error}=await db.functions.invoke("send-vehicle-push",{body:{action:"register",qr_code:qrCode,owner_phone:phone,push_token:pushToken}});if(error)throw new Error(error.message);if(data&&data.ok===false)throw new Error(data.message||"등록에 실패했습니다.");resultMsg.style.color="green";resultMsg.textContent="🎉 차량 QR 등록이 성공적으로 완료되었습니다! 이제 차량 이동 알림을 받으실 수 있습니다.";phoneInput.disabled=true}catch(err){console.error("등록 실패:",err);resultMsg.style.color="red";resultMsg.textContent="등록 실패: "+(err.message||"알 수 없는 오류");regButton.disabled=false;regButton.textContent="차량 QR 등록 완료하기"}}document.addEventListener("DOMContentLoaded",()=>{document.getElementById("registerButton")?.addEventListener("click",handleRegistration)});
+  </script>
 </body>
 </html>
