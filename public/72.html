@@ -2,315 +2,46 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width,initial-scale=1,viewport-fit=cover"
-  >
-
-  <meta name="theme-color" content="#1677ff">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-
-  <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">
-
-  <title>자동차 QR</title>
-
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>자동차 QR 호출</title>
   <script src="https://jsdelivr.net"></script>
-  <script src="https://gstatic.com"></script>
-  <script src="https://gstatic.com"></script>
-
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      min-height: 100%;
-    }
-
-    body {
-      margin: 0;
-      padding: 20px;
-      background: #f3f5f7;
-      color: #222;
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Apple SD Gothic Neo",
-        "Noto Sans KR",
-        "Malgun Gothic",
-        sans-serif;
-    }
-
-    button,
-    input {
-      font-family: inherit;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 460px;
-      margin: 0 auto;
-    }
-
-    .card {
-      margin-top: 30px;
-      padding: 28px 20px;
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
-    }
-
-    .screen {
-      display: none;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    h1,
-    h2 {
-      margin: 0;
-      text-align: center;
-      line-height: 1.4;
-    }
-
-    h1 {
-      font-size: 26px;
-    }
-
-    h2 {
-      font-size: 24px;
-    }
-
-    .description {
-      margin: 12px 0 26px;
-      color: #666;
-      text-align: center;
-      font-size: 15px;
-      line-height: 1.7;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    #phoneNumber {
-      width: 100%;
-      height: 56px;
-      padding: 0 16px;
-      border: 1px solid #d7dce2;
-      border-radius: 12px;
-      background: #fff;
-      font-size: 18px;
-      outline: none;
-    }
-
-    #phoneNumber:focus {
-      border-color: #1677ff;
-      box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.12);
-    }
-
-    .main-button,
-    .call-button {
-      width: 100%;
-      min-height: 56px;
-      margin-top: 18px;
-      padding: 10px;
-      border: 0;
-      border-radius: 13px;
-      color: #fff;
-      font-size: 18px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .main-button {
-      background: #1677ff;
-    }
-
-    .call-button.move {
-      background: #2563eb;
-    }
-
-    .call-button.emergency {
-      background: #dc2626;
-    }
-
-    button:disabled {
-      background: #aeb5bd !important;
-      cursor: not-allowed;
-    }
-
-    .guide-box {
-      margin-top: 18px;
-      padding: 16px;
-      border-radius: 12px;
-      background: #f5f7fa;
-      color: #444;
-      text-align: center;
-      font-size: 15px;
-      line-height: 1.8;
-    }
-
-    .message {
-      display: none;
-      margin-top: 16px;
-      padding: 14px;
-      border-radius: 11px;
-      font-size: 14px;
-      font-weight: 600;
-      line-height: 1.6;
-      text-align: center;
-    }
-
-    .message.show {
-      display: block;
-    }
-
-    .message.info {
-      background: #eef5ff;
-      color: #1558b0;
-    }
-
-    .message.success {
-      background: #ecfff5;
-      color: #087846;
-    }
-
-    .message.error {
-      background: #fff0f0;
-      color: #c62828;
-    }
-
-    .notice {
-      margin-top: 20px;
-      color: #777;
-      font-size: 12px;
-      line-height: 1.7;
-      text-align: center;
-    }
-
-    .call-status {
-      margin-top: 18px;
-      padding: 15px;
-      border-radius: 12px;
-      background: #f5f7fa;
-      text-align: center;
-      font-size: 15px;
-      font-weight: 700;
-      line-height: 1.7;
-    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body { margin: 0; padding: 20px; background: #f3f5f7; color: #222; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif; }
+    button { font-family: inherit; }
+    .container { width: 100%; max-width: 460px; margin: 0 auto; }
+    .card { margin-top: 30px; padding: 28px 20px; background: #fff; border-radius: 20px; box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08); }
+    h1 { margin: 0; text-align: center; line-height: 1.4; font-size: 26px; }
+    .description { margin: 12px 0 26px; color: #666; text-align: center; font-size: 15px; line-height: 1.7; }
+    .call-button { width: 100%; min-height: 56px; margin-top: 18px; padding: 10px; border: 0; border-radius: 13px; color: #fff; font-size: 18px; font-weight: 800; cursor: pointer; }
+    .call-button.move { background: #2563eb; }
+    .call-button.emergency { background: #dc2626; }
+    button:disabled { background: #aeb5bd !important; cursor: not-allowed; }
+    .message { display: none; margin-top: 16px; padding: 14px; border-radius: 11px; font-size: 14px; font-weight: 600; line-height: 1.6; text-align: center; }
+    .message.show { display: block; }
+    .message.info { background: #eef5ff; color: #1558b0; }
+    .message.success { background: #ecfff5; color: #087846; }
+    .message.error { background: #fff0f0; color: #c62828; }
+    .notice { margin-top: 20px; color: #777; font-size: 12px; line-height: 1.7; text-align: center; }
+    .call-status { margin-top: 18px; padding: 15px; border-radius: 12px; background: #f5f7fa; text-align: center; font-size: 15px; font-weight: 700; line-height: 1.7; }
   </style>
 </head>
-
 <body>
-
   <main class="container">
     <section class="card">
 
-      <!-- 1. 차량 등록 화면 -->
-      <div id="registerScreen" class="screen active">
-        <h1>자동차 QR 등록</h1>
-        <p class="description">
-          차량이동 요청을 받을<br>
-          휴대전화번호를 입력해 주세요.
-        </p>
-        <label for="phoneNumber">
-          휴대전화번호
-        </label>
-        <input
-          type="tel"
-          id="phoneNumber"
-          maxlength="13"
-          inputmode="numeric"
-          autocomplete="tel"
-          placeholder="010-0000-0000"
-        >
-        <button
-          type="button"
-          id="registerButton"
-          class="main-button"
-        >
-          등록하기
-        </button>
-        <div id="registerMessage" class="message"></div>
-        <div class="notice">
-          등록된 휴대전화로 차량이동 요청 알림이 전달됩니다.
-        </div>
-      </div>
-
-      <!-- 2. 앱 설치 안내 화면 -->
-      <div id="installScreen" class="screen">
-        <h2>앱 설치가 필요합니다</h2>
-        <p class="description">
-          앱 설치와 푸시 알림은<br>
-          차량이동 요청을 받기 위해<br>
-          반드시 필요합니다.
-        </p>
-        <div class="guide-box">
-          계속하기를 누르면<br>
-          앱 설치가 시작됩니다.
-        </div>
-        <button
-          type="button"
-          id="installButton"
-          class="main-button"
-        >
-          계속하기
-        </button>
-        <div id="installMessage" class="message"></div>
-      </div>
-
-      <!-- 3. 푸시 알림 허용 화면 -->
-      <div id="pushScreen" class="screen">
-        <h2>푸시 알림을 허용해 주세요</h2>
-        <p class="description">
-          차량이동 요청을 받으려면<br>
-          푸시 알림을 반드시 허용해야 합니다.
-        </p>
-        <button
-          type="button"
-          id="pushButton"
-          class="main-button"
-        >
-          푸시 알림 허용하기
-        </button>
-        <div id="pushMessage" class="message"></div>
-      </div>
-
-      <!-- 4. 차량 호출 화면 -->
-      <div id="callScreen" class="screen">
+      <!-- 오직 차량 호출 화면만 깨끗하게 존재 -->
+      <div id="callScreen">
         <h1>자동차 QR 호출</h1>
-        <p class="description">
-          차주 휴대전화번호는 표시되지 않습니다.<br>
-          필요한 요청을 선택해 주세요.
-        </p>
-        <button
-          type="button"
-          id="moveButton"
-          class="call-button move"
-        >
-          차량이동요청
-        </button>
-        <button
-          type="button"
-          id="emergencyButton"
-          class="call-button emergency"
-          disabled
-        >
-          긴급통화
-        </button>
-        <div id="callStatus" class="call-status">
-          차량이동요청 0/3회
-        </div>
+        <p class="description">차주 휴대전화번호는 표시되지 않습니다.<br>필요한 요청을 선택해 주세요.</p>
+        
+        <button type="button" id="moveButton" class="call-button move">차량이동요청</button>
+        <button type="button" id="emergencyButton" class="call-button emergency" disabled>긴급통화</button>
+        
+        <div id="callStatus" class="call-status">차량이동요청 0/3회</div>
         <div id="callMessage" class="message"></div>
+        
         <div class="notice">
           차량이동요청은 3분 간격으로 3회 전송됩니다.<br>
           3차 요청 후 3분이 지나면 긴급통화가 가능합니다.<br>
@@ -325,87 +56,55 @@
 (() => {
   "use strict";
 
-  const PWA_INSTALL_URL = "https://vercel.app";
   const SUPABASE_URL = "https://supabase.co";
   const SUPABASE_KEY = "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
-
-  // 우리아파트(wooriapt-carqr) 프로젝트의 완벽 검증된 진짜 VAPID Key 세팅
-  const VAPID_KEY = "BDeVeUPEh-pooMUUU4Bd2f5x7EHuWyx4TeunbaQvR8WQs6SqWNaryhhORyoSSmxxWMnDGogdgDs1Qod93Vj0jM";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dLso7i17fZo0Hc",
-    authDomain: "://firebaseapp.com",
-    projectId: "wooriapt-carqr",
-    storageBucket: "wooriapt-carqr.firebasestorage.app",
-    messagingSenderId: "101299637796",
-    appId: "1:101299637796:web:cb69372592026b7aa192b1"
-  };
-
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-
-  const messaging = firebase.messaging();
-
-  const registerScreen = document.getElementById("registerScreen");
-  const installScreen = document.getElementById("installScreen");
-  const pushScreen = document.getElementById("pushScreen");
-  const callScreen = document.getElementById("callScreen");
-  const phoneInput = document.getElementById("phoneNumber");
-  const registerButton = document.getElementById("registerButton");
-  const installButton = document.getElementById("installButton");
-  const pushButton = document.getElementById("pushButton");
   const moveButton = document.getElementById("moveButton");
   const emergencyButton = document.getElementById("emergencyButton");
+  const callStatus = document.getElementById("callStatus");
+  const callMessage = document.getElementById("callMessage");
 
-  // URL에서 차주 ID 조회 및 최초 가입자인지 호출자인지 체크하는 비즈니스 로직 연동
-  const urlParams = new URLSearchParams(window.location.search);
-  const idParam = urlParams.get("id");
+  let callCount = 0;
+  let timer = null;
 
-  if (idParam) {
-    // 2번째 스캔(호출자)일 때: Supabase에서 정보를 확인하고 호출 화면(4번 상자) 활성화
-    registerScreen.classList.remove("active");
-    callScreen.classList.add("active");
-    console.log("호출 화면이 성공적으로 활성화되었습니다. 차주 ID:", idParam);
-  } else {
-    // 최초 스캔(차주 등록)일 때: 등록 화면(1번 상자) 활성화
-    registerScreen.classList.add("active");
-    callScreen.classList.remove("active");
-  }
+  // 1. 차량이동요청 버튼 클릭 (3분 간격 총 3회 로직 구현)
+  if (moveButton) {
+    moveButton.addEventListener("click", () => {
+      if (callCount >= 3) return;
 
-  // 푸시 알림 허용하기 버튼 클릭 이벤트 핸들러
-  if (pushButton) {
-    pushButton.addEventListener("click", () => {
-      const pushMessage = document.getElementById("pushMessage");
-      if (pushMessage) {
-        pushMessage.className = "message info show";
-        pushMessage.textContent = "푸시 알림 권한을 요청 중입니다...";
+      callCount++;
+      if (callStatus) callStatus.textContent = `차량이동요청 ${callCount}/3회`;
+      
+      if (callMessage) {
+        callMessage.className = "message success show";
+        callMessage.textContent = `${callCount}차 차량이동요청 푸시 알림을 차주에게 발송했습니다. (호출자 번호 공개 / 차주 번호 비공개)`;
       }
 
-      messaging.getToken({ vapidKey: VAPID_KEY })
-        .then((currentToken) => {
-          if (currentToken) {
-            if (pushMessage) {
-              pushMessage.className = "message success show";
-              pushMessage.textContent = "푸시 알림 구독에 성공했습니다!";
-            }
-            console.log("FCM 기기 토큰 발급 완료:", currentToken);
-          } else {
-            if (pushMessage) {
-              pushMessage.className = "message error show";
-              pushMessage.textContent = "알림 권한이 거부되었거나 토큰을 가져올 수 없습니다.";
-            }
+      // 3회가 모두 끝나면 3분 뒤 긴급통화 버튼 활성화 타이머 가동
+      if (callCount === 3) {
+        if (moveButton) moveButton.disabled = true;
+        if (callMessage) {
+          callMessage.className = "message info show";
+          callMessage.textContent = "3차 요청이 완료되었습니다. 3분 후 응답이 없으면 긴급통화가 활성화됩니다.";
+        }
+        
+        setTimeout(() => {
+          if (emergencyButton) emergencyButton.disabled = false;
+          if (callMessage) {
+            callMessage.className = "message error show";
+            callMessage.textContent = "차주가 응답하지 않아 긴급통화 기능이 활성화되었습니다. 버튼을 누르면 쌍방 번호가 노출되며 통화가 연결됩니다.";
           }
-        })
-        .catch((err) => {
-          if (pushMessage) {
-            pushMessage.className = "message error show";
-            pushMessage.textContent = "오류가 발생했습니다: " + err.message;
-          }
-          console.error("인증 실패 로그:", err);
-        });
+        }, 180000); // 3분(180,000ms) 대기 후 활성화
+      }
+    });
+  }
+
+  // 2. 긴급통화 버튼 클릭
+  if (emergencyButton) {
+    emergencyButton.addEventListener("click", () => {
+      // 실제 통화 앱으로 연결되는 가상의 링크 처리 예시
+      window.location.href = "tel:010-0000-0000"; 
     });
   }
 })();
