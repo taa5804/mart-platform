@@ -24,15 +24,13 @@
     #loading { font-size: 16px; color: #4a5568; font-weight: bold; }
     .error-title { color: #e53e3e !important; }
   </style>
-  <!-- Supabase 클라이언트 SDK 라이브러리 정상 복구 -->
-  <script src="https://jsdelivr.net"></script>
 </head>
 <body>
 
-  <!-- 최초 진입 시 고속 분기 중 로딩 안내 -->
+  <!-- 상태 판별 대기 레이어 -->
   <div id="loading">차량 및 QR 상태 확인 중...</div>
 
-  <!-- [화면 가이드 A] 주소창에 phone 파라미터가 있을 때 즉시 열리는 푸시알림 설치/등록 UI -->
+  <!-- [화면 가이드 A] 주소창에 phone 파라미터가 있을 때 열리는 푸시알림 설치/등록 UI -->
   <div id="registerCard" class="card register-mode">
     <h1>🔔 푸시알림 설치 및 등록</h1>
     <p>우리APT 주차 안심 QR 알림판 서비스 등록을 시작합니다.<br>아래 버튼을 눌러 알림 설치 동의를 완료하시면<br>스마트폰으로 실시간 이동 요청 알림을 받으실 수 있습니다.</p>
@@ -56,10 +54,12 @@
   </div>
 
   <script type="module">
-    // 💡 브라우저 오류를 유발하던 Deno 구문을 완전히 소거하고 최적의 주소 매핑으로 복구
+    // 💡 브라우저 오류를 완벽하게 해결하는 안전한 수파베이스 모듈 최신 로드 규격
+    import { createClient } from "https://jsdelivr.net";
+
     const currentOrigin = window.location.origin;
-    // ⚠️ 실제 본인의 Supabase anon_key 문자열을 "your-anon-key" 자리에 넣어주세요.
-    const db = supabase.createClient(currentOrigin, "your-anon-key");
+    // ⚠️ 본인의 실제 Supabase anon_key 문자열을 "your-anon-key" 자리에 대입해 주세요.
+    const db = createClient(currentOrigin, "your-anon-key");
 
     const urlParams = new URLSearchParams(window.location.search);
     const rawQr = urlParams.get("qr") || "";
@@ -78,7 +78,7 @@
     const callerSessionId = getOrCreateSessionId();
 
     // ==========================================
-    // 1단계. 차량 및 QR 상태 확인 (서버 조회 지연 제거 튜닝)
+    // 1단계. 차량 및 QR 상태 확인 (대기 시간 0초 분기 처리)
     // ==========================================
     function checkPageRoutingDirect() {
       const loading = document.getElementById("loading");
@@ -91,36 +91,32 @@
         return;
       }
 
-      loading.style.display = "none"; // 로딩 즉시 소거
+      loading.style.display = "none"; // 뺑뺑이 로딩 화면 즉시 제거
 
-      // 💡 맹점 보완: 주소창 파라미터에 phone이 명확하게 실려서 들어온 경우 -> 등록 카드 즉시 활성화
+      // 주소창 파라미터에 phone이 함께 실려왔다면 -> 확인할 필요 없이 즉시 가입 모드 오픈
       if (ownerPhone && ownerPhone.length >= 10) {
         regCard.style.display = "block";
         return;
       }
 
-      // 💡 phone 파라미터가 없다면 호출자가 스캔한 것이므로 실시간 DB 연동 상태 체크 수행
+      // phone 파라미터가 없다면 호출자 전용이므로 실시간 백엔드 status 체크 진입
       verifyRemoteStatus(callCard, unregCard);
     }
 
-    // 호출자 진입 시 원격 Supabase 상태 체크 후 호출방 UI 노출
     async function verifyRemoteStatus(callCard, unregCard) {
       try {
         const { data: statusData, error: statusError } = await db.functions.invoke("send-vehicle-push", {
           body: { action: "status", qr_code: qrCode }
         });
-
         if (statusError || !statusData) {
           document.getElementById("loading").style.display = "block";
-          document.getElementById("loading").textContent = "시스템 통신 점검 중입니다.";
+          document.getElementById("loading").textContent = "시스템 점검 중입니다.";
           return;
         }
-
         if (statusData.exists === false || statusData.is_registered === false) {
           unregCard.style.display = "block";
           return;
         }
-
         callCard.style.display = "block";
         await checkCallStatus();
       } catch (err) {
@@ -129,7 +125,7 @@
     }
 
     // ==========================================
-    // 2단계. 호출 진행상태 확인 (쿨타임 제어)
+    // 2단계. 호출 진행상태 확인
     // ==========================================
     async function checkCallStatus() {
       const pushButton = document.getElementById("pushButton");
@@ -171,7 +167,7 @@
     }
 
     // ==========================================
-    // 3단계. 차주 최초 등록 (푸시알림 수신 토큰 설치)
+    // 3단계. 차주 최초 등록 (푸시알림 설치동의)
     // ==========================================
     async function requestNotificationPermission() {
       try {
@@ -233,3 +229,8 @@
     // ==========================================
     async function sendVehicleCall() {
       const pushButton = document.getElementById("pushButton");
+      const resultMessage = document.getElementById("callResult");
+
+      pushButton.disabled = true;
+      pushButton.textContent = "전송 중...";
+
