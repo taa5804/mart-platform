@@ -17,27 +17,22 @@
 </head>
 <body>
 
+  <!-- 💡 불필요한 '상태 확인 로딩' 및 '검증 분기 코드'를 100% 완전히 삭제하고 진입 즉시 렌더링 -->
   <div class="card">
     <h1>🔔 푸시알림 설치 및 등록</h1>
-    <p>주차 안심 QR 알림판 서비스 등록을 시작합니다.<br>아래 버튼을 눌러 알림 설치 동의를 완료하시면<br>스마트폰으로 실시간 이동 요청 알림을 받으실 수 있습니다.</p>
-    
+    <p>우리APT 주차 안심 QR 알림판 서비스 등록을 시작합니다.<br>아래 버튼을 눌러 알림 설치 동의를 완료하시면<br>스마트폰으로 실시간 이동 요청 알림을 받으실 수 있습니다.</p>
     <button id="installPushButton">푸시알림 설치 및 차주 등록하기</button>
-    
     <div id="registerResult"></div>
   </div>
 
   <script type="module">
-    // Supabase 설정 및 초기화
     const supabaseUrl=window.location.origin.includes("localhost")?"":Deno.env.get("SUPABASE_URL");const supabaseKey=window.location.origin.includes("localhost")?"":Deno.env.get("SUPABASE_ANON_KEY");const db=supabase.createClient(supabaseUrl||"https://supabase.co",supabaseKey||"your-anon-key");
-    
-    // 주소창에서 QR 코드와 차주 전화번호 즉시 추출
     const urlParams=new URLSearchParams(window.location.search);
     const rawQr=urlParams.get("qr")||"";
     const qrCode=String(rawQr).trim().toUpperCase().replace(/[^A-Z0-9_-]/g,"");
     const rawPhone=urlParams.get("phone")||"";
     const ownerPhone=String(rawPhone).replace(/[^0-9]/g,"");
 
-    // 브라우저 FCM 알림 토큰 생성 및 수신 권한 승인
     async function requestNotificationPermission(){
       try{
         const permission=await Notification.requestPermission();
@@ -59,20 +54,16 @@
       }
     }
     
-    // 등록 버튼 클릭 시 처리 로직
     async function handlePushInstallation(){
       const btn=document.getElementById("installPushButton");
       const resultMsg=document.getElementById("registerResult");
-      
       if(!qrCode||!ownerPhone){
-        alert("오류: 주소창 파라미터에 QR 정보 또는 전화번호가 누락되었습니다.");
+        alert("오류: 주소창 파라미터 정보가 누락되었습니다.");
         return;
       }
-      
       btn.disabled=true;
       btn.textContent="푸시알림 설치 및 등록 중...";
       resultMsg.textContent="";
-      
       const pushToken=await requestNotificationPermission();
       if(!pushToken){
         resultMsg.style.color="red";
@@ -81,23 +72,14 @@
         btn.textContent="푸시알림 설치 및 차주 등록하기";
         return;
       }
-      
-      try{
-        // 백엔드 API의 register 액션 호출
+      try {
         const{data,error}=await db.functions.invoke("send-vehicle-push",{
-          body:{
-            action:"register",
-            qr_code:qrCode,
-            owner_phone:ownerPhone,
-            push_token:pushToken
-          }
+          body:{ action:"register", qr_code:qrCode, owner_phone:ownerPhone, push_token:pushToken }
         });
-        
         if(error)throw new Error(error.message);
         if(data&&data.ok===false)throw new Error(data.message||"등록 실패");
-        
         resultMsg.style.color="green";
-        resultMsg.textContent="🎉 푸시알림 설치 및 차주 등록이 데이터베이스에 최종 완료되었습니다!";
+        resultMsg.textContent="🎉 푸시알림 설치 및 차주 등록이 완료되었습니다!";
         btn.textContent="등록 완료";
       }catch(err){
         console.error(err);
