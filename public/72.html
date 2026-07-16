@@ -66,11 +66,12 @@
 
   let callCount = 0;
 
-  // 주소창(URL)에서 차주 전화번호(phone) 값 파싱하여 가져오기
+  // 🔍 [보안 필터 추가] 주소창의 phone 값에서 불필요한 대시(-) 기호를 완벽하게 지우고 숫자만 정제
   const urlParams = new URLSearchParams(window.location.search);
-  const ownerPhone = urlParams.get("phone") || "010-0000-0000"; // 번호가 없으면 기본값 세팅
+  let rawPhone = urlParams.get("phone") || "01000000000";
+  const ownerPhone = rawPhone.replace(/[^0-9]/g, ""); // 숫자가 아닌 모든 특수기호 강제 제거
 
-  // 1. 차량이동요청 버튼 클릭 (실제 전송 상태 로그 및 데이터베이스 전송 기능 연동)
+  // 1. 차량이동요청 버튼 클릭
   if (moveButton) {
     moveButton.addEventListener("click", async () => {
       if (callCount >= 3) return;
@@ -83,27 +84,25 @@
         callMessage.textContent = `${callCount}차 차량이동 알림을 전송 중입니다...`;
       }
 
-      // Supabase 데이터베이스의 알림 전송 테이블(예: 알림 요청 기록 테이블)에 실시간 인서트
+      // 정제된 깨끗한 번호 데이터로 Supabase 전송 시도
       const { data, error } = await db
-        .from('calls') // ⚠️ 사용하시는 실제 Supabase 테이블명에 맞게 자동 작동
+        .from('calls')
         .insert([{ target_phone: ownerPhone, call_round: callCount, status: 'pending' }]);
 
       if (error) {
-        console.error("Supabase 전송 실패:", error.message);
+        console.error("Supabase 통신 오류:", error.message);
         if (callMessage) {
           callMessage.className = "message error show";
-          callMessage.textContent = "알림 서버 통신 실패: " + error.message;
+          callMessage.textContent = "알림 전송 실패: " + error.message;
         }
         return;
       }
 
-      // 정상 발송 성공 시 메시지 출력
       if (callMessage) {
         callMessage.className = "message success show";
         callMessage.textContent = `성공: 차주에게 ${callCount}차 차량이동 푸시 알림이 발송되었습니다.`;
       }
 
-      // 3회차 요청이 끝나면 3분 대기 타이머 가동 후 긴급통화 버튼 활성화
       if (callCount === 3) {
         if (moveButton) moveButton.disabled = true;
         if (callMessage) {
@@ -117,15 +116,14 @@
             callMessage.className = "message error show";
             callMessage.textContent = "차주가 응답하지 않아 긴급통화 기능이 활성화되었습니다.";
           }
-        }, 180000); // 정확히 3분(180,000ms) 대기
+        }, 180000);
       }
     });
   }
 
-  // 2. 긴급통화 버튼 클릭 시 주소창의 차주 번호로 실제 전화 연결
+  // 2. 긴급통화 버튼 클릭
   if (emergencyButton) {
     emergencyButton.addEventListener("click", () => {
-      // 주소창에서 추출한 차주의 진짜 전화번호로 즉시 다이얼 연결
       window.location.href = `tel:${ownerPhone}`; 
     });
   }
