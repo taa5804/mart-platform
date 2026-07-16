@@ -31,7 +31,6 @@
   <main class="container">
     <section class="card">
 
-      <!-- 오직 차량 호출 화면만 깨끗하게 존재 -->
       <div id="callScreen">
         <h1>자동차 QR 호출</h1>
         <p class="description">차주 휴대전화번호는 표시되지 않습니다.<br>필요한 요청을 선택해 주세요.</p>
@@ -66,22 +65,45 @@
   const callMessage = document.getElementById("callMessage");
 
   let callCount = 0;
-  let timer = null;
 
-  // 1. 차량이동요청 버튼 클릭 (3분 간격 총 3회 로직 구현)
+  // 주소창(URL)에서 차주 전화번호(phone) 값 파싱하여 가져오기
+  const urlParams = new URLSearchParams(window.location.search);
+  const ownerPhone = urlParams.get("phone") || "010-0000-0000"; // 번호가 없으면 기본값 세팅
+
+  // 1. 차량이동요청 버튼 클릭 (실제 전송 상태 로그 및 데이터베이스 전송 기능 연동)
   if (moveButton) {
-    moveButton.addEventListener("click", () => {
+    moveButton.addEventListener("click", async () => {
       if (callCount >= 3) return;
 
       callCount++;
       if (callStatus) callStatus.textContent = `차량이동요청 ${callCount}/3회`;
       
       if (callMessage) {
-        callMessage.className = "message success show";
-        callMessage.textContent = `${callCount}차 차량이동요청 푸시 알림을 차주에게 발송했습니다. (호출자 번호 공개 / 차주 번호 비공개)`;
+        callMessage.className = "message info show";
+        callMessage.textContent = `${callCount}차 차량이동 알림을 전송 중입니다...`;
       }
 
-      // 3회가 모두 끝나면 3분 뒤 긴급통화 버튼 활성화 타이머 가동
+      // Supabase 데이터베이스의 알림 전송 테이블(예: 알림 요청 기록 테이블)에 실시간 인서트
+      const { data, error } = await db
+        .from('calls') // ⚠️ 사용하시는 실제 Supabase 테이블명에 맞게 자동 작동
+        .insert([{ target_phone: ownerPhone, call_round: callCount, status: 'pending' }]);
+
+      if (error) {
+        console.error("Supabase 전송 실패:", error.message);
+        if (callMessage) {
+          callMessage.className = "message error show";
+          callMessage.textContent = "알림 서버 통신 실패: " + error.message;
+        }
+        return;
+      }
+
+      // 정상 발송 성공 시 메시지 출력
+      if (callMessage) {
+        callMessage.className = "message success show";
+        callMessage.textContent = `성공: 차주에게 ${callCount}차 차량이동 푸시 알림이 발송되었습니다.`;
+      }
+
+      // 3회차 요청이 끝나면 3분 대기 타이머 가동 후 긴급통화 버튼 활성화
       if (callCount === 3) {
         if (moveButton) moveButton.disabled = true;
         if (callMessage) {
@@ -93,18 +115,18 @@
           if (emergencyButton) emergencyButton.disabled = false;
           if (callMessage) {
             callMessage.className = "message error show";
-            callMessage.textContent = "차주가 응답하지 않아 긴급통화 기능이 활성화되었습니다. 버튼을 누르면 쌍방 번호가 노출되며 통화가 연결됩니다.";
+            callMessage.textContent = "차주가 응답하지 않아 긴급통화 기능이 활성화되었습니다.";
           }
-        }, 180000); // 3분(180,000ms) 대기 후 활성화
+        }, 180000); // 정확히 3분(180,000ms) 대기
       }
     });
   }
 
-  // 2. 긴급통화 버튼 클릭
+  // 2. 긴급통화 버튼 클릭 시 주소창의 차주 번호로 실제 전화 연결
   if (emergencyButton) {
     emergencyButton.addEventListener("click", () => {
-      // 실제 통화 앱으로 연결되는 가상의 링크 처리 예시
-      window.location.href = "tel:010-0000-0000"; 
+      // 주소창에서 추출한 차주의 진짜 전화번호로 즉시 다이얼 연결
+      window.location.href = `tel:${ownerPhone}`; 
     });
   }
 })();
