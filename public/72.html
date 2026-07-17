@@ -318,8 +318,7 @@
 
     let deferredInstallPrompt = null;
     let countdownTimer = null;
-
-    const cards = {
+        const cards = {
       loading: document.getElementById("loadingCard"),
       register: document.getElementById("registerCard"),
       install: document.getElementById("installCard"),
@@ -337,7 +336,8 @@
 
     const continueButton =
       document.getElementById("continueButton");
-        const pushButton =
+
+    const pushButton =
       document.getElementById("pushButton");
 
     const completeButton =
@@ -595,19 +595,38 @@
         );
       }
 
-      const registration =
-        await navigator.serviceWorker.register(
-          "/firebase-messaging-sw.js",
-          { scope: "/" }
-        );
+      return navigator.serviceWorker.register(
+        "/firebase-messaging-sw.js",
+        { scope: "/" }
+      );
+    }
 
-      await navigator.serviceWorker.ready;
+    function withTimeout(
+      promise,
+      milliseconds,
+      message
+    ) {
+      let timeoutId;
 
-      return registration;
+      const timeoutPromise =
+        new Promise((_, reject) => {
+          timeoutId =
+            setTimeout(() => {
+              reject(
+                new Error(message)
+              );
+            }, milliseconds);
+        });
+
+      return Promise.race([
+        promise.finally(() => {
+          clearTimeout(timeoutId);
+        }),
+        timeoutPromise
+      ]);
     }
 
     async function createFcmToken() {
-
       const permission =
         await Notification.requestPermission();
 
@@ -617,49 +636,40 @@
         );
       }
 
-      if (!firebase.apps.length) {
-        firebase.initializeApp(
-          FIREBASE_CONFIG
-        );
-      }
+      return withTimeout(
+        (async function() {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(
+              FIREBASE_CONFIG
+            );
+          }
 
-      const messaging =
-        firebase.messaging();
+          const messaging =
+            firebase.messaging();
 
-      const registration =
-        await registerServiceWorker();
+          const registration =
+            await registerServiceWorker();
 
-      const token =
-        await Promise.race([
+          const token =
+            await messaging.getToken({
+              vapidKey: VAPID_KEY,
+              serviceWorkerRegistration:
+                registration
+            });
 
-          messaging.getToken({
-            vapidKey: VAPID_KEY,
-            serviceWorkerRegistration:
-              registration
-          }),
+          if (!token) {
+            throw new Error(
+              "토큰 발급 실패"
+            );
+          }
 
-          new Promise((_, reject) => {
-            setTimeout(() => {
-              reject(
-                new Error(
-                  "푸시 연결 시간이 초과되었습니다."
-                )
-              );
-            }, 3000);
-          })
-
-        ]);
-
-      if (!token) {
-        throw new Error(
-          "토큰 발급 실패"
-        );
-      }
-
-      return token;
+          return token;
+        })(),
+        3000,
+        "푸시 연결 시간이 초과되었습니다."
+      );
     }
         async function checkQrStatus() {
-
       const pending =
         restorePending();
 
@@ -676,7 +686,6 @@
       }
 
       try {
-
         const data =
           await callApi({
             action: "status",
@@ -684,7 +693,6 @@
           });
 
         if (data.registered === true) {
-
           clearPending();
 
           updateRequestState(data);
@@ -693,9 +701,8 @@
 
           return;
         }
-
-      } catch (e) {
-        console.error(e);
+      } catch (error) {
+        console.error(error);
       }
 
       if (
@@ -731,7 +738,6 @@
     }
 
     function updateRequestState(data) {
-
       const requestCount =
         Number(
           data.request_count || 0
@@ -743,16 +749,11 @@
           requestCount >= 3
         );
 
-      if (
-        data.next_allowed_at
-      ) {
-
+      if (data.next_allowed_at) {
         startCountdown(
           data.next_allowed_at
         );
-
       } else {
-
         countdownBox.style.display =
           "none";
 
@@ -765,7 +766,6 @@
     }
 
     function startCountdown(nextAllowedAt) {
-
       if (countdownTimer) {
         clearInterval(
           countdownTimer
@@ -778,15 +778,11 @@
         ).getTime();
 
       function updateCountdown() {
-
         const remaining =
           targetTime -
           Date.now();
 
-        if (
-          remaining <= 0
-        ) {
-
+        if (remaining <= 0) {
           clearInterval(
             countdownTimer
           );
@@ -854,20 +850,17 @@
 
     phoneInput.addEventListener(
       "input",
-      (e) => {
-
-        e.target.value =
+      function(event) {
+        event.target.value =
           formatPhone(
-            e.target.value
+            event.target.value
           );
-
       }
     );
 
     registerButton.addEventListener(
       "click",
-      () => {
-
+      function() {
         const phone =
           normalizePhone(
             phoneInput.value
@@ -878,7 +871,6 @@
             phone
           )
         ) {
-
           setStatus(
             registerStatus,
             "휴대전화번호를 확인해 주세요.",
@@ -922,26 +914,22 @@
         showCard(
           "install"
         );
-
       }
     );
 
     window.addEventListener(
       "beforeinstallprompt",
-      (e) => {
-
-        e.preventDefault();
+      function(event) {
+        event.preventDefault();
 
         deferredInstallPrompt =
-          e;
-
+          event;
       }
     );
 
     window.addEventListener(
       "appinstalled",
-      () => {
-
+      function() {
         deferredInstallPrompt =
           null;
 
@@ -953,13 +941,15 @@
         showCard(
           "push"
         );
-
       }
     );
-        continueButton.addEventListener(
+
+    continueButton.addEventListener(
       "click",
       async function() {
-        continueButton.disabled = true;
+        continueButton.disabled =
+          true;
+
         continueButton.textContent =
           "앱 설치 중...";
 
@@ -999,7 +989,8 @@
           const result =
             await deferredInstallPrompt.userChoice;
 
-          deferredInstallPrompt = null;
+          deferredInstallPrompt =
+            null;
 
           if (
             result.outcome === "accepted"
@@ -1010,6 +1001,7 @@
             );
 
             showCard("push");
+
             return;
           }
 
@@ -1032,11 +1024,11 @@
         }
       }
     );
-
-    pushButton.addEventListener(
+        pushButton.addEventListener(
       "click",
       async function() {
-        pushButton.disabled = true;
+        pushButton.disabled =
+          true;
 
         pushButton.textContent =
           "푸시 알림 등록 중...";
