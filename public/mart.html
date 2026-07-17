@@ -167,4 +167,431 @@
     <div id="pushStatus" class="status"></div>
   </section>
 
- 
+  <section id="completeCard" class="card">
+    <h1>설치 완료</h1>
+
+    <div class="guide">
+      우리마트 앱과 푸시알림 설정이<br>
+      완료되었습니다.
+    </div>
+
+    <button id="openMartButton" type="button">
+      우리마트 보기
+    </button>
+  </section>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+
+  <script>
+    const API_URL =
+      "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/register-mart-push";
+
+    const SUPABASE_KEY =
+      "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
+
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dLso7i17fZo0Hc",
+      authDomain: "wooriapt-carqr.firebaseapp.com",
+      projectId: "wooriapt-carqr",
+      storageBucket: "wooriapt-carqr.firebasestorage.app",
+      messagingSenderId: "101299637796",
+      appId: "1:101299637796:web:cb69372592026b7aa192b1"
+    };
+
+    const VAPID_KEY =
+      "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
+
+    const params =
+      new URLSearchParams(window.location.search);
+
+    const storeCode =
+      cleanStoreCode(
+        params.get("store") || "STORE0001"
+      );
+
+    const source =
+      String(
+        params.get("source") || "signboard"
+      ).trim();
+
+    const MART_MAIN_URL =
+      "/?store=" +
+      encodeURIComponent(storeCode) +
+      "&source=" +
+      encodeURIComponent(source);
+
+    const REGISTERED_KEY =
+      "wooriapt_mart_push_registered_" +
+      storeCode;
+
+    const INSTALL_FINISHED_KEY =
+      "wooriapt_mart_install_finished";
+
+    let deferredInstallPrompt = null;
+
+    const installCard =
+      document.getElementById("installCard");
+
+    const pushCard =
+      document.getElementById("pushCard");
+
+    const completeCard =
+      document.getElementById("completeCard");
+
+    const continueButton =
+      document.getElementById("continueButton");
+
+    const pushButton =
+      document.getElementById("pushButton");
+
+    const openMartButton =
+      document.getElementById("openMartButton");
+
+    const installStatus =
+      document.getElementById("installStatus");
+
+    const pushStatus =
+      document.getElementById("pushStatus");
+
+    function cleanStoreCode(value) {
+      return String(value || "")
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9_-]/g, "");
+    }
+
+    function showCard(card) {
+      installCard.classList.remove("active");
+      pushCard.classList.remove("active");
+      completeCard.classList.remove("active");
+
+      card.classList.add("active");
+      window.scrollTo(0, 0);
+    }
+
+    function setStatus(element, message, type) {
+      element.textContent = message || "";
+      element.className = "status";
+
+      if (type) {
+        element.classList.add(type);
+      }
+    }
+
+    function isInstalledApp() {
+      return (
+        window.matchMedia(
+          "(display-mode: standalone)"
+        ).matches ||
+        window.navigator.standalone === true
+      );
+    }
+
+    function withTimeout(
+      promise,
+      milliseconds,
+      message
+    ) {
+      let timeoutId;
+
+      const timeoutPromise =
+        new Promise((_, reject) => {
+          timeoutId =
+            setTimeout(() => {
+              reject(new Error(message));
+            }, milliseconds);
+        });
+
+      return Promise.race([
+        promise.finally(() => {
+          clearTimeout(timeoutId);
+        }),
+        timeoutPromise
+      ]);
+    }
+
+    async function registerServiceWorker() {
+      if (!("serviceWorker" in navigator)) {
+        throw new Error(
+          "이 브라우저에서는 푸시알림을 사용할 수 없습니다."
+        );
+      }
+
+      const registration =
+        await navigator.serviceWorker.register(
+          "/firebase-messaging-sw.js",
+          {
+            scope: "/"
+          }
+        );
+
+      if (registration.active) {
+        return registration;
+      }
+
+      return withTimeout(
+        navigator.serviceWorker.ready,
+        15000,
+        "서비스워커 활성화 시간이 초과되었습니다."
+      );
+    }
+
+    async function createFcmToken() {
+      if (!("Notification" in window)) {
+        throw new Error(
+          "이 브라우저에서는 알림 기능을 사용할 수 없습니다."
+        );
+      }
+
+      const permission =
+        await Notification.requestPermission();
+
+      if (permission !== "granted") {
+        throw new Error(
+          "푸시알림을 허용해 주세요."
+        );
+      }
+
+      return withTimeout(
+        (async function() {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(
+              FIREBASE_CONFIG
+            );
+          }
+
+          const registration =
+            await registerServiceWorker();
+
+          const messaging =
+            firebase.messaging();
+
+          const token =
+            await messaging.getToken({
+              vapidKey: VAPID_KEY,
+              serviceWorkerRegistration:
+                registration
+            });
+
+          if (!token) {
+            throw new Error(
+              "푸시알림 토큰을 발급하지 못했습니다."
+            );
+          }
+
+          return token;
+        })(),
+        20000,
+        "푸시알림 연결 시간이 초과되었습니다."
+      );
+    }
+
+    async function callRegisterApi(pushToken) {
+      const response =
+        await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization":
+              "Bearer " + SUPABASE_KEY,
+            "apikey": SUPABASE_KEY
+          },
+          body: JSON.stringify({
+            action: "register",
+            store_code: storeCode,
+            push_token: pushToken,
+            platform: "web",
+            source: source,
+            user_agent: navigator.userAgent
+          })
+        });
+
+      const text =
+        await response.text();
+
+      let data = {};
+
+      try {
+        data = text
+          ? JSON.parse(text)
+          : {};
+      } catch {
+        data = {};
+      }
+
+      if (
+        !response.ok ||
+        data.ok === false ||
+        data.success === false
+      ) {
+        throw new Error(
+          data.message ||
+          data.error ||
+          "푸시알림 저장 서버가 아직 준비되지 않았습니다."
+        );
+      }
+
+      return data;
+    }
+
+    window.addEventListener(
+      "beforeinstallprompt",
+      function(event) {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+      }
+    );
+
+    window.addEventListener(
+      "appinstalled",
+      function() {
+        deferredInstallPrompt = null;
+
+        sessionStorage.setItem(
+          INSTALL_FINISHED_KEY,
+          "true"
+        );
+
+        showCard(pushCard);
+      }
+    );
+
+    continueButton.addEventListener(
+      "click",
+      async function() {
+        continueButton.disabled = true;
+
+        setStatus(
+          installStatus,
+          "",
+          ""
+        );
+
+        try {
+          if (
+            !isInstalledApp() &&
+            deferredInstallPrompt
+          ) {
+            deferredInstallPrompt.prompt();
+
+            const result =
+              await deferredInstallPrompt.userChoice;
+
+            deferredInstallPrompt = null;
+
+            if (result.outcome !== "accepted") {
+              throw new Error(
+                "앱 설치를 완료해 주세요."
+              );
+            }
+          }
+
+          sessionStorage.setItem(
+            INSTALL_FINISHED_KEY,
+            "true"
+          );
+
+          showCard(pushCard);
+        } catch (error) {
+          setStatus(
+            installStatus,
+            error.message ||
+            "앱 설치를 완료하지 못했습니다.",
+            "error"
+          );
+
+          continueButton.disabled = false;
+        }
+      }
+    );
+
+    pushButton.addEventListener(
+      "click",
+      async function() {
+        pushButton.disabled = true;
+        pushButton.textContent =
+          "푸시알림 등록 중...";
+
+        setStatus(
+          pushStatus,
+          "푸시알림을 설정하고 있습니다.",
+          "waiting"
+        );
+
+        try {
+          const fcmToken =
+            await createFcmToken();
+
+          await callRegisterApi(
+            fcmToken
+          );
+
+          localStorage.setItem(
+            REGISTERED_KEY,
+            "true"
+          );
+
+          sessionStorage.removeItem(
+            INSTALL_FINISHED_KEY
+          );
+
+          showCard(completeCard);
+        } catch (error) {
+          setStatus(
+            pushStatus,
+            error.message ||
+            "푸시알림 등록에 실패했습니다.",
+            "error"
+          );
+
+          pushButton.disabled = false;
+          pushButton.textContent =
+            "푸시알림 허용";
+        }
+      }
+    );
+
+    openMartButton.addEventListener(
+      "click",
+      function() {
+        window.location.href =
+          MART_MAIN_URL;
+      }
+    );
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      function() {
+        const alreadyRegistered =
+          localStorage.getItem(
+            REGISTERED_KEY
+          ) === "true";
+
+        if (
+          alreadyRegistered &&
+          Notification.permission === "granted"
+        ) {
+          window.location.replace(
+            MART_MAIN_URL
+          );
+
+          return;
+        }
+
+        if (
+          isInstalledApp() ||
+          sessionStorage.getItem(
+            INSTALL_FINISHED_KEY
+          ) === "true"
+        ) {
+          showCard(pushCard);
+          return;
+        }
+
+        showCard(installCard);
+      }
+    );
+  </script>
+</body>
+</html>
