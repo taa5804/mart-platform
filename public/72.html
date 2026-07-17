@@ -299,7 +299,7 @@
     };
 
     const VAPID_KEY =
-      "BDeVeUPEh-pooMUUU4Bd2f5x7Ehuwyx4TeunbaQvR8WQs6SqWNaryhh0RyoSSmxxMNnDGogdgDs1Qod93Vj0jM";
+      "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
 
     const PENDING_KEY =
       "wooriapt_vehicle_pending_registration";
@@ -337,8 +337,7 @@
 
     const continueButton =
       document.getElementById("continueButton");
-
-    const pushButton =
+        const pushButton =
       document.getElementById("pushButton");
 
     const completeButton =
@@ -565,7 +564,7 @@
         data = text
           ? JSON.parse(text)
           : {};
-      } catch (error) {
+      } catch {
         data = {};
       }
 
@@ -592,16 +591,14 @@
     async function registerServiceWorker() {
       if (!("serviceWorker" in navigator)) {
         throw new Error(
-          "이 브라우저에서는 푸시 알림을 사용할 수 없습니다."
+          "이 브라우저에서는 푸시를 사용할 수 없습니다."
         );
       }
 
       const registration =
         await navigator.serviceWorker.register(
           "/firebase-messaging-sw.js",
-          {
-            scope: "/"
-          }
+          { scope: "/" }
         );
 
       await navigator.serviceWorker.ready;
@@ -610,11 +607,6 @@
     }
 
     async function createFcmToken() {
-      if (!("Notification" in window)) {
-        throw new Error(
-          "이 기기에서는 알림을 지원하지 않습니다."
-        );
-      }
 
       const permission =
         await Notification.requestPermission();
@@ -622,12 +614,6 @@
       if (permission !== "granted") {
         throw new Error(
           "푸시 알림을 허용해 주세요."
-        );
-      }
-
-      if (!window.firebase) {
-        throw new Error(
-          "Firebase 프로그램을 불러오지 못했습니다."
         );
       }
 
@@ -644,37 +630,53 @@
         await registerServiceWorker();
 
       const token =
-        await messaging.getToken({
-          vapidKey: VAPID_KEY,
-          serviceWorkerRegistration:
-            registration
-        });
+        await Promise.race([
+
+          messaging.getToken({
+            vapidKey: VAPID_KEY,
+            serviceWorkerRegistration:
+              registration
+          }),
+
+          new Promise((_, reject) => {
+            setTimeout(() => {
+              reject(
+                new Error(
+                  "푸시 연결 시간이 초과되었습니다."
+                )
+              );
+            }, 3000);
+          })
+
+        ]);
 
       if (!token) {
         throw new Error(
-          "푸시 알림 토큰을 발급하지 못했습니다."
+          "토큰 발급 실패"
         );
       }
 
       return token;
     }
+        async function checkQrStatus() {
 
-    async function checkQrStatus() {
       const pending =
         restorePending();
 
       if (!qrCode && pending) {
-        qrCode = pending.qr_code;
+        qrCode =
+          pending.qr_code;
       }
 
       if (!qrCode) {
         showError(
-          "올바른 자동차 QR 주소가 아닙니다."
+          "올바른 자동차 QR이 아닙니다."
         );
         return;
       }
 
       try {
+
         const data =
           await callApi({
             action: "status",
@@ -682,16 +684,24 @@
           });
 
         if (data.registered === true) {
+
           clearPending();
+
           updateRequestState(data);
+
           showCard("request");
+
           return;
         }
-      } catch (error) {
-        console.error(error);
+
+      } catch (e) {
+        console.error(e);
       }
 
-      if (isInstalledApp() && pending) {
+      if (
+        isInstalledApp() &&
+        pending
+      ) {
         showCard("push");
         return;
       }
@@ -706,15 +716,22 @@
         return;
       }
 
-      if (isValidPhone(phoneFromUrl)) {
+      if (
+        isValidPhone(
+          phoneFromUrl
+        )
+      ) {
         phoneInput.value =
-          formatPhone(phoneFromUrl);
+          formatPhone(
+            phoneFromUrl
+          );
       }
 
       showCard("register");
     }
 
     function updateRequestState(data) {
+
       const requestCount =
         Number(
           data.request_count || 0
@@ -726,46 +743,69 @@
           requestCount >= 3
         );
 
-      if (data.next_allowed_at) {
+      if (
+        data.next_allowed_at
+      ) {
+
         startCountdown(
           data.next_allowed_at
         );
+
       } else {
+
         countdownBox.style.display =
           "none";
 
-        moveButton.disabled = false;
+        moveButton.disabled =
+          false;
+
         moveButton.textContent =
           "차량이동요청";
       }
     }
 
     function startCountdown(nextAllowedAt) {
+
       if (countdownTimer) {
-        clearInterval(countdownTimer);
+        clearInterval(
+          countdownTimer
+        );
       }
 
       const targetTime =
-        new Date(nextAllowedAt).getTime();
+        new Date(
+          nextAllowedAt
+        ).getTime();
 
       function updateCountdown() {
-        const remaining =
-          targetTime - Date.now();
 
-        if (remaining <= 0) {
-          clearInterval(countdownTimer);
-          countdownTimer = null;
+        const remaining =
+          targetTime -
+          Date.now();
+
+        if (
+          remaining <= 0
+        ) {
+
+          clearInterval(
+            countdownTimer
+          );
+
+          countdownTimer =
+            null;
 
           countdownBox.style.display =
             "none";
 
-          moveButton.disabled = false;
+          moveButton.disabled =
+            false;
+
           moveButton.textContent =
             "차량이동요청";
 
           setStatus(
             requestStatus,
-            "다음 차량이동요청을 보낼 수 있습니다.",
+            "다음 요청이 가능합니다.",
             "success"
           );
 
@@ -773,14 +813,22 @@
         }
 
         const totalSeconds =
-          Math.ceil(remaining / 1000);
+          Math.ceil(
+            remaining / 1000
+          );
 
         const minutes =
-          Math.floor(totalSeconds / 60);
+          Math.floor(
+            totalSeconds / 60
+          );
 
         const seconds =
-          String(totalSeconds % 60)
-            .padStart(2, "0");
+          String(
+            totalSeconds % 60
+          ).padStart(
+            2,
+            "0"
+          );
 
         countdownBox.style.display =
           "block";
@@ -791,7 +839,8 @@
           ":" +
           seconds;
 
-        moveButton.disabled = true;
+        moveButton.disabled =
+          true;
       }
 
       updateCountdown();
@@ -805,30 +854,44 @@
 
     phoneInput.addEventListener(
       "input",
-      function(event) {
-        event.target.value =
-          formatPhone(event.target.value);
+      (e) => {
+
+        e.target.value =
+          formatPhone(
+            e.target.value
+          );
+
       }
     );
 
     registerButton.addEventListener(
       "click",
-      function() {
-        const phone =
-          normalizePhone(phoneInput.value);
+      () => {
 
-        if (!isValidPhone(phone)) {
+        const phone =
+          normalizePhone(
+            phoneInput.value
+          );
+
+        if (
+          !isValidPhone(
+            phone
+          )
+        ) {
+
           setStatus(
             registerStatus,
-            "휴대전화번호를 정확히 입력해 주세요.",
+            "휴대전화번호를 확인해 주세요.",
             "error"
           );
 
           phoneInput.focus();
+
           return;
         }
 
-        phoneFromUrl = phone;
+        phoneFromUrl =
+          phone;
 
         savePending(
           qrCode,
@@ -836,7 +899,9 @@
         );
 
         const nextUrl =
-          new URL(window.location.href);
+          new URL(
+            location.href
+          );
 
         nextUrl.searchParams.set(
           "qr",
@@ -848,39 +913,50 @@
           phone
         );
 
-        window.history.replaceState(
+        history.replaceState(
           {},
           "",
-          nextUrl.toString()
+          nextUrl
         );
 
-        showCard("install");
+        showCard(
+          "install"
+        );
+
       }
     );
 
     window.addEventListener(
       "beforeinstallprompt",
-      function(event) {
-        event.preventDefault();
-        deferredInstallPrompt = event;
+      (e) => {
+
+        e.preventDefault();
+
+        deferredInstallPrompt =
+          e;
+
       }
     );
 
     window.addEventListener(
       "appinstalled",
-      function() {
-        deferredInstallPrompt = null;
+      () => {
+
+        deferredInstallPrompt =
+          null;
 
         sessionStorage.setItem(
           "wooriapt_install_finished",
           "true"
         );
 
-        showCard("push");
+        showCard(
+          "push"
+        );
+
       }
     );
-
-    continueButton.addEventListener(
+        continueButton.addEventListener(
       "click",
       async function() {
         continueButton.disabled = true;
@@ -921,8 +997,7 @@
           deferredInstallPrompt.prompt();
 
           const result =
-            await deferredInstallPrompt
-              .userChoice;
+            await deferredInstallPrompt.userChoice;
 
           deferredInstallPrompt = null;
 
@@ -983,7 +1058,9 @@
           }
 
           qrCode =
-            cleanQr(pending.qr_code);
+            cleanQr(
+              pending.qr_code
+            );
 
           const ownerPhone =
             normalizePhone(
@@ -1039,19 +1116,26 @@
               qr_code: qrCode
             });
 
-          updateRequestState(data);
+          updateRequestState(
+            data
+          );
         } catch (error) {
-          console.error(error);
+          console.error(
+            error
+          );
         }
 
-        showCard("request");
+        showCard(
+          "request"
+        );
       }
     );
 
     moveButton.addEventListener(
       "click",
       async function() {
-        moveButton.disabled = true;
+        moveButton.disabled =
+          true;
 
         moveButton.textContent =
           "요청 전송 중...";
@@ -1066,7 +1150,8 @@
           const data =
             await callApi({
               action: "request",
-              qr_code: qrCode,
+              qr_code:
+                qrCode,
               caller_session_id:
                 getCallerSessionId()
             });
@@ -1081,12 +1166,16 @@
           moveButton.textContent =
             "차량이동요청";
 
-          updateRequestState(data);
+          updateRequestState(
+            data
+          );
         } catch (error) {
           const data =
             error.data || {};
 
-          if (data.next_allowed_at) {
+          if (
+            data.next_allowed_at
+          ) {
             startCountdown(
               data.next_allowed_at
             );
@@ -1106,7 +1195,9 @@
             "error"
           );
 
-          if (!data.next_allowed_at) {
+          if (
+            !data.next_allowed_at
+          ) {
             moveButton.disabled =
               false;
           }
