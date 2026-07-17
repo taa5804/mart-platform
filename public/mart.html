@@ -1,18 +1,31 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  />
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+  >
 
-  <meta name="theme-color" content="#0b7a3e" />
+  <meta name="theme-color" content="#16a34a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
 
-  <title>우리마트</title>
+  <link
+    rel="manifest"
+    href="/mart-manifest.webmanifest"
+  >
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link
+    rel="apple-touch-icon"
+    href="/icons/icon-192.png"
+  >
+
+  <title>우리마트 앱 설치</title>
+
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js"></script>
 
   <style>
     * {
@@ -21,2198 +34,724 @@
 
     html,
     body {
-      margin: 0;
-      padding: 0;
-      font-family:
-        Arial,
-        "Noto Sans KR",
-        sans-serif;
-      background: #f4f5f7;
-      color: #222;
-    }
-
-    button,
-    input,
-    textarea {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .app {
       width: 100%;
-      max-width: 520px;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
       min-height: 100vh;
-      margin: 0 auto;
-      background: #ffffff;
-      padding-bottom: 90px;
-    }
-
-    .header {
-      position: sticky;
-      top: 0;
-      z-index: 30;
-      background: #0b7a3e;
-      color: #ffffff;
-      padding: 16px;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    .header-title {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 800;
-    }
-
-    .header-subtitle {
-      margin-top: 5px;
-      font-size: 13px;
-      opacity: 0.95;
-    }
-
-    .top-menu {
-      position: sticky;
-      top: 76px;
-      z-index: 25;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 5px;
-      padding: 8px;
-      background: #ffffff;
-      border-bottom: 1px solid #dddddd;
-    }
-
-    .top-menu button {
-      min-height: 48px;
-      padding: 7px 4px;
-      border: 1px solid #d6d6d6;
-      border-radius: 9px;
-      background: #ffffff;
-      color: #333333;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .top-menu button.active {
-      border-color: #0b7a3e;
-      background: #0b7a3e;
-      color: #ffffff;
-    }
-
-    .content {
-      padding: 14px;
-    }
-
-    .screen {
-      display: none;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    .section-title {
-      margin: 3px 0 14px;
-      font-size: 23px;
-      font-weight: 900;
-    }
-
-    .section-description {
-      margin: -5px 0 16px;
-      color: #666666;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .product-card {
-      overflow: hidden;
-      border: 1px solid #e1e1e1;
-      border-radius: 13px;
-      background: #ffffff;
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
-    }
-
-    .product-image-wrap {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: #eeeeee;
-    }
-
-    .product-image {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-    }
-
-    .product-badge {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      padding: 5px 8px;
-      border-radius: 999px;
-      background: #e53935;
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .product-body {
-      padding: 11px;
-    }
-
-    .product-name {
-      min-height: 42px;
-      margin: 0;
-      font-size: 16px;
-      font-weight: 800;
-      line-height: 1.35;
-      word-break: keep-all;
-    }
-
-    .normal-price {
-      margin-top: 7px;
-      color: #999999;
-      font-size: 12px;
-      text-decoration: line-through;
-    }
-
-    .sale-price {
-      margin-top: 3px;
-      color: #e53935;
-      font-size: 19px;
-      font-weight: 900;
-    }
-
-    .product-unit {
-      color: #777777;
-      font-size: 12px;
-    }
-
-    .quantity-row {
-      display: grid;
-      grid-template-columns: 34px 1fr 34px;
-      align-items: center;
-      gap: 5px;
-      margin-top: 10px;
-    }
-
-    .quantity-button {
-      width: 34px;
-      height: 34px;
-      border: 1px solid #cccccc;
-      border-radius: 7px;
-      background: #ffffff;
-      font-size: 19px;
-      font-weight: 800;
-    }
-
-    .quantity-value {
-      text-align: center;
-      font-weight: 800;
-    }
-
-    .cart-button,
-    .join-button {
-      width: 100%;
-      min-height: 42px;
-      margin-top: 9px;
-      border: 0;
-      border-radius: 8px;
-      background: #0b7a3e;
-      color: #ffffff;
-      font-weight: 800;
-    }
-
-    .join-button {
-      background: #e67e22;
-    }
-
-    .group-status {
-      margin-top: 9px;
-      padding: 8px;
-      border-radius: 8px;
-      background: #fff4e5;
-      color: #9a4d00;
-      font-size: 12px;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    .empty-message {
-      grid-column: 1 / -1;
-      padding: 35px 10px;
-      color: #777777;
-      text-align: center;
-      line-height: 1.6;
-    }
-
-    .cart-summary {
-      margin-bottom: 14px;
-      padding: 14px;
-      border-radius: 12px;
-      background: #f2f8f4;
-      border: 1px solid #cde3d5;
-    }
-
-    .cart-count {
-      font-size: 15px;
-      font-weight: 800;
-    }
-
-    .cart-total {
-      margin-top: 4px;
-      color: #0b7a3e;
-      font-size: 22px;
-      font-weight: 900;
-    }
-
-    .cart-list {
-      display: grid;
-      gap: 9px;
-      margin-bottom: 18px;
-    }
-
-    .cart-item {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 9px;
-      align-items: center;
-      padding: 12px;
-      border: 1px solid #dddddd;
-      border-radius: 10px;
-    }
-
-    .cart-item-name {
-      font-weight: 800;
-    }
-
-    .cart-item-detail {
-      margin-top: 4px;
-      color: #777777;
-      font-size: 13px;
-    }
-
-    .remove-button {
-      border: 0;
-      border-radius: 7px;
-      padding: 8px 10px;
-      background: #eeeeee;
-      color: #333333;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .order-form {
-      display: grid;
-      gap: 11px;
-      padding: 15px;
-      border: 1px solid #dddddd;
-      border-radius: 13px;
-      background: #ffffff;
-    }
-
-    .form-label {
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .form-input,
-    .form-textarea {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid #cccccc;
-      border-radius: 9px;
-      outline: none;
-      background: #ffffff;
-    }
-
-    .form-input:focus,
-    .form-textarea:focus {
-      border-color: #0b7a3e;
-    }
-
-    .form-textarea {
-      min-height: 85px;
-      resize: vertical;
-    }
-
-    .delivery-select {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .delivery-button {
-      min-height: 45px;
-      border: 1px solid #cccccc;
-      border-radius: 9px;
-      background: #ffffff;
-      font-weight: 800;
-    }
-
-    .delivery-button.active {
-      border-color: #0b7a3e;
-      background: #e8f5ed;
-      color: #0b7a3e;
-    }
-
-    .account-box {
-      padding: 13px;
-      border-radius: 9px;
-      background: #fff8df;
-      color: #5d4a00;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .order-button {
-      min-height: 51px;
-      border: 0;
-      border-radius: 10px;
-      background: #0b7a3e;
-      color: #ffffff;
-      font-size: 17px;
-      font-weight: 900;
-    }
-
-    .store-card {
-      padding: 18px;
-      border: 1px solid #dddddd;
-      border-radius: 13px;
-      background: #ffffff;
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
-    }
-
-    .store-name {
-      margin: 0 0 14px;
-      font-size: 25px;
-      font-weight: 900;
-    }
-
-    .store-row {
-      padding: 11px 0;
-      border-bottom: 1px solid #eeeeee;
-      line-height: 1.55;
-    }
-
-    .store-row:last-child {
-      border-bottom: 0;
-    }
-
-    .store-label {
-      display: block;
-      margin-bottom: 3px;
-      color: #777777;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .store-value {
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    .map-button {
-      width: 100%;
-      min-height: 49px;
-      margin-top: 14px;
-      border: 0;
-      border-radius: 9px;
-      background: #1565c0;
-      color: #ffffff;
-      font-weight: 900;
-    }
-
-    .bottom-menu {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      z-index: 40;
-      width: 100%;
-      max-width: 520px;
-      transform: translateX(-50%);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 7px;
-      padding:
-        9px
-        10px
-        calc(9px + env(safe-area-inset-bottom));
-      background: #ffffff;
-      border-top: 1px solid #dddddd;
-      box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .bottom-menu button,
-    .bottom-menu a {
+      padding: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 50px;
-      border: 0;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 16px;
-      font-weight: 900;
+      background: #f4f7fb;
+      color: #111827;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Apple SD Gothic Neo",
+        "Noto Sans KR",
+        "Malgun Gothic",
+        Arial,
+        sans-serif;
     }
 
-    .store-button {
-      background: #eeeeee;
-      color: #333333;
+    button {
+      font-family: inherit;
     }
 
-    .phone-button {
-      background: #0b7a3e;
-      color: #ffffff;
+    .container {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
     }
 
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 92px;
-      z-index: 100;
-      width: calc(100% - 36px);
-      max-width: 470px;
-      transform: translateX(-50%);
+    .card {
       display: none;
-      padding: 13px 16px;
-      border-radius: 10px;
-      background: rgba(20, 20, 20, 0.94);
-      color: #ffffff;
+      width: 100%;
+      padding: 30px 22px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 10px 35px rgba(15, 23, 42, 0.1);
       text-align: center;
-      font-size: 14px;
-      font-weight: 700;
     }
 
-    .toast.show {
+    .card.active {
       display: block;
     }
 
-    .loading {
-      padding: 45px 15px;
-      color: #777777;
-      text-align: center;
+    h1,
+    h2 {
+      margin: 0;
+      line-height: 1.4;
+      word-break: keep-all;
     }
 
-    @media (max-width: 360px) {
-      .top-menu button {
-        font-size: 11px;
-      }
+    h1 {
+      margin-bottom: 22px;
+      font-size: 27px;
+    }
 
-      .product-grid {
-        gap: 8px;
-      }
+    h2 {
+      margin-bottom: 18px;
+      font-size: 25px;
+    }
 
-      .product-body {
-        padding: 9px;
-      }
+    .benefits {
+      margin: 0 0 23px;
+      padding: 20px 18px;
+      border-radius: 13px;
+      background: #f8fafc;
+      text-align: left;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 2;
+    }
 
-      .product-name {
-        font-size: 14px;
-      }
+    .guide {
+      margin: 0 0 23px;
+      color: #475569;
+      font-size: 16px;
+      line-height: 1.8;
+      word-break: keep-all;
+    }
+
+    .guide-box {
+      margin: 0 0 22px;
+      padding: 17px;
+      border-radius: 12px;
+      background: #f0fdf4;
+      color: #166534;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.8;
+    }
+
+    button {
+      width: 100%;
+      min-height: 56px;
+      padding: 14px 16px;
+      border: 0;
+      border-radius: 11px;
+      background: #16a34a;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #cbd5e1;
+      color: #64748b;
+      cursor: not-allowed;
+    }
+
+    .status {
+      display: none;
+      margin-top: 17px;
+      padding: 13px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.6;
+      word-break: keep-all;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.success {
+      background: #ecfdf5;
+      color: #15803d;
+    }
+
+    .status.error {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .status.waiting {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .complete-icon {
+      margin-bottom: 18px;
+      font-size: 62px;
+      line-height: 1;
+    }
+
+    .complete-message {
+      margin: 0 0 25px;
+      color: #475569;
+      font-size: 16px;
+      line-height: 1.8;
+      word-break: keep-all;
     }
   </style>
 </head>
 
 <body>
-  <div class="app">
 
-    <header class="header">
-      <h1 id="headerStoreName" class="header-title">
-        우리마트
-      </h1>
+  <main class="container">
 
-      <div class="header-subtitle">
-        오늘의 상품을 편리하게 확인하세요
+    <!-- 1. 우리마트 앱 설치 안내 화면 -->
+    <section
+      id="installCard"
+      class="card active"
+    >
+      <h1>우리마트 앱 설치</h1>
+
+      <div class="benefits">
+        <div>✅ 오늘의 특가 실시간 알림</div>
+        <div>✅ 행사상품 할인 알림</div>
+        <div>✅ 공동구매 할인 알림</div>
+        <div>✅ 모바일 할인쿠폰 제공</div>
       </div>
-    </header>
 
-    <nav class="top-menu">
-      <button
-        type="button"
-        class="menu-button active"
-        data-screen="specialScreen"
-      >
-        오늘의 특가
-      </button>
+      <div class="guide">
+        앱 설치와 푸시 알림은<br>
+        우리마트 행사 정보를 받기 위해<br>
+        반드시 필요합니다.
+      </div>
 
-      <button
-        type="button"
-        class="menu-button"
-        data-screen="eventScreen"
-      >
-        행사상품
-      </button>
+      <div class="guide-box">
+        계속하기를 누르면<br>
+        앱 설치가 시작됩니다.
+      </div>
 
       <button
+        id="continueButton"
         type="button"
-        class="menu-button"
-        data-screen="groupScreen"
       >
-        공동구매
+        계속하기
       </button>
 
-      <button
-        type="button"
-        class="menu-button"
-        data-screen="orderScreen"
-      >
-        주문하기
-      </button>
-    </nav>
+      <div
+        id="installStatus"
+        class="status"
+      ></div>
+    </section>
 
-    <main class="content">
 
-      <section
-        id="specialScreen"
-        class="screen active"
-      >
-        <h2 class="section-title">
-          오늘의 특가
-        </h2>
-
-        <p class="section-description">
-          오늘만 특별한 가격으로 판매하는 상품입니다.
-        </p>
-
-        <div
-          id="specialGrid"
-          class="product-grid"
-        >
-          <div class="loading">
-            상품을 불러오는 중입니다.
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="eventScreen"
-        class="screen"
-      >
-        <h2 class="section-title">
-          행사상품
-        </h2>
-
-        <p class="section-description">
-          현재 진행 중인 행사상품입니다.
-        </p>
-
-        <div
-          id="eventGrid"
-          class="product-grid"
-        >
-          <div class="loading">
-            상품을 불러오는 중입니다.
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="groupScreen"
-        class="screen"
-      >
-        <h2 class="section-title">
-          공동구매
-        </h2>
-
-        <p class="section-description">
-          목표 인원이 모이면 공동구매가 진행됩니다.
-        </p>
-
-        <div
-          id="groupGrid"
-          class="product-grid"
-        >
-          <div class="loading">
-            상품을 불러오는 중입니다.
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="orderScreen"
-        class="screen"
-      >
-        <h2 class="section-title">
-          주문하기
-        </h2>
-
-        <div class="cart-summary">
-          <div
-            id="cartCount"
-            class="cart-count"
-          >
-            장바구니 상품 0개
-          </div>
-
-          <div
-            id="cartTotal"
-            class="cart-total"
-          >
-            0원
-          </div>
-        </div>
-
-        <div
-          id="cartList"
-          class="cart-list"
-        >
-          <div class="empty-message">
-            장바구니에 담긴 상품이 없습니다.
-          </div>
-        </div>
-
-        <form
-          id="orderForm"
-          class="order-form"
-        >
-          <label class="form-label">
-            주문자명
-          </label>
-
-          <input
-            id="customerName"
-            class="form-input"
-            type="text"
-            placeholder="주문자명을 입력하세요"
-            autocomplete="name"
-          />
-
-          <label class="form-label">
-            연락처
-          </label>
-
-          <input
-            id="customerPhone"
-            class="form-input"
-            type="tel"
-            inputmode="numeric"
-            placeholder="010-0000-0000"
-            autocomplete="tel"
-          />
-
-          <label class="form-label">
-            수령방법
-          </label>
-
-          <div class="delivery-select">
-            <button
-              id="pickupButton"
-              class="delivery-button active"
-              type="button"
-              data-delivery="방문"
-            >
-              방문
-            </button>
-
-            <button
-              id="deliveryButton"
-              class="delivery-button"
-              type="button"
-              data-delivery="배달"
-            >
-              배달
-            </button>
-          </div>
-
-          <div id="addressArea" hidden>
-            <label class="form-label">
-              배달주소
-            </label>
-
-            <input
-              id="customerAddress"
-              class="form-input"
-              type="text"
-              placeholder="배달받을 주소를 입력하세요"
-              autocomplete="street-address"
-            />
-          </div>
-
-          <label class="form-label">
-            요청사항
-          </label>
-
-          <textarea
-            id="customerRequest"
-            class="form-textarea"
-            placeholder="요청사항을 입력하세요"
-          ></textarea>
-
-          <div
-            id="accountBox"
-            class="account-box"
-          >
-            결제는 매장 방문 또는 상품 수령 시 진행합니다.
-          </div>
-
-          <button
-            id="submitOrderButton"
-            class="order-button"
-            type="submit"
-          >
-            주문 완료
-          </button>
-        </form>
-      </section>
-
-      <section
-        id="storeScreen"
-        class="screen"
-      >
-        <h2 class="section-title">
-          매장안내
-        </h2>
-
-        <div class="store-card">
-          <h3
-            id="storeName"
-            class="store-name"
-          >
-            우리마트
-          </h3>
-
-          <div class="store-row">
-            <span class="store-label">
-              주소
-            </span>
-
-            <span
-              id="storeAddress"
-              class="store-value"
-            >
-              매장 주소를 준비 중입니다.
-            </span>
-          </div>
-
-          <div class="store-row">
-            <span class="store-label">
-              전화번호
-            </span>
-
-            <span
-              id="storePhone"
-              class="store-value"
-            >
-              전화번호를 준비 중입니다.
-            </span>
-          </div>
-
-          <div class="store-row">
-            <span class="store-label">
-              영업시간
-            </span>
-
-            <span
-              id="storeHours"
-              class="store-value"
-            >
-              영업시간을 준비 중입니다.
-            </span>
-          </div>
-
-          <button
-            id="mapButton"
-            class="map-button"
-            type="button"
-          >
-            오시는 길
-          </button>
-        </div>
-      </section>
-
-    </main>
-  </div>
-
-  <div class="bottom-menu">
-    <button
-      id="bottomStoreButton"
-      class="store-button"
-      type="button"
+    <!-- 2. 푸시 알림 허용 화면 -->
+    <section
+      id="pushCard"
+      class="card"
     >
-      매장안내
-    </button>
+      <h2>푸시 알림을 허용해 주세요</h2>
 
-    <a
-      id="bottomPhoneButton"
-      class="phone-button"
-      href="tel:"
+      <div class="guide">
+        오늘의 특가와 행사 정보를 받으려면<br>
+        푸시 알림을 반드시 허용해야 합니다.
+      </div>
+
+      <button
+        id="pushButton"
+        type="button"
+      >
+        푸시 알림 허용하기
+      </button>
+
+      <div
+        id="pushStatus"
+        class="status"
+      ></div>
+    </section>
+
+
+    <!-- 3. 설치 완료 화면 -->
+    <section
+      id="completeCard"
+      class="card"
     >
-      전화하기
-    </a>
-  </div>
+      <div class="complete-icon">
+        ✅
+      </div>
 
-  <div
-    id="toast"
-    class="toast"
-  ></div>
+      <h2>설치가 완료되었습니다</h2>
+
+      <div class="complete-message">
+        이제 우리마트의 오늘의 특가,<br>
+        행사상품, 공동구매 및 할인쿠폰<br>
+        알림을 받을 수 있습니다.
+      </div>
+
+      <button
+        id="openMartButton"
+        type="button"
+      >
+        우리마트 보기
+      </button>
+    </section>
+
+  </main>
+
 
   <script>
     (() => {
       "use strict";
 
-      const SUPABASE_URL =
-        "https://dcysjuxyjqtvkihdsjvv.supabase.co";
+      const VAPID_KEY =
+        "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYqS5mxxWMn0GogdgDs1Qod93Vj0jM";
 
-      const SUPABASE_KEY =
-        "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
+      const firebaseConfig = {
+        apiKey:
+          "AIzaSyB3nZdmUrj2wsKPQpOV8dLso7i17fZo0Hc",
 
-      const db =
-        window.supabase.createClient(
-          SUPABASE_URL,
-          SUPABASE_KEY
-        );
+        authDomain:
+          "wooriapt-carqr.firebaseapp.com",
 
-      const query =
-        new URLSearchParams(
-          window.location.search
-        );
+        projectId:
+          "wooriapt-carqr",
 
-      const STORE_ID =
-        query.get("store") ||
-        query.get("store_id") ||
-        "default";
+        storageBucket:
+          "wooriapt-carqr.firebasestorage.app",
 
-      const state = {
-        products: [],
-        cart: [],
-        deliveryType: "방문",
+        messagingSenderId:
+          "101299637796",
 
-        store: {
-          id: STORE_ID,
-          name: "우리마트",
-          phone: "",
-          address: "",
-          business_hours: "",
-          map_url: "",
-          bank_account: ""
-        }
+        appId:
+          "1:101299637796:web:cb69372592026b7aa192b1"
       };
 
-      const specialGrid =
-        document.getElementById(
-          "specialGrid"
+      if (!firebase.apps.length) {
+        firebase.initializeApp(
+          firebaseConfig
         );
-
-      const eventGrid =
-        document.getElementById(
-          "eventGrid"
-        );
-
-      const groupGrid =
-        document.getElementById(
-          "groupGrid"
-        );
-
-      const cartList =
-        document.getElementById(
-          "cartList"
-        );
-
-      const cartCount =
-        document.getElementById(
-          "cartCount"
-        );
-
-      const cartTotal =
-        document.getElementById(
-          "cartTotal"
-        );
-
-      const orderForm =
-        document.getElementById(
-          "orderForm"
-        );
-
-      const customerName =
-        document.getElementById(
-          "customerName"
-        );
-
-      const customerPhone =
-        document.getElementById(
-          "customerPhone"
-        );
-
-      const customerAddress =
-        document.getElementById(
-          "customerAddress"
-        );
-
-      const customerRequest =
-        document.getElementById(
-          "customerRequest"
-        );
-
-      const addressArea =
-        document.getElementById(
-          "addressArea"
-        );
-
-      const accountBox =
-        document.getElementById(
-          "accountBox"
-        );
-
-      const headerStoreName =
-        document.getElementById(
-          "headerStoreName"
-        );
-
-      const storeName =
-        document.getElementById(
-          "storeName"
-        );
-
-      const storeAddress =
-        document.getElementById(
-          "storeAddress"
-        );
-
-      const storePhone =
-        document.getElementById(
-          "storePhone"
-        );
-
-      const storeHours =
-        document.getElementById(
-          "storeHours"
-        );
-
-      const mapButton =
-        document.getElementById(
-          "mapButton"
-        );
-
-      const bottomPhoneButton =
-        document.getElementById(
-          "bottomPhoneButton"
-        );
-
-      const toast =
-        document.getElementById(
-          "toast"
-        );
-
-      function showToast(message) {
-        toast.textContent = message;
-        toast.classList.add("show");
-
-        window.clearTimeout(
-          showToast.timer
-        );
-
-        showToast.timer =
-          window.setTimeout(() => {
-            toast.classList.remove(
-              "show"
-            );
-          }, 2200);
       }
 
-      function cleanPhone(value) {
-        return String(value || "")
-          .replace(/\D/g, "")
-          .slice(0, 11);
-      }
+      const messaging =
+        firebase.messaging();
 
-      function formatPhone(value) {
-        const number =
-          cleanPhone(value);
+      const installCard =
+        document.getElementById(
+          "installCard"
+        );
 
-        if (number.length <= 3) {
-          return number;
-        }
+      const pushCard =
+        document.getElementById(
+          "pushCard"
+        );
 
-        if (number.length <= 7) {
-          return (
-            number.slice(0, 3) +
-            "-" +
-            number.slice(3)
+      const completeCard =
+        document.getElementById(
+          "completeCard"
+        );
+
+      const continueButton =
+        document.getElementById(
+          "continueButton"
+        );
+
+      const pushButton =
+        document.getElementById(
+          "pushButton"
+        );
+
+      const openMartButton =
+        document.getElementById(
+          "openMartButton"
+        );
+
+      const installStatus =
+        document.getElementById(
+          "installStatus"
+        );
+
+      const pushStatus =
+        document.getElementById(
+          "pushStatus"
+        );
+
+      let deferredInstallPrompt =
+        null;
+
+
+      function showCard(card) {
+        [
+          installCard,
+          pushCard,
+          completeCard
+        ].forEach(element => {
+          element.classList.remove(
+            "active"
           );
-        }
+        });
 
-        return (
-          number.slice(0, 3) +
-          "-" +
-          number.slice(3, 7) +
-          "-" +
-          number.slice(7, 11)
+        card.classList.add(
+          "active"
         );
       }
 
-      function formatPrice(value) {
-        const number =
-          Number(value || 0);
 
-        return (
-          number.toLocaleString(
-            "ko-KR"
-          ) + "원"
-        );
-      }
-
-      function normalizeCategory(value) {
-        const text =
-          String(value || "")
-            .trim()
-            .toLowerCase();
-
-        if (
-          text === "special" ||
-          text === "today" ||
-          text.includes("특가")
-        ) {
-          return "special";
-        }
-
-        if (
-          text === "group" ||
-          text.includes("공동")
-        ) {
-          return "group";
-        }
-
-        return "event";
-      }
-
-      function normalizeProduct(row) {
-        return {
-          id:
-            row.id ||
-            crypto.randomUUID(),
-
-          store_id:
-            row.store_id ||
-            STORE_ID,
-
-          category:
-            normalizeCategory(
-              row.category ||
-              row.product_type ||
-              row.type
-            ),
-
-          name:
-            row.name ||
-            row.product_name ||
-            row.title ||
-            "상품명",
-
-          price:
-            Number(
-              row.sale_price ??
-              row.price ??
-              0
-            ),
-
-          normal_price:
-            Number(
-              row.normal_price ??
-              row.original_price ??
-              0
-            ),
-
-          unit:
-            row.unit ||
-            row.description ||
-            "",
-
-          image_url:
-            row.image_url ||
-            row.photo_url ||
-            row.image ||
-            "",
-
-          participant_count:
-            Number(
-              row.participant_count ??
-              row.current_count ??
-              0
-            ),
-
-          target_count:
-            Number(
-              row.target_count ??
-              row.goal_count ??
-              0
-            ),
-
-          is_active:
-            row.is_active !== false,
-
-          sort_order:
-            Number(
-              row.sort_order ??
-              row.position ??
-              0
-            )
-        };
-      }
-
-      function fallbackProducts() {
-        return [
-          {
-            id: "sample-special-1",
-            category: "special",
-            name: "오늘의 특가상품",
-            price: 1980,
-            normal_price: 2500,
-            unit: "100g",
-            image_url:
-              "https://placehold.co/800x800?text=오늘의+특가",
-            participant_count: 0,
-            target_count: 0,
-            is_active: true,
-            sort_order: 1
-          },
-          {
-            id: "sample-event-1",
-            category: "event",
-            name: "행사상품",
-            price: 4200,
-            normal_price: 5000,
-            unit: "행사기간 한정",
-            image_url:
-              "https://placehold.co/800x800?text=행사상품",
-            participant_count: 0,
-            target_count: 0,
-            is_active: true,
-            sort_order: 1
-          },
-          {
-            id: "sample-group-1",
-            category: "group",
-            name: "공동구매 상품",
-            price: 39800,
-            normal_price: 49800,
-            unit: "공동구매",
-            image_url:
-              "https://placehold.co/800x800?text=공동구매",
-            participant_count: 15,
-            target_count: 30,
-            is_active: true,
-            sort_order: 1
-          }
-        ];
-      }
-
-      function productCard(product) {
-        const card =
-          document.createElement("article");
-
-        card.className =
-          "product-card";
-
-        const badgeText =
-          product.category === "special"
-            ? "오늘의 특가"
-            : product.category === "group"
-              ? "공동구매"
-              : "행사상품";
-
-        const normalPriceHtml =
-          product.normal_price >
-          product.price
-            ? `
-              <div class="normal-price">
-                ${formatPrice(
-                  product.normal_price
-                )}
-              </div>
-            `
-            : "";
-
-        const groupHtml =
-          product.category === "group"
-            ? `
-              <div class="group-status">
-                ${product.participant_count}명 참여 /
-                목표 ${product.target_count || 0}명
-              </div>
-            `
-            : "";
-
-        const buttonText =
-          product.category === "group"
-            ? "참여하기"
-            : "장바구니";
-
-        const buttonClass =
-          product.category === "group"
-            ? "join-button"
-            : "cart-button";
-
-        card.innerHTML = `
-          <div class="product-image-wrap">
-            <img
-              class="product-image"
-              src="${product.image_url ||
-                "https://placehold.co/800x800?text=상품사진"}"
-              alt="${product.name}"
-              loading="lazy"
-              onerror="
-                this.onerror=null;
-                this.src='https://placehold.co/800x800?text=상품사진';
-              "
-            />
-
-            <span class="product-badge">
-              ${badgeText}
-            </span>
-          </div>
-
-          <div class="product-body">
-            <h3 class="product-name">
-              ${product.name}
-            </h3>
-
-            ${normalPriceHtml}
-
-            <div class="sale-price">
-              ${formatPrice(product.price)}
-            </div>
-
-            ${
-              product.unit
-                ? `
-                  <div class="product-unit">
-                    ${product.unit}
-                  </div>
-                `
-                : ""
-            }
-
-            <div class="quantity-row">
-              <button
-                class="quantity-button minus-button"
-                type="button"
-              >
-                −
-              </button>
-
-              <div class="quantity-value">
-                1
-              </div>
-
-              <button
-                class="quantity-button plus-button"
-                type="button"
-              >
-                +
-              </button>
-            </div>
-
-            ${groupHtml}
-
-            <button
-              class="${buttonClass} add-button"
-              type="button"
-            >
-              ${buttonText}
-            </button>
-          </div>
-        `;
-
-        let quantity = 1;
-
-        const quantityValue =
-          card.querySelector(
-            ".quantity-value"
-          );
-
-        card
-          .querySelector(
-            ".minus-button"
-          )
-          .addEventListener(
-            "click",
-            () => {
-              quantity =
-                Math.max(
-                  1,
-                  quantity - 1
-                );
-
-              quantityValue.textContent =
-                quantity;
-            }
-          );
-
-        card
-          .querySelector(
-            ".plus-button"
-          )
-          .addEventListener(
-            "click",
-            () => {
-              quantity =
-                Math.min(
-                  99,
-                  quantity + 1
-                );
-
-              quantityValue.textContent =
-                quantity;
-            }
-          );
-
-        card
-          .querySelector(
-            ".add-button"
-          )
-          .addEventListener(
-            "click",
-            () => {
-              addToCart(
-                product,
-                quantity
-              );
-            }
-          );
-
-        return card;
-      }
-
-      function renderProductGrid(
+      function setStatus(
         element,
-        products,
-        maximum
+        message,
+        type
       ) {
-        element.innerHTML = "";
+        element.textContent =
+          message;
 
-        const visibleProducts =
-          products
-            .filter(
-              product =>
-                product.is_active
-            )
-            .sort(
-              (a, b) =>
-                a.sort_order -
-                b.sort_order
-            )
-            .slice(0, maximum);
+        element.className =
+          "status show " + type;
+      }
 
+
+      function clearStatus(element) {
+        element.textContent = "";
+        element.className =
+          "status";
+      }
+
+
+      function isInstalledApp() {
+        return (
+          window.matchMedia(
+            "(display-mode: standalone)"
+          ).matches ||
+          window.navigator.standalone ===
+            true
+        );
+      }
+
+
+      function isIOS() {
+        return /iphone|ipad|ipod/i.test(
+          navigator.userAgent
+        );
+      }
+
+
+      async function registerServiceWorker() {
         if (
-          visibleProducts.length === 0
-        ) {
-          element.innerHTML = `
-            <div class="empty-message">
-              등록된 상품이 없습니다.
-            </div>
-          `;
-
-          return;
-        }
-
-        visibleProducts.forEach(
-          product => {
-            element.appendChild(
-              productCard(product)
-            );
-          }
-        );
-      }
-
-      function renderProducts() {
-        renderProductGrid(
-          specialGrid,
-          state.products.filter(
-            product =>
-              product.category ===
-              "special"
-          ),
-          8
-        );
-
-        renderProductGrid(
-          eventGrid,
-          state.products.filter(
-            product =>
-              product.category ===
-              "event"
-          ),
-          20
-        );
-
-        renderProductGrid(
-          groupGrid,
-          state.products.filter(
-            product =>
-              product.category ===
-              "group"
-          ),
-          6
-        );
-      }
-
-      function addToCart(
-        product,
-        quantity
-      ) {
-        const existing =
-          state.cart.find(
-            item =>
-              item.product.id ===
-              product.id
-          );
-
-        if (existing) {
-          existing.quantity +=
-            quantity;
-        } else {
-          state.cart.push({
-            product,
-            quantity
-          });
-        }
-
-        renderCart();
-
-        showToast(
-          product.category === "group"
-            ? "공동구매 상품이 주문목록에 추가되었습니다."
-            : "장바구니에 담았습니다."
-        );
-      }
-
-      function removeCartItem(
-        productId
-      ) {
-        state.cart =
-          state.cart.filter(
-            item =>
-              item.product.id !==
-              productId
-          );
-
-        renderCart();
-      }
-
-      function renderCart() {
-        const totalQuantity =
-          state.cart.reduce(
-            (sum, item) =>
-              sum + item.quantity,
-            0
-          );
-
-        const totalPrice =
-          state.cart.reduce(
-            (sum, item) =>
-              sum +
-              item.product.price *
-                item.quantity,
-            0
-          );
-
-        cartCount.textContent =
-          `장바구니 상품 ${totalQuantity}개`;
-
-        cartTotal.textContent =
-          formatPrice(totalPrice);
-
-        cartList.innerHTML = "";
-
-        if (
-          state.cart.length === 0
-        ) {
-          cartList.innerHTML = `
-            <div class="empty-message">
-              장바구니에 담긴 상품이 없습니다.
-            </div>
-          `;
-
-          return;
-        }
-
-        state.cart.forEach(
-          item => {
-            const row =
-              document.createElement(
-                "div"
-              );
-
-            row.className =
-              "cart-item";
-
-            row.innerHTML = `
-              <div>
-                <div class="cart-item-name">
-                  ${item.product.name}
-                </div>
-
-                <div class="cart-item-detail">
-                  ${formatPrice(
-                    item.product.price
-                  )}
-                  ×
-                  ${item.quantity}개
-                  =
-                  ${formatPrice(
-                    item.product.price *
-                    item.quantity
-                  )}
-                </div>
-              </div>
-
-              <button
-                class="remove-button"
-                type="button"
-              >
-                삭제
-              </button>
-            `;
-
-            row
-              .querySelector(
-                ".remove-button"
-              )
-              .addEventListener(
-                "click",
-                () => {
-                  removeCartItem(
-                    item.product.id
-                  );
-                }
-              );
-
-            cartList.appendChild(row);
-          }
-        );
-      }
-
-      function showScreen(screenId) {
-        document
-          .querySelectorAll(
-            ".screen"
+          !(
+            "serviceWorker" in
+            navigator
           )
-          .forEach(screen => {
-            screen.classList.remove(
-              "active"
-            );
-          });
+        ) {
+          throw new Error(
+            "현재 브라우저에서는 푸시 알림을 지원하지 않습니다."
+          );
+        }
 
-        document
-          .querySelectorAll(
-            ".menu-button"
+        await navigator
+          .serviceWorker
+          .register(
+            "/firebase-messaging-sw.js"
+          );
+
+        return await navigator
+          .serviceWorker
+          .ready;
+      }
+
+
+      async function createPushToken() {
+        if (
+          !(
+            "Notification" in
+            window
           )
-          .forEach(button => {
-            button.classList.remove(
-              "active"
-            );
+        ) {
+          throw new Error(
+            "현재 브라우저에서는 푸시 알림을 사용할 수 없습니다."
+          );
+        }
+
+        const permission =
+          await Notification
+            .requestPermission();
+
+        if (
+          permission !==
+          "granted"
+        ) {
+          throw new Error(
+            "푸시 알림을 허용해야 행사 알림을 받을 수 있습니다."
+          );
+        }
+
+        const serviceWorkerRegistration =
+          await registerServiceWorker();
+
+        const token =
+          await messaging.getToken({
+            vapidKey:
+              VAPID_KEY,
+
+            serviceWorkerRegistration:
+              serviceWorkerRegistration
           });
 
-        const screen =
-          document.getElementById(
-            screenId
-          );
-
-        if (screen) {
-          screen.classList.add(
-            "active"
+        if (!token) {
+          throw new Error(
+            "푸시 알림 연결에 실패했습니다."
           );
         }
 
-        const menuButton =
-          document.querySelector(
-            `[data-screen="${screenId}"]`
-          );
-
-        if (menuButton) {
-          menuButton.classList.add(
-            "active"
-          );
-        }
-
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        });
+        return token;
       }
 
-      function setDeliveryType(type) {
-        state.deliveryType = type;
 
-        document
-          .querySelectorAll(
-            ".delivery-button"
-          )
-          .forEach(button => {
-            button.classList.toggle(
-              "active",
-              button.dataset.delivery ===
-                type
-            );
-          });
-
-        addressArea.hidden =
-          type !== "배달";
-      }
-
-      async function loadProducts() {
-        let rows = null;
-
-        const attempts = [
-          async () =>
-            await db
-              .from("products")
-              .select("*")
-              .eq(
-                "store_id",
-                STORE_ID
-              )
-              .order(
-                "sort_order",
-                {
-                  ascending: true
-                }
-              ),
-
-          async () =>
-            await db
-              .from("products")
-              .select("*")
-              .order(
-                "sort_order",
-                {
-                  ascending: true
-                }
-              ),
-
-          async () =>
-            await db
-              .from("mart_products")
-              .select("*")
-              .eq(
-                "store_id",
-                STORE_ID
-              ),
-
-          async () =>
-            await db
-              .from("mart_products")
-              .select("*")
-        ];
-
-        for (
-          const attempt of attempts
-        ) {
-          try {
-            const result =
-              await attempt();
-
-            if (
-              !result.error &&
-              Array.isArray(
-                result.data
-              )
-            ) {
-              rows = result.data;
-              break;
-            }
-          } catch (error) {
-            console.warn(error);
-          }
-        }
-
-        if (
-          rows &&
-          rows.length > 0
-        ) {
-          state.products =
-            rows.map(
-              normalizeProduct
-            );
-        } else {
-          state.products =
-            fallbackProducts();
-        }
-
-        renderProducts();
-      }
-
-      function normalizeStore(row) {
-        return {
-          id:
-            row.id ||
-            row.store_id ||
-            STORE_ID,
-
-          name:
-            row.name ||
-            row.store_name ||
-            row.mart_name ||
-            "우리마트",
-
-          phone:
-            row.phone ||
-            row.store_phone ||
-            "",
-
-          address:
-            row.address ||
-            row.store_address ||
-            "",
-
-          business_hours:
-            row.business_hours ||
-            row.hours ||
-            row.opening_hours ||
-            "",
-
-          map_url:
-            row.map_url ||
-            row.map_link ||
-            "",
-
-          bank_account:
-            row.bank_account ||
-            row.account ||
-            ""
-        };
-      }
-
-      async function loadStore() {
-        let row = null;
-
-        const attempts = [
-          async () =>
-            await db
-              .from("stores")
-              .select("*")
-              .eq(
-                "id",
-                STORE_ID
-              )
-              .maybeSingle(),
-
-          async () =>
-            await db
-              .from("stores")
-              .select("*")
-              .eq(
-                "store_id",
-                STORE_ID
-              )
-              .maybeSingle(),
-
-          async () =>
-            await db
-              .from("store_info")
-              .select("*")
-              .eq(
-                "store_id",
-                STORE_ID
-              )
-              .maybeSingle(),
-
-          async () =>
-            await db
-              .from("store_info")
-              .select("*")
-              .limit(1)
-              .maybeSingle()
-        ];
-
-        for (
-          const attempt of attempts
-        ) {
-          try {
-            const result =
-              await attempt();
-
-            if (
-              !result.error &&
-              result.data
-            ) {
-              row = result.data;
-              break;
-            }
-          } catch (error) {
-            console.warn(error);
-          }
-        }
-
-        if (row) {
-          state.store =
-            normalizeStore(row);
-        }
-
-        renderStore();
-      }
-
-      function renderStore() {
-        headerStoreName.textContent =
-          state.store.name ||
-          "우리마트";
-
-        storeName.textContent =
-          state.store.name ||
-          "우리마트";
-
-        storeAddress.textContent =
-          state.store.address ||
-          "매장 주소를 준비 중입니다.";
-
-        storePhone.textContent =
-          state.store.phone ||
-          "전화번호를 준비 중입니다.";
-
-        storeHours.textContent =
-          state.store.business_hours ||
-          "영업시간을 준비 중입니다.";
-
-        const cleanStorePhone =
-          cleanPhone(
-            state.store.phone
-          );
-
-        bottomPhoneButton.href =
-          cleanStorePhone
-            ? `tel:${cleanStorePhone}`
-            : "javascript:void(0)";
-
-        if (
-          state.store.bank_account
-        ) {
-          accountBox.textContent =
-            `입금계좌: ${state.store.bank_account}`;
-        }
-      }
-
-      async function submitOrder() {
-        const name =
-          customerName.value.trim();
-
-        const phone =
-          cleanPhone(
-            customerPhone.value
-          );
-
-        const address =
-          customerAddress.value.trim();
-
-        const request =
-          customerRequest.value.trim();
-
-        if (
-          state.cart.length === 0
-        ) {
-          showToast(
-            "장바구니에 상품을 담아 주세요."
-          );
-
-          return;
-        }
-
-        if (!name) {
-          showToast(
-            "주문자명을 입력해 주세요."
-          );
-
-          customerName.focus();
-          return;
-        }
-
-        if (
-          phone.length < 10
-        ) {
-          showToast(
-            "연락처를 정확히 입력해 주세요."
-          );
-
-          customerPhone.focus();
-          return;
-        }
-
-        if (
-          state.deliveryType ===
-            "배달" &&
-          !address
-        ) {
-          showToast(
-            "배달주소를 입력해 주세요."
-          );
-
-          customerAddress.focus();
-          return;
-        }
-
-        const totalPrice =
-          state.cart.reduce(
-            (sum, item) =>
-              sum +
-              item.product.price *
-                item.quantity,
-            0
-          );
-
-        const orderItems =
-          state.cart.map(
-            item => ({
-              product_id:
-                item.product.id,
-
-              product_name:
-                item.product.name,
-
-              price:
-                item.product.price,
-
-              quantity:
-                item.quantity,
-
-              amount:
-                item.product.price *
-                item.quantity
-            })
-          );
-
-        const orderData = {
-          store_id: STORE_ID,
-          customer_name: name,
-          customer_phone: phone,
-          delivery_type:
-            state.deliveryType,
-
-          address:
-            state.deliveryType ===
-            "배달"
-              ? address
-              : "",
-
-          request_message:
-            request,
-
-          total_price:
-            totalPrice,
-
-          items:
-            orderItems,
-
-          status: "접수",
-
-          created_at:
-            new Date().toISOString()
-        };
-
-        const button =
-          document.getElementById(
-            "submitOrderButton"
-          );
-
-        button.disabled = true;
-        button.textContent =
-          "주문 접수 중...";
-
-        try {
-          let saved = false;
-
-          const attempts = [
-            async () =>
-              await db
-                .from("orders")
-                .insert(
-                  orderData
-                ),
-
-            async () =>
-              await db
-                .from("mart_orders")
-                .insert(
-                  orderData
-                )
-          ];
-
-          for (
-            const attempt of attempts
-          ) {
-            try {
-              const result =
-                await attempt();
-
-              if (!result.error) {
-                saved = true;
-                break;
-              }
-            } catch (error) {
-              console.warn(error);
-            }
-          }
-
-          if (!saved) {
-            throw new Error(
-              "주문 저장에 실패했습니다."
-            );
-          }
-
-          alert(
-            "주문이 완료되었습니다.\n매장에서 확인 후 연락드리겠습니다."
-          );
-
-          state.cart = [];
-
-          orderForm.reset();
-
-          setDeliveryType(
-            "방문"
-          );
-
-          renderCart();
-        } catch (error) {
-          console.error(error);
-
-          alert(
-            "주문 접수에 실패했습니다.\n잠시 후 다시 시도해 주세요."
-          );
-        } finally {
-          button.disabled = false;
-          button.textContent =
-            "주문 완료";
-        }
-      }
-
-      document
-        .querySelectorAll(
-          ".menu-button"
-        )
-        .forEach(button => {
-          button.addEventListener(
-            "click",
-            () => {
-              showScreen(
-                button.dataset.screen
-              );
-            }
-          );
-        });
-
-      document
-        .querySelectorAll(
-          ".delivery-button"
-        )
-        .forEach(button => {
-          button.addEventListener(
-            "click",
-            () => {
-              setDeliveryType(
-                button.dataset.delivery
-              );
-            }
-          );
-        });
-
-      document
-        .getElementById(
-          "bottomStoreButton"
-        )
-        .addEventListener(
-          "click",
-          () => {
-            showScreen(
-              "storeScreen"
-            );
-          }
-        );
-
-      bottomPhoneButton.addEventListener(
+      continueButton.addEventListener(
         "click",
-        event => {
-          if (
-            !cleanPhone(
-              state.store.phone
-            )
-          ) {
-            event.preventDefault();
+        async () => {
+          clearStatus(
+            installStatus
+          );
 
-            showToast(
-              "매장 전화번호가 등록되지 않았습니다."
+          continueButton.disabled =
+            true;
+
+          continueButton.textContent =
+            "앱 설치 중...";
+
+          try {
+            if (
+              isInstalledApp()
+            ) {
+              localStorage.setItem(
+                "martPwaInstalled",
+                "true"
+              );
+
+              showCard(
+                pushCard
+              );
+
+              return;
+            }
+
+            if (isIOS()) {
+              setStatus(
+                installStatus,
+                "화면 아래 공유 버튼을 누른 후 ‘홈 화면에 추가’를 선택하고 설치된 우리마트 앱을 실행해 주세요.",
+                "waiting"
+              );
+
+              return;
+            }
+
+            if (
+              !deferredInstallPrompt
+            ) {
+              /*
+               * 자동차 QR에서 사용한 것과 동일하게
+               * 설치 이벤트가 나타나지 않아도 버튼이 멈추지 않고
+               * 푸시 알림 허용 화면으로 이동합니다.
+               */
+              localStorage.setItem(
+                "martPwaInstalled",
+                "true"
+              );
+
+              showCard(
+                pushCard
+              );
+
+              return;
+            }
+
+            deferredInstallPrompt
+              .prompt();
+
+            const result =
+              await deferredInstallPrompt
+                .userChoice;
+
+            deferredInstallPrompt =
+              null;
+
+            if (
+              result.outcome ===
+              "accepted"
+            ) {
+              localStorage.setItem(
+                "martPwaInstalled",
+                "true"
+              );
+
+              showCard(
+                pushCard
+              );
+
+              return;
+            }
+
+            throw new Error(
+              "앱 설치를 완료해 주세요."
             );
+
+          } catch (error) {
+            setStatus(
+              installStatus,
+              error.message ||
+                "앱 설치를 완료하지 못했습니다.",
+              "error"
+            );
+
+          } finally {
+            continueButton.disabled =
+              false;
+
+            continueButton.textContent =
+              "계속하기";
           }
         }
       );
 
-      mapButton.addEventListener(
+
+      pushButton.addEventListener(
+        "click",
+        async () => {
+          clearStatus(
+            pushStatus
+          );
+
+          pushButton.disabled =
+            true;
+
+          pushButton.textContent =
+            "푸시 알림 등록 중...";
+
+          try {
+            const pushToken =
+              await createPushToken();
+
+            localStorage.setItem(
+              "martPushToken",
+              pushToken
+            );
+
+            localStorage.setItem(
+              "martPushRegistered",
+              "true"
+            );
+
+            showCard(
+              completeCard
+            );
+
+          } catch (error) {
+            setStatus(
+              pushStatus,
+              error.message ||
+                "푸시 알림 등록에 실패했습니다.",
+              "error"
+            );
+
+          } finally {
+            pushButton.disabled =
+              false;
+
+            pushButton.textContent =
+              "푸시 알림 허용하기";
+          }
+        }
+      );
+
+
+      openMartButton.addEventListener(
         "click",
         () => {
-          if (
-            state.store.map_url
-          ) {
-            window.open(
-              state.store.map_url,
-              "_blank",
-              "noopener"
-            );
+          window.location.href =
+            "/";
+        }
+      );
 
-            return;
-          }
 
-          if (
-            state.store.address
-          ) {
-            const mapUrl =
-              "https://www.google.com/maps/search/?api=1&query=" +
-              encodeURIComponent(
-                state.store.address
-              );
+      window.addEventListener(
+        "beforeinstallprompt",
+        event => {
+          event.preventDefault();
 
-            window.open(
-              mapUrl,
-              "_blank",
-              "noopener"
-            );
+          deferredInstallPrompt =
+            event;
+        }
+      );
 
-            return;
-          }
 
-          showToast(
-            "매장 주소가 등록되지 않았습니다."
+      window.addEventListener(
+        "appinstalled",
+        () => {
+          deferredInstallPrompt =
+            null;
+
+          localStorage.setItem(
+            "martPwaInstalled",
+            "true"
+          );
+
+          showCard(
+            pushCard
           );
         }
       );
 
-      customerPhone.addEventListener(
-        "input",
-        event => {
-          event.target.value =
-            formatPhone(
-              event.target.value
+
+      messaging.onMessage(
+        payload => {
+          const notification =
+            payload &&
+            payload.notification;
+
+          if (notification) {
+            alert(
+              (
+                notification.title ||
+                "우리마트"
+              ) +
+              "\n" +
+              (
+                notification.body ||
+                ""
+              )
             );
+          }
         }
       );
 
-      orderForm.addEventListener(
-        "submit",
-        event => {
-          event.preventDefault();
-          submitOrder();
+
+      function initializePage() {
+        const pushRegistered =
+          localStorage.getItem(
+            "martPushRegistered"
+          ) === "true";
+
+        if (pushRegistered) {
+          showCard(
+            completeCard
+          );
+
+          return;
         }
-      );
 
-      async function initialize() {
-        renderCart();
+        if (
+          isInstalledApp() ||
+          localStorage.getItem(
+            "martPwaInstalled"
+          ) === "true"
+        ) {
+          showCard(
+            pushCard
+          );
 
-        await Promise.all([
-          loadProducts(),
-          loadStore()
-        ]);
+          return;
+        }
+
+        showCard(
+          installCard
+        );
       }
 
-      initialize();
+
+      initializePage();
+
     })();
   </script>
+
 </body>
 </html>
