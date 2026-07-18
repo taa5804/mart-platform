@@ -27,13 +27,13 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle =
     notification.title ||
     data.title ||
-    "자동차 QR 알림";
+    "우리마트 알림";
 
   const notificationOptions = {
     body:
       notification.body ||
       data.body ||
-      "차량 이동 요청이 도착했습니다.",
+      "새로운 행사와 특가 소식이 도착했습니다.",
 
     icon:
       data.icon ||
