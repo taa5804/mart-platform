@@ -7,7 +7,7 @@ importScripts(
 );
 
 firebase.initializeApp({
-  apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
+  apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dLso7i17fZo0Hc",
   authDomain: "wooriapt-carqr.firebaseapp.com",
   projectId: "wooriapt-carqr",
   storageBucket: "wooriapt-carqr.firebasestorage.app",
@@ -27,13 +27,13 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle =
     notification.title ||
     data.title ||
-    "우리마트 알림";
+    "자동차 QR 알림";
 
   const notificationOptions = {
     body:
       notification.body ||
       data.body ||
-      "새로운 행사와 특가 소식이 도착했습니다.",
+      "차량 이동 요청이 도착했습니다.",
 
     icon:
       data.icon ||
