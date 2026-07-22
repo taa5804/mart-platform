@@ -7,10 +7,7 @@ importScripts(
 );
 
 firebase.initializeApp({
-  const firebaseConfig = {
   apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
-  ...
-}
   authDomain: "wooriapt-carqr.firebaseapp.com",
   projectId: "wooriapt-carqr",
   storageBucket: "wooriapt-carqr.firebasestorage.app",
