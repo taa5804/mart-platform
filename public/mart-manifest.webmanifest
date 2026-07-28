@@ -1,11 +1,12 @@
 {
   "id": "/mart.html",
-  "name": "우리마트",
-  "short_name": "우리마트",
-  "start_url": "/mart.html?store=STORE0001&source=app",
+  "name": "우리가게",
+  "short_name": "우리가게",
+  "description": "우리가게 특가, 행사, 공동구매 알림 앱",
+  "start_url": "/mart.html",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f5f7fb",
+  "background_color": "#ffffff",
   "theme_color": "#16a34a",
   "orientation": "portrait",
   "icons": [
