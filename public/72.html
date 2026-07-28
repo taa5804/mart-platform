@@ -10,7 +10,7 @@
 
   <meta name="theme-color" content="#16a34a">
 
-  <link rel="manifest" href="/mart-manifest.webmanifest?v=20260728">
+  <link rel="manifest" href="/mart-manifest.webmanifest?v=20260728-5">
 
   <title>우리가게 앱 설치</title>
 
@@ -240,7 +240,7 @@
     </p>
 
     <button id="completeButton" type="button">
-      확인
+      우리가게 바로가기
     </button>
   </section>
 
@@ -306,6 +306,12 @@
 
     const CALLER_KEY =
       "wooriapt_vehicle_caller_session";
+
+    const MART_QR_KEY =
+      "woorigage_selected_qr";
+
+    const MART_CODE_KEY =
+      "woorigage_selected_mart_code";
 
     const params =
       new URLSearchParams(window.location.search);
@@ -373,6 +379,65 @@
         .trim()
         .toUpperCase()
         .replace(/[^A-Z0-9_-]/g, "");
+    }
+
+    function getMartCode(code) {
+      const match =
+        cleanQr(code).match(
+          /(?:^|-)M([0-9]+)(?:-|$)/
+        );
+
+      if (!match) {
+        return "";
+      }
+
+      return (
+        "M" +
+        String(match[1]).padStart(2, "0")
+      );
+    }
+
+    function saveSelectedMart(code) {
+      const cleanCode = cleanQr(code);
+      const martCode = getMartCode(cleanCode);
+
+      if (cleanCode) {
+        localStorage.setItem(
+          MART_QR_KEY,
+          cleanCode
+        );
+      }
+
+      if (martCode) {
+        localStorage.setItem(
+          MART_CODE_KEY,
+          martCode
+        );
+      }
+    }
+
+    function waitForInstallPrompt(timeoutMs) {
+      return new Promise(function(resolve) {
+        if (deferredInstallPrompt) {
+          resolve(deferredInstallPrompt);
+          return;
+        }
+
+        const startedAt = Date.now();
+
+        const timer = setInterval(function() {
+          if (deferredInstallPrompt) {
+            clearInterval(timer);
+            resolve(deferredInstallPrompt);
+            return;
+          }
+
+          if (Date.now() - startedAt >= timeoutMs) {
+            clearInterval(timer);
+            resolve(null);
+          }
+        }, 150);
+      });
     }
 
     function normalizePhone(value) {
@@ -685,6 +750,10 @@
         return;
       }
 
+      saveSelectedMart(
+        qrCode
+      );
+
       try {
         const data =
           await callApi({
@@ -846,6 +915,10 @@
           phone
         );
 
+        saveSelectedMart(
+          qrCode
+        );
+
         const nextUrl =
           new URL(window.location.href);
 
@@ -919,21 +992,20 @@
             return;
           }
 
-          if (!deferredInstallPrompt) {
-            sessionStorage.setItem(
-              "wooriapt_install_finished",
-              "true"
-            );
+          const installPrompt =
+            deferredInstallPrompt ||
+            await waitForInstallPrompt(3000);
 
-            showCard("push");
-            return;
+          if (!installPrompt) {
+            throw new Error(
+              "앱 설치창이 준비되지 않았습니다. 잠시 후 계속하기를 다시 눌러주세요."
+            );
           }
 
-          deferredInstallPrompt.prompt();
+          installPrompt.prompt();
 
           const result =
-            await deferredInstallPrompt
-              .userChoice;
+            await installPrompt.userChoice;
 
           deferredInstallPrompt = null;
 
@@ -1043,8 +1115,12 @@
     completeButton.addEventListener(
       "click",
       function() {
+        saveSelectedMart(
+          qrCode
+        );
+
         window.location.href =
-          "https://wooriapt.ai.kr/74";
+          "/mart-open.html";
       }
     );
 
@@ -1162,7 +1238,15 @@
 
     document.addEventListener(
       "DOMContentLoaded",
-      checkQrStatus
+      function() {
+        if (qrCode) {
+          saveSelectedMart(
+            qrCode
+          );
+        }
+
+        checkQrStatus();
+      }
     );
   </script>
 </body>
