@@ -2,7 +2,7 @@
   "id": "/woorigage-app",
   "name": "우리가게",
   "short_name": "우리가게",
-  "description": "에너젠마트 특가·행사 알림 앱",
+  "description": "마트 특가·행사 알림 앱",
   "start_url": "/mart-open.html",
   "scope": "/",
   "display": "standalone",
