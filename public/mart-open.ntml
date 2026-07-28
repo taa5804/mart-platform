@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>우리가게</title>
+</head>
+
+<body>
+  <div style="
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:Arial,sans-serif;
+    font-size:17px;
+  ">
+    해당 마트로 이동하고 있습니다.
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const MART_CODE_KEY =
+        "woorigage_selected_mart_code";
+
+      const DEFAULT_URL =
+        "https://wooriapt.ai.kr/74";
+
+      function getSavedMartCode() {
+        return String(
+          localStorage.getItem(
+            MART_CODE_KEY
+          ) || ""
+        )
+          .trim()
+          .toUpperCase();
+      }
+
+      function getMartPageNumber(
+        martCode
+      ) {
+        const match =
+          martCode.match(
+            /^M([0-9]+)$/
+          );
+
+        if (!match) {
+          return null;
+        }
+
+        const martNumber =
+          Number(match[1]);
+
+        if (
+          !Number.isInteger(
+            martNumber
+          ) ||
+          martNumber < 1
+        ) {
+          return null;
+        }
+
+        return 73 + martNumber;
+      }
+
+      function getMartUrl(
+        martCode
+      ) {
+        const pageNumber =
+          getMartPageNumber(
+            martCode
+          );
+
+        if (!pageNumber) {
+          return DEFAULT_URL;
+        }
+
+        return (
+          "https://wooriapt.ai.kr/" +
+          pageNumber
+        );
+      }
+
+      const savedMartCode =
+        getSavedMartCode();
+
+      const destination =
+        getMartUrl(
+          savedMartCode
+        );
+
+      window.location.replace(
+        destination
+      );
+    })();
+  </script>
+</body>
+</html>
