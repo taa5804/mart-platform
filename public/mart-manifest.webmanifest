@@ -1,8 +1,8 @@
 {
-  "id": "/woorigage-app",
+  "id": "/woorigage-app-v1",
   "name": "우리가게",
   "short_name": "우리가게",
-  "description": "마트 특가·행사 알림 앱",
+  "description": "우리동네 마트 특가와 행사 알림",
   "start_url": "/mart-open.html",
   "scope": "/",
   "display": "standalone",
