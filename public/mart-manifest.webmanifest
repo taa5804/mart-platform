@@ -1,10 +1,10 @@
 {
-  "id": "/mart.html",
+  "id": "/mart-app",
   "name": "우리가게",
   "short_name": "우리가게",
   "description": "우리가게 특가, 행사, 공동구매 알림 앱",
   "start_url": "/mart.html",
-  "scope": "/",
+  "scope": "/mart.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#16a34a",
