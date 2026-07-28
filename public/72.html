@@ -10,7 +10,7 @@
 
   <meta name="theme-color" content="#16a34a">
 
-  <link rel="manifest" href="/mart-manifest.webmanifest?v=20260728-5">
+  <link rel="manifest" href="/mart-manifest.webmanifest?v=20260728">
 
   <title>우리가게 앱 설치</title>
 
@@ -240,7 +240,7 @@
     </p>
 
     <button id="completeButton" type="button">
-      우리가게 바로가기
+      확인
     </button>
   </section>
 
@@ -307,11 +307,11 @@
     const CALLER_KEY =
       "wooriapt_vehicle_caller_session";
 
+    const MART_CODE_KEY =
+            "woorigage_selected_mart_code";
+
     const MART_QR_KEY =
       "woorigage_selected_qr";
-
-    const MART_CODE_KEY =
-      "woorigage_selected_mart_code";
 
     const params =
       new URLSearchParams(window.location.search);
@@ -398,8 +398,11 @@
     }
 
     function saveSelectedMart(code) {
-      const cleanCode = cleanQr(code);
-      const martCode = getMartCode(cleanCode);
+      const cleanCode =
+        cleanQr(code);
+
+      const martCode =
+        getMartCode(cleanCode);
 
       if (cleanCode) {
         localStorage.setItem(
@@ -620,6 +623,7 @@
           },
           body: JSON.stringify(payload)
         });
+              });
 
       const text =
         await response.text();
@@ -750,9 +754,7 @@
         return;
       }
 
-      saveSelectedMart(
-        qrCode
-      );
+      saveSelectedMart(qrCode);
 
       try {
         const data =
@@ -915,9 +917,7 @@
           phone
         );
 
-        saveSelectedMart(
-          qrCode
-        );
+        saveSelectedMart(qrCode);
 
         const nextUrl =
           new URL(window.location.href);
@@ -963,8 +963,7 @@
         showCard("push");
       }
     );
-
-    continueButton.addEventListener(
+        continueButton.addEventListener(
       "click",
       async function() {
         continueButton.disabled = true;
@@ -1073,6 +1072,8 @@
               pending.owner_phone
             );
 
+          saveSelectedMart(qrCode);
+
           const fcmToken =
             await createFcmToken();
 
@@ -1115,9 +1116,7 @@
     completeButton.addEventListener(
       "click",
       function() {
-        saveSelectedMart(
-          qrCode
-        );
+        saveSelectedMart(qrCode);
 
         window.location.href =
           "/mart-open.html";
@@ -1240,9 +1239,7 @@
       "DOMContentLoaded",
       function() {
         if (qrCode) {
-          saveSelectedMart(
-            qrCode
-          );
+          saveSelectedMart(qrCode);
         }
 
         checkQrStatus();
