@@ -8,14 +8,22 @@
     content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
   >
 
-  <meta name="theme-color" content="#16a34a">
+  <meta
+    name="theme-color"
+    content="#16a34a"
+  >
 
   <link
     rel="manifest"
     href="/mart-manifest.webmanifest"
   >
 
-  <title>우리마트 앱 설치</title>
+  <link
+    rel="apple-touch-icon"
+    href="/icon-192.png"
+  >
+
+  <title>우리가게 앱 설치</title>
 
   <style>
     * {
@@ -53,7 +61,9 @@
       padding: 30px 22px;
       background: #ffffff;
       border-radius: 18px;
-      box-shadow: 0 10px 35px rgba(15, 23, 42, 0.1);
+      box-shadow:
+        0 10px 35px
+        rgba(15, 23, 42, 0.1);
       text-align: center;
     }
 
@@ -84,6 +94,24 @@
       font-size: 16px;
       line-height: 1.8;
       word-break: keep-all;
+    }
+
+    .manual-guide {
+      display: none;
+      margin: 18px 0 0;
+      padding: 17px;
+      border-radius: 12px;
+      background: #fff7ed;
+      color: #9a3412;
+      text-align: left;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.8;
+      word-break: keep-all;
+    }
+
+    .manual-guide.active {
+      display: block;
     }
 
     button {
@@ -130,12 +158,12 @@
 
 <body>
 
-  <!-- 1. 우리마트 메인 화면 -->
+  <!-- 1. 우리가게 앱 설치 화면 -->
   <section
     id="installCard"
     class="card active"
   >
-    <h1>우리마트 앱 설치</h1>
+    <h1>우리가게 앱 설치</h1>
 
     <div class="benefits">
       <div>✅ 오늘의 특가 실시간 알림</div>
@@ -146,7 +174,7 @@
 
     <div class="guide">
       앱 설치와 푸시 알림은<br>
-      우리마트 행사 정보를 받기 위해<br>
+      우리가게 행사 정보를 받기 위해<br>
       반드시 필요합니다.<br><br>
 
       계속하기를 누르면<br>
@@ -164,10 +192,24 @@
       id="installStatus"
       class="status"
     ></div>
+
+    <div
+      id="manualGuide"
+      class="manual-guide"
+    >
+      자동 설치창이 나타나지 않았습니다.<br><br>
+
+      휴대전화 화면 오른쪽 위의<br>
+      <strong>점 3개 메뉴</strong>를 누른 다음<br>
+      <strong>설치 및 바로가기 만들기</strong>를 누르세요.<br><br>
+
+      <strong>우리가게 설치</strong>를 완료한 후<br>
+      홈 화면에서 <strong>우리가게 앱</strong>을 실행하세요.
+    </div>
   </section>
 
 
-  <!-- 2. 푸시알림 승인 화면 -->
+  <!-- 2. 푸시 알림 승인 화면 -->
   <section
     id="pushCard"
     class="card"
@@ -201,7 +243,7 @@
     <h1>등록 완료</h1>
 
     <div class="guide">
-      우리마트 앱 설치와<br>
+      우리가게 앱 설치와<br>
       푸시 알림 설정이 완료되었습니다.
     </div>
 
@@ -209,7 +251,7 @@
       id="completeButton"
       type="button"
     >
-      확인
+      우리가게 바로가기
     </button>
   </section>
 
@@ -238,11 +280,17 @@
         "1:101299637796:web:cb69372592026b7aa192b1"
     };
 
+
     const VAPID_KEY =
       "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
 
-    let deferredInstallPrompt =
-      null;
+
+    let deferredInstallPrompt = null;
+
+    let installEventReceived = false;
+
+    let serviceWorkerRegistration = null;
+
 
     const installCard =
       document.getElementById(
@@ -284,6 +332,11 @@
         "pushStatus"
       );
 
+    const manualGuide =
+      document.getElementById(
+        "manualGuide"
+      );
+
 
     function showCard(card) {
       installCard.classList.remove(
@@ -312,7 +365,7 @@
     function setStatus(
       element,
       message,
-      type
+      type = ""
     ) {
       element.textContent =
         message || "";
@@ -333,9 +386,41 @@
         window.matchMedia(
           "(display-mode: standalone)"
         ).matches ||
-        window.navigator.standalone ===
-          true
+        window.navigator.standalone === true
       );
+    }
+
+
+    function wait(milliseconds) {
+      return new Promise(
+        resolve => {
+          setTimeout(
+            resolve,
+            milliseconds
+          );
+        }
+      );
+    }
+
+
+    async function waitForInstallPrompt() {
+      if (deferredInstallPrompt) {
+        return true;
+      }
+
+      for (
+        let attempt = 0;
+        attempt < 10;
+        attempt += 1
+      ) {
+        await wait(300);
+
+        if (deferredInstallPrompt) {
+          return true;
+        }
+      }
+
+      return false;
     }
 
 
@@ -347,22 +432,44 @@
         )
       ) {
         throw new Error(
-          "이 브라우저에서는 푸시를 사용할 수 없습니다."
+          "이 브라우저에서는 앱 알림을 사용할 수 없습니다."
         );
       }
 
-      return navigator
+      if (serviceWorkerRegistration) {
+        return serviceWorkerRegistration;
+      }
+
+      serviceWorkerRegistration =
+        await navigator
+          .serviceWorker
+          .register(
+            "/firebase-messaging-sw.js",
+            {
+              scope: "/"
+            }
+          );
+
+      await navigator
         .serviceWorker
-        .register(
-          "/firebase-messaging-sw.js",
-          {
-            scope: "/"
-          }
-        );
+        .ready;
+
+      return serviceWorkerRegistration;
     }
 
 
     async function createFcmToken() {
+      if (
+        !(
+          "Notification" in
+          window
+        )
+      ) {
+        throw new Error(
+          "이 브라우저에서는 푸시 알림을 지원하지 않습니다."
+        );
+      }
+
       const permission =
         await Notification
           .requestPermission();
@@ -401,7 +508,7 @@
 
       if (!token) {
         throw new Error(
-          "토큰 발급 실패"
+          "푸시 알림 토큰을 발급하지 못했습니다."
         );
       }
 
@@ -416,6 +523,19 @@
 
         deferredInstallPrompt =
           event;
+
+        installEventReceived =
+          true;
+
+        manualGuide.classList.remove(
+          "active"
+        );
+
+        setStatus(
+          installStatus,
+          "앱 설치 준비가 완료되었습니다.",
+          "success"
+        );
       }
     );
 
@@ -426,9 +546,15 @@
         deferredInstallPrompt =
           null;
 
-        sessionStorage.setItem(
-          "wooriapt_install_finished",
+        localStorage.setItem(
+          "woorigage_app_installed",
           "true"
+        );
+
+        setStatus(
+          installStatus,
+          "우리가게 앱 설치가 완료되었습니다.",
+          "success"
         );
 
         showCard(
@@ -445,30 +571,26 @@
           true;
 
         continueButton.textContent =
-          "앱 설치 중...";
+          "앱 설치 확인 중...";
+
+        manualGuide.classList.remove(
+          "active"
+        );
 
         setStatus(
           installStatus,
-          "앱 설치 화면을 열고 있습니다.",
+          "우리가게 앱 설치 상태를 확인하고 있습니다.",
           "waiting"
         );
 
         try {
+          await registerServiceWorker();
+
           if (
             isInstalledApp()
           ) {
-            showCard(
-              pushCard
-            );
-
-            return;
-          }
-
-          if (
-            !deferredInstallPrompt
-          ) {
-            sessionStorage.setItem(
-              "wooriapt_install_finished",
+            localStorage.setItem(
+              "woorigage_app_installed",
               "true"
             );
 
@@ -479,8 +601,33 @@
             return;
           }
 
-          deferredInstallPrompt
-            .prompt();
+          const installPromptReady =
+            await waitForInstallPrompt();
+
+          if (
+            !installPromptReady ||
+            !deferredInstallPrompt
+          ) {
+            manualGuide.classList.add(
+              "active"
+            );
+
+            setStatus(
+              installStatus,
+              "자동 설치창이 준비되지 않았습니다. 아래 안내에 따라 설치해 주세요.",
+              "error"
+            );
+
+            continueButton.disabled =
+              false;
+
+            continueButton.textContent =
+              "설치 완료 후 다시 확인";
+
+            return;
+          }
+
+          deferredInstallPrompt.prompt();
 
           const result =
             await deferredInstallPrompt
@@ -493,10 +640,18 @@
             result.outcome ===
             "accepted"
           ) {
-            sessionStorage.setItem(
-              "wooriapt_install_finished",
+            localStorage.setItem(
+              "woorigage_app_installed",
               "true"
             );
+
+            setStatus(
+              installStatus,
+              "우리가게 앱 설치가 완료되었습니다.",
+              "success"
+            );
+
+            await wait(700);
 
             showCard(
               pushCard
@@ -506,7 +661,7 @@
           }
 
           throw new Error(
-            "앱 설치를 완료해 주세요."
+            "우리가게 앱 설치를 완료해 주세요."
           );
 
         } catch (error) {
@@ -547,13 +702,22 @@
             await createFcmToken();
 
           localStorage.setItem(
-            "wooriapt_mart_push_token",
+            "woorigage_mart_push_token",
             fcmToken
           );
 
-          sessionStorage.removeItem(
-            "wooriapt_install_finished"
+          localStorage.setItem(
+            "woorigage_push_enabled",
+            "true"
           );
+
+          setStatus(
+            pushStatus,
+            "푸시 알림 설정이 완료되었습니다.",
+            "success"
+          );
+
+          await wait(500);
 
           showCard(
             completeCard
@@ -586,16 +750,52 @@
     );
 
 
-    if (
-      isInstalledApp() &&
-      sessionStorage.getItem(
-        "wooriapt_install_finished"
-      ) === "true"
-    ) {
-      showCard(
-        pushCard
-      );
-    }
+    document.addEventListener(
+      "DOMContentLoaded",
+      async function() {
+        try {
+          await registerServiceWorker();
+        } catch (error) {
+          console.error(
+            error
+          );
+        }
+
+        if (
+          isInstalledApp()
+        ) {
+          localStorage.setItem(
+            "woorigage_app_installed",
+            "true"
+          );
+
+          showCard(
+            pushCard
+          );
+        }
+      }
+    );
+
+
+    window.matchMedia(
+      "(display-mode: standalone)"
+    ).addEventListener(
+      "change",
+      event => {
+        if (
+          event.matches
+        ) {
+          localStorage.setItem(
+            "woorigage_app_installed",
+            "true"
+          );
+
+          showCard(
+            pushCard
+          );
+        }
+      }
+    );
   </script>
 
 </body>
