@@ -2,7 +2,7 @@
   "id": "/woorigage-app",
   "name": "우리가게",
   "short_name": "우리가게",
-  "description": "우리동네 매장의 특가·행사 알림 앱",
+  "description": "우리동네 매장 특가·행사 알림",
   "lang": "ko-KR",
   "start_url": "/mart-open.html",
   "scope": "/",
