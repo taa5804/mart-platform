@@ -12,7 +12,7 @@ firebase.initializeApp({
   projectId: "wooriapt-carqr",
   storageBucket: "wooriapt-carqr.firebasestorage.app",
   messagingSenderId: "101299637796",
-  appId: "1:101299637796:web:cb69372592026b7aa192b1"
+  appId: "1:101299637796:web:cb69372592026b7aa192b1",
 });
 
 const messaging = firebase.messaging();
