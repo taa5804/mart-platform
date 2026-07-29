@@ -659,7 +659,7 @@
 
       const permission =
         await Notification.requestPermission();
-
+console.log("permission =", permission);
       if (permission !== "granted") {
         throw new Error(
           "푸시 알림을 허용해 주세요."
