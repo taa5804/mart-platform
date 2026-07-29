@@ -2,104 +2,212 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#16a34a">
   <title>우리가게</title>
-</head>
 
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f4f7fb;
+      color: #111827;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 28px 22px;
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: 0 10px 35px rgba(15, 23, 42, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: 24px;
+      line-height: 1.4;
+    }
+
+    p {
+      margin: 0;
+      color: #64748b;
+      font-size: 15px;
+      line-height: 1.7;
+      word-break: keep-all;
+    }
+
+    .error {
+      color: #dc2626;
+      font-weight: 700;
+    }
+  </style>
+</head>
 <body>
-  <div style="
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:Arial,sans-serif;
-    font-size:17px;
-  ">
-    해당 마트로 이동하고 있습니다.
-  </div>
+  <main class="card">
+    <h1 id="title">우리가게를 여는 중</h1>
+    <p id="message">등록된 매장으로 이동하고 있습니다.<br>잠시만 기다려 주세요.</p>
+  </main>
 
   <script>
-    (() => {
-      "use strict";
+    "use strict";
 
-      const MART_CODE_KEY =
-        "woorigage_selected_mart_code";
+    const STORE_CODE_KEY = "wooriapt_store_code";
+    const STORE_PATH_KEY = "wooriapt_store_path";
 
-      const DEFAULT_URL =
-        "https://wooriapt.ai.kr/74";
+    const params = new URLSearchParams(window.location.search);
 
-      function getSavedMartCode() {
-        return String(
-          localStorage.getItem(
-            MART_CODE_KEY
-          ) || ""
-        )
-          .trim()
-          .toUpperCase();
+    function cleanStoreCode(value) {
+      return String(value || "")
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9_-]/g, "");
+    }
+
+    function cleanStorePath(value) {
+      const numbers = String(value || "")
+        .replace(/[^0-9]/g, "");
+
+      if (!numbers) {
+        return "";
       }
 
-      function getMartPageNumber(
-        martCode
-      ) {
-        const match =
-          martCode.match(
-            /^M([0-9]+)$/
-          );
+      const storeNumber = Number(numbers);
 
-        if (!match) {
-          return null;
-        }
-
-        const martNumber =
-          Number(match[1]);
-
-        if (
-          !Number.isInteger(
-            martNumber
-          ) ||
-          martNumber < 1
-        ) {
-          return null;
-        }
-
-        return 73 + martNumber;
+      if (!Number.isSafeInteger(storeNumber) || storeNumber <= 0) {
+        return "";
       }
 
-      function getMartUrl(
-        martCode
-      ) {
-        const pageNumber =
-          getMartPageNumber(
-            martCode
-          );
+      return "/" + storeNumber;
+    }
 
-        if (!pageNumber) {
-          return DEFAULT_URL;
-        }
+    function storePathFromCode(storeCode) {
+      const match = String(storeCode || "")
+        .match(/-(\d{5})$/);
 
-        return (
-          "https://wooriapt.ai.kr/" +
-          pageNumber
+      if (!match) {
+        return "";
+      }
+
+      return cleanStorePath(match[1]);
+    }
+
+    function saveStore(storeCode, storePath) {
+      if (storeCode) {
+        localStorage.setItem(
+          STORE_CODE_KEY,
+          storeCode
         );
       }
 
-      const savedMartCode =
-        getSavedMartCode();
+      if (storePath) {
+        localStorage.setItem(
+          STORE_PATH_KEY,
+          storePath
+        );
+      }
+    }
+
+    function showError(message) {
+      document.getElementById("title").textContent =
+        "매장 연결이 필요합니다";
+
+      const messageElement =
+        document.getElementById("message");
+
+      messageElement.textContent = message;
+      messageElement.classList.add("error");
+    }
+
+    function openRegisteredStore() {
+      const queryStoreCode = cleanStoreCode(
+        params.get("store") ||
+        params.get("store_code")
+      );
+
+      let queryStorePath = cleanStorePath(
+        params.get("path") ||
+        params.get("store_path")
+      );
+
+      if (!queryStorePath && queryStoreCode) {
+        queryStorePath =
+          storePathFromCode(queryStoreCode);
+      }
+
+      if (queryStoreCode || queryStorePath) {
+        saveStore(
+          queryStoreCode,
+          queryStorePath
+        );
+      }
+
+      const savedStoreCode = cleanStoreCode(
+        localStorage.getItem(STORE_CODE_KEY)
+      );
+
+      let savedStorePath = cleanStorePath(
+        localStorage.getItem(STORE_PATH_KEY)
+      );
+
+      if (!savedStorePath && savedStoreCode) {
+        savedStorePath =
+          storePathFromCode(savedStoreCode);
+
+        if (savedStorePath) {
+          localStorage.setItem(
+            STORE_PATH_KEY,
+            savedStorePath
+          );
+        }
+      }
 
       const destination =
-        getMartUrl(
-          savedMartCode
-        );
+        queryStorePath || savedStorePath;
 
-      window.location.replace(
-        destination
-      );
-    })();
+      if (!destination) {
+        showError(
+          "등록된 매장 정보가 없습니다. 자동차 QR 등록을 먼저 완료해 주세요."
+        );
+        return;
+      }
+
+      if (destination === window.location.pathname) {
+        showError(
+          "매장 이동 주소가 올바르지 않습니다."
+        );
+        return;
+      }
+
+      window.location.replace(destination);
+    }
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      openRegisteredStore
+    );
   </script>
 </body>
 </html>
