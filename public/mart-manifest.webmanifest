@@ -1,15 +1,14 @@
 {
-  "id": "/woorigage-app",
+  "id": "/mart-open.html",
   "name": "우리가게",
   "short_name": "우리가게",
-  "description": "우리동네 매장 특가·행사 알림",
-  "lang": "ko-KR",
+  "description": "우리가게 특가·행사 알림",
   "start_url": "/mart-open.html",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#16a34a",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/icon-192.png",
