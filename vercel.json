@@ -1,23 +1,55 @@
 {
-  "rewrites": [
-    {
-      "source": "/72",
-      "destination": "/72.html"
-    },
-    {
-      "source": "/admin",
-      "destination": "/admin.html"
-    }
-  ],
+  "cleanUrls": true,
+
+  "trailingSlash": false,
+
   "headers": [
+
     {
-      "source": "/sw.js",
+      "source": "/firebase-messaging-sw.js",
+
       "headers": [
+
+        {
+          "key": "Service-Worker-Allowed",
+
+          "value": "/"
+        },
+
         {
           "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
+
+          "value": "no-cache, no-store, must-revalidate"
         }
+
       ]
+
+    },
+
+    {
+      "source": "/mart-manifest.webmanifest",
+
+      "headers": [
+
+        {
+          "key": "Content-Type",
+
+          "value": "application/manifest+json"
+        }
+
+      ]
+
     }
+
+  ],
+
+  "rewrites": [
+
+    {
+      "source": "/",
+
+      "destination": "/index.html"
+    }
+
   ]
 }
