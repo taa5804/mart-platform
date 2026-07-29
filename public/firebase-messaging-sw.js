@@ -7,7 +7,7 @@ importScripts(
 );
 
 firebase.initializeApp({
-  apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
+  apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dLso7i17fZo0Hc",
   authDomain: "wooriapt-carqr.firebaseapp.com",
   projectId: "wooriapt-carqr",
   storageBucket: "wooriapt-carqr.firebasestorage.app",
@@ -17,86 +17,115 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage((payload) => {
+messaging.onBackgroundMessage(function (payload) {
+
   const notification =
     payload.notification || {};
 
   const data =
     payload.data || {};
 
-  const notificationTitle =
+  const title =
     notification.title ||
     data.title ||
-    "자동차 QR 알림";
+    "우리가게 알림";
 
-  const notificationOptions = {
+  const options = {
+
     body:
       notification.body ||
       data.body ||
-      "차량 이동 요청이 도착했습니다.",
+      "새로운 특가·행사 알림이 도착했습니다.",
 
     icon:
       data.icon ||
-      "/icons/icon-192.png",
+      "/icon-192.png",
 
     badge:
       data.badge ||
-      "/icons/icon-192.png",
+      "/icon-192.png",
+
+    tag:
+      data.tag ||
+      "woorigage-notification",
+
+    renotify: true,
+
+    requireInteraction: false,
 
     data: {
+
       url:
         data.url ||
-        "/"
-    },
+        data.click_action ||
+        "/mart-open.html",
 
-    vibrate: [
-      200,
-      100,
-      200
-    ],
+      store_code:
+        data.store_code ||
+        "",
 
-    requireInteraction: true
+      store_path:
+        data.store_path ||
+        ""
+
+    }
+
   };
 
-  return self.registration.showNotification(
-    notificationTitle,
-    notificationOptions
+  self.registration.showNotification(
+    title,
+    options
   );
+
 });
 
 self.addEventListener(
   "notificationclick",
-  (event) => {
+  function (event) {
+
     event.notification.close();
 
+    const data =
+      event.notification.data || {};
+
     const targetUrl =
-      event.notification.data?.url ||
-      "/";
+      data.url ||
+      "/mart-open.html";
 
     event.waitUntil(
-      clients
-        .matchAll({
-          type: "window",
-          includeUncontrolled: true
-        })
-        .then((clientList) => {
-          for (const client of clientList) {
-            if (
-              "focus" in client
-            ) {
-              client.navigate(targetUrl);
-              return client.focus();
-            }
+
+      clients.matchAll({
+
+        type: "window",
+
+        includeUncontrolled: true
+
+      }).then(function (clientList) {
+
+        for (const client of clientList) {
+
+          if ("focus" in client) {
+
+            client.navigate(targetUrl);
+
+            return client.focus();
+
           }
 
-          if (
-            clients.openWindow
-          ) {
-            return clients.openWindow(
-              targetUrl
-            );
-          }
-        })
+        }
+
+        if (clients.openWindow) {
+
+          return clients.openWindow(
+            targetUrl
+          );
+
+        }
+
+      })
+
     );
+
   }
+
 );
