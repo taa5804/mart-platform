@@ -148,13 +148,7 @@
     const PENDING_KEY = "wooriapt_vehicle_pending_registration";
     const STORE_CODE_KEY = "wooriapt_store_code";
     const STORE_PATH_KEY = "wooriapt_store_path";
-    const STORE_URL_KEY = "wooriapt_store_url";
     const CALLER_KEY = "wooriapt_vehicle_caller_session";
-
-    /* 확정된 매장 연결표: STORE0001 = 에너젠마트 /74 */
-    const STORE_PATH_MAP = {
-      STORE0001: "/74"
-    };
 
     const params = new URLSearchParams(location.search);
     let qrCode = cleanQr(params.get("qr"));
@@ -201,38 +195,10 @@
       return numbers ? "/" + String(Number(numbers)) : "";
     }
 
-    function extractStoreCodeFromQr(code) {
-      const match = cleanQr(code).match(/-(STORE[0-9]+)$/);
-      return match ? cleanStoreCode(match[1]) : "";
-    }
-
     function storePathFromCode(code) {
-      const cleanCode = cleanStoreCode(code);
-
-      if (STORE_PATH_MAP[cleanCode]) {
-        return STORE_PATH_MAP[cleanCode];
-      }
-
-      const match = cleanCode.match(/-(\d{5})$/);
+      const match = String(code || "").match(/-(\d{5})$/);
       if (!match) return "";
-
       return "/" + String(Number(match[1]));
-    }
-
-    function resolveStoreInformation() {
-      if (!storeCode) {
-        storeCode = extractStoreCodeFromQr(qrCode);
-      }
-
-      if (!storePath && storeCode) {
-        storePath = storePathFromCode(storeCode);
-      }
-
-      return {
-        store_code: storeCode,
-        store_path: storePath,
-        store_url: storePath
-      };
     }
 
     function normalizePhone(value) {
@@ -275,14 +241,13 @@
     function savePending(phone) {
       if (!qrCode || !isValidPhone(phone)) return;
 
-      const storeInformation = resolveStoreInformation();
+      if (!storePath && storeCode) storePath = storePathFromCode(storeCode);
 
       const data = {
         qr_code: qrCode,
         owner_phone: phone,
-        store_code: storeInformation.store_code,
-        store_path: storeInformation.store_path,
-        store_url: storeInformation.store_url
+        store_code: storeCode,
+        store_path: storePath
       };
 
       localStorage.setItem(PENDING_KEY, JSON.stringify(data));
@@ -300,8 +265,7 @@
           qr_code: cleanQr(data.qr_code),
           owner_phone: normalizePhone(data.owner_phone),
           store_code: cleanStoreCode(data.store_code),
-          store_path: cleanStorePath(data.store_path),
-          store_url: cleanStorePath(data.store_url || data.store_path)
+          store_path: cleanStorePath(data.store_path)
         };
         if (!pending.qr_code || !isValidPhone(pending.owner_phone)) return null;
         return pending;
@@ -319,7 +283,7 @@
       if (!pending) return null;
       qrCode = qrCode || pending.qr_code;
       storeCode = storeCode || pending.store_code;
-      storePath = storePath || pending.store_url || pending.store_path;
+      storePath = storePath || pending.store_path;
       return pending;
     }
 
@@ -547,39 +511,19 @@
 
         const fcmToken = await createFcmToken();
 
-        const registerData = await callApi({
+        await callApi({
           action: "register",
           qr_code: pending.qr_code,
           owner_phone: pending.owner_phone,
           push_token: fcmToken,
           store_code: pending.store_code || null,
           store_path: pending.store_path || null,
-          store_url: pending.store_url || pending.store_path || null,
           platform: "web",
           user_agent: navigator.userAgent
         });
 
-        const finalStoreCode = cleanStoreCode(
-          registerData.store_code || pending.store_code
-        );
-
-        const finalStoreUrl = cleanStorePath(
-          registerData.store_url ||
-          registerData.store_path ||
-          pending.store_url ||
-          pending.store_path ||
-          storePathFromCode(finalStoreCode)
-        );
-
-        if (finalStoreCode) {
-          localStorage.setItem(STORE_CODE_KEY, finalStoreCode);
-        }
-
-        if (finalStoreUrl) {
-          localStorage.setItem(STORE_PATH_KEY, finalStoreUrl);
-          localStorage.setItem(STORE_URL_KEY, finalStoreUrl);
-        }
-
+        if (pending.store_code) localStorage.setItem(STORE_CODE_KEY, pending.store_code);
+        if (pending.store_path) localStorage.setItem(STORE_PATH_KEY, pending.store_path);
         localStorage.setItem("wooriapt_mart_push_token", fcmToken);
 
         clearPending();
@@ -643,7 +587,7 @@
     });
 
     document.addEventListener("DOMContentLoaded", () => {
-      resolveStoreInformation();
+      if (!storePath && storeCode) storePath = storePathFromCode(storeCode);
       checkRegisteredStatus();
     });
   </script>
