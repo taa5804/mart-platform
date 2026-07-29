@@ -2,9 +2,15 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+  >
+
   <meta name="theme-color" content="#16a34a">
-  <title>우리가게</title>
+
+  <title>우리가게 열기</title>
 
   <style>
     * {
@@ -25,7 +31,6 @@
       align-items: center;
       justify-content: center;
       background: #f4f7fb;
-      color: #111827;
       font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -33,14 +38,15 @@
         Roboto,
         Arial,
         sans-serif;
+      color: #111827;
     }
 
     .card {
       width: 100%;
       max-width: 420px;
-      padding: 28px 22px;
-      border-radius: 18px;
+      padding: 30px 22px;
       background: #ffffff;
+      border-radius: 18px;
       box-shadow: 0 10px 35px rgba(15, 23, 42, 0.1);
       text-align: center;
     }
@@ -65,149 +71,160 @@
     }
   </style>
 </head>
+
 <body>
-  <main class="card">
-    <h1 id="title">우리가게를 여는 중</h1>
-    <p id="message">등록된 매장으로 이동하고 있습니다.<br>잠시만 기다려 주세요.</p>
-  </main>
+
+  <section class="card">
+
+    <h1 id="title">
+      우리가게를 열고 있습니다
+    </h1>
+
+    <p id="message">
+      잠시만 기다려 주세요.
+    </p>
+
+  </section>
 
   <script>
     "use strict";
 
-    const STORE_CODE_KEY = "wooriapt_store_code";
-    const STORE_PATH_KEY = "wooriapt_store_path";
+    const STORE_CODE_KEY =
+      "wooriapt_store_code";
 
-    const params = new URLSearchParams(window.location.search);
+    const STORE_PATH_KEY =
+      "wooriapt_store_path";
+
+    const title =
+      document.getElementById(
+        "title"
+      );
+
+    const message =
+      document.getElementById(
+        "message"
+      );
 
     function cleanStoreCode(value) {
+
       return String(value || "")
         .trim()
         .toUpperCase()
-        .replace(/[^A-Z0-9_-]/g, "");
+        .replace(
+          /[^A-Z0-9_-]/g,
+          ""
+        );
+
     }
 
     function cleanStorePath(value) {
-      const numbers = String(value || "")
-        .replace(/[^0-9]/g, "");
 
-      if (!numbers) {
+      const digits =
+        String(value || "")
+          .replace(
+            /[^0-9]/g,
+            ""
+          );
+
+      if (!digits) {
         return "";
       }
 
-      const storeNumber = Number(numbers);
+      return (
+        "/" +
+        String(
+          Number(digits)
+        )
+      );
 
-      if (!Number.isSafeInteger(storeNumber) || storeNumber <= 0) {
-        return "";
-      }
-
-      return "/" + storeNumber;
     }
 
-    function storePathFromCode(storeCode) {
-      const match = String(storeCode || "")
-        .match(/-(\d{5})$/);
+    function deriveStorePath(
+      storeCode
+    ) {
+
+      const cleanCode =
+        cleanStoreCode(
+          storeCode
+        );
+
+      const match =
+        cleanCode.match(
+          /([0-9]{1,10})$/
+        );
 
       if (!match) {
         return "";
       }
 
-      return cleanStorePath(match[1]);
+      return (
+        "/" +
+        String(
+          Number(match[1])
+        )
+      );
+
     }
 
-    function saveStore(storeCode, storePath) {
-      if (storeCode) {
-        localStorage.setItem(
-          STORE_CODE_KEY,
-          storeCode
+    function getStorePath() {
+
+      const savedPath =
+        localStorage.getItem(
+          STORE_PATH_KEY
         );
+
+      const cleanPath =
+        cleanStorePath(
+          savedPath
+        );
+
+      if (cleanPath) {
+        return cleanPath;
       }
 
-      if (storePath) {
-        localStorage.setItem(
-          STORE_PATH_KEY,
-          storePath
+      const savedCode =
+        localStorage.getItem(
+          STORE_CODE_KEY
         );
-      }
+
+      return deriveStorePath(
+        savedCode
+      );
+
     }
 
-    function showError(message) {
-      document.getElementById("title").textContent =
-        "매장 연결이 필요합니다";
+    function openStore() {
 
-      const messageElement =
-        document.getElementById("message");
+      const storePath =
+        getStorePath();
 
-      messageElement.textContent = message;
-      messageElement.classList.add("error");
-    }
+      if (!storePath) {
 
-    function openRegisteredStore() {
-      const queryStoreCode = cleanStoreCode(
-        params.get("store") ||
-        params.get("store_code")
-      );
+        title.textContent =
+          "등록 정보가 없습니다";
 
-      let queryStorePath = cleanStorePath(
-        params.get("path") ||
-        params.get("store_path")
-      );
+        message.textContent =
+          "입간판 QR을 다시 스캔하여 우리가게 앱 등록을 먼저 완료해 주세요.";
 
-      if (!queryStorePath && queryStoreCode) {
-        queryStorePath =
-          storePathFromCode(queryStoreCode);
-      }
-
-      if (queryStoreCode || queryStorePath) {
-        saveStore(
-          queryStoreCode,
-          queryStorePath
+        message.classList.add(
+          "error"
         );
-      }
 
-      const savedStoreCode = cleanStoreCode(
-        localStorage.getItem(STORE_CODE_KEY)
-      );
-
-      let savedStorePath = cleanStorePath(
-        localStorage.getItem(STORE_PATH_KEY)
-      );
-
-      if (!savedStorePath && savedStoreCode) {
-        savedStorePath =
-          storePathFromCode(savedStoreCode);
-
-        if (savedStorePath) {
-          localStorage.setItem(
-            STORE_PATH_KEY,
-            savedStorePath
-          );
-        }
-      }
-
-      const destination =
-        queryStorePath || savedStorePath;
-
-      if (!destination) {
-        showError(
-          "등록된 매장 정보가 없습니다. 자동차 QR 등록을 먼저 완료해 주세요."
-        );
         return;
+
       }
 
-      if (destination === window.location.pathname) {
-        showError(
-          "매장 이동 주소가 올바르지 않습니다."
-        );
-        return;
-      }
+      window.location.replace(
+        storePath
+      );
 
-      window.location.replace(destination);
     }
 
     document.addEventListener(
       "DOMContentLoaded",
-      openRegisteredStore
+      openStore
     );
   </script>
+
 </body>
 </html>
