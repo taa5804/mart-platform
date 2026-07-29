@@ -75,15 +75,11 @@
 <body>
 
   <section class="card">
-
-    <h1 id="title">
-      우리가게를 열고 있습니다
-    </h1>
+    <h1 id="title">우리가게를 열고 있습니다</h1>
 
     <p id="message">
       잠시만 기다려 주세요.
     </p>
-
   </section>
 
   <script>
@@ -95,78 +91,76 @@
     const STORE_PATH_KEY =
       "wooriapt_store_path";
 
+    const STORE_URL_KEY =
+      "wooriapt_store_url";
+
+    const STORE_NO_KEY =
+      "wooriapt_store_no";
+
     const title =
-      document.getElementById(
-        "title"
-      );
+      document.getElementById("title");
 
     const message =
-      document.getElementById(
-        "message"
-      );
+      document.getElementById("message");
 
     function cleanStoreCode(value) {
-
       return String(value || "")
         .trim()
         .toUpperCase()
-        .replace(
-          /[^A-Z0-9_-]/g,
-          ""
-        );
-
+        .replace(/[^A-Z0-9_-]/g, "");
     }
 
-    function cleanStorePath(value) {
-
+    function cleanStoreUrl(value) {
       const digits =
         String(value || "")
-          .replace(
-            /[^0-9]/g,
-            ""
-          );
+          .replace(/[^0-9]/g, "");
 
       if (!digits) {
         return "";
       }
 
-      return (
-        "/" +
-        String(
-          Number(digits)
-        )
-      );
+      const number =
+        Number(digits);
 
-    }
-
-    function deriveStorePath(
-      storeCode
-    ) {
-
-      const cleanCode =
-        cleanStoreCode(
-          storeCode
-        );
-
-      const match =
-        cleanCode.match(
-          /([0-9]{1,10})$/
-        );
-
-      if (!match) {
+      if (
+        !Number.isInteger(number) ||
+        number <= 0
+      ) {
         return "";
       }
 
-      return (
-        "/" +
-        String(
-          Number(match[1])
-        )
-      );
-
+      return "/" + number;
     }
 
-    function getStorePath() {
+    function deriveStoreUrl(storeCode) {
+      const cleanCode =
+        cleanStoreCode(storeCode);
+
+      const parts =
+        cleanCode.split("-");
+
+      const lastPart =
+        parts[parts.length - 1] || "";
+
+      if (!/^[0-9]+$/.test(lastPart)) {
+        return "";
+      }
+
+      return cleanStoreUrl(lastPart);
+    }
+
+    function getStoreUrl() {
+      const savedUrl =
+        localStorage.getItem(
+          STORE_URL_KEY
+        );
+
+      const cleanUrl =
+        cleanStoreUrl(savedUrl);
+
+      if (cleanUrl) {
+        return cleanUrl;
+      }
 
       const savedPath =
         localStorage.getItem(
@@ -174,12 +168,22 @@
         );
 
       const cleanPath =
-        cleanStorePath(
-          savedPath
-        );
+        cleanStoreUrl(savedPath);
 
       if (cleanPath) {
         return cleanPath;
+      }
+
+      const savedStoreNo =
+        localStorage.getItem(
+          STORE_NO_KEY
+        );
+
+      const storeNoUrl =
+        cleanStoreUrl(savedStoreNo);
+
+      if (storeNoUrl) {
+        return storeNoUrl;
       }
 
       const savedCode =
@@ -187,19 +191,16 @@
           STORE_CODE_KEY
         );
 
-      return deriveStorePath(
+      return deriveStoreUrl(
         savedCode
       );
-
     }
 
     function openStore() {
+      const storeUrl =
+        getStoreUrl();
 
-      const storePath =
-        getStorePath();
-
-      if (!storePath) {
-
+      if (!storeUrl) {
         title.textContent =
           "등록 정보가 없습니다";
 
@@ -211,13 +212,11 @@
         );
 
         return;
-
       }
 
       window.location.replace(
-        storePath
+        storeUrl
       );
-
     }
 
     document.addEventListener(
