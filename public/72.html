@@ -770,7 +770,11 @@ permission =
       setStatus(requestStatus, "긴급통화를 연결하고 있습니다.", "waiting");
 
       try {
-        const data = await callApi({ action: "emergency", qr_code: qrCode });
+        const data = await callApi({
+  action: "emergency",
+  qr_code: qrCode,
+  caller_session_id: getCallerSessionId()
+});
         const phone = normalizePhone(data.owner_phone);
         if (!phone) throw new Error("긴급통화 번호를 확인할 수 없습니다.");
         emergencyButton.disabled = false;
