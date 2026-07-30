@@ -1,3 +1,10 @@
+/* =========================================================
+   firebase-messaging-sw.js
+   자동차 QR + 우리가게 공용 푸시 서비스워커
+   ========================================================= */
+
+"use strict";
+
 importScripts(
   "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"
 );
@@ -15,185 +22,83 @@ firebase.initializeApp({
   appId: "1:101299637796:web:cb69372592026b7aa192b1"
 });
 
-const messaging =
-  firebase.messaging();
+const messaging = firebase.messaging();
 
+self.addEventListener("install", function () {
+  self.skipWaiting();
+});
 
-function normalizeTargetUrl(value) {
+self.addEventListener("activate", function (event) {
+  event.waitUntil(self.clients.claim());
+});
 
-  const url =
-    String(value || "").trim();
+messaging.onBackgroundMessage(function (payload) {
+  const notification = payload.notification || {};
+  const data = payload.data || {};
 
-  if (!url) {
-    return "/mart-open.html";
-  }
+  const isVehicle =
+    data.type === "vehicle_move_request" ||
+    data.request_type === "vehicle_move_request";
 
-  /*
-    매장 경로가 /74처럼 들어오면
-    Vercel의 /74가 아니라
-    실제 우리아파트 매장 주소로 이동합니다.
-  */
-  if (/^\/[0-9]+$/.test(url)) {
-    return "https://wooriapt.ai.kr" + url;
-  }
+  const title =
+    notification.title ||
+    data.title ||
+    (isVehicle ? "차량이동 요청" : "우리가게 알림");
 
-  /*
-    74처럼 숫자만 들어오는 경우
-  */
-  if (/^[0-9]+$/.test(url)) {
-    return "https://wooriapt.ai.kr/" + url;
-  }
+  const body =
+    notification.body ||
+    data.body ||
+    (isVehicle
+      ? "차량이동 요청이 도착했습니다."
+      : "새로운 알림이 도착했습니다.");
 
-  /*
-    완전한 주소는 그대로 사용합니다.
-  */
-  if (
-    url.startsWith("https://") ||
-    url.startsWith("http://")
-  ) {
-    return url;
-  }
+  const targetUrl =
+    data.url ||
+    data.store_url ||
+    data.store_path ||
+    (isVehicle ? "/72.html" : "/mart-open.html");
 
-  /*
-    mart-open.html 등 Vercel 내부 파일 경로
-  */
-  if (url.startsWith("/")) {
-    return url;
-  }
+  return self.registration.showNotification(title, {
+    body: body,
+    icon: "/icon-192.png",
+    badge: "/icon-192.png",
+    tag: isVehicle
+      ? "vehicle-move-request"
+      : "mart-notification",
+    renotify: true,
+    requireInteraction: isVehicle,
+    data: {
+      url: targetUrl
+    }
+  });
+});
 
-  return "/" + url;
-}
+self.addEventListener("notificationclick", function (event) {
+  event.notification.close();
 
+  const data = event.notification.data || {};
+  const targetUrl = data.url || "/mart-open.html";
 
-messaging.onBackgroundMessage(
-  function (payload) {
-
-    const notification =
-      payload.notification || {};
-
-    const data =
-      payload.data || {};
-
-    const title =
-      notification.title ||
-      data.title ||
-      "우리가게 알림";
-
-    const targetUrl =
-      normalizeTargetUrl(
-        data.url ||
-        data.click_action ||
-        data.store_url ||
-        data.store_path ||
-        "/mart-open.html"
-      );
-
-    const options = {
-
-      body:
-        notification.body ||
-        data.body ||
-        "새로운 특가·행사 알림이 도착했습니다.",
-
-      icon:
-        data.icon ||
-        "/icon-192.png",
-
-      badge:
-        data.badge ||
-        "/icon-192.png",
-
-      tag:
-        data.tag ||
-        "woorigage-notification",
-
-      renotify: true,
-
-      requireInteraction: false,
-
-      data: {
-
-        url: targetUrl,
-
-        store_code:
-          data.store_code || "",
-
-        store_path:
-          data.store_path || "",
-
-        store_url:
-          data.store_url || ""
-
-      }
-
-    };
-
-    return self.registration
-      .showNotification(
-        title,
-        options
-      );
-
-  }
-);
-
-
-self.addEventListener(
-  "notificationclick",
-  function (event) {
-
-    event.notification.close();
-
-    const data =
-      event.notification.data || {};
-
-    const targetUrl =
-      normalizeTargetUrl(
-        data.url ||
-        data.store_url ||
-        data.store_path ||
-        "/mart-open.html"
-      );
-
-    event.waitUntil(
-
-      clients.matchAll({
+  event.waitUntil(
+    self.clients
+      .matchAll({
         type: "window",
         includeUncontrolled: true
-      }).then(
-        async function (clientList) {
-
-          for (const client of clientList) {
-
-            if (
-              "navigate" in client &&
-              "focus" in client
-            ) {
-
-              await client.navigate(
-                targetUrl
-              );
-
+      })
+      .then(function (clientList) {
+        for (const client of clientList) {
+          if ("navigate" in client && "focus" in client) {
+            return client.navigate(targetUrl).then(function () {
               return client.focus();
-
-            }
-
+            });
           }
-
-          if (clients.openWindow) {
-
-            return clients.openWindow(
-              targetUrl
-            );
-
-          }
-
-          return null;
-
         }
-      )
 
-    );
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(targetUrl);
+        }
 
-  }
-);
+        return null;
+      })
+  );
+});
