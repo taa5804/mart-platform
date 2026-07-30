@@ -63,6 +63,11 @@
       background: #eff6ff; color: #1d4ed8; font-size: 17px; font-weight: 800;
     }
     .small { margin-top: 15px; color: #64748b; font-size: 13px; line-height: 1.6; }
+    .build-version {
+      position: fixed; bottom: 6px; left: 0; right: 0;
+      text-align: center; color: #94a3b8; font-size: 10px;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -125,6 +130,8 @@
     <p id="errorMessage">QR 정보를 확인할 수 없습니다.</p>
   </section>
 
+  <div class="build-version">버전 20260730-01</div>
+
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 
@@ -150,6 +157,7 @@
     const STORE_PATH_KEY = "wooriapt_store_path";
     const STORE_URL_KEY = "wooriapt_store_url";
     const CALLER_KEY = "wooriapt_vehicle_caller_session";
+    const BUILD_VERSION = "20260730-01";
 
     const params = new URLSearchParams(location.search);
     let qrCode = cleanQr(params.get("qr"));
@@ -197,21 +205,34 @@
     }
 
     function extractStoreCodeFromQr(code) {
-      const match = cleanQr(code).match(/-(STORE[0-9]+)$/);
-      return match ? cleanStoreCode(match[1]) : "";
+      const cleanCode = cleanQr(code);
+
+      const oldMatch =
+        cleanCode.match(/-(STORE[0-9]+)$/);
+
+      if (oldMatch) {
+        return cleanStoreCode(oldMatch[1]);
+      }
+
+      const currentMatch =
+        cleanCode.match(/-(M[0-9]+)-[0-9]+$/);
+
+      return currentMatch
+        ? cleanStoreCode(currentMatch[1])
+        : "";
     }
 
     function storePathFromCode(code) {
       const cleanCode = cleanStoreCode(code);
 
-      if (cleanCode === "STORE0001") {
+      if (
+        cleanCode === "STORE0001" ||
+        cleanCode === "M01"
+      ) {
         return "/74";
       }
 
-      const match = cleanCode.match(/-(\d{5})$/);
-      if (!match) return "";
-
-      return "/" + String(Number(match[1]));
+      return "";
     }
 
     function resolveStoreInformation() {
@@ -350,21 +371,43 @@
       if (!("serviceWorker" in navigator)) {
         throw new Error("이 브라우저에서는 푸시 알림을 사용할 수 없습니다.");
       }
+
       const registration = await withTimeout(
-        navigator.serviceWorker.register("/firebase-messaging-sw.js", { scope: "/" }),
+        navigator.serviceWorker.register(
+          "/firebase-messaging-sw.js?v=" + BUILD_VERSION,
+          {
+            scope: "/",
+            updateViaCache: "none"
+          }
+        ),
         15000,
         "푸시 알림 설치 시간이 초과되었습니다."
       );
+
+      await registration.update();
       await navigator.serviceWorker.ready;
       return registration;
     }
 
-    async function createFcmToken() {
+    async function createFcmToken(onStep) {
       if (!("Notification" in window)) {
         throw new Error("이 기기에서는 알림을 지원하지 않습니다.");
       }
 
-      const permission = await Notification.requestPermission();
+      onStep("알림 권한을 확인하고 있습니다.");
+
+      if (Notification.permission === "denied") {
+        throw new Error(
+          "알림 권한이 차단되어 있습니다. 사이트 알림 권한을 허용한 뒤 다시 눌러 주세요."
+        );
+      }
+
+      let permission = Notification.permission;
+
+      if (permission !== "granted") {
+        permission = await Notification.requestPermission();
+      }
+
       if (permission !== "granted") {
         throw new Error("푸시 알림을 허용해 주세요.");
       }
@@ -373,17 +416,30 @@
         throw new Error("Firebase 프로그램을 불러오지 못했습니다.");
       }
 
-      if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+      onStep("푸시 프로그램을 준비하고 있습니다.");
+
+      if (!firebase.apps.length) {
+        firebase.initializeApp(FIREBASE_CONFIG);
+      }
+
       const messaging = firebase.messaging();
       const registration = await registerServiceWorker();
 
+      onStep("푸시 알림 토큰을 발급하고 있습니다.");
+
       const token = await withTimeout(
-        messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: registration }),
+        messaging.getToken({
+          vapidKey: VAPID_KEY,
+          serviceWorkerRegistration: registration
+        }),
         20000,
-        "푸시 알림 등록 시간이 초과되었습니다."
+        "푸시 알림 토큰 발급 시간이 초과되었습니다."
       );
 
-      if (!token) throw new Error("푸시 알림 토큰을 발급하지 못했습니다.");
+      if (!token) {
+        throw new Error("푸시 알림 토큰을 발급하지 못했습니다.");
+      }
+
       return token;
     }
 
@@ -527,17 +583,29 @@
 
     pushButton.addEventListener("click", async () => {
       pushButton.disabled = true;
-      pushButton.textContent = "푸시 알림 등록 중...";
-      setStatus(pushStatus, "푸시 알림을 설정하고 있습니다.", "waiting");
+      pushButton.textContent = "알림 권한 확인 중...";
+      setStatus(pushStatus, "알림 권한을 확인하고 있습니다.", "waiting");
+
+      const showPushStep = message => {
+        pushButton.textContent = message;
+        setStatus(pushStatus, message, "waiting");
+      };
 
       try {
         const pending = restorePending();
-        if (!pending) throw new Error("등록 정보를 찾을 수 없습니다. QR을 다시 스캔해 주세요.");
 
-        const fcmToken = await createFcmToken();
+        if (!pending) {
+          throw new Error("등록 정보를 찾을 수 없습니다. QR을 다시 스캔해 주세요.");
+        }
+
+        const fcmToken =
+          await createFcmToken(showPushStep);
+
+        showPushStep("서버에 등록하고 있습니다.");
 
         await callApi({
           action: "register",
+          registration_type: "mart",
           qr_code: pending.qr_code,
           owner_phone: pending.owner_phone,
           push_token: fcmToken,
@@ -562,13 +630,26 @@
           localStorage.setItem(STORE_URL_KEY, finalStoreUrl);
         }
 
-        localStorage.setItem("wooriapt_mart_push_token", fcmToken);
+        localStorage.setItem(
+          "wooriapt_mart_push_token",
+          fcmToken
+        );
 
         clearPending();
-        setStatus(pushStatus, "등록이 완료되었습니다.", "success");
+
+        pushButton.textContent = "등록 완료";
+        setStatus(pushStatus, "", "");
         showCard("complete");
+
       } catch (error) {
-        setStatus(pushStatus, error.message || "푸시 알림 등록에 실패했습니다.", "error");
+        console.error("푸시 등록 오류:", error);
+
+        setStatus(
+          pushStatus,
+          error.message || "푸시 알림 등록에 실패했습니다.",
+          "error"
+        );
+
         pushButton.disabled = false;
         pushButton.textContent = "푸시 알림 허용";
       }
