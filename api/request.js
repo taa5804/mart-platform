@@ -15,7 +15,9 @@ function getFirebaseApp() {
     !process.env.FIREBASE_CLIENT_EMAIL ||
     !privateKey
   ) {
-    throw new Error("Firebase 서버 환경변수가 설정되지 않았습니다.");
+    throw new Error(
+      "Firebase 서버 환경변수가 설정되지 않았습니다."
+    );
   }
 
   return admin.initializeApp({
@@ -36,7 +38,10 @@ module.exports = async (req, res) => {
 
   const { code, kind } = req.body || {};
 
-  if (!validCode(code) || !["move", "emergency"].includes(kind)) {
+  if (
+    !validCode(code) ||
+    !["move", "emergency"].includes(kind)
+  ) {
     return res.status(400).json({
       error: "요청값이 올바르지 않습니다."
     });
@@ -44,20 +49,31 @@ module.exports = async (req, res) => {
 
   try {
     const rows = await sb(
-      `qr_codes?qr_code=eq.${encodeURIComponent(
+      `vehicle_qr?qr_code=eq.${encodeURIComponent(
         code
-      )}&select=qr_code,owner_phone,push_token,is_registered&limit=1`
+      )}&select=qr_code,owner_phone,push_subscription,is_registered,is_active,updated_at&order=updated_at.desc&limit=1`
     );
 
     const row = rows && rows[0];
 
-    if (!row || !row.owner_phone || !row.is_registered) {
+    if (
+      !row ||
+      !row.owner_phone ||
+      !row.is_registered ||
+      !row.is_active
+    ) {
       return res.status(404).json({
         error: "등록되지 않은 차량입니다."
       });
     }
 
-    if (!row.push_token) {
+    const pushToken =
+      row.push_subscription &&
+      row.push_subscription.token
+        ? row.push_subscription.token
+        : "";
+
+    if (!pushToken) {
       return res.status(400).json({
         error: "차주의 푸시 알림이 등록되지 않았습니다."
       });
@@ -88,24 +104,32 @@ module.exports = async (req, res) => {
         : "주차된 차량의 이동 요청이 접수되었습니다.";
 
     const messageId = await admin.messaging().send({
-      token: row.push_token,
+      token: pushToken,
+
       notification: {
         title,
         body
       },
+
       data: {
         qr_code: String(code),
         request_type: String(kind),
-        url: "/72.html?code=" + encodeURIComponent(code)
+        url:
+          "/72.html?code=" +
+          encodeURIComponent(code)
       },
+
       webpush: {
         notification: {
           icon: "/icon-192.png",
           badge: "/icon-192.png",
           requireInteraction: true
         },
+
         fcmOptions: {
-          link: "/72.html?code=" + encodeURIComponent(code)
+          link:
+            "/72.html?code=" +
+            encodeURIComponent(code)
         }
       }
     });
@@ -115,7 +139,10 @@ module.exports = async (req, res) => {
       messageId
     });
   } catch (error) {
-    console.error("푸시 발송 오류:", error);
+    console.error(
+      "푸시 발송 오류:",
+      error
+    );
 
     return res.status(500).json({
       error: "푸시 알림 전송에 실패했습니다.",
