@@ -374,12 +374,12 @@
 
       const registration = await withTimeout(
         navigator.serviceWorker.register(
-          "/firebase-messaging-sw.js?v=" + BUILD_VERSION,
-          {
-            scope: "/",
-            updateViaCache: "none"
-          }
-        ),
+  "/firebase-vehicle-sw.js?v=" + BUILD_VERSION,
+  {
+    scope: "/",
+    updateViaCache: "none"
+  }
+),
         15000,
         "푸시 알림 설치 시간이 초과되었습니다."
       );
