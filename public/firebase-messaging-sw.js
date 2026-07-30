@@ -15,71 +15,128 @@ firebase.initializeApp({
   appId: "1:101299637796:web:cb69372592026b7aa192b1"
 });
 
-const messaging = firebase.messaging();
+const messaging =
+  firebase.messaging();
 
-messaging.onBackgroundMessage(function (payload) {
 
-  const notification = payload.notification || {};
-  const data = payload.data || {};
+function normalizeTargetUrl(value) {
 
-  const title =
-    notification.title ||
-    data.title ||
-    "우리가게 알림";
+  const url =
+    String(value || "").trim();
 
-  const targetUrl =
-    data.url ||
-    data.click_action ||
-    data.store_url ||
-    data.store_path ||
-    "/mart-open.html";
+  if (!url) {
+    return "/mart-open.html";
+  }
 
-  const options = {
+  /*
+    매장 경로가 /74처럼 들어오면
+    Vercel의 /74가 아니라
+    실제 우리아파트 매장 주소로 이동합니다.
+  */
+  if (/^\/[0-9]+$/.test(url)) {
+    return "https://wooriapt.ai.kr" + url;
+  }
 
-    body:
-      notification.body ||
-      data.body ||
-      "새로운 특가·행사 알림이 도착했습니다.",
+  /*
+    74처럼 숫자만 들어오는 경우
+  */
+  if (/^[0-9]+$/.test(url)) {
+    return "https://wooriapt.ai.kr/" + url;
+  }
 
-    icon:
-      data.icon ||
-      "/icon-192.png",
+  /*
+    완전한 주소는 그대로 사용합니다.
+  */
+  if (
+    url.startsWith("https://") ||
+    url.startsWith("http://")
+  ) {
+    return url;
+  }
 
-    badge:
-      data.badge ||
-      "/icon-192.png",
+  /*
+    mart-open.html 등 Vercel 내부 파일 경로
+  */
+  if (url.startsWith("/")) {
+    return url;
+  }
 
-    tag:
-      data.tag ||
-      "woorigage-notification",
+  return "/" + url;
+}
 
-    renotify: true,
 
-    requireInteraction: false,
+messaging.onBackgroundMessage(
+  function (payload) {
 
-    data: {
+    const notification =
+      payload.notification || {};
 
-      url: targetUrl,
+    const data =
+      payload.data || {};
 
-      store_code:
-        data.store_code || "",
+    const title =
+      notification.title ||
+      data.title ||
+      "우리가게 알림";
 
-      store_path:
-        data.store_path || "",
+    const targetUrl =
+      normalizeTargetUrl(
+        data.url ||
+        data.click_action ||
+        data.store_url ||
+        data.store_path ||
+        "/mart-open.html"
+      );
 
-      store_url:
-        data.store_url || ""
+    const options = {
 
-    }
+      body:
+        notification.body ||
+        data.body ||
+        "새로운 특가·행사 알림이 도착했습니다.",
 
-  };
+      icon:
+        data.icon ||
+        "/icon-192.png",
 
-  return self.registration.showNotification(
-    title,
-    options
-  );
+      badge:
+        data.badge ||
+        "/icon-192.png",
 
-});
+      tag:
+        data.tag ||
+        "woorigage-notification",
+
+      renotify: true,
+
+      requireInteraction: false,
+
+      data: {
+
+        url: targetUrl,
+
+        store_code:
+          data.store_code || "",
+
+        store_path:
+          data.store_path || "",
+
+        store_url:
+          data.store_url || ""
+
+      }
+
+    };
+
+    return self.registration
+      .showNotification(
+        title,
+        options
+      );
+
+  }
+);
+
 
 self.addEventListener(
   "notificationclick",
@@ -91,46 +148,52 @@ self.addEventListener(
       event.notification.data || {};
 
     const targetUrl =
-      data.url ||
-      data.store_url ||
-      data.store_path ||
-      "/mart-open.html";
+      normalizeTargetUrl(
+        data.url ||
+        data.store_url ||
+        data.store_path ||
+        "/mart-open.html"
+      );
 
     event.waitUntil(
 
       clients.matchAll({
-
         type: "window",
         includeUncontrolled: true
+      }).then(
+        async function (clientList) {
 
-      }).then(function (clientList) {
+          for (const client of clientList) {
 
-        for (const client of clientList) {
+            if (
+              "navigate" in client &&
+              "focus" in client
+            ) {
 
-          if ("focus" in client) {
+              await client.navigate(
+                targetUrl
+              );
 
-            client.navigate(targetUrl);
+              return client.focus();
 
-            return client.focus();
+            }
 
           }
 
+          if (clients.openWindow) {
+
+            return clients.openWindow(
+              targetUrl
+            );
+
+          }
+
+          return null;
+
         }
-
-        if (clients.openWindow) {
-
-          return clients.openWindow(
-            targetUrl
-          );
-
-        }
-
-        return null;
-
-      })
+      )
 
     );
 
   }
-
 );
