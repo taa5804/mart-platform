@@ -412,10 +412,27 @@
       }
 
       if (permission === "default") {
-        permission =
-          await Notification.requestPermission();
-      }
 
+  const result =
+    await Notification.requestPermission();
+
+  await new Promise(function(resolve){
+    setTimeout(resolve,700);
+  });
+
+  permission =
+    Notification.permission;
+
+  console.log(
+    "requestPermission:",
+    result,
+    "actual:",
+    permission
+  );
+
+}
+permission =
+  Notification.permission;
       if (permission !== "granted") {
         throw new Error(
           "푸시 알림을 허용해야 등록할 수 있습니다."
