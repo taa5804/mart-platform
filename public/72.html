@@ -539,7 +539,7 @@ permission =
 
     function updateRequestState(data) {
       const requestCount = Number(data.request_count ?? data.stage ?? 0);
-      emergencyButton.disabled = !(data.emergency_enabled === true || requestCount >= 3);
+      emergencyButton.disabled = data.emergency_enabled !== true;
 
       if (data.next_allowed_at) {
         startCountdown(data.next_allowed_at);
