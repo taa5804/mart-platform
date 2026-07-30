@@ -751,8 +751,9 @@ permission =
           startCountdown(new Date(Date.now() + 3 * 60 * 1000).toISOString());
         }
 
-        if (requestCount >= 3 || data.emergency_enabled === true) {
-          emergencyButton.disabled = false;
+        if (data.emergency_enabled === true) {
+  emergencyButton.disabled = false;
+}
         }
       } catch (error) {
         const data = error.data || {};
