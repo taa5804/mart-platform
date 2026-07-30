@@ -215,8 +215,8 @@
       }
 
       window.location.replace(
-        storeUrl
-      );
+  "https://wooriapt.ai.kr" + storeUrl
+);
     }
 
     document.addEventListener(
