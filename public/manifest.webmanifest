@@ -1,7 +1,7 @@
 {
   "id": "/72.html",
-  "name": "우리APT 자동차 QR",
-  "short_name": "자동차QR",
+  "name": "우리가게",
+"short_name": "우리가게",
   "start_url": "/72.html",
   "scope": "/",
   "display": "standalone",
