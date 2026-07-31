@@ -1,13 +1,15 @@
 {
-  "id": "/72.html",
+  "id": "/woorigage-app",
   "name": "우리가게",
-"short_name": "우리가게",
-  "start_url": "/72.html",
+  "short_name": "우리가게",
+  "description": "마트 행사와 차량이동 알림 앱",
+  "start_url": "/mart-open.html",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f5f7fb",
+  "background_color": "#ffffff",
   "theme_color": "#16a34a",
   "orientation": "portrait",
+  "lang": "ko-KR",
   "icons": [
     {
       "src": "/icon-192.png",
