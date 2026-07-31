@@ -2,18 +2,20 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
   <title>우리가게</title>
 
   <script>
-    location.replace("https://wooriapt.ai.kr/74");
+    window.location.replace(
+      "https://wooriapt.ai.kr/74"
+    );
   </script>
-
 </head>
 
 <body>
-
-  에너젠마트로 이동중입니다.
-
+  에너젠마트로 이동 중입니다.
 </body>
 </html>
