@@ -239,7 +239,7 @@
     "use strict";
 
     const API_URL =
-      "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/send-mart-push";
+      "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/register-mart-push";
 
     const SUPABASE_KEY =
       "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
@@ -393,20 +393,10 @@
       const cleanCode =
         cleanStoreCode(code);
 
-      const match = cleanCode.match(
-        /^([A-Z]{2})-([A-Z]{2})-(SQ\d{3})-(M\d{2})-(\d{3})$/
-      );
+      const match =
+        /^([A-Z]{2})-([A-Z]{2})-(SQ\d{3})-(M\d{2})-(\d{3})$/.exec(cleanCode);
 
       if (!match) {
-        return null;
-      }
-
-      const storeNo = Number(match[5]);
-
-      if (
-        !Number.isInteger(storeNo) ||
-        storeNo <= 0
-      ) {
         return null;
       }
 
@@ -415,8 +405,9 @@
         region_code: match[1],
         district_code: match[2],
         zone_code: match[3],
-        store_group_code: match[4],
-        store_no: storeNo,
+        distribution_code: match[4],
+        serial_no: Number(match[5]),
+        store_no: 74,
         store_url: "/74"
       };
     }
@@ -1001,6 +992,12 @@ console.log("permission =", permission);
           );
 
           showCard("complete");
+
+          setTimeout(function() {
+            window.location.replace(
+              "https://wooriapt.ai.kr/74"
+            );
+          }, 1200);
 
         } catch (error) {
           setStatus(
