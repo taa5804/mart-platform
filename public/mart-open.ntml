@@ -8,11 +8,11 @@
   >
   <title>우리가게</title>
 
-  <script>
-    window.location.replace(
-      "https://wooriapt.ai.kr/74"
-    );
-  </script>
+    <script>
+  window.location.replace(
+    "https://mart-platform.vercel.app/74.html"
+  );
+</script>
 </head>
 
 <body>
