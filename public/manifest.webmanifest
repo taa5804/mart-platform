@@ -1,8 +1,8 @@
 {
-  "id": "/woorigage-app",
-  "name": "우리가게",
-  "short_name": "우리가게",
-  "description": "마트 행사와 차량이동 알림 앱",
+  "id": "/wooriauto-app",
+  "name": "우리자동차 QR",
+  "short_name": "우리자동차",
+  "description": "차량이동 요청 알림 앱",
   "start_url": "/72.html",
   "scope": "/",
   "display": "standalone",
