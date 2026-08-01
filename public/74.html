@@ -239,7 +239,7 @@
     "use strict";
 
     const API_URL =
-      "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/send-vehicle-push";
+      "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/send-mart-push";
 
     const SUPABASE_KEY =
       "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
@@ -286,7 +286,8 @@
     let storeCode =
       cleanStoreCode(
         params.get("store") ||
-        params.get("store_code")
+        params.get("store_code") ||
+        qrCode
       );
 
     let storePath =
@@ -392,26 +393,15 @@
       const cleanCode =
         cleanStoreCode(code);
 
-      const parts =
-        cleanCode.split("-");
+      const match = cleanCode.match(
+        /^([A-Z]{2})-([A-Z]{2})-(SQ\d{3})-(M\d{2})-(\d{3})$/
+      );
 
-      if (
-        parts.length < 3 ||
-        !parts[0] ||
-        !parts[1]
-      ) {
+      if (!match) {
         return null;
       }
 
-      const lastPart =
-        parts[parts.length - 1];
-
-      if (!/^[0-9]+$/.test(lastPart)) {
-        return null;
-      }
-
-      const storeNo =
-        Number(lastPart);
+      const storeNo = Number(match[5]);
 
       if (
         !Number.isInteger(storeNo) ||
@@ -422,10 +412,12 @@
 
       return {
         store_code: cleanCode,
-        region_code: parts[0],
-        district_code: parts[1],
+        region_code: match[1],
+        district_code: match[2],
+        zone_code: match[3],
+        store_group_code: match[4],
         store_no: storeNo,
-        store_url: "/" + storeNo
+        store_url: "/74"
       };
     }
 
@@ -779,7 +771,7 @@ console.log("permission =", permission);
         if (!storeInformation) {
           setStatus(
             registerStatus,
-            "매장코드 형식이 올바르지 않습니다. 예: GJ-BK-00074",
+            "입간판 QR 형식이 올바르지 않습니다. 예: GJ-BK-SQ001-M01-001",
             "error"
           );
 
