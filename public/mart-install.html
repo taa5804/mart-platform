@@ -296,6 +296,9 @@
       );
 
     let deferredInstallPrompt = null;
+    let serviceWorkerPromise = null;
+    let pushRegistrationRunning = false;
+    let pushCardOpened = false;
 
     const cards = {
       loading: document.getElementById("loadingCard"),
@@ -562,25 +565,18 @@
       localStorage.removeItem(PENDING_KEY);
     }
 
-    function withTimeout(
-      promise,
-      milliseconds,
-      message
-    ) {
-      return Promise.race([
-        promise,
-        new Promise(function(_, reject) {
-          setTimeout(function() {
-            reject(new Error(message));
-          }, milliseconds);
-        })
-      ]);
-    }
+    async function callApi(payload, timeoutMs = 10000) {
+      const controller =
+        new AbortController();
 
-    async function callApi(payload) {
-      const response =
-        await withTimeout(
-          fetch(API_URL, {
+      const timer =
+        setTimeout(function() {
+          controller.abort();
+        }, timeoutMs);
+
+      try {
+        const response =
+          await fetch(API_URL, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -588,83 +584,167 @@
                 "Bearer " + SUPABASE_KEY,
               "apikey": SUPABASE_KEY
             },
-            body: JSON.stringify(payload)
-          }),
-          15000,
-          "서버 응답이 없습니다. 다시 눌러 주세요."
-        );
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
 
-      const text =
-        await response.text();
+        const text =
+          await response.text();
 
-      let data = {};
+        let data = {};
 
-      try {
-        data = text
-          ? JSON.parse(text)
-          : {};
+        try {
+          data = text
+            ? JSON.parse(text)
+            : {};
+        } catch (error) {
+          data = {};
+        }
+
+        if (
+          !response.ok ||
+          data.ok === false ||
+          data.success === false
+        ) {
+          const apiError =
+            new Error(
+              data.message ||
+              data.error ||
+              "서버 처리에 실패했습니다."
+            );
+
+          apiError.data = data;
+          throw apiError;
+        }
+
+        return data;
+
       } catch (error) {
-        data = {};
+        if (
+          error &&
+          error.name === "AbortError"
+        ) {
+          throw new Error(
+            "서버 등록 응답이 지연되고 있습니다. 다시 시도해 주세요."
+          );
+        }
+
+        throw error;
+
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    function sleep(milliseconds) {
+      return new Promise(function(resolve) {
+        setTimeout(resolve, milliseconds);
+      });
+    }
+
+    function showPushCardOnce() {
+      if (pushCardOpened) {
+        return;
       }
 
-      if (
-        !response.ok ||
-        data.ok === false ||
-        data.success === false
-      ) {
-        const apiError =
-          new Error(
-            data.message ||
-            data.error ||
-            "서버 처리에 실패했습니다."
+      pushCardOpened = true;
+      showCard("push");
+    }
+
+    function prepareServiceWorker() {
+      if (serviceWorkerPromise) {
+        return serviceWorkerPromise;
+      }
+
+      if (!("serviceWorker" in navigator)) {
+        serviceWorkerPromise =
+          Promise.reject(
+            new Error(
+              "이 브라우저에서는 푸시 알림을 사용할 수 없습니다."
+            )
           );
 
-        apiError.data = data;
-        throw apiError;
+        serviceWorkerPromise.catch(function() {});
+        return serviceWorkerPromise;
       }
 
-      return data;
+      serviceWorkerPromise =
+        (async function() {
+          let registration =
+            await navigator.serviceWorker
+              .getRegistration("/");
+
+          if (!registration) {
+            registration =
+              await navigator.serviceWorker
+                .register(
+                  "/firebase-messaging-sw.js",
+                  {
+                    scope: "/",
+                    updateViaCache: "none"
+                  }
+                );
+          }
+
+          if (registration.active) {
+            return registration;
+          }
+
+          const readyRegistration =
+            await navigator.serviceWorker.ready;
+
+          return readyRegistration || registration;
+        })().catch(function(error) {
+          serviceWorkerPromise = null;
+          throw error;
+        });
+
+      serviceWorkerPromise.catch(function() {});
+      return serviceWorkerPromise;
     }
 
-    async function registerServiceWorker() {
-      if (!("serviceWorker" in navigator)) {
-        throw new Error(
-          "이 브라우저에서는 푸시 알림을 사용할 수 없습니다."
-        );
-      }
-
-      const registration =
-        await withTimeout(
-          navigator.serviceWorker.register(
-            "/firebase-messaging-sw.js",
-            {
-              scope: "/"
-            }
-          ),
-          15000,
-          "푸시 알림 설치 시간이 초과되었습니다."
-        );
-
-      await navigator.serviceWorker.ready;
-
-      return registration;
-    }
-
-    async function createFcmToken() {
+    async function waitForPermission() {
       if (!("Notification" in window)) {
         throw new Error(
           "이 기기에서는 알림을 지원하지 않습니다."
         );
       }
 
-      const permission =
-        await Notification.requestPermission();
+      if (Notification.permission === "denied") {
+        throw new Error(
+          "알림 권한이 차단되어 있습니다. 브라우저의 사이트 설정에서 알림을 허용해 주세요."
+        );
+      }
 
-      if (permission !== "granted") {
+      if (Notification.permission === "default") {
+        const result =
+          await Notification.requestPermission();
+
+        if (result === "denied") {
+          throw new Error(
+            "알림 권한이 차단되어 있습니다. 브라우저의 사이트 설정에서 알림을 허용해 주세요."
+          );
+        }
+      }
+
+      for (
+        let attempt = 0;
+        attempt < 15 &&
+        Notification.permission === "default";
+        attempt += 1
+      ) {
+        await sleep(200);
+      }
+
+      if (Notification.permission !== "granted") {
         throw new Error(
           "푸시 알림을 허용해 주세요."
         );
       }
+    }
+
+    async function createFcmToken() {
+      await waitForPermission();
 
       if (!window.firebase) {
         throw new Error(
@@ -682,26 +762,47 @@
         firebase.messaging();
 
       const registration =
-        await registerServiceWorker();
+        await prepareServiceWorker();
 
-      const token =
-        await withTimeout(
-          messaging.getToken({
-            vapidKey: VAPID_KEY,
-            serviceWorkerRegistration:
-              registration
-          }),
-          20000,
-          "푸시 알림 등록 시간이 초과되었습니다."
-        );
+      let lastError = null;
 
-      if (!token) {
-        throw new Error(
-          "푸시 알림 토큰을 발급하지 못했습니다."
-        );
+      for (
+        let attempt = 1;
+        attempt <= 2;
+        attempt += 1
+      ) {
+        try {
+          const token =
+            await messaging.getToken({
+              vapidKey: VAPID_KEY,
+              serviceWorkerRegistration:
+                registration
+            });
+
+          if (token) {
+            return token;
+          }
+
+          lastError =
+            new Error(
+              "푸시 알림 토큰을 발급하지 못했습니다."
+            );
+
+        } catch (error) {
+          lastError = error;
+        }
+
+        if (attempt < 2) {
+          await sleep(700);
+        }
       }
 
-      return token;
+      throw (
+        lastError ||
+        new Error(
+          "푸시 알림 토큰을 발급하지 못했습니다."
+        )
+      );
     }
 
     async function checkRegisteredStatus() {
@@ -791,6 +892,14 @@
 
         savePending(phone);
 
+        prepareServiceWorker()
+          .catch(function(error) {
+            console.warn(
+              "서비스워커 사전 준비 실패:",
+              error
+            );
+          });
+
         setStatus(
           registerStatus,
           "",
@@ -814,11 +923,19 @@
       function() {
         deferredInstallPrompt = null;
 
+        prepareServiceWorker()
+          .catch(function(error) {
+            console.warn(
+              "서비스워커 사전 준비 실패:",
+              error
+            );
+          });
+
         /*
           설치 후 앱을 자동 실행하지 않습니다.
           현재 화면에서 푸시 승인 단계로 이동합니다.
         */
-        showCard("push");
+        showPushCardOnce();
       }
     );
 
@@ -836,6 +953,14 @@
           "waiting"
         );
 
+        prepareServiceWorker()
+          .catch(function(error) {
+            console.warn(
+              "서비스워커 사전 준비 실패:",
+              error
+            );
+          });
+
         try {
           const pending =
             loadPending();
@@ -847,7 +972,7 @@
           }
 
           if (isInstalledApp()) {
-            showCard("push");
+            showPushCardOnce();
             return;
           }
 
@@ -877,7 +1002,7 @@
             앱을 자동 실행하지 않고
             현재 화면에서 푸시 승인 단계로 이동합니다.
           */
-          showCard("push");
+          showPushCardOnce();
 
         } catch (error) {
           setStatus(
@@ -899,6 +1024,12 @@
     pushButton.addEventListener(
       "click",
       async function() {
+        if (pushRegistrationRunning) {
+          return;
+        }
+
+        pushRegistrationRunning = true;
+
         pushButton.disabled = true;
 
         pushButton.textContent =
@@ -906,9 +1037,18 @@
 
         setStatus(
           pushStatus,
-          "푸시 알림을 설정하고 있습니다.",
+          "푸시 알림을 등록하고 있습니다. 버튼을 다시 누르지 마세요.",
           "waiting"
         );
+
+        const slowTimer =
+          setTimeout(function() {
+            setStatus(
+              pushStatus,
+              "등록을 마무리하고 있습니다. 잠시만 더 기다려 주세요.",
+              "waiting"
+            );
+          }, 10000);
 
         try {
           const pending =
@@ -923,30 +1063,33 @@
           const fcmToken =
             await createFcmToken();
 
-          await callApi({
-            action: "register",
-            registration_type: "mart",
-            qr_code: pending.qr_code,
-            owner_phone: pending.owner_phone,
-            push_token: fcmToken,
-            store_code:
-              pending.store_code || null,
-            region_code:
-              pending.region_code || null,
-            district_code:
-              pending.district_code || null,
-            store_no:
-              pending.store_no || null,
-            store_path:
-              pending.store_path || null,
-            store_url:
-              pending.store_url ||
-              pending.store_path ||
-              null,
-            platform: "web",
-            user_agent:
-              navigator.userAgent
-          });
+          await callApi(
+            {
+              action: "register",
+              registration_type: "mart",
+              qr_code: pending.qr_code,
+              owner_phone: pending.owner_phone,
+              push_token: fcmToken,
+              store_code:
+                pending.store_code || null,
+              region_code:
+                pending.region_code || null,
+              district_code:
+                pending.district_code || null,
+              store_no:
+                pending.store_no || null,
+              store_path:
+                pending.store_path || null,
+              store_url:
+                pending.store_url ||
+                pending.store_path ||
+                null,
+              platform: "web",
+              user_agent:
+                navigator.userAgent
+            },
+            10000
+          );
 
           if (pending.store_code) {
             localStorage.setItem(
@@ -1029,6 +1172,10 @@
 
           pushButton.textContent =
             "푸시 알림 허용";
+
+        } finally {
+          clearTimeout(slowTimer);
+          pushRegistrationRunning = false;
         }
       }
     );
