@@ -1,0 +1,480 @@
+<div id="banner-admin-app">
+  <div class="ba-wrap">
+    <div class="ba-header">
+      <h2>메인 배너관리</h2>
+      <p>오늘의 특가 아래에 표시되는 작은 배너 2개를 관리합니다.</p>
+    </div>
+
+    <div id="ba-message" class="ba-message"></div>
+
+    <div class="ba-card">
+      <div class="ba-card-title">
+        <strong>배너 1</strong>
+
+        <label class="ba-switch-label">
+          <input type="checkbox" id="enabled-1" checked>
+          <span>사용</span>
+        </label>
+      </div>
+
+      <label class="ba-label" for="title-1">제목</label>
+      <input
+        id="title-1"
+        class="ba-input"
+        type="text"
+        maxlength="60"
+        placeholder="예: 아파트 분양 상담 고객"
+      >
+
+      <label class="ba-label" for="content-1">내용</label>
+      <input
+        id="content-1"
+        class="ba-input"
+        type="text"
+        maxlength="100"
+        placeholder="예: 3,000포인트 지급"
+      >
+
+      <label class="ba-label" for="url-1">연결 URL</label>
+      <input
+        id="url-1"
+        class="ba-input"
+        type="url"
+        placeholder="https://"
+      >
+
+    </div>
+
+    <div class="ba-card">
+      <div class="ba-card-title">
+        <strong>배너 2</strong>
+
+        <label class="ba-switch-label">
+          <input type="checkbox" id="enabled-2" checked>
+          <span>사용</span>
+        </label>
+      </div>
+
+      <label class="ba-label" for="title-2">제목</label>
+      <input
+        id="title-2"
+        class="ba-input"
+        type="text"
+        maxlength="60"
+        placeholder="예: 아파트 분양 특별혜택"
+      >
+
+      <label class="ba-label" for="content-2">내용</label>
+      <input
+        id="content-2"
+        class="ba-input"
+        type="text"
+        maxlength="100"
+        placeholder="예: 포인트 지급 내용을 확인하세요"
+      >
+
+      <label class="ba-label" for="url-2">연결 URL</label>
+      <input
+        id="url-2"
+        class="ba-input"
+        type="url"
+        placeholder="https://"
+      >
+
+      
+    </div>
+
+    <button
+      type="button"
+      class="ba-save-all-button"
+      onclick="saveAllBanners()"
+    >
+      저장
+    </button>
+  </div>
+</div>
+
+<style>
+  #banner-admin-app {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 18px 12px 30px;
+    background: #f5f6f8;
+  }
+
+  #banner-admin-app * {
+    box-sizing: border-box;
+  }
+
+  #banner-admin-app .ba-wrap {
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  #banner-admin-app .ba-header {
+    margin-bottom: 16px;
+  }
+
+  #banner-admin-app .ba-header h2 {
+    margin: 0 0 7px;
+    color: #222;
+    font-size: 23px;
+  }
+
+  #banner-admin-app .ba-header p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  #banner-admin-app .ba-card {
+    margin-bottom: 14px;
+    padding: 18px;
+    border: 1px solid #e3e5e8;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  #banner-admin-app .ba-card-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 17px;
+  }
+
+  #banner-admin-app .ba-card-title strong {
+    font-size: 18px;
+    color: #222;
+  }
+
+  #banner-admin-app .ba-switch-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #444;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  #banner-admin-app .ba-switch-label input {
+    width: 18px;
+    height: 18px;
+  }
+
+  #banner-admin-app .ba-label {
+    display: block;
+    margin: 13px 0 6px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  #banner-admin-app .ba-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 12px;
+    border: 1px solid #d8dbe0;
+    border-radius: 8px;
+    background: #fff;
+    color: #222;
+    font-size: 15px;
+    outline: none;
+  }
+
+  #banner-admin-app .ba-input:focus {
+    border-color: #777;
+  }
+
+  #banner-admin-app button {
+    width: 100%;
+    min-height: 46px;
+    border: 0;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  #banner-admin-app .ba-save-button {
+    margin-top: 17px;
+    background: #333;
+    color: #fff;
+  }
+
+  #banner-admin-app .ba-save-all-button {
+    background: #111;
+    color: #fff;
+  }
+
+  #banner-admin-app button:disabled {
+    opacity: 0.55;
+    cursor: wait;
+  }
+
+  #banner-admin-app .ba-message {
+    display: none;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  #banner-admin-app .ba-message.success {
+    display: block;
+    border: 1px solid #b8dec2;
+    background: #edf8f0;
+    color: #236631;
+  }
+
+  #banner-admin-app .ba-message.error {
+    display: block;
+    border: 1px solid #efb8b8;
+    background: #fff0f0;
+    color: #a02020;
+  }
+</style>
+
+<script>
+(function () {
+  "use strict";
+
+  const SUPABASE_URL =
+    "https://dcysjuxyjqtvkihdsjvv.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
+
+  const TABLE_NAME = "main_banners";
+
+  function headers(prefer) {
+    return {
+      "apikey": SUPABASE_KEY,
+      "Authorization": "Bearer " + SUPABASE_KEY,
+      "Content-Type": "application/json",
+      "Prefer": prefer || "return=representation"
+    };
+  }
+
+  function showMessage(text, type) {
+    const message = document.getElementById("ba-message");
+
+    if (!message) return;
+
+    message.textContent = text;
+    message.className = "ba-message " + type;
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  function setButtonsDisabled(disabled) {
+    document
+      .querySelectorAll("#banner-admin-app button")
+      .forEach(function (button) {
+        button.disabled = disabled;
+      });
+  }
+
+  function normalizeUrl(value) {
+    const url = value.trim();
+
+    if (!url) return "";
+
+    if (
+      url.startsWith("https://") ||
+      url.startsWith("http://")
+    ) {
+      return url;
+    }
+
+    return "https://" + url;
+  }
+
+  function getFormData(slot) {
+    const title =
+      document.getElementById("title-" + slot).value.trim();
+
+    const content =
+      document.getElementById("content-" + slot).value.trim();
+
+    const url =
+      normalizeUrl(
+        document.getElementById("url-" + slot).value
+      );
+
+    const enabled =
+      document.getElementById("enabled-" + slot).checked;
+
+    if (enabled && !title) {
+      throw new Error(
+        "배너 " + slot + "의 제목을 입력해 주세요."
+      );
+    }
+
+    if (enabled && !content) {
+      throw new Error(
+        "배너 " + slot + "의 내용을 입력해 주세요."
+      );
+    }
+
+    if (enabled && !url) {
+      throw new Error(
+        "배너 " + slot + "의 연결 URL을 입력해 주세요."
+      );
+    }
+
+    return {
+      slot: slot,
+      title: title,
+      content: content,
+      url: url,
+      enabled: enabled,
+      updated_at: new Date().toISOString()
+    };
+  }
+
+  async function loadBanners() {
+    try {
+      setButtonsDisabled(true);
+
+      const response = await fetch(
+        SUPABASE_URL +
+        "/rest/v1/" +
+        TABLE_NAME +
+        "?select=slot,title,content,url,enabled&order=slot.asc",
+        {
+          method: "GET",
+          headers: headers()
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "배너 정보를 불러오지 못했습니다."
+        );
+      }
+
+      const rows = await response.json();
+
+      rows.forEach(function (row) {
+        const slot = row.slot;
+
+        const title =
+          document.getElementById("title-" + slot);
+
+        const content =
+          document.getElementById("content-" + slot);
+
+        const url =
+          document.getElementById("url-" + slot);
+
+        const enabled =
+          document.getElementById("enabled-" + slot);
+
+        if (title) title.value = row.title || "";
+        if (content) content.value = row.content || "";
+        if (url) url.value = row.url || "";
+        if (enabled) enabled.checked = row.enabled !== false;
+      });
+    } catch (error) {
+      showMessage(
+        error.message || "불러오기 중 오류가 발생했습니다.",
+        "error"
+      );
+    } finally {
+      setButtonsDisabled(false);
+    }
+  }
+
+  async function upsertBanner(data) {
+    const response = await fetch(
+      SUPABASE_URL +
+      "/rest/v1/" +
+      TABLE_NAME +
+      "?on_conflict=slot",
+      {
+        method: "POST",
+        headers: headers(
+          "resolution=merge-duplicates,return=representation"
+        ),
+        body: JSON.stringify(data)
+      }
+    );
+
+    if (!response.ok) {
+      let detail = "";
+
+      try {
+        const result = await response.json();
+        detail = result.message || result.hint || "";
+      } catch (error) {}
+
+      throw new Error(
+        detail || "저장 중 오류가 발생했습니다."
+      );
+    }
+
+    return response.json();
+  }
+
+  window.saveBanner = async function (slot) {
+    try {
+      setButtonsDisabled(true);
+
+      const data = getFormData(slot);
+
+      await upsertBanner(data);
+
+      showMessage(
+        "배너 " + slot + "이 저장되었습니다.",
+        "success"
+      );
+    } catch (error) {
+      showMessage(
+        error.message || "저장 중 오류가 발생했습니다.",
+        "error"
+      );
+    } finally {
+      setButtonsDisabled(false);
+    }
+  };
+
+  window.saveAllBanners = async function () {
+    try {
+      setButtonsDisabled(true);
+
+      const banner1 = getFormData(1);
+      const banner2 = getFormData(2);
+
+      await upsertBanner(banner1);
+      await upsertBanner(banner2);
+
+      showMessage(
+        "배너 2개가 모두 저장되었습니다.",
+        "success"
+      );
+    } catch (error) {
+      showMessage(
+        error.message || "저장 중 오류가 발생했습니다.",
+        "error"
+      );
+    } finally {
+      setButtonsDisabled(false);
+    }
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      loadBanners
+    );
+  } else {
+    loadBanners();
+  }
+})();
+</script>
