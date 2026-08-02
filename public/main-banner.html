@@ -230,12 +230,6 @@
       const SUPABASE_KEY =
         "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
 
-      const ACCOUNT_FUNCTION_URL =
-        SUPABASE_URL + "/functions/v1/hq-admin-account";
-
-      const SESSION_KEY =
-        "wooriapt_hq_admin_session";
-
       const STORAGE_BUCKET =
         "product_images";
 
@@ -301,47 +295,6 @@
           },
           extra||{}
         );
-      }
-
-
-      async function validateSession(){
-        const token=
-          localStorage.getItem(SESSION_KEY)||"";
-
-        if(!token){
-          location.replace("/hq-account.html");
-          return false;
-        }
-
-        const response=await fetch(
-          ACCOUNT_FUNCTION_URL,
-          {
-            method:"POST",
-            headers:{
-              "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-              action:"validate_session",
-              session_token:token
-            })
-          }
-        );
-
-        if(!response.ok){
-          localStorage.removeItem(SESSION_KEY);
-          location.replace("/hq-account.html");
-          return false;
-        }
-
-        const data=await response.json();
-
-        if(data.ok===false){
-          localStorage.removeItem(SESSION_KEY);
-          location.replace("/hq-account.html");
-          return false;
-        }
-
-        return true;
       }
 
 
@@ -810,10 +763,6 @@
 
       async function start(){
         try{
-          const valid=await validateSession();
-
-          if(!valid)return;
-
           await loadStores();
 
           loadingPanel.hidden=true;
