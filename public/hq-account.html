@@ -213,8 +213,7 @@
           });
 
           saveSession(data.session_token,data.admin_id);
-          showAccount(data.admin_id);
-          showMessage("로그인되었습니다.","success");
+          window.location.href="/hq-dashboard.html";
         }catch(error){
           showMessage(error.message || "로그인에 실패했습니다.","error");
         }finally{
