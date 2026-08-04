@@ -137,7 +137,7 @@
     const LAST_QR_KEY="wooriapt_vehicle_last_qr";
     const CALLER_KEY="wooriapt_vehicle_caller_session";
     const INSTALL_RELOAD_KEY="wooriapt_vehicle_install_reload_done";
-    const BUILD_VERSION="20260804-IPHONE-02";
+    const BUILD_VERSION="20260804-FINAL-REGFLOW-01";
 
     const params=new URLSearchParams(location.search);
     let qrCode=cleanQr(params.get("qr")||localStorage.getItem(LAST_QR_KEY));
@@ -298,6 +298,23 @@
       )
     }
 
+    async function prepareIphoneRegistration(qrCodeValue, phoneValue){
+      const data=await callApi({
+        action:"prepare_registration",
+        registration_type:"vehicle",
+        qr_code:qrCodeValue,
+        owner_phone:phoneValue
+      });
+
+      const registrationKey=String(data.registration_key||"").trim().toLowerCase();
+
+      if(!registrationKey){
+        throw new Error("아이폰 등록키를 발급하지 못했습니다.");
+      }
+
+      return registrationKey;
+    }
+
     async function prepareInstallStep(){
       const browser=getBrowserInfo();
 
@@ -450,18 +467,65 @@
 
     phoneInput.addEventListener("input",e=>e.target.value=formatPhone(e.target.value));
 
-    registerButton.addEventListener("click",()=>{
+    registerButton.addEventListener("click",async()=>{
+      if(registerButton.disabled)return;
+
       const phone=normalizePhone(phoneInput.value);
+
       if(!isValidPhone(phone)){
         setStatus(registerStatus,"휴대전화번호를 정확히 입력해 주세요.","error");
         phoneInput.focus();
         return
       }
+
       if(!qrCode){
         setStatus(registerStatus,"자동차 QR 정보를 확인할 수 없습니다.","error");
         return
       }
+
       savePending(qrCode,phone);
+
+      const browser=getBrowserInfo();
+
+      /*
+       * 아이폰에서만 등록키를 먼저 발급하고
+       * 동적 매니페스트에 연결한다.
+       */
+      if(browser.ios){
+        registerButton.disabled=true;
+        registerButton.textContent="등록 준비 중...";
+
+        setStatus(
+          registerStatus,
+          "앱 설치를 준비하고 있습니다.",
+          "waiting"
+        );
+
+        try{
+          const registrationKey=
+            await prepareIphoneRegistration(qrCode,phone);
+
+          location.replace(
+            "/iphone-install.html?reg="+
+            encodeURIComponent(registrationKey)
+          );
+        }catch(error){
+          setStatus(
+            registerStatus,
+            error.message||"아이폰 등록 준비에 실패했습니다.",
+            "error"
+          );
+
+          registerButton.disabled=false;
+          registerButton.textContent="등록하기";
+        }
+
+        return
+      }
+
+      /*
+       * Android Chrome·삼성 인터넷은 기존 흐름 그대로.
+       */
       setStatus(registerStatus,"","");
       showCard("install");
       prepareInstallStep()
@@ -539,7 +603,25 @@
         const pending=loadPending();
         if(!pending)throw new Error("등록 정보를 찾을 수 없습니다. QR을 다시 스캔해 주세요.");
         const token=await createFcmToken();
-        await callApi({action:"register",qr_code:pending.qr_code,owner_phone:pending.owner_phone,push_token:token,platform:"web",user_agent:navigator.userAgent},10000);
+        const registerResult=await callApi({
+          action:"register",
+          qr_code:pending.qr_code,
+          owner_phone:pending.owner_phone,
+          push_token:token,
+          platform:"web",
+          user_agent:navigator.userAgent
+        },10000);
+
+        localStorage.setItem("wooriapt_app_registered","1");
+        localStorage.setItem("wooriapt_registered_phone",pending.owner_phone);
+
+        if(registerResult.customer_id){
+          localStorage.setItem(
+            "wooriapt_customer_id",
+            String(registerResult.customer_id)
+          );
+        }
+
         clearPending();
         setStatus(pushStatus,"","");
         showCard("complete")
