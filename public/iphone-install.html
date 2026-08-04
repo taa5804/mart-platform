@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#16a34a">
+  <title>우리가게 앱 설치</title>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const params = new URLSearchParams(location.search);
+      const registrationKey = String(params.get("reg") || "").trim().toLowerCase();
+      const valid =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+          .test(registrationKey);
+
+      const link = document.createElement("link");
+      link.rel = "manifest";
+      link.href = valid
+        ? "/api/iphone-manifest?reg=" + encodeURIComponent(registrationKey)
+        : "/mart-manifest.webmanifest";
+
+      document.head.appendChild(link);
+      window.__WOORI_REG_KEY__ = valid ? registrationKey : "";
+    })();
+  </script>
+
+  <style>
+    *{box-sizing:border-box}
+    html,body{width:100%;min-height:100%;margin:0}
+    body{min-height:100vh;padding:20px;display:flex;align-items:center;justify-content:center;background:#f4f7fb;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+    .card{width:100%;max-width:420px;padding:28px 22px;background:#fff;border-radius:18px;box-shadow:0 10px 35px rgba(15,23,42,.1);text-align:center}
+    h1{margin:0 0 14px;font-size:24px;line-height:1.4}
+    .step{margin:12px 0;padding:14px;border-radius:12px;background:#f8fafc;color:#334155;font-size:16px;font-weight:700;line-height:1.65}
+    .share{display:inline-flex;align-items:center;justify-content:center;width:58px;height:58px;margin:5px auto 10px;border:2px solid #94a3b8;border-radius:14px;background:#fff;font-size:32px}
+    .app-icon{display:block;width:118px;height:118px;margin:18px auto 8px;border-radius:24px;box-shadow:0 8px 24px rgba(15,23,42,.18);object-fit:cover}
+    .app-name{margin-bottom:16px;font-size:18px;font-weight:800}
+    .important{padding:15px;border-radius:12px;background:#ecfdf5;color:#166534;font-size:15px;font-weight:700;line-height:1.7}
+    .error{color:#dc2626;font-weight:700;line-height:1.7}
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <div id="normalContent">
+      <h1>우리가게 앱 설치</h1>
+
+      <div class="step">1. Safari 아래의 공유 버튼을 누르세요.</div>
+      <div class="share">□↑</div>
+      <div class="step">2. 홈 화면에 추가를 누르세요.</div>
+      <div class="step">3. 오른쪽 위의 추가를 누르세요.</div>
+
+      <img class="app-icon" src="/icon-192.png" alt="우리가게 앱 아이콘">
+      <div class="app-name">우리가게</div>
+
+      <div class="important">
+        홈 화면에 생성된<br>
+        <b>우리가게 앱을 눌러 주세요.</b><br><br>
+
+        앱이 열리면 먼저 등록키를 확인한 뒤<br>
+        <b>푸시 알림 허용</b> 버튼이 나타납니다.<br><br>
+
+        푸시 알림을 허용해야<br>
+        자동차 QR 등록이 완료되고<br>
+        그 이후에만 에너젠마트가 열립니다.
+      </div>
+    </div>
+
+    <div id="errorContent" class="error" style="display:none;">
+      등록키를 확인할 수 없습니다.<br>
+      자동차 QR을 다시 스캔해 주세요.
+    </div>
+  </main>
+
+  <script>
+    "use strict";
+
+    if (!window.__WOORI_REG_KEY__) {
+      document.getElementById("normalContent").style.display = "none";
+      document.getElementById("errorContent").style.display = "block";
+    }
+  </script>
+</body>
+</html>
