@@ -28,7 +28,7 @@
     const VAPID_KEY="BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
     const PENDING_KEY="wooriapt_vehicle_pending_registration";
     const LAST_QR_KEY="wooriapt_vehicle_last_qr";
-    const CALLER_KEY="wooriapt_vehicle_caller_session";const BUILD_VERSION="20260804-CHROME-01";
+    const CALLER_KEY="wooriapt_vehicle_caller_session";const BUILD_VERSION="20260731-02";
     const params=new URLSearchParams(location.search);
     let qrCode=cleanQr(params.get("qr")||localStorage.getItem(LAST_QR_KEY));
     if(qrCode)localStorage.setItem(LAST_QR_KEY,qrCode);
@@ -36,47 +36,28 @@
     let serviceWorkerPromise=null;
     let pushRegistrationRunning=false;
     let pushCardOpened=false;
-    const loadingCard=document.getElementById("loadingCard");
-    const registerCard=document.getElementById("registerCard");
-    const installCard=document.getElementById("installCard");
-    const pushCard=document.getElementById("pushCard");
-    const completeCard=document.getElementById("completeCard");
-    const requestCard=document.getElementById("requestCard");
-    const errorCard=document.getElementById("errorCard");
-    const phoneInput=document.getElementById("phoneInput");
-    const registerButton=document.getElementById("registerButton");
-    const registerStatus=document.getElementById("registerStatus");
-    const browserGuide=document.getElementById("browserGuide");
-    const continueButton=document.getElementById("continueButton");
-    const installStatus=document.getElementById("installStatus");
-    const pushButton=document.getElementById("pushButton");
-    const pushStatus=document.getElementById("pushStatus");
-    const moveButton=document.getElementById("moveButton");
-    const countdownBox=document.getElementById("countdownBox");
-    const emergencyButton=document.getElementById("emergencyButton");
-    const requestStatus=document.getElementById("requestStatus");
-    const errorMessage=document.getElementById("errorMessage");
     const cards={loading:loadingCard,register:registerCard,install:installCard,push:pushCard,complete:completeCard,request:requestCard,error:errorCard};
     function cleanQr(v){return String(v||"").trim().toUpperCase().replace(/[^A-Z0-9_-]/g,"")}
     function normalizePhone(v){return String(v||"").replace(/[^0-9]/g,"")}
     function isValidPhone(v){return /^01[016789][0-9]{7,8}$/.test(v)}
     function formatPhone(v){const n=normalizePhone(v).slice(0,11);if(n.length<=3)return n;if(n.length<=7)return n.slice(0,3)+"-"+n.slice(3);return n.slice(0,3)+"-"+n.slice(3,7)+"-"+n.slice(7)}
     function isInstalledApp(){return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}
-    function getBrowserInfo(){const ua=navigator.userAgent||"";const ios=/iphone|ipad|ipod/i.test(ua);const android=/android/i.test(ua);const samsung=/samsungbrowser/i.test(ua);const chrome=/chrome\//i.test(ua)&&!/edga|edgios|edg\/|opr\/|opera|samsungbrowser|wv\)/i.test(ua);const safari=/safari/i.test(ua)&&!/chrome|crios|android/i.test(ua);const explicitInApp=/(kakaotalk|naver\(inapp|naverapp|line\/|instagram|fbav|fban|\bGSA\/)/i.test(ua);const inApp=explicitInApp||/;\s*wv\)/i.test(ua);return{ios,android,samsung,chrome,safari,inApp}}
+    function getBrowserInfo(){const ua=navigator.userAgent||"",ios=/iphone|ipad|ipod/i.test(ua),android=/android/i.test(ua),samsung=/samsungbrowser/i.test(ua),chrome=/chrome|crios/i.test(ua)&&!/edg|opr|samsungbrowser/i.test(ua),safari=/safari/i.test(ua)&&!/chrome|crios|android/i.test(ua),explicitInApp=/(kakaotalk|naver\(inapp|naverapp|line\/|instagram|fbav|fban)/i.test(ua),inApp=!samsung&&!chrome&&!safari&&explicitInApp;return{ios,android,samsung,chrome,safari,inApp}}
     function hideBrowserGuide(){browserGuide.classList.remove("show");browserGuide.innerHTML=""}
     function showBrowserGuide(title,html){browserGuide.innerHTML="<strong>"+title+"</strong>"+html;browserGuide.classList.add("show")}
     function openCurrentPageInChrome(){
-      const current=new URL(location.href);
-      const scheme=current.protocol.replace(":","");
+      const u=new URL(location.href);
       const intentUrl=
         "intent://"+
-        current.host+
-        current.pathname+
-        current.search+
-        current.hash+
-        "#Intent;scheme="+scheme+
-        ";package=com.android.chrome"+
-        ";S.browser_fallback_url="+encodeURIComponent(current.href)+
+        u.host+
+        u.pathname+
+        u.search+
+        u.hash+
+        "#Intent;scheme="+
+        u.protocol.replace(":","")+
+        ";package=com.android.chrome;"+
+        "S.browser_fallback_url="+
+        encodeURIComponent(u.href)+
         ";end";
       location.href=intentUrl;
     }
@@ -103,89 +84,15 @@
     registerButton.addEventListener("click",()=>{const phone=normalizePhone(phoneInput.value);if(!isValidPhone(phone)){setStatus(registerStatus,"휴대전화번호를 정확히 입력해 주세요.","error");phoneInput.focus();return}if(!qrCode){setStatus(registerStatus,"자동차 QR 정보를 확인할 수 없습니다.","error");return}savePending(qrCode,phone);prepareServiceWorker().catch(error=>console.warn("서비스워커 사전 준비 실패:",error));setStatus(registerStatus,"","");showCard("install")});
     addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstallPrompt=e;hideBrowserGuide();if(cards.install.classList.contains("active")){setStatus(installStatus,"앱 설치 준비가 완료되었습니다. 계속하기를 눌러 주세요.","waiting");continueButton.textContent="계속하기";continueButton.disabled=false}});
     addEventListener("appinstalled",()=>{deferredInstallPrompt=null;continueButton.dataset.manualReady="";hideBrowserGuide();prepareServiceWorker().catch(error=>console.warn("서비스워커 사전 준비 실패:",error));showPushCardOnce()});
-    continueButton.addEventListener("click",async()=>{
-      if(continueButton.disabled)return;
-      continueButton.disabled=true;
-      continueButton.textContent="확인 중...";
-      try{
-        if(!loadPending())throw new Error("휴대전화번호를 다시 입력해 주세요.");
-
-        const browser=getBrowserInfo();
-
-        /*
-         * Android에서는 실제 Chrome이 아닌 모든 브라우저
-         * (네이버·Google·카카오 내부 브라우저, 삼성 인터넷 등)를
-         * 같은 72 주소 그대로 Chrome 앱으로 넘긴다.
-         */
-        if(browser.android&&!browser.chrome){
-          setStatus(installStatus,"Chrome으로 이동합니다.","waiting");
-          continueButton.textContent="Chrome으로 이동 중...";
-          openCurrentPageInChrome();
-
-          /*
-           * 기기에서 Chrome 실행을 차단한 경우에만 안내가 남는다.
-           * 정상 전환되면 현재 페이지를 벗어나므로 아래 코드는 보이지 않는다.
-           */
-          setTimeout(()=>{
-            continueButton.disabled=false;
-            continueButton.textContent="계속하기";
-            setStatus(
-              installStatus,
-              "Chrome이 열리지 않으면 휴대폰의 Chrome 앱에서 같은 QR 주소를 열어 주세요.",
-              "error"
-            );
-          },1800);
-          return;
-        }
-
-        if(isInstalledApp()){
-          hideBrowserGuide();
-          showPushCardOnce();
-          return;
-        }
-
-        hideBrowserGuide();
-        prepareServiceWorker().catch(error=>console.warn("서비스워커 사전 준비 실패:",error));
-        setStatus(installStatus,"앱 설치 가능 상태를 확인하고 있습니다.","waiting");
-
-        const promptEvent=await waitForInstallPrompt(5000);
-
-        if(promptEvent){
-          continueButton.textContent="앱 설치 중...";
-          setStatus(installStatus,"브라우저의 앱 설치 화면에서 설치를 선택해 주세요.","waiting");
-
-          await promptEvent.prompt();
-          const result=await promptEvent.userChoice;
-          deferredInstallPrompt=null;
-
-          if(result.outcome==="accepted"){
-            hideBrowserGuide();
-            setStatus(installStatus,"앱 설치가 선택되었습니다. 푸시 알림 단계로 이동합니다.","waiting");
-            await sleep(500);
-            showPushCardOnce();
-            return;
-          }
-
-          setStatus(installStatus,"앱 설치가 취소되었습니다. 계속하기를 다시 눌러 주세요.","error");
-          continueButton.textContent="계속하기";
-          return;
-        }
-
-        /*
-         * iPhone/Safari 등 Chrome intent를 사용할 수 없는 환경은
-         * 기존 수동 설치 안내를 그대로 사용한다.
-         */
-        showManualInstallGuide();
-      }catch(e){
-        setStatus(installStatus,e.message||"앱 설치에 실패했습니다.","error");
-        continueButton.textContent="다시 시도하기";
-      }finally{
-        if(!(getBrowserInfo().android&&!getBrowserInfo().chrome)){
-          continueButton.disabled=false;
-        }
-      }
-    });
-
+    continueButton.addEventListener("click",async()=>{continueButton.disabled=true;continueButton.textContent="확인 중...";prepareServiceWorker().catch(error=>console.warn("서비스워커 사전 준비 실패:",error));try{if(!loadPending())throw new Error("휴대전화번호를 다시 입력해 주세요.");if(continueButton.dataset.manualReady==="1"){hideBrowserGuide();showPushCardOnce();return}if(isInstalledApp()){hideBrowserGuide();showPushCardOnce();return}hideBrowserGuide();setStatus(installStatus,"앱 설치 가능 상태를 확인하고 있습니다.","waiting");const browser=getBrowserInfo();if(browser.inApp&&browser.android){
+      setStatus(installStatus,"Chrome으로 이동합니다.","waiting");
+      openCurrentPageInChrome();
+      return
+    }
+    if(browser.inApp){
+      showManualInstallGuide();
+      return
+    }const promptEvent=await waitForInstallPrompt(2500);if(promptEvent){continueButton.textContent="앱 설치 중...";setStatus(installStatus,"브라우저의 앱 설치 화면에서 설치를 선택해 주세요.","waiting");promptEvent.prompt();const result=await promptEvent.userChoice;deferredInstallPrompt=null;if(result.outcome==="accepted"){hideBrowserGuide();setStatus(installStatus,"앱 설치가 선택되었습니다. 푸시 알림 단계로 이동합니다.","waiting");await sleep(500);showPushCardOnce();return}showManualInstallGuide();continueButton.dataset.manualReady="1";continueButton.textContent="앱 설치 완료 후 계속";return}showManualInstallGuide();continueButton.dataset.manualReady="1";continueButton.textContent="앱 설치 완료 후 계속"}catch(e){setStatus(installStatus,e.message||"앱 설치에 실패했습니다.","error");continueButton.textContent="다시 시도하기"}finally{continueButton.disabled=false}});
     pushButton.addEventListener("click",async()=>{if(pushRegistrationRunning)return;pushRegistrationRunning=true;pushButton.disabled=true;pushButton.textContent="푸시 알림 등록 중...";setStatus(pushStatus,"푸시 알림을 등록하고 있습니다. 버튼을 다시 누르지 마세요.","waiting");const slowTimer=setTimeout(()=>{setStatus(pushStatus,"등록을 마무리하고 있습니다. 잠시만 더 기다려 주세요.","waiting")},10000);try{const pending=loadPending();if(!pending)throw new Error("등록 정보를 찾을 수 없습니다. QR을 다시 스캔해 주세요.");const token=await createFcmToken();await callApi({action:"register",qr_code:pending.qr_code,owner_phone:pending.owner_phone,push_token:token,platform:"web",user_agent:navigator.userAgent},10000);clearPending();setStatus(pushStatus,"","");showCard("complete")}catch(e){setStatus(pushStatus,e.message||"푸시 알림 등록에 실패했습니다.","error");pushButton.disabled=false;pushButton.textContent="푸시 알림 허용"}finally{clearTimeout(slowTimer);pushRegistrationRunning=false}});
     moveButton.addEventListener("click",async()=>{moveButton.disabled=true;moveButton.textContent="요청 전송 중...";setStatus(requestStatus,"차주에게 푸시 알림을 보내고 있습니다.","waiting");try{const d=await callApi({action:"request",qr_code:qrCode,caller_session_id:getCallerSessionId()});setStatus(requestStatus,Number(d.request_count||1)+"차 차량이동요청을 보냈습니다.","success");updateRequestState(d)}catch(e){const d=e.data||{};if(d.next_allowed_at)startCountdown(d.next_allowed_at);if(d.emergency_enabled===true)emergencyButton.disabled=false;setStatus(requestStatus,e.message||"요청 전송에 실패했습니다.","error");if(!d.next_allowed_at)moveButton.disabled=false;moveButton.textContent="차량이동요청"}});
     emergencyButton.addEventListener("click",async()=>{emergencyButton.disabled=true;setStatus(requestStatus,"긴급통화를 연결하고 있습니다.","waiting");try{const d=await callApi({action:"emergency",qr_code:qrCode,caller_session_id:getCallerSessionId()}),phone=normalizePhone(d.owner_phone);if(!phone)throw new Error("긴급통화 번호를 확인할 수 없습니다.");emergencyButton.disabled=false;location.href="tel:"+phone}catch(e){setStatus(requestStatus,e.message||"긴급통화를 연결하지 못했습니다.","error");emergencyButton.disabled=false}});
