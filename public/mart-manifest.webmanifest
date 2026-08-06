@@ -1,9 +1,9 @@
 {
-  "id": "/mart-app-v1",
+  "id": "/mart-install.html",
   "name": "우리가게",
   "short_name": "우리가게",
   "description": "우리가게 특가·행사 알림",
-  "start_url": "/mart-open.html",
+  "start_url": "/mart-install.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
