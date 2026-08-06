@@ -108,7 +108,7 @@
   let serviceWorkerPromise = null;
 
   const gate = document.getElementById("martRegistrationGate");
-  const main = document.getElementById("eventMainApp");
+  let main = null;
   const cards = {
     loading: document.getElementById("mrgLoading"),
     register: document.getElementById("mrgRegister"),
@@ -374,7 +374,10 @@
   });
 
   retryBtn.addEventListener("click",checkStatus);
-  document.addEventListener("DOMContentLoaded",checkStatus);
+  document.addEventListener("DOMContentLoaded",function(){
+    main = document.getElementById("eventMainApp");
+    checkStatus();
+  });
 })();
 </script>
 
