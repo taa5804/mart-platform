@@ -417,8 +417,20 @@
         return;
       }
 
-      setStatus(installStatus,"앱을 설치하고 있습니다. 잠시만 기다려 주세요.","waiting");
-      installBtn.textContent="설치 완료 대기 중";
+      setStatus(installStatus,"앱 설치 요청이 승인되었습니다.","success");
+      installBtn.textContent="설치 완료";
+
+      /*
+       * 일부 갤럭시·Chrome에서는 실제 설치가 끝나도
+       * appinstalled 이벤트가 전달되지 않는 경우가 있습니다.
+       * 설치창에서 사용자가 설치를 승인한 결과를 기준으로
+       * 푸시 알림 단계로 한 번만 이동합니다.
+       */
+      setTimeout(function(){
+        if(loadPending() && cards.install.style.display!=="none"){
+          showCard("push");
+        }
+      },1200);
     }catch(e){
       setStatus(installStatus,e.message||"앱 설치에 실패했습니다.","error");
       installBtn.textContent="다시 시도하기";
