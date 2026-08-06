@@ -247,7 +247,7 @@
       "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
 
     const FIREBASE_CONFIG = {
-      apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
+      apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dLso7i17fZo0Hc",
       authDomain: "wooriapt-carqr.firebaseapp.com",
       projectId: "wooriapt-carqr",
       storageBucket: "wooriapt-carqr.firebasestorage.app",
@@ -298,10 +298,17 @@
         "74"
       );
 
+    const INSTALL_RELOAD_KEY =
+      "wooriapt_mart_install_reload_done";
+
+    const BUILD_VERSION =
+      "20260806-MART-INSTALL-FINAL-01";
+
     let deferredInstallPrompt = null;
-    let installRunning = false;
-    let pushRunning = false;
+    let serviceWorkerPromise = null;
+    let installPreparationTimer = null;
     let pushCardOpened = false;
+    let pushRegistrationRunning = false;
 
     const cards = {
       loading: document.getElementById("loadingCard"),
@@ -643,28 +650,143 @@
       return data;
     }
 
-    async function registerServiceWorker() {
-      if (!("serviceWorker" in navigator)) {
-        throw new Error(
-          "이 브라우저에서는 푸시 알림을 사용할 수 없습니다."
-        );
+    function prepareServiceWorker() {
+      if (serviceWorkerPromise) {
+        return serviceWorkerPromise;
       }
 
-      const registration =
-        await withTimeout(
-          navigator.serviceWorker.register(
-            "/firebase-messaging-sw.js",
-            {
-              scope: "/"
-            }
-          ),
-          15000,
-          "푸시 알림 설치 시간이 초과되었습니다."
+      if (!("serviceWorker" in navigator)) {
+        serviceWorkerPromise = Promise.reject(
+          new Error(
+            "이 브라우저에서는 앱 설치를 준비할 수 없습니다."
+          )
         );
 
-      await navigator.serviceWorker.ready;
+        serviceWorkerPromise.catch(function() {});
+        return serviceWorkerPromise;
+      }
 
-      return registration;
+      serviceWorkerPromise = (async function() {
+        let registration =
+          await navigator.serviceWorker.getRegistration("/");
+
+        if (!registration) {
+          registration =
+            await navigator.serviceWorker.register(
+              "/firebase-messaging-sw.js?v=" +
+              BUILD_VERSION,
+              {
+                scope: "/",
+                updateViaCache: "none"
+              }
+            );
+        } else {
+          try {
+            await registration.update();
+          } catch (error) {
+            console.warn(
+              "서비스워커 업데이트 확인 실패:",
+              error
+            );
+          }
+        }
+
+        const ready =
+          await navigator.serviceWorker.ready;
+
+        return ready || registration;
+      })().catch(function(error) {
+        serviceWorkerPromise = null;
+        throw error;
+      });
+
+      serviceWorkerPromise.catch(function() {});
+      return serviceWorkerPromise;
+    }
+
+    function enableInstallButton() {
+      if (installPreparationTimer) {
+        clearTimeout(installPreparationTimer);
+        installPreparationTimer = null;
+      }
+
+      continueButton.disabled = false;
+      continueButton.textContent = "계속하기";
+
+      setStatus(
+        installStatus,
+        "앱 설치 준비가 완료되었습니다.",
+        "success"
+      );
+    }
+
+    async function prepareInstallStep() {
+      if (isInstalledApp()) {
+        showPushCardOnce();
+        return;
+      }
+
+      continueButton.disabled = true;
+      continueButton.textContent =
+        "앱 설치 준비 중...";
+
+      setStatus(
+        installStatus,
+        "앱 설치를 준비하고 있습니다.",
+        "waiting"
+      );
+
+      try {
+        await prepareServiceWorker();
+      } catch (error) {
+        setTimeout(
+          prepareInstallStep,
+          1500
+        );
+        return;
+      }
+
+      if (deferredInstallPrompt) {
+        enableInstallButton();
+        return;
+      }
+
+      if (installPreparationTimer) {
+        clearTimeout(installPreparationTimer);
+      }
+
+      installPreparationTimer =
+        setTimeout(function() {
+          if (deferredInstallPrompt) {
+            enableInstallButton();
+            return;
+          }
+
+          if (
+            !sessionStorage.getItem(
+              INSTALL_RELOAD_KEY
+            )
+          ) {
+            sessionStorage.setItem(
+              INSTALL_RELOAD_KEY,
+              "1"
+            );
+
+            window.location.reload();
+            return;
+          }
+
+          setStatus(
+            installStatus,
+            "앱 설치 준비가 늦어지고 있습니다. 잠시만 기다려 주세요.",
+            "waiting"
+          );
+
+          setTimeout(
+            prepareInstallStep,
+            2000
+          );
+        }, 5000);
     }
 
     async function createFcmToken() {
@@ -699,7 +821,7 @@
         firebase.messaging();
 
       const registration =
-        await registerServiceWorker();
+        await prepareServiceWorker();
 
       const token =
         await withTimeout(
@@ -812,6 +934,7 @@
         );
 
         showCard("install");
+        prepareInstallStep();
       }
     );
 
@@ -820,6 +943,14 @@
       function(event) {
         event.preventDefault();
         deferredInstallPrompt = event;
+
+        if (
+          cards.install.classList.contains(
+            "active"
+          )
+        ) {
+          enableInstallButton();
+        }
       }
     );
 
@@ -828,75 +959,94 @@
       function() {
         deferredInstallPrompt = null;
 
-        /*
-          설치 후 앱을 자동 실행하지 않습니다.
-          현재 화면에서 푸시 승인 단계로 이동합니다.
-        */
-        showPushCardOnce();
+        sessionStorage.removeItem(
+          INSTALL_RELOAD_KEY
+        );
+
+        if (
+          loadPending() &&
+          cards.install.classList.contains(
+            "active"
+          )
+        ) {
+          showPushCardOnce();
+        }
       }
     );
 
     continueButton.addEventListener(
       "click",
       async function() {
-        if (installRunning) {
+        if (continueButton.disabled) {
           return;
         }
 
-        installRunning = true;
+        const pending =
+          loadPending();
+
+        if (!pending) {
+          showCard("register");
+          return;
+        }
+
+        if (!deferredInstallPrompt) {
+          prepareInstallStep();
+          return;
+        }
+
         continueButton.disabled = true;
 
         continueButton.textContent =
-          "우리가게 앱 설치 중...";
+          "앱 설치 중...";
 
         setStatus(
           installStatus,
-          "우리가게 앱 설치 화면을 열고 있습니다.",
+          "표시되는 설치 창에서 설치를 눌러 주세요.",
           "waiting"
         );
 
         try {
-          const pending =
-            loadPending();
-
-          if (!pending) {
-            throw new Error(
-              "휴대전화번호를 다시 입력해 주세요."
-            );
-          }
-
-          if (isInstalledApp()) {
-            showPushCardOnce();
-            return;
-          }
-
-          if (!deferredInstallPrompt) {
-            throw new Error(
-              "브라우저 메뉴에서 '앱 설치'를 선택한 후 다시 계속하기를 눌러 주세요."
-            );
-          }
-
-          deferredInstallPrompt.prompt();
-
-          const result =
-            await deferredInstallPrompt.userChoice;
+          const promptEvent =
+            deferredInstallPrompt;
 
           deferredInstallPrompt = null;
+
+          await promptEvent.prompt();
+
+          const result =
+            await promptEvent.userChoice;
 
           if (
             result.outcome !==
             "accepted"
           ) {
-            throw new Error(
-              "우리가게 앱 설치를 완료해 주세요."
+            setStatus(
+              installStatus,
+              "앱 설치가 취소되었습니다. 계속하기를 다시 눌러 주세요.",
+              "error"
             );
+
+            continueButton.textContent =
+              "계속하기";
+
+            continueButton.disabled =
+              false;
+
+            return;
           }
 
           /*
-            앱을 자동 실행하지 않고
-            현재 화면에서 푸시 승인 단계로 이동합니다.
+            여기에서는 푸시 화면으로 넘어가지 않습니다.
+            실제 설치 완료는 appinstalled 이벤트에서만 확인합니다.
           */
-          showPushCardOnce();
+          setStatus(
+            installStatus,
+            "앱을 설치하고 있습니다. 잠시만 기다려 주세요.",
+            "waiting"
+          );
+
+          continueButton.textContent =
+            "설치 완료 대기 중";
 
         } catch (error) {
           setStatus(
@@ -906,13 +1056,11 @@
             "error"
           );
 
+          continueButton.textContent =
+            "다시 시도하기";
+
           continueButton.disabled =
             false;
-
-          continueButton.textContent =
-            "계속하기";
-        } finally {
-          installRunning = false;
         }
       }
     );
@@ -920,11 +1068,11 @@
     pushButton.addEventListener(
       "click",
       async function() {
-        if (pushRunning) {
+        if (pushRegistrationRunning) {
           return;
         }
 
-        pushRunning = true;
+        pushRegistrationRunning = true;
         pushButton.disabled = true;
 
         pushButton.textContent =
@@ -1050,7 +1198,7 @@
           pushButton.textContent =
             "푸시 알림 허용";
         } finally {
-          pushRunning = false;
+          pushRegistrationRunning = false;
         }
       }
     );
