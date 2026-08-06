@@ -1,15 +1,14 @@
 {
-  "id": "/vehicle-app-v1",
-  "name": "우리APT 자동차 QR",
-  "short_name": "자동차QR",
-  "description": "우리APT 자동차 QR 차량이동 알림 앱",
-  "start_url": "/72.html",
+  "id": "/mart-app-v1",
+  "name": "우리가게",
+  "short_name": "우리가게",
+  "description": "우리가게 특가·행사 알림",
+  "start_url": "/mart-open.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#16a34a",
   "orientation": "portrait",
-  "lang": "ko-KR",
   "icons": [
     {
       "src": "/icon-192.png",
