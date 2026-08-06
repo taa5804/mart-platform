@@ -94,9 +94,8 @@
   };
   const VAPID_KEY = "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
   const PENDING_KEY = "wooriapt_mart_pending_registration";
-  const INSTALLED_KEY = "wooriapt_mart_app_installed_v1";
   const REGISTERED_PREFIX = "wooriapt_mart_registered_";
-  const BUILD_VERSION = "20260806-MART-REG-STABLE-01";
+  const BUILD_VERSION = "20260806-MART-REG-STABLE-03";
 
   const params = new URLSearchParams(location.search);
   const qrCode = cleanQr(params.get("qr"));
@@ -145,7 +144,7 @@
     return matchMedia("(display-mode: standalone)").matches || navigator.standalone===true;
   }
   function appKnownInstalled(){
-    return isStandalone() || localStorage.getItem(INSTALLED_KEY)==="1";
+    return isStandalone();
   }
   function setStatus(el,msg,type){
     el.textContent=msg||"";
@@ -282,8 +281,10 @@
 
   window.addEventListener("appinstalled",function(){
     deferredInstallPrompt=null;
-    localStorage.setItem(INSTALLED_KEY,"1");
-    if(loadPending()) showCard("push");
+    if(loadPending()) {
+      setStatus(installStatus,"앱 설치가 완료되었습니다.","success");
+      showCard("push");
+    }
   });
 
   phoneInput.addEventListener("input",e=>{ e.target.value=formatPhone(e.target.value); });
@@ -300,7 +301,7 @@
     try{ await prepareServiceWorker(); }catch(e){}
     if(appKnownInstalled()){
       showCard("push");
-    }else{
+    } else {
       showCard("install");
     }
   });
@@ -320,18 +321,23 @@
       if(!deferredInstallPrompt){
         throw new Error("Chrome 오른쪽 위 메뉴에서 ‘앱 설치’를 눌러 설치한 뒤, 이 버튼을 다시 눌러 주세요.");
       }
-      await deferredInstallPrompt.prompt();
-      const choice=await deferredInstallPrompt.userChoice;
+      const promptEvent=deferredInstallPrompt;
+      await promptEvent.prompt();
+      const choice=await promptEvent.userChoice;
       deferredInstallPrompt=null;
-      if(choice.outcome!=="accepted") throw new Error("우리가게 앱 설치를 완료해 주세요.");
-      localStorage.setItem(INSTALLED_KEY,"1");
-      setStatus(installStatus,"앱 설치가 완료되었습니다.","success");
-      showCard("push");
+      if(choice.outcome!=="accepted") {
+        throw new Error("우리가게 앱 설치를 완료해 주세요.");
+      }
+      setStatus(installStatus,"앱 설치를 완료하는 중입니다. 잠시만 기다려 주세요.","waiting");
+      installBtn.textContent="설치 완료 대기 중";
+      return;
     }catch(e){
       setStatus(installStatus,e.message||"앱 설치에 실패했습니다.","error");
     }finally{
-      installBtn.disabled=false;
-      installBtn.textContent="계속하기";
+      if(!installStatus.textContent.includes("완료하는 중")){
+        installBtn.disabled=false;
+        installBtn.textContent="계속하기";
+      }
     }
   });
 
