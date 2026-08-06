@@ -1,23 +1,402 @@
-<div id="eventMainApp">
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16a34a">
+<link rel="manifest" href="/mart-manifest.webmanifest">
+<title>에너젠마트</title>
+</head>
+<body style="margin:0">
+
+<div id="martRegistrationGate" class="mrg-wrap" style="display:none">
+  <section id="mrgLoading" class="mrg-card">
+    <h1>우리가게 QR 확인 중</h1>
+    <p>잠시만 기다려 주세요.</p>
+  </section>
+
+  <section id="mrgRegister" class="mrg-card" style="display:none">
+    <h1>우리가게 앱 등록</h1>
+    <p>특가·행사 알림을 받을<br>휴대전화번호를 입력해 주세요.</p>
+    <input id="mrgPhone" type="tel" inputmode="numeric" autocomplete="tel"
+           maxlength="13" placeholder="010-0000-0000">
+    <button id="mrgRegisterBtn" type="button">등록하기</button>
+    <div id="mrgRegisterStatus" class="mrg-status"></div>
+  </section>
+
+  <section id="mrgInstall" class="mrg-card" style="display:none">
+    <h1>앱 설치가 필요합니다</h1>
+    <div class="mrg-guide">
+      앱 설치와 푸시 알림은<br>
+      특가·행사 알림을 받기 위해<br>
+      반드시 필요합니다.<br><br>
+      계속하기를 누르면<br>
+      우리가게 앱 설치가 시작됩니다.
+    </div>
+    <button id="mrgInstallBtn" type="button">계속하기</button>
+    <div id="mrgInstallStatus" class="mrg-status"></div>
+  </section>
+
+  <section id="mrgPush" class="mrg-card" style="display:none">
+    <h1>푸시 알림 승인</h1>
+    <div class="mrg-guide">특가·행사 알림을 받기 위해<br>푸시 알림을 허용해 주세요.</div>
+    <button id="mrgPushBtn" type="button">푸시 알림 허용</button>
+    <div id="mrgPushStatus" class="mrg-status"></div>
+  </section>
+
+  <section id="mrgComplete" class="mrg-card" style="display:none">
+    <h1>등록 완료</h1>
+    <div class="mrg-guide">우리가게 앱 설치와<br>푸시 알림 등록이 완료되었습니다.</div>
+    <div class="mrg-status mrg-success">에너젠마트로 이동합니다.</div>
+  </section>
+
+  <section id="mrgError" class="mrg-card" style="display:none">
+    <h1>확인이 필요합니다</h1>
+    <p id="mrgErrorText"></p>
+    <button id="mrgRetryBtn" type="button">다시 확인</button>
+  </section>
+</div>
+
+<style>
+#mrgDummy{display:none}
+#martRegistrationGate{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+#martRegistrationGate.mrg-wrap{min-height:100vh;padding:20px;display:flex;align-items:center;justify-content:center;background:#f4f7fb;color:#111827;box-sizing:border-box}
+#martRegistrationGate *{box-sizing:border-box}
+#martRegistrationGate .mrg-card{width:100%;max-width:420px;padding:28px 22px;background:#fff;border-radius:18px;box-shadow:0 10px 35px rgba(15,23,42,.10);text-align:center}
+#martRegistrationGate h1{margin:0 0 14px;font-size:24px;line-height:1.4}
+#martRegistrationGate p{margin:0 0 20px;color:#64748b;font-size:15px;line-height:1.7}
+#martRegistrationGate input{width:100%;height:54px;margin-bottom:12px;padding:0 15px;border:1px solid #cbd5e1;border-radius:11px;outline:none;font-size:17px;text-align:center}
+#martRegistrationGate button{width:100%;min-height:54px;padding:13px 16px;border:0;border-radius:11px;background:#16a34a;color:#fff;font-size:17px;font-weight:700;cursor:pointer}
+#martRegistrationGate button:disabled{background:#cbd5e1;color:#64748b;cursor:not-allowed}
+#martRegistrationGate .mrg-guide{margin:16px 0 20px;padding:18px;border-radius:12px;background:#f8fafc;color:#334155;font-size:16px;line-height:1.8}
+#martRegistrationGate .mrg-status{min-height:24px;margin-top:16px;font-size:14px;font-weight:700;line-height:1.6;word-break:keep-all}
+#martRegistrationGate .mrg-success{color:#15803d}
+#martRegistrationGate .mrg-error{color:#dc2626}
+#martRegistrationGate .mrg-waiting{color:#1d4ed8}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+
+<script>
+(function(){
+  "use strict";
+
+  const API_URL = "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/register-mart-push";
+  const SUPABASE_KEY = "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
+    authDomain: "wooriapt-carqr.firebaseapp.com",
+    projectId: "wooriapt-carqr",
+    storageBucket: "wooriapt-carqr.firebasestorage.app",
+    messagingSenderId: "101299637796",
+    appId: "1:101299637796:web:cb69372592026b7aa192b1"
+  };
+  const VAPID_KEY = "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
+  const PENDING_KEY = "wooriapt_mart_pending_registration";
+  const INSTALLED_KEY = "wooriapt_mart_app_installed_v1";
+  const REGISTERED_PREFIX = "wooriapt_mart_registered_";
+  const BUILD_VERSION = "20260806-MART-REG-STABLE-01";
+
+  const params = new URLSearchParams(location.search);
+  const qrCode = cleanQr(params.get("qr"));
+  const storeCode = cleanCode(params.get("store") || params.get("store_code"));
+  const currentStorePath = deriveCurrentStorePath();
+
+  let deferredInstallPrompt = null;
+  let registrationRunning = false;
+  let serviceWorkerPromise = null;
+
+  const gate = document.getElementById("martRegistrationGate");
+  const main = document.getElementById("eventMainApp");
+  const cards = {
+    loading: document.getElementById("mrgLoading"),
+    register: document.getElementById("mrgRegister"),
+    install: document.getElementById("mrgInstall"),
+    push: document.getElementById("mrgPush"),
+    complete: document.getElementById("mrgComplete"),
+    error: document.getElementById("mrgError")
+  };
+  const phoneInput = document.getElementById("mrgPhone");
+  const registerBtn = document.getElementById("mrgRegisterBtn");
+  const installBtn = document.getElementById("mrgInstallBtn");
+  const pushBtn = document.getElementById("mrgPushBtn");
+  const retryBtn = document.getElementById("mrgRetryBtn");
+  const registerStatus = document.getElementById("mrgRegisterStatus");
+  const installStatus = document.getElementById("mrgInstallStatus");
+  const pushStatus = document.getElementById("mrgPushStatus");
+  const errorText = document.getElementById("mrgErrorText");
+
+  function cleanQr(v){ return String(v||"").trim().toUpperCase().replace(/[^A-Z0-9_-]/g,""); }
+  function cleanCode(v){ return String(v||"").trim().toUpperCase().replace(/[^A-Z0-9_-]/g,""); }
+  function normalizePhone(v){ return String(v||"").replace(/[^0-9]/g,""); }
+  function isValidPhone(v){ return /^01[016789][0-9]{7,8}$/.test(v); }
+  function formatPhone(v){
+    const n=normalizePhone(v).slice(0,11);
+    if(n.length<=3)return n;
+    if(n.length<=7)return n.slice(0,3)+"-"+n.slice(3);
+    return n.slice(0,3)+"-"+n.slice(3,7)+"-"+n.slice(7);
+  }
+  function deriveCurrentStorePath(){
+    const m=location.pathname.match(/\/(\d+)\/?$/);
+    return m ? "/"+String(Number(m[1])) : "/74";
+  }
+  function isStandalone(){
+    return matchMedia("(display-mode: standalone)").matches || navigator.standalone===true;
+  }
+  function appKnownInstalled(){
+    return isStandalone() || localStorage.getItem(INSTALLED_KEY)==="1";
+  }
+  function setStatus(el,msg,type){
+    el.textContent=msg||"";
+    el.className="mrg-status"+(type?" mrg-"+type:"");
+  }
+  function showCard(name){
+    Object.values(cards).forEach(c=>c.style.display="none");
+    cards[name].style.display="block";
+    gate.style.display="flex";
+    main.style.display="none";
+    scrollTo(0,0);
+  }
+  function openMain(){
+    gate.style.display="none";
+    main.style.display="block";
+    history.replaceState(null,"",location.pathname);
+    scrollTo(0,0);
+  }
+  function showError(message){
+    errorText.textContent=message;
+    showCard("error");
+  }
+  function savePending(phone){
+    localStorage.setItem(PENDING_KEY,JSON.stringify({
+      qr_code:qrCode,
+      owner_phone:phone,
+      store_code:storeCode||null,
+      store_path:currentStorePath,
+      store_url:currentStorePath
+    }));
+  }
+  function loadPending(){
+    try{
+      const d=JSON.parse(localStorage.getItem(PENDING_KEY)||"null");
+      if(!d || cleanQr(d.qr_code)!==qrCode || !isValidPhone(normalizePhone(d.owner_phone))) return null;
+      d.owner_phone=normalizePhone(d.owner_phone);
+      return d;
+    }catch(e){ return null; }
+  }
+  function clearPending(){ localStorage.removeItem(PENDING_KEY); }
+
+  async function callApi(payload, timeoutMs=12000){
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),timeoutMs);
+    try{
+      const r=await fetch(API_URL,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization":"Bearer "+SUPABASE_KEY,
+          "apikey":SUPABASE_KEY
+        },
+        body:JSON.stringify(payload),
+        signal:controller.signal
+      });
+      const text=await r.text();
+      let data={};
+      try{ data=text?JSON.parse(text):{}; }catch(e){}
+      if(!r.ok || data.ok===false || data.success===false){
+        throw new Error(data.message||data.error||"서버 처리에 실패했습니다.");
+      }
+      return data;
+    }catch(e){
+      if(e.name==="AbortError") throw new Error("서버 응답이 지연되고 있습니다. 다시 눌러 주세요.");
+      throw e;
+    }finally{ clearTimeout(timer); }
+  }
+
+  function prepareServiceWorker(){
+    if(serviceWorkerPromise) return serviceWorkerPromise;
+    serviceWorkerPromise=(async()=>{
+      if(!("serviceWorker" in navigator)) throw new Error("이 브라우저에서는 앱 설치와 푸시 알림을 사용할 수 없습니다.");
+      let reg=await navigator.serviceWorker.getRegistration("/");
+      if(!reg){
+        reg=await navigator.serviceWorker.register("/firebase-messaging-sw.js?v="+BUILD_VERSION,{
+          scope:"/",
+          updateViaCache:"none"
+        });
+      }else{
+        try{ await reg.update(); }catch(e){}
+      }
+      return (await navigator.serviceWorker.ready)||reg;
+    })().catch(e=>{ serviceWorkerPromise=null; throw e; });
+    return serviceWorkerPromise;
+  }
+
+  async function createFcmToken(){
+    if(!("Notification" in window)) throw new Error("이 기기에서는 알림을 지원하지 않습니다.");
+    if(Notification.permission==="denied") throw new Error("알림이 차단되어 있습니다. Chrome 사이트 설정에서 알림을 허용해 주세요.");
+    if(Notification.permission==="default"){
+      const permission=await Notification.requestPermission();
+      if(permission!=="granted") throw new Error("푸시 알림을 허용해 주세요.");
+    }
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    const reg=await prepareServiceWorker();
+    const token=await firebase.messaging().getToken({
+      vapidKey:VAPID_KEY,
+      serviceWorkerRegistration:reg
+    });
+    if(!token) throw new Error("푸시 알림 토큰을 발급하지 못했습니다.");
+    return token;
+  }
+
+  async function checkStatus(){
+    if(!qrCode){
+      openMain();
+      return;
+    }
+    if(localStorage.getItem(REGISTERED_PREFIX+qrCode)==="1"){
+      openMain();
+      return;
+    }
+    showCard("loading");
+    try{
+      const data=await callApi({action:"status",qr_code:qrCode,registration_type:"mart"});
+      if(data.registered===true){
+        localStorage.setItem(REGISTERED_PREFIX+qrCode,"1");
+        clearPending();
+        openMain();
+        return;
+      }
+      showCard("register");
+    }catch(e){
+      /* 서버 확인 실패 시에도 미사용 QR 등록 화면을 한 번만 표시 */
+      showCard("register");
+      setStatus(registerStatus,"등록 상태 확인이 지연되었습니다. 전화번호를 입력하고 계속 진행해 주세요.","waiting");
+    }
+  }
+
+  window.addEventListener("beforeinstallprompt",function(e){
+    e.preventDefault();
+    deferredInstallPrompt=e;
+  });
+
+  window.addEventListener("appinstalled",function(){
+    deferredInstallPrompt=null;
+    localStorage.setItem(INSTALLED_KEY,"1");
+    if(loadPending()) showCard("push");
+  });
+
+  phoneInput.addEventListener("input",e=>{ e.target.value=formatPhone(e.target.value); });
+
+  registerBtn.addEventListener("click",async function(){
+    const phone=normalizePhone(phoneInput.value);
+    if(!isValidPhone(phone)){
+      setStatus(registerStatus,"휴대전화번호를 정확히 입력해 주세요.","error");
+      phoneInput.focus();
+      return;
+    }
+    savePending(phone);
+    setStatus(registerStatus,"","");
+    try{ await prepareServiceWorker(); }catch(e){}
+    if(appKnownInstalled()){
+      showCard("push");
+    }else{
+      showCard("install");
+    }
+  });
+
+  installBtn.addEventListener("click",async function(){
+    if(installBtn.disabled) return;
+    installBtn.disabled=true;
+    installBtn.textContent="앱 설치 확인 중...";
+    setStatus(installStatus,"앱 설치 화면을 준비하고 있습니다.","waiting");
+    try{
+      if(!loadPending()) throw new Error("전화번호 등록정보가 없습니다. QR을 다시 스캔해 주세요.");
+      await prepareServiceWorker();
+      if(appKnownInstalled()){
+        showCard("push");
+        return;
+      }
+      if(!deferredInstallPrompt){
+        throw new Error("Chrome 오른쪽 위 메뉴에서 ‘앱 설치’를 눌러 설치한 뒤, 이 버튼을 다시 눌러 주세요.");
+      }
+      await deferredInstallPrompt.prompt();
+      const choice=await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt=null;
+      if(choice.outcome!=="accepted") throw new Error("우리가게 앱 설치를 완료해 주세요.");
+      localStorage.setItem(INSTALLED_KEY,"1");
+      setStatus(installStatus,"앱 설치가 완료되었습니다.","success");
+      showCard("push");
+    }catch(e){
+      setStatus(installStatus,e.message||"앱 설치에 실패했습니다.","error");
+    }finally{
+      installBtn.disabled=false;
+      installBtn.textContent="계속하기";
+    }
+  });
+
+  pushBtn.addEventListener("click",async function(){
+    if(registrationRunning) return;
+    registrationRunning=true;
+    pushBtn.disabled=true;
+    pushBtn.textContent="푸시 알림 등록 중...";
+    setStatus(pushStatus,"등록하고 있습니다. 버튼을 다시 누르지 마세요.","waiting");
+    try{
+      const pending=loadPending();
+      if(!pending) throw new Error("등록정보가 없습니다. QR을 다시 스캔해 주세요.");
+      const token=await createFcmToken();
+      await callApi({
+        action:"register",
+        registration_type:"mart",
+        qr_code:pending.qr_code,
+        owner_phone:pending.owner_phone,
+        push_token:token,
+        store_code:pending.store_code,
+        store_path:pending.store_path,
+        store_url:pending.store_url,
+        platform:"web",
+        user_agent:navigator.userAgent
+      },15000);
+      localStorage.setItem("wooriapt_mart_push_token",token);
+      localStorage.setItem("wooriapt_store_path",currentStorePath);
+      localStorage.setItem("wooriapt_store_url",currentStorePath);
+      localStorage.setItem(REGISTERED_PREFIX+qrCode,"1");
+      clearPending();
+      showCard("complete");
+      setTimeout(openMain,900);
+    }catch(e){
+      setStatus(pushStatus,e.message||"푸시 알림 등록에 실패했습니다.","error");
+      pushBtn.disabled=false;
+      pushBtn.textContent="푸시 알림 허용";
+    }finally{
+      registrationRunning=false;
+    }
+  });
+
+  retryBtn.addEventListener("click",checkStatus);
+  document.addEventListener("DOMContentLoaded",checkStatus);
+})();
+</script>
+
+<div id="eventMainApp" style="display:none">
 <style>
 #eventMainApp{font-family:Arial,sans-serif;max-width:480px;margin:0 auto;background:#f7f7f7;padding-bottom:80px}
 .top-title{background:#1f7a3a;color:#fff;padding:16px;text-align:center;font-size:22px;font-weight:bold}
 .store-title{background:#fff;padding:10px 14px;text-align:center;font-size:15px;font-weight:bold;border-bottom:1px solid #ddd}
-.menu-tabs{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-bottom:1px solid #ddd}
+.menu-tabs{display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-bottom:1px solid #ddd}
 .menu-tabs button{border:0;background:#fff;padding:12px 4px;font-size:13px;font-weight:bold}
 .menu-tabs button.active{background:#1f7a3a;color:#fff}
 .section{display:none;padding:14px}.section.active{display:block}
-.product-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+#eventMainApp .product-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
 .card,.info-box{background:#fff;border-radius:10px;padding:10px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
-.card img{width:100%;height:120px;object-fit:cover;border-radius:8px;background:#ddd}
-.name{margin-top:8px;font-size:15px;font-weight:bold}.price{color:#d60000;font-size:17px;font-weight:bold;margin-top:4px}
-.desc{font-size:12px;color:#555;margin-top:4px;white-space:pre-line}
-.qty-box{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:8px}
-.qty-box button{width:30px;height:30px;border:0;border-radius:50%;background:#1f7a3a;color:#fff;font-size:18px;font-weight:bold}
-.qty-num{font-size:16px;font-weight:bold}
-.btns{display:flex;gap:6px;margin-top:8px}
-.btns button,.join-btn,.submit-btn{flex:1;border:0;border-radius:6px;padding:9px 4px;font-size:13px;font-weight:bold;color:#fff}
-.cart-btn{background:#333}.join-btn,.submit-btn{background:#ff7a00}
+#eventMainApp .card{display:grid!important;grid-template-columns:76px minmax(0,1fr)!important;gap:7px!important;align-items:stretch!important;padding:7px!important;min-width:0!important}#eventMainApp .card img{display:block!important;width:76px!important;height:104px!important;min-height:0!important;object-fit:cover!important;border-radius:7px!important;background:#ddd!important}#eventMainApp .card-body{display:flex!important;flex-direction:column!important;min-width:0!important;width:auto!important}#eventMainApp .name{margin-top:1px!important;font-size:11px!important;font-weight:700!important;line-height:1.25!important;word-break:keep-all!important;overflow-wrap:anywhere!important}#eventMainApp .price{color:#d60000!important;font-size:12px!important;font-weight:800!important;margin-top:3px!important;line-height:1.2!important}
+#eventMainApp .desc{font-size:9px!important;color:#555!important;margin-top:3px!important;line-height:1.25!important;white-space:pre-line!important}
+#eventMainApp .qty-box{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:4px!important;margin-top:auto!important;padding-top:5px!important}
+#eventMainApp .qty-box button{width:22px!important;height:22px!important;border:0!important;border-radius:50%!important;background:#1f7a3a!important;color:#fff!important;font-size:13px!important;font-weight:bold!important;padding:0!important}
+#eventMainApp .qty-num{font-size:11px!important;font-weight:bold!important}
+#eventMainApp .btns{display:flex!important;gap:4px!important;margin-top:5px!important}
+#eventMainApp .btns button,#eventMainApp .join-btn,#eventMainApp .submit-btn{flex:1!important;border:0!important;border-radius:5px!important;padding:6px 2px!important;font-size:10px!important;font-weight:bold!important;color:#fff!important}
+.cart-btn{background:linear-gradient(135deg,#17823d,#0f6b31);box-shadow:0 4px 10px rgba(22,130,61,.22)}.join-btn,.submit-btn{background:#ff7a00}
 .group-info{margin-top:8px;font-size:14px;line-height:1.6}
 .normal{text-decoration:line-through;color:#777}.group-price{color:#d60000;font-size:18px;font-weight:bold}
 .goal{margin-top:8px;background:#f1f1f1;border-radius:8px;padding:8px;font-size:14px;font-weight:bold}
@@ -100,6 +479,359 @@
   .main-banner-title{font-size:13px}
   .main-banner-content{font-size:10px}
 }
+
+.general-list{display:flex;flex-direction:column;gap:7px}
+.general-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;background:#fff;border:1px solid #e6e6e6;border-radius:10px;padding:10px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.general-info{min-width:0}.general-name{font-size:14px;font-weight:800}.general-price{margin-top:3px;color:#d60000;font-size:15px;font-weight:800}
+.general-qty{display:flex;align-items:center;gap:7px}.general-qty button{width:29px;height:29px;border:1px solid #b8d9c2;border-radius:8px;background:#fff;color:#16733a;font-size:18px;font-weight:800}.general-cart{width:38px;height:34px;border:0;border-radius:8px;background:linear-gradient(135deg,#17823d,#0f6b31);color:#fff;font-size:18px;box-shadow:0 4px 10px rgba(22,130,61,.2)}
+.shipping-box{margin-bottom:14px;padding:14px;border:1px solid #d5e9da;border-radius:12px;background:#f4fbf6}.shipping-title{font-weight:800;color:#166534}.shipping-progress{height:9px;margin-top:9px;border-radius:99px;background:#e5e7eb;overflow:hidden}.shipping-progress span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#16a34a,#15803d)}.shipping-meta{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:12px;color:#4b5563}
+
+
+@media(max-width:430px){
+  #eventMainApp .section{padding:8px!important}
+  #eventMainApp .product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+  #eventMainApp .card{grid-template-columns:68px minmax(0,1fr)!important;gap:6px!important;padding:6px!important}
+  #eventMainApp .card img{width:68px!important;height:96px!important}
+  #eventMainApp .name{font-size:10px!important}
+  #eventMainApp .price{font-size:11px!important}
+  #eventMainApp .desc{font-size:8px!important}
+  #eventMainApp .qty-box button{width:20px!important;height:20px!important;font-size:12px!important}
+  #eventMainApp .qty-num{font-size:10px!important}
+  #eventMainApp .btns button{padding:5px 1px!important;font-size:9px!important}
+}
+
+
+/* 주문하기 목록: 사진 상품과 일반상품을 같은 목록에 섞어서 표시 */
+#eventMainApp .order-list-title{
+  margin-bottom:8px;
+  font-size:15px;
+  font-weight:800;
+  color:#111827
+}
+#eventMainApp .order-cart-row{
+  display:grid;
+  grid-template-columns:54px minmax(0,1fr);
+  gap:9px;
+  align-items:center;
+  margin-bottom:8px;
+  padding:9px;
+  border:1px solid #e5e7eb;
+  border-radius:11px;
+  background:#fff;
+  box-shadow:0 2px 7px rgba(15,23,42,.05)
+}
+#eventMainApp .order-cart-row.no-image{
+  grid-template-columns:minmax(0,1fr)
+}
+#eventMainApp .order-cart-thumb{
+  width:54px;
+  height:54px;
+  border-radius:9px;
+  object-fit:cover;
+  background:#f3f4f6
+}
+#eventMainApp .order-cart-main{min-width:0}
+#eventMainApp .order-cart-line1{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0
+}
+#eventMainApp .order-cart-name{
+  overflow:hidden;
+  font-size:13px;
+  font-weight:800;
+  line-height:1.3;
+  color:#111827;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+#eventMainApp .order-cart-badge{
+  flex-shrink:0;
+  padding:2px 6px;
+  border-radius:999px;
+  background:#eef8f1;
+  color:#16733a;
+  font-size:9px;
+  font-weight:800
+}
+#eventMainApp .order-cart-line2{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:6px
+}
+#eventMainApp .order-cart-price{
+  min-width:0;
+  font-size:11px;
+  line-height:1.35;
+  color:#4b5563
+}
+#eventMainApp .order-cart-price b{
+  color:#dc2626;
+  font-size:12px
+}
+#eventMainApp .order-cart-actions{
+  display:flex;
+  flex-shrink:0;
+  align-items:center;
+  gap:4px
+}
+#eventMainApp .order-mini-btn{
+  min-width:27px;
+  height:27px;
+  padding:0 7px;
+  border:1px solid #d1d5db;
+  border-radius:7px;
+  background:#fff;
+  color:#374151;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer
+}
+#eventMainApp .order-mini-btn.plus{
+  border-color:#b7dbc1;
+  background:#f0faf3;
+  color:#16733a
+}
+#eventMainApp .order-mini-btn.remove{
+  min-width:27px;
+  padding:0;
+  border-color:#fecaca;
+  background:#fff5f5;
+  color:#dc2626
+}
+#eventMainApp .order-total-box{
+  margin-top:12px;
+  padding:13px 12px;
+  border-radius:11px;
+  background:#f3f4f6;
+  text-align:right;
+  font-size:17px;
+  font-weight:800;
+  color:#111827
+}
+#eventMainApp .order-total-box b{color:#dc2626}
+#eventMainApp .shipping-box{
+  margin-bottom:10px;
+  padding:11px 12px
+}
+#eventMainApp #fullOrderButton{
+  padding:12px!important;
+  border-radius:9px!important;
+  font-size:15px!important;
+  box-shadow:0 4px 10px rgba(31,122,58,.16)
+}
+@media(max-width:430px){
+  #eventMainApp .order-cart-row{
+    grid-template-columns:48px minmax(0,1fr);
+    gap:7px;
+    padding:8px
+  }
+  #eventMainApp .order-cart-row.no-image{
+    grid-template-columns:minmax(0,1fr)
+  }
+  #eventMainApp .order-cart-thumb{width:48px;height:48px}
+  #eventMainApp .order-cart-name{font-size:12px}
+  #eventMainApp .order-cart-price{font-size:10px}
+  #eventMainApp .order-mini-btn{min-width:25px;height:25px;padding:0 6px;font-size:11px}
+}
+
+
+/* 최종 확정: 한 줄 2개, 사진 위 70%, 정보 아래 30% */
+#eventMainApp .product-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important
+}
+#eventMainApp .card{
+  display:flex!important;
+  flex-direction:column!important;
+  min-width:0!important;
+  height:310px!important;
+  padding:7px!important;
+  overflow:hidden!important;
+  border-radius:11px!important;
+  background:#fff!important;
+  box-shadow:0 2px 8px rgba(15,23,42,.08)!important
+}
+#eventMainApp .card>img{
+  display:block!important;
+  width:100%!important;
+  height:70%!important;
+  min-height:0!important;
+  flex:0 0 70%!important;
+  object-fit:cover!important;
+  border-radius:8px!important;
+  background:#e5e7eb!important
+}
+#eventMainApp .card-body{
+  display:flex!important;
+  flex:1 1 30%!important;
+  flex-direction:column!important;
+  min-width:0!important;
+  padding-top:6px!important
+}
+#eventMainApp .name{
+  display:-webkit-box!important;
+  margin:0!important;
+  overflow:hidden!important;
+  color:#111827!important;
+  font-size:11px!important;
+  font-weight:800!important;
+  line-height:1.25!important;
+  word-break:keep-all!important;
+  overflow-wrap:anywhere!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important
+}
+#eventMainApp .price{
+  margin-top:3px!important;
+  color:#dc0000!important;
+  font-size:13px!important;
+  font-weight:800!important;
+  line-height:1.15!important
+}
+#eventMainApp .desc{
+  display:-webkit-box!important;
+  margin-top:3px!important;
+  overflow:hidden!important;
+  color:#666!important;
+  font-size:8px!important;
+  line-height:1.25!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:1!important
+}
+#eventMainApp .product-action-row{
+  display:grid!important;
+  grid-template-columns:24px 20px 24px minmax(34px,1fr)!important;
+  gap:3px!important;
+  align-items:center!important;
+  margin-top:auto!important;
+  padding-top:5px!important
+}
+#eventMainApp .product-action-row button{
+  height:24px!important;
+  border:0!important;
+  border-radius:6px!important;
+  font-size:11px!important;
+  font-weight:800!important;
+  cursor:pointer!important
+}
+#eventMainApp .product-action-row .qty-action{
+  width:24px!important;
+  padding:0!important;
+  background:#eef8f1!important;
+  color:#16733a!important
+}
+#eventMainApp .product-action-row .qty-value{
+  min-width:20px!important;
+  text-align:center!important;
+  font-size:10px!important;
+  font-weight:800!important
+}
+#eventMainApp .product-action-row .cart-action{
+  width:100%!important;
+  min-width:0!important;
+  padding:0 4px!important;
+  background:linear-gradient(135deg,#16823d,#0f6b31)!important;
+  color:#fff!important;
+  box-shadow:0 2px 6px rgba(22,130,61,.18)!important
+}
+#eventMainApp .group-info{
+  margin-top:3px!important;
+  font-size:8px!important;
+  line-height:1.25!important
+}
+#eventMainApp .group-price{
+  font-size:11px!important
+}
+#eventMainApp .goal{
+  margin-top:3px!important;
+  padding:3px!important;
+  border-radius:5px!important;
+  font-size:8px!important
+}
+#eventMainApp .group-extra{
+  margin-top:3px!important
+}
+#eventMainApp .group-extra .join-btn{
+  width:100%!important;
+  padding:4px 2px!important;
+  border-radius:5px!important;
+  font-size:8px!important
+}
+
+/* 하단 고정 주문하기 버튼은 만들지 않음 */
+#eventMainApp .bottom-order-bar,
+#eventMainApp .sticky-order-bar,
+#eventMainApp .fixed-order-button{
+  display:none!important
+}
+
+@media(max-width:430px){
+  #eventMainApp .section{padding:8px!important}
+  #eventMainApp .product-grid{gap:6px!important}
+  #eventMainApp .card{
+    height:286px!important;
+    padding:6px!important
+  }
+  #eventMainApp .card>img{
+    height:70%!important;
+    flex-basis:70%!important
+  }
+  #eventMainApp .name{font-size:10px!important}
+  #eventMainApp .price{font-size:12px!important}
+  #eventMainApp .desc{font-size:7.5px!important}
+  #eventMainApp .product-action-row{
+    grid-template-columns:22px 18px 22px minmax(31px,1fr)!important;
+    gap:2px!important
+  }
+  #eventMainApp .product-action-row button{
+    height:22px!important;
+    font-size:10px!important
+  }
+  #eventMainApp .product-action-row .qty-action{width:22px!important}
+  #eventMainApp .product-action-row .qty-value{min-width:18px!important;font-size:9px!important}
+  #eventMainApp .product-action-row .cart-action{font-size:9px!important;padding:0 2px!important}
+}
+
+
+/* 공동구매 카드 잘림 수정 */
+#eventMainApp #group .card{
+  height:auto!important;
+  min-height:340px!important;
+  overflow:visible!important
+}
+#eventMainApp #group .card>img{
+  height:218px!important;
+  flex:0 0 218px!important
+}
+#eventMainApp #group .card-body{
+  flex:1 1 auto!important;
+  overflow:visible!important
+}
+#eventMainApp #group .group-extra{
+  display:block!important;
+  margin-top:4px!important
+}
+#eventMainApp #group .join-form{
+  position:static!important;
+  width:100%!important;
+  overflow:visible!important
+}
+@media(max-width:430px){
+  #eventMainApp #group .card{
+    min-height:326px!important
+  }
+  #eventMainApp #group .card>img{
+    height:200px!important;
+    flex-basis:200px!important
+  }
+}
+
 </style>
 
 <div class="top-title">행사메인화면</div>
@@ -109,7 +841,8 @@
   <button class="tab-btn active" onclick="showSection('today',this)">오늘특가</button>
   <button class="tab-btn" onclick="showSection('sale',this)">행사상품</button>
   <button class="tab-btn" onclick="showSection('group',this)">공동구매</button>
-  <button class="tab-btn" onclick="showSection('order',this)">주문하기</button>
+  <button class="tab-btn" onclick="showSection('general',this)">일반상품</button>
+  <button class="tab-btn" onclick="showSection('order',this);renderCart()">주문하기</button>
 </div>
 
 <div id="today" class="section active">
@@ -118,10 +851,17 @@
 </div>
 <div id="sale" class="section"><div class="product-grid" id="saleList"><div class="empty-box">상품을 불러오는 중입니다.</div></div></div>
 <div id="group" class="section"><div class="product-grid" id="groupList"><div class="empty-box">상품을 불러오는 중입니다.</div></div></div>
+<div id="general" class="section"><div class="general-list" id="generalList"><div class="empty-box">일반상품을 불러오는 중입니다.</div></div></div>
 
 <div id="order" class="section">
   <div class="info-box">
+    <div id="orderStoreInfo" style="margin-bottom:12px;padding:11px 12px;border:1px solid #d5e9da;border-radius:10px;background:#f7fbf8;line-height:1.65;">
+      <div id="orderStoreName" style="font-size:15px;font-weight:800;color:#166534;"></div>
+      <div id="orderStorePhone" style="font-size:12px;color:#4b5563;"></div>
+      <div id="orderStoreAddress" style="font-size:12px;color:#4b5563;"></div>
+    </div>
     <b>주문하기</b><br><br>
+    <div id="shippingBox" class="shipping-box" style="display:none"></div>
     <div id="cartList"></div>
 
     <div id="fullOrderArea" style="display:none;margin-top:16px;">
@@ -158,6 +898,8 @@
       </div>
 
       <input id="orderType" type="hidden" value="">
+
+      <div id="customerInfoArea" style="display:none;">
 
       <label style="display:block;font-weight:bold;margin-top:10px;">이름</label>
       <input
@@ -213,6 +955,8 @@
 
       <div id="finalOrderSummary" style="margin-top:14px;padding:13px;background:#f5f5f5;border-radius:8px;line-height:1.7;"></div>
 
+      </div>
+
       <button
         type="button"
         onclick="completeFullOrder()"
@@ -247,6 +991,8 @@ let cartItems=[];
 let todayProducts=[];
 let saleProducts=[];
 let groupProducts=[];
+let generalProducts=[];
+let freeDeliveryAmount=0;
 
 function escapeHtml(value){
   return String(value??'')
@@ -274,6 +1020,7 @@ function getProduct(type,id){
   if(type==='today') return todayProducts.find(p=>p.id===id);
   if(type==='sale') return saleProducts.find(p=>p.id===id);
   if(type==='group') return groupProducts.find(p=>p.id===id);
+  if(type==='general') return generalProducts.find(p=>p.id===id);
   return null;
 }
 
@@ -299,13 +1046,25 @@ function productCard(p){
   return `
   <div class="card">
     <img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}">
-    <div class="name">${escapeHtml(p.name)}</div>
-    <div class="price">${escapeHtml(p.price)}</div>
-    <div class="desc">${escapeHtml(p.desc)}</div>
-    ${qtyBox(p.type,p.id)}
-    <div class="btns">
-      <button class="cart-btn" onclick="addCart('${p.type}',${p.id})">장바구니</button>
+    <div class="card-body">
+      <div class="name">${escapeHtml(p.name)}</div>
+      <div class="price">${escapeHtml(p.price)}</div>
+      <div class="desc">${escapeHtml(p.desc)}</div>
+      <div class="product-action-row">
+        <button class="qty-action" onclick="changeQty('${p.type}',${p.id},-1)" aria-label="수량 줄이기">−</button>
+        <span class="qty-value" id="qty-${p.type}-${p.id}">1</span>
+        <button class="qty-action" onclick="changeQty('${p.type}',${p.id},1)" aria-label="수량 늘리기">＋</button>
+        <button class="cart-action" onclick="addCart('${p.type}',${p.id})" aria-label="장바구니 담기">🛒</button>
+      </div>
     </div>
+  </div>`;
+}
+
+function generalRow(p){
+  return `<div class="general-row">
+    <div class="general-info"><div class="general-name">${escapeHtml(p.name)}</div><div class="general-price">${escapeHtml(p.price)}</div></div>
+    <div class="general-qty"><button onclick="changeQty('general',${p.id},-1)">−</button><b id="qty-general-${p.id}">1</b><button onclick="changeQty('general',${p.id},1)">＋</button></div>
+    <button class="general-cart" onclick="addCart('general',${p.id})" aria-label="장바구니 담기">🛒</button>
   </div>`;
 }
 
@@ -313,30 +1072,35 @@ function groupCard(p){
   return `
   <div class="card">
     <img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}">
-    <div class="name">${escapeHtml(p.name)}</div>
-    <div class="group-info">
-      정상가: <span class="normal">${escapeHtml(p.normal)}</span><br>
-      공동구매가: <span class="group-price">${escapeHtml(p.group)}</span>
-    </div>
-    <div class="goal">
-      <span id="joinCount${p.id}">${p.join}</span>명 참여 / 목표 ${p.goal}명
-    </div>
-    ${qtyBox(p.type,p.id)}
-    <div class="btns">
-      <button class="cart-btn" onclick="addCart('${p.type}',${p.id})">장바구니</button>
-      <button class="join-btn" onclick="openJoinForm(${p.id})">참여하기</button>
-    </div>
-
-    <div id="joinForm${p.id}" class="join-form">
-      <input id="joinName${p.id}" type="text" placeholder="이름 입력">
-      <input id="joinPhone${p.id}" type="tel" placeholder="전화번호 입력">
-      <select id="receiveType${p.id}" onchange="toggleDeliveryAddress(${p.id})">
-        <option value="">방문/배달 선택</option>
-        <option value="방문">방문</option>
-        <option value="배달">배달</option>
-      </select>
-      <textarea id="deliveryAddress${p.id}" class="delivery-address" placeholder="배달주소 입력"></textarea>
-      <button class="submit-btn" onclick="completeJoin(${p.id})">참여완료</button>
+    <div class="card-body">
+      <div class="name">${escapeHtml(p.name)}</div>
+      <div class="group-info">
+        정상가: <span class="normal">${escapeHtml(p.normal)}</span><br>
+        공동구매가: <span class="group-price">${escapeHtml(p.group)}</span>
+      </div>
+      <div class="goal">
+        <span id="joinCount${p.id}">${p.join}</span>명 / 목표 ${p.goal}명
+      </div>
+      <div class="product-action-row">
+        <button class="qty-action" onclick="changeQty('${p.type}',${p.id},-1)" aria-label="수량 줄이기">−</button>
+        <span class="qty-value" id="qty-${p.type}-${p.id}">1</span>
+        <button class="qty-action" onclick="changeQty('${p.type}',${p.id},1)" aria-label="수량 늘리기">＋</button>
+        <button class="cart-action" onclick="addCart('${p.type}',${p.id})" aria-label="장바구니 담기">🛒</button>
+      </div>
+      <div class="group-extra">
+        <button class="join-btn" onclick="openJoinForm(${p.id})">참여하기</button>
+      </div>
+      <div id="joinForm${p.id}" class="join-form">
+        <input id="joinName${p.id}" type="text" placeholder="이름 입력">
+        <input id="joinPhone${p.id}" type="tel" placeholder="전화번호 입력">
+        <select id="receiveType${p.id}" onchange="toggleDeliveryAddress(${p.id})">
+          <option value="">방문/배달 선택</option>
+          <option value="방문">방문</option>
+          <option value="배달">배달</option>
+        </select>
+        <textarea id="deliveryAddress${p.id}" class="delivery-address" placeholder="배달주소 입력"></textarea>
+        <button class="submit-btn" onclick="completeJoin(${p.id})">참여완료</button>
+      </div>
     </div>
   </div>`;
 }
@@ -345,6 +1109,7 @@ function renderProducts(){
   const todayList=document.getElementById('todayList');
   const saleList=document.getElementById('saleList');
   const groupList=document.getElementById('groupList');
+  const generalList=document.getElementById('generalList');
 
   todayList.innerHTML=todayProducts.length
     ? todayProducts.map(productCard).join('')
@@ -357,18 +1122,40 @@ function renderProducts(){
   groupList.innerHTML=groupProducts.length
     ? groupProducts.map(groupCard).join('')
     : '<div class="empty-box">등록된 공동구매 상품이 없습니다.</div>';
+
+  generalList.innerHTML=generalProducts.length
+    ? generalProducts.map(generalRow).join('')
+    : '<div class="empty-box">등록된 일반상품이 없습니다.</div>';
 }
 
 async function loadStoreInfo(){
   try{
     const response=await fetch(
-      `${SUPABASE_URL}/rest/v1/store_info?store_id=eq.${encodeURIComponent(CURRENT_STORE_ID)}&select=store_name`,
+      `${SUPABASE_URL}/rest/v1/store_info?store_id=eq.${encodeURIComponent(CURRENT_STORE_ID)}&select=store_name,phone,address,free_delivery_amount`,
       {headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}}
     );
     if(!response.ok)throw new Error(await response.text());
     const rows=await response.json();
     document.getElementById('storeTitle').textContent=
       rows.length&&rows[0].store_name ? rows[0].store_name : CURRENT_STORE_ID;
+
+    const storeInfo=rows.length?rows[0]:{};
+    const orderStoreName=document.getElementById('orderStoreName');
+    const orderStorePhone=document.getElementById('orderStorePhone');
+    const orderStoreAddress=document.getElementById('orderStoreAddress');
+
+    if(orderStoreName){
+      orderStoreName.textContent=storeInfo.store_name||CURRENT_STORE_ID;
+    }
+    if(orderStorePhone){
+      orderStorePhone.textContent=storeInfo.phone?'☎ '+storeInfo.phone:'';
+    }
+    if(orderStoreAddress){
+      orderStoreAddress.textContent=storeInfo.address?'📍 '+storeInfo.address:'';
+    }
+
+    freeDeliveryAmount=rows.length?Number(rows[0].free_delivery_amount||0):0;
+    renderCart();
   }catch(e){
     document.getElementById('storeTitle').textContent=CURRENT_STORE_ID;
   }
@@ -422,12 +1209,17 @@ async function loadLiveProducts(){
         qty:1
       }));
 
+    generalProducts=rows
+      .filter(r=>r.category==='general'&&(r.product_name||r.price))
+      .map(r=>({type:'general',id:Number(r.product_no),name:r.product_name||'상품명 없음',price:r.price||'',desc:r.description||'',qty:1}));
+
     renderProducts();
   }catch(e){
     console.error('상품 불러오기 실패:',e);
     document.getElementById('todayList').innerHTML='<div class="empty-box">상품을 불러오지 못했습니다.</div>';
     document.getElementById('saleList').innerHTML='<div class="empty-box">상품을 불러오지 못했습니다.</div>';
     document.getElementById('groupList').innerHTML='<div class="empty-box">상품을 불러오지 못했습니다.</div>';
+    document.getElementById('generalList').innerHTML='<div class="empty-box">상품을 불러오지 못했습니다.</div>';
   }
 }
 
@@ -457,7 +1249,9 @@ function addCart(type,id){
       name:p.name,
       qty:p.qty,
       unitPrice:unitPrice,
-      unitPriceText:unitPriceText||''
+      unitPriceText:unitPriceText||'',
+      img:p.img||'',
+      category:type
     });
   }
 
@@ -522,8 +1316,22 @@ function resetFullOrderForm(){
   if(visitTimeArea)visitTimeArea.style.display='none';
   if(entrancePasswordInput)entrancePasswordInput.value='';
   if(orderRequestInput)orderRequestInput.value='';
+  const customerInfoArea=document.getElementById('customerInfoArea');
+  if(customerInfoArea)customerInfoArea.style.display='none';
 
   updateOrderTypeButtons();
+}
+
+
+function renderShipping(total){
+  const box=document.getElementById('shippingBox');
+  if(!box)return;
+  if(freeDeliveryAmount<=0){box.style.display='none';box.innerHTML='';return;}
+  const remaining=Math.max(0,freeDeliveryAmount-total);
+  const percent=Math.min(100,Math.round((total/freeDeliveryAmount)*100));
+  const message=remaining>0?`무료배송까지 <b>${formatWon(remaining)}</b> 남았습니다.`:'<b>무료배송이 적용되었습니다.</b>';
+  box.innerHTML=`<div class="shipping-title">🚚 ${message}</div><div class="shipping-progress"><span style="width:${percent}%"></span></div><div class="shipping-meta"><span>현재 주문금액 ${formatWon(total)}</span><span>무료배송 기준 ${formatWon(freeDeliveryAmount)}</span></div>`;
+  box.style.display='block';
 }
 
 function renderCart(){
@@ -532,7 +1340,8 @@ function renderCart(){
   const fullOrderForm=document.getElementById('fullOrderForm');
 
   if(cartItems.length===0){
-    cartList.innerHTML='장바구니가 비어 있습니다.';
+    renderShipping(0);
+    cartList.innerHTML='<div style="padding:18px 8px;text-align:center;color:#6b7280;">장바구니가 비어 있습니다.</div>';
     if(fullOrderArea)fullOrderArea.style.display='none';
     if(fullOrderForm)fullOrderForm.style.display='none';
     return;
@@ -540,33 +1349,51 @@ function renderCart(){
 
   let totalAmount=0;
 
+  const categoryName={
+    today:'오늘특가',
+    sale:'행사상품',
+    group:'공동구매',
+    general:'일반상품'
+  };
+
   const rows=cartItems.map((item,i)=>{
     const lineTotal=item.unitPrice*item.qty;
     totalAmount+=lineTotal;
 
     const priceLine=item.unitPrice>0
       ? formatWon(item.unitPrice)+' × '+item.qty+'개 = <b>'+formatWon(lineTotal)+'</b>'
-      : '가격 미입력 / 수량 '+item.qty+'개';
+      : '가격 미입력 · 수량 '+item.qty+'개';
 
-    return '<div style="padding:12px 0;border-bottom:1px solid #ddd;line-height:1.7;">'
-      +(i+1)+'. <b>'+escapeHtml(item.name)+'</b><br>'
-      +priceLine
-      +'<div style="display:flex;gap:6px;margin-top:8px;">'
-      +'<button onclick="decreaseCartItem('+i+')" style="flex:1;border:0;border-radius:6px;padding:8px;background:#666;color:#fff;font-weight:bold;">- 1개</button>'
-      +'<button onclick="increaseCartItem('+i+')" style="flex:1;border:0;border-radius:6px;padding:8px;background:#1f7a3a;color:#fff;font-weight:bold;">+ 1개</button>'
-      +'<button onclick="removeCartItem('+i+')" style="flex:1;border:0;border-radius:6px;padding:8px;background:#d60000;color:#fff;font-weight:bold;">상품 빼기</button>'
+    const imageHtml=item.img
+      ? '<img class="order-cart-thumb" src="'+escapeHtml(item.img)+'" alt="'+escapeHtml(item.name)+'">'
+      : '';
+
+    return '<div class="order-cart-row '+(item.img?'':'no-image')+'">'
+      +imageHtml
+      +'<div class="order-cart-main">'
+      +'<div class="order-cart-line1">'
+      +'<div class="order-cart-name">'+escapeHtml(item.name)+'</div>'
+      +'<span class="order-cart-badge">'+escapeHtml(categoryName[item.category]||'상품')+'</span>'
+      +'</div>'
+      +'<div class="order-cart-line2">'
+      +'<div class="order-cart-price">'+priceLine+'</div>'
+      +'<div class="order-cart-actions">'
+      +'<button class="order-mini-btn" type="button" onclick="decreaseCartItem('+i+')" aria-label="수량 줄이기">−</button>'
+      +'<button class="order-mini-btn plus" type="button" onclick="increaseCartItem('+i+')" aria-label="수량 늘리기">＋</button>'
+      +'<button class="order-mini-btn remove" type="button" onclick="removeCartItem('+i+')" aria-label="상품 삭제">×</button>'
+      +'</div>'
+      +'</div>'
       +'</div>'
       +'</div>';
   }).join('');
 
   cartList.innerHTML=
-    '<b>장바구니 목록</b><br>'
+    '<div class="order-list-title">장바구니 목록</div>'
     +rows
-    +'<div style="margin-top:14px;padding:14px 10px;background:#f1f1f1;border-radius:8px;text-align:right;font-size:18px;font-weight:bold;">'
-    +'총 주문금액: '+formatWon(totalAmount)
-    +'</div>';
+    +'<div class="order-total-box">총 주문금액 <b>'+formatWon(totalAmount)+'</b></div>';
 
   if(fullOrderArea)fullOrderArea.style.display='block';
+  renderShipping(totalAmount);
   updateFinalOrderSummary();
 }
 
@@ -591,6 +1418,8 @@ function closeFullOrderForm(){
 
 function selectOrderType(type){
   document.getElementById('orderType').value=type;
+  const customerInfoArea=document.getElementById('customerInfoArea');
+  if(customerInfoArea)customerInfoArea.style.display='block';
   document.getElementById('orderAddressArea').style.display=type==='배달'?'block':'none';
   document.getElementById('visitTimeArea').style.display=type==='방문'?'block':'none';
   updateOrderTypeButtons();
@@ -831,3 +1660,5 @@ loadLiveProducts();
 loadMainBanners();
 </script>
 </div>
+</body>
+</html>
