@@ -1,14 +1,14 @@
 {
-  "id": "/mart-app-v1",
   "name": "우리가게",
   "short_name": "우리가게",
-  "description": "에너젠마트 특가·행사 알림",
-  "start_url": "https://wooriapt.ai.kr/74",
-  "scope": "/",
+  "start_url": "/72.html",
+  "scope": "/72.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#16a34a",
   "orientation": "portrait",
+  "lang": "ko-KR",
+  "description": "우리APT 자동차 QR",
   "icons": [
     {
       "src": "/icon-192.png",
