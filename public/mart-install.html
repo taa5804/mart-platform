@@ -210,11 +210,13 @@
 
     <div class="guide">
       우리가게 앱 설치와<br>
-      푸시 알림 등록이 완료되었습니다.
+      푸시 알림 등록이 완료되었습니다.<br><br>
+      휴대폰의 우리가게 앱을 눌러<br>
+      에너젠마트를 이용해 주세요.
     </div>
 
     <div class="status success">
-      이제 특가·행사 알림을 받을 수 있습니다.
+      이 화면에서 등록 절차가 모두 끝났습니다.
     </div>
   </section>
 
@@ -245,7 +247,7 @@
       "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
 
     const FIREBASE_CONFIG = {
-      apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dLso7i17fZo0Hc",
+      apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
       authDomain: "wooriapt-carqr.firebaseapp.com",
       projectId: "wooriapt-carqr",
       storageBucket: "wooriapt-carqr.firebasestorage.app",
@@ -254,7 +256,7 @@
     };
 
     const VAPID_KEY =
-      "BDeVeUPEh-pooMUUU4Bd2f5x7Ehuwyx4TeunbaQvR8WQs6SqWNaryhh0RyoSSmxxMNnDGogdgDs1Qod93Vj0jM";
+      "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
 
     const PENDING_KEY =
       "wooriapt_mart_pending_registration";
@@ -292,12 +294,13 @@
     let storePath =
       cleanStorePath(
         params.get("path") ||
-        params.get("store_path")
+        params.get("store_path") ||
+        "74"
       );
 
     let deferredInstallPrompt = null;
-    let serviceWorkerPromise = null;
-    let pushRegistrationRunning = false;
+    let installRunning = false;
+    let pushRunning = false;
     let pushCardOpened = false;
 
     const cards = {
@@ -459,6 +462,15 @@
       window.scrollTo(0, 0);
     }
 
+    function showPushCardOnce() {
+      if (pushCardOpened) {
+        return;
+      }
+
+      pushCardOpened = true;
+      showCard("push");
+    }
+
     function setStatus(element, message, type) {
       element.textContent = message || "";
       element.className = "status";
@@ -478,14 +490,16 @@
         normalizePhone(phone);
 
       const storeInformation =
-        parseStoreInformation(storeCode);
+        storeCode
+          ? parseStoreInformation(storeCode)
+          : null;
 
       const finalPath =
         storePath ||
         (
           storeInformation
             ? storeInformation.store_url
-            : ""
+            : "/74"
         );
 
       localStorage.setItem(
@@ -565,18 +579,25 @@
       localStorage.removeItem(PENDING_KEY);
     }
 
-    async function callApi(payload, timeoutMs = 10000) {
-      const controller =
-        new AbortController();
+    function withTimeout(
+      promise,
+      milliseconds,
+      message
+    ) {
+      return Promise.race([
+        promise,
+        new Promise(function(_, reject) {
+          setTimeout(function() {
+            reject(new Error(message));
+          }, milliseconds);
+        })
+      ]);
+    }
 
-      const timer =
-        setTimeout(function() {
-          controller.abort();
-        }, timeoutMs);
-
-      try {
-        const response =
-          await fetch(API_URL, {
+    async function callApi(payload) {
+      const response =
+        await withTimeout(
+          fetch(API_URL, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -584,167 +605,83 @@
                 "Bearer " + SUPABASE_KEY,
               "apikey": SUPABASE_KEY
             },
-            body: JSON.stringify(payload),
-            signal: controller.signal
-          });
+            body: JSON.stringify(payload)
+          }),
+          15000,
+          "서버 응답이 없습니다. 다시 눌러 주세요."
+        );
 
-        const text =
-          await response.text();
+      const text =
+        await response.text();
 
-        let data = {};
+      let data = {};
 
-        try {
-          data = text
-            ? JSON.parse(text)
-            : {};
-        } catch (error) {
-          data = {};
-        }
-
-        if (
-          !response.ok ||
-          data.ok === false ||
-          data.success === false
-        ) {
-          const apiError =
-            new Error(
-              data.message ||
-              data.error ||
-              "서버 처리에 실패했습니다."
-            );
-
-          apiError.data = data;
-          throw apiError;
-        }
-
-        return data;
-
+      try {
+        data = text
+          ? JSON.parse(text)
+          : {};
       } catch (error) {
-        if (
-          error &&
-          error.name === "AbortError"
-        ) {
-          throw new Error(
-            "서버 등록 응답이 지연되고 있습니다. 다시 시도해 주세요."
+        data = {};
+      }
+
+      if (
+        !response.ok ||
+        data.ok === false ||
+        data.success === false
+      ) {
+        const apiError =
+          new Error(
+            data.message ||
+            data.error ||
+            "서버 처리에 실패했습니다."
           );
-        }
 
-        throw error;
-
-      } finally {
-        clearTimeout(timer);
-      }
-    }
-
-    function sleep(milliseconds) {
-      return new Promise(function(resolve) {
-        setTimeout(resolve, milliseconds);
-      });
-    }
-
-    function showPushCardOnce() {
-      if (pushCardOpened) {
-        return;
+        apiError.data = data;
+        throw apiError;
       }
 
-      pushCardOpened = true;
-      showCard("push");
+      return data;
     }
 
-    function prepareServiceWorker() {
-      if (serviceWorkerPromise) {
-        return serviceWorkerPromise;
-      }
-
+    async function registerServiceWorker() {
       if (!("serviceWorker" in navigator)) {
-        serviceWorkerPromise =
-          Promise.reject(
-            new Error(
-              "이 브라우저에서는 푸시 알림을 사용할 수 없습니다."
-            )
-          );
-
-        serviceWorkerPromise.catch(function() {});
-        return serviceWorkerPromise;
+        throw new Error(
+          "이 브라우저에서는 푸시 알림을 사용할 수 없습니다."
+        );
       }
 
-      serviceWorkerPromise =
-        (async function() {
-          let registration =
-            await navigator.serviceWorker
-              .getRegistration("/");
+      const registration =
+        await withTimeout(
+          navigator.serviceWorker.register(
+            "/firebase-messaging-sw.js",
+            {
+              scope: "/"
+            }
+          ),
+          15000,
+          "푸시 알림 설치 시간이 초과되었습니다."
+        );
 
-          if (!registration) {
-            registration =
-              await navigator.serviceWorker
-                .register(
-                  "/firebase-messaging-sw.js",
-                  {
-                    scope: "/",
-                    updateViaCache: "none"
-                  }
-                );
-          }
+      await navigator.serviceWorker.ready;
 
-          if (registration.active) {
-            return registration;
-          }
-
-          const readyRegistration =
-            await navigator.serviceWorker.ready;
-
-          return readyRegistration || registration;
-        })().catch(function(error) {
-          serviceWorkerPromise = null;
-          throw error;
-        });
-
-      serviceWorkerPromise.catch(function() {});
-      return serviceWorkerPromise;
+      return registration;
     }
 
-    async function waitForPermission() {
+    async function createFcmToken() {
       if (!("Notification" in window)) {
         throw new Error(
           "이 기기에서는 알림을 지원하지 않습니다."
         );
       }
 
-      if (Notification.permission === "denied") {
-        throw new Error(
-          "알림 권한이 차단되어 있습니다. 브라우저의 사이트 설정에서 알림을 허용해 주세요."
-        );
-      }
+      const permission =
+        await Notification.requestPermission();
 
-      if (Notification.permission === "default") {
-        const result =
-          await Notification.requestPermission();
-
-        if (result === "denied") {
-          throw new Error(
-            "알림 권한이 차단되어 있습니다. 브라우저의 사이트 설정에서 알림을 허용해 주세요."
-          );
-        }
-      }
-
-      for (
-        let attempt = 0;
-        attempt < 15 &&
-        Notification.permission === "default";
-        attempt += 1
-      ) {
-        await sleep(200);
-      }
-
-      if (Notification.permission !== "granted") {
+      if (permission !== "granted") {
         throw new Error(
           "푸시 알림을 허용해 주세요."
         );
       }
-    }
-
-    async function createFcmToken() {
-      await waitForPermission();
 
       if (!window.firebase) {
         throw new Error(
@@ -762,47 +699,26 @@
         firebase.messaging();
 
       const registration =
-        await prepareServiceWorker();
+        await registerServiceWorker();
 
-      let lastError = null;
+      const token =
+        await withTimeout(
+          messaging.getToken({
+            vapidKey: VAPID_KEY,
+            serviceWorkerRegistration:
+              registration
+          }),
+          20000,
+          "푸시 알림 등록 시간이 초과되었습니다."
+        );
 
-      for (
-        let attempt = 1;
-        attempt <= 2;
-        attempt += 1
-      ) {
-        try {
-          const token =
-            await messaging.getToken({
-              vapidKey: VAPID_KEY,
-              serviceWorkerRegistration:
-                registration
-            });
-
-          if (token) {
-            return token;
-          }
-
-          lastError =
-            new Error(
-              "푸시 알림 토큰을 발급하지 못했습니다."
-            );
-
-        } catch (error) {
-          lastError = error;
-        }
-
-        if (attempt < 2) {
-          await sleep(700);
-        }
+      if (!token) {
+        throw new Error(
+          "푸시 알림 토큰을 발급하지 못했습니다."
+        );
       }
 
-      throw (
-        lastError ||
-        new Error(
-          "푸시 알림 토큰을 발급하지 못했습니다."
-        )
-      );
+      return token;
     }
 
     async function checkRegisteredStatus() {
@@ -875,30 +791,19 @@
         }
 
         const storeInformation =
-          parseStoreInformation(storeCode);
-
-        if (!storeInformation) {
-          setStatus(
-            registerStatus,
-            "매장코드 형식이 올바르지 않습니다. 예: GJ-BK-00074",
-            "error"
-          );
-
-          return;
-        }
+          storeCode
+            ? parseStoreInformation(storeCode)
+            : null;
 
         storePath =
-          storeInformation.store_url;
+          (
+            storeInformation &&
+            storeInformation.store_url
+          ) ||
+          storePath ||
+          "/74";
 
         savePending(phone);
-
-        prepareServiceWorker()
-          .catch(function(error) {
-            console.warn(
-              "서비스워커 사전 준비 실패:",
-              error
-            );
-          });
 
         setStatus(
           registerStatus,
@@ -923,14 +828,6 @@
       function() {
         deferredInstallPrompt = null;
 
-        prepareServiceWorker()
-          .catch(function(error) {
-            console.warn(
-              "서비스워커 사전 준비 실패:",
-              error
-            );
-          });
-
         /*
           설치 후 앱을 자동 실행하지 않습니다.
           현재 화면에서 푸시 승인 단계로 이동합니다.
@@ -942,6 +839,11 @@
     continueButton.addEventListener(
       "click",
       async function() {
+        if (installRunning) {
+          return;
+        }
+
+        installRunning = true;
         continueButton.disabled = true;
 
         continueButton.textContent =
@@ -952,14 +854,6 @@
           "우리가게 앱 설치 화면을 열고 있습니다.",
           "waiting"
         );
-
-        prepareServiceWorker()
-          .catch(function(error) {
-            console.warn(
-              "서비스워커 사전 준비 실패:",
-              error
-            );
-          });
 
         try {
           const pending =
@@ -1017,6 +911,8 @@
 
           continueButton.textContent =
             "계속하기";
+        } finally {
+          installRunning = false;
         }
       }
     );
@@ -1024,12 +920,11 @@
     pushButton.addEventListener(
       "click",
       async function() {
-        if (pushRegistrationRunning) {
+        if (pushRunning) {
           return;
         }
 
-        pushRegistrationRunning = true;
-
+        pushRunning = true;
         pushButton.disabled = true;
 
         pushButton.textContent =
@@ -1037,18 +932,9 @@
 
         setStatus(
           pushStatus,
-          "푸시 알림을 등록하고 있습니다. 버튼을 다시 누르지 마세요.",
+          "푸시 알림을 설정하고 있습니다.",
           "waiting"
         );
-
-        const slowTimer =
-          setTimeout(function() {
-            setStatus(
-              pushStatus,
-              "등록을 마무리하고 있습니다. 잠시만 더 기다려 주세요.",
-              "waiting"
-            );
-          }, 10000);
 
         try {
           const pending =
@@ -1063,33 +949,30 @@
           const fcmToken =
             await createFcmToken();
 
-          await callApi(
-            {
-              action: "register",
-              registration_type: "mart",
-              qr_code: pending.qr_code,
-              owner_phone: pending.owner_phone,
-              push_token: fcmToken,
-              store_code:
-                pending.store_code || null,
-              region_code:
-                pending.region_code || null,
-              district_code:
-                pending.district_code || null,
-              store_no:
-                pending.store_no || null,
-              store_path:
-                pending.store_path || null,
-              store_url:
-                pending.store_url ||
-                pending.store_path ||
-                null,
-              platform: "web",
-              user_agent:
-                navigator.userAgent
-            },
-            10000
-          );
+          await callApi({
+            action: "register",
+            registration_type: "mart",
+            qr_code: pending.qr_code,
+            owner_phone: pending.owner_phone,
+            push_token: fcmToken,
+            store_code:
+              pending.store_code || null,
+            region_code:
+              pending.region_code || null,
+            district_code:
+              pending.district_code || null,
+            store_no:
+              pending.store_no || null,
+            store_path:
+              pending.store_path || null,
+            store_url:
+              pending.store_url ||
+              pending.store_path ||
+              null,
+            platform: "web",
+            user_agent:
+              navigator.userAgent
+          });
 
           if (pending.store_code) {
             localStorage.setItem(
@@ -1153,12 +1036,6 @@
 
           showCard("complete");
 
-          setTimeout(function() {
-            window.location.replace(
-              "https://wooriapt.ai.kr/74"
-            );
-          }, 1200);
-
         } catch (error) {
           setStatus(
             pushStatus,
@@ -1172,10 +1049,8 @@
 
           pushButton.textContent =
             "푸시 알림 허용";
-
         } finally {
-          clearTimeout(slowTimer);
-          pushRegistrationRunning = false;
+          pushRunning = false;
         }
       }
     );
