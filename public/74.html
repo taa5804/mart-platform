@@ -47,7 +47,13 @@
   <section id="mrgComplete" class="mrg-card" style="display:none">
     <h1>등록 완료</h1>
     <div class="mrg-guide">우리가게 앱 설치와<br>푸시 알림 등록이 완료되었습니다.</div>
-    <div class="mrg-status mrg-success">에너젠마트로 이동합니다.</div>
+    <div class="mrg-status mrg-success">휴대폰의 우리가게 앱을 눌러 이용해 주세요.</div>
+  </section>
+
+  <section id="mrgAlready" class="mrg-card" style="display:none">
+    <h1>이미 등록되었습니다</h1>
+    <div class="mrg-guide">우리가게 앱과 푸시 알림 등록이<br>이미 완료되어 있습니다.</div>
+    <div class="mrg-status mrg-success">휴대폰의 우리가게 앱을 눌러 이용해 주세요.</div>
   </section>
 
   <section id="mrgError" class="mrg-card" style="display:none">
@@ -114,6 +120,7 @@
     install: document.getElementById("mrgInstall"),
     push: document.getElementById("mrgPush"),
     complete: document.getElementById("mrgComplete"),
+    already: document.getElementById("mrgAlready"),
     error: document.getElementById("mrgError")
   };
   const phoneInput = document.getElementById("mrgPhone");
@@ -254,7 +261,7 @@
       return;
     }
     if(localStorage.getItem(REGISTERED_PREFIX+qrCode)==="1"){
-      openMain();
+      showCard("already");
       return;
     }
     showCard("loading");
@@ -263,7 +270,7 @@
       if(data.registered===true){
         localStorage.setItem(REGISTERED_PREFIX+qrCode,"1");
         clearPending();
-        openMain();
+        showCard("already");
         return;
       }
       showCard("register");
@@ -369,7 +376,6 @@
       localStorage.setItem(REGISTERED_PREFIX+qrCode,"1");
       clearPending();
       showCard("complete");
-      setTimeout(openMain,900);
     }catch(e){
       setStatus(pushStatus,e.message||"푸시 알림 등록에 실패했습니다.","error");
       pushBtn.disabled=false;
