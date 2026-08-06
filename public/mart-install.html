@@ -273,6 +273,32 @@
   <script>
     "use strict";
 
+    /* 설치 이벤트는 페이지 로딩 초기에 발생할 수 있으므로 가장 먼저 잡아 둡니다. */
+    let deferredInstallPrompt=null;
+    let installEventCaptured=false;
+
+    window.addEventListener("beforeinstallprompt",event=>{
+      event.preventDefault();
+      deferredInstallPrompt=event;
+      installEventCaptured=true;
+
+      const button=document.getElementById("continueButton");
+      const card=document.getElementById("installCard");
+      const status=document.getElementById("installStatus");
+
+      if(button&&card&&card.classList.contains("active")){
+        clearTimeout(installPreparationTimer);
+        installPreparationTimer=null;
+        button.style.display="block";
+        button.disabled=false;
+        button.textContent="계속하기";
+        if(status){
+          status.textContent="앱 설치 준비가 완료되었습니다.";
+          status.className="status success";
+        }
+      }
+    });
+
     const API_URL="https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/register-mart-push";
     const SUPABASE_KEY="sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
     const FIREBASE_CONFIG={apiKey:"AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",authDomain:"wooriapt-carqr.firebaseapp.com",projectId:"wooriapt-carqr",storageBucket:"wooriapt-carqr.firebasestorage.app",messagingSenderId:"101299637796",appId:"1:101299637796:web:cb69372592026b7aa192b1"};
@@ -280,7 +306,7 @@
 
     const PENDING_KEY="wooriapt_mart_pending_registration";
     const INSTALL_RELOAD_KEY="wooriapt_mart_install_reload_done";
-    const BUILD_VERSION="20260806-MART-72LIKE-IOS-01";
+    const BUILD_VERSION="20260806-MART-INSTALL-EVENT-02";
     const STORE_PATH_KEY="wooriapt_store_path";
     const STORE_URL_KEY="wooriapt_store_url";
 
@@ -288,7 +314,6 @@
     const qrCode=cleanQr(params.get("qr"));
     const storePath="/74";
 
-    let deferredInstallPrompt=null;
     let serviceWorkerPromise=null;
     let installPreparationTimer=null;
     let pushRegistrationRunning=false;
@@ -437,20 +462,41 @@
       continueButton.textContent="앱 설치 준비 중...";
       setStatus(installStatus,"앱 설치를 준비하고 있습니다.","waiting");
 
-      try{await prepareServiceWorker()}catch(e){setTimeout(prepareInstallStep,1500);return}
+      try{await prepareServiceWorker()}catch(e){
+        setStatus(installStatus,e.message||"앱 설치 준비에 실패했습니다.","error");
+        setTimeout(prepareInstallStep,1500);
+        return
+      }
 
-      if(deferredInstallPrompt){enableInstallButton();return}
+      if(deferredInstallPrompt||installEventCaptured){
+        enableInstallButton();
+        return
+      }
 
-      installPreparationTimer=setTimeout(()=>{
-        if(deferredInstallPrompt){enableInstallButton();return}
+      /* manifest와 service worker를 브라우저가 평가할 시간을 주고 설치 이벤트를 기다립니다. */
+      let checks=0;
+      const waitForInstallEvent=()=>{
+        if(deferredInstallPrompt){
+          enableInstallButton();
+          return
+        }
+        checks+=1;
+        if(checks<20){
+          installPreparationTimer=setTimeout(waitForInstallEvent,500);
+          return
+        }
+
+        /* 한 번만 새로고침하여 Chrome이 PWA 설치 가능 상태를 다시 계산하게 합니다. */
         if(!sessionStorage.getItem(INSTALL_RELOAD_KEY)){
           sessionStorage.setItem(INSTALL_RELOAD_KEY,"1");
           location.reload();
           return
         }
-        setStatus(installStatus,"앱 설치를 준비하고 있습니다. 잠시만 기다려 주세요.","waiting");
-        setTimeout(prepareInstallStep,2000)
-      },5000)
+
+        setStatus(installStatus,"앱 설치 정보를 다시 확인하고 있습니다.","waiting");
+        installPreparationTimer=setTimeout(prepareInstallStep,1500)
+      };
+      waitForInstallEvent()
     }
 
     async function waitForPermission(){
@@ -497,12 +543,6 @@
       prepareInstallStep()
     });
 
-    addEventListener("beforeinstallprompt",e=>{
-      e.preventDefault();
-      deferredInstallPrompt=e;
-      if(installCard.classList.contains("active"))enableInstallButton()
-    });
-
     addEventListener("appinstalled",()=>{
       deferredInstallPrompt=null;
       sessionStorage.removeItem(INSTALL_RELOAD_KEY);
@@ -519,7 +559,18 @@
       if(continueButton.disabled)return;
       const pending=loadPending();
       if(!pending){showCard("register");return}
-      if(!deferredInstallPrompt){prepareInstallStep();return}
+      if(!deferredInstallPrompt){
+        continueButton.disabled=true;
+        continueButton.textContent="설치창 준비 중...";
+        setStatus(installStatus,"앱 설치창을 준비하고 있습니다.","waiting");
+        for(let i=0;i<20&&!deferredInstallPrompt;i++)await sleep(150);
+        if(!deferredInstallPrompt){
+          continueButton.disabled=false;
+          continueButton.textContent="계속하기";
+          prepareInstallStep();
+          return
+        }
+      }
 
       continueButton.disabled=true;
       continueButton.textContent="앱 설치 중...";
