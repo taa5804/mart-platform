@@ -4,391 +4,232 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>분양 등록·수정 관리자</title>
-
 <style>
 *{box-sizing:border-box}
-body{
-  margin:0;
-  padding:20px;
-  background:#f3f5f7;
-  color:#17212b;
-  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR","Segoe UI",Arial,sans-serif
-}
-.wrap{
-  width:100%;
-  max-width:760px;
-  margin:auto
-}
-.header{
-  padding:26px;
-  margin-bottom:18px;
-  border-radius:18px;
-  background:linear-gradient(135deg,#102536,#17384f);
-  color:#fff
-}
-.header small{
-  color:#d3b16e;
-  font-weight:800;
-  letter-spacing:1.5px
-}
-.header h1{
-  margin:8px 0 6px;
-  font-size:28px
-}
-.header p{
-  margin:0;
-  color:#d5e0e6;
-  font-size:13px
-}
-.card{
-  padding:23px;
-  margin-bottom:16px;
-  border:1px solid #dfe4e8;
-  border-radius:16px;
-  background:#fff
-}
-.card h2{
-  margin:0 0 20px;
-  font-size:20px
-}
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px
-}
-label{
-  display:block;
-  margin-bottom:6px;
-  color:#52606c;
-  font-size:12px;
-  font-weight:700
-}
-input,select,textarea{
-  width:100%;
-  margin-bottom:15px;
-  border:1px solid #d8dee3;
-  border-radius:9px;
-  outline:none;
-  background:#fff;
-  font:inherit
-}
-input,select{
-  height:44px;
-  padding:0 12px
-}
-textarea{
-  min-height:95px;
-  padding:12px;
-  resize:vertical
-}
-input:focus,select:focus,textarea:focus{
-  border-color:#b8914f;
-  box-shadow:0 0 0 3px rgba(184,145,79,.12)
-}
-.help{
-  margin:-7px 0 15px;
-  color:#7b8790;
-  font-size:11px
-}
-.save-btn{
-  width:100%;
-  height:50px;
-  border:0;
-  border-radius:10px;
-  background:#b8914f;
-  color:#102536;
-  font-size:16px;
-  font-weight:800;
-  cursor:pointer
-}
-.save-btn:disabled{
-  opacity:.6;
-  cursor:wait
-}
-.message{
-  display:none;
-  margin-top:14px;
-  padding:13px;
-  border-radius:9px;
-  font-size:13px
-}
-.message.success{
-  display:block;
-  background:#e9f7ee;
-  color:#176c36
-}
-.message.error{
-  display:block;
-  background:#fdecec;
-  color:#a92b2b
-}
-@media(max-width:600px){
-  body{padding:11px}
-  .row{grid-template-columns:1fr;gap:0}
-  .header{padding:22px}
-  .header h1{font-size:24px}
-  .card{padding:17px}
-}
+:root{--navy:#102536;--navy2:#17384f;--gold:#b8914f;--line:#dfe4e8;--bg:#f3f5f7;--text:#17212b}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR","Segoe UI",Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+.wrap{width:100%;max-width:1180px;margin:auto;padding:24px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:27px;border-radius:18px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;box-shadow:0 15px 35px rgba(15,36,52,.17)}
+.head small,.panel-head small{display:block;margin-bottom:7px;color:#d3b16e;font-weight:800;letter-spacing:1.7px}
+.head h1{margin:0 0 8px;font-size:29px}.head p{margin:0;color:#cbd5dc;font-size:13px}
+.head button,.save-page{min-height:45px;padding:0 18px;border:0;border-radius:9px;background:var(--gold);color:var(--navy);font-weight:800;cursor:pointer}
+.card,.panel{margin-top:20px;padding:24px;border:1px solid var(--line);border-radius:16px;background:#fff}
+.card h2{margin:0 0 18px;font-size:19px}
+.grid,.fields{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+label span{display:block;margin-bottom:7px;color:#52606c;font-size:12px;font-weight:700}
+input,select,textarea{width:100%;border:1px solid #d8dee3;border-radius:9px;outline:0;background:#fff}
+input,select{height:44px;padding:0 13px}textarea{padding:12px;resize:vertical;line-height:1.5}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,145,79,.12)}
+.full{grid-column:1/-1}
+.tabs{display:flex;gap:8px;margin:20px 0;padding:10px;overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+.tabs button{flex:0 0 auto;min-height:40px;padding:0 16px;border:0;border-radius:9px;background:#eef1f3;color:#53606b;font-size:12px;font-weight:700;cursor:pointer}
+.tabs button.active{background:var(--navy);color:#fff}
+.panel{display:none;margin-top:0;box-shadow:0 10px 28px rgba(25,39,52,.07)}.panel.active{display:block}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:22px;padding-bottom:17px;border-bottom:1px solid #e8ecef}
+.panel-head h2{margin:0;font-size:21px}
+.editor{display:grid;grid-template-columns:minmax(320px,.9fr) minmax(360px,1.1fr);gap:27px}
+.photo-editor{padding:14px;border:1px solid #e0e5e9;border-radius:14px;background:#f7f8f9}
+.stage{position:relative;width:100%;height:410px;overflow:hidden;border-radius:10px;background:#dfe4e7;touch-action:none;cursor:grab}
+.stage.floor{background:#edf0ee}
+.stage img{display:none;position:absolute;left:50%;top:50%;max-width:none;max-height:none;transform-origin:center;pointer-events:none;user-select:none}
+.empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;color:#76828b;font-size:13px;text-align:center}
+.file{display:none}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.actions button{min-height:38px;padding:6px;border:1px solid #d9dfe3;border-radius:8px;background:#fff;color:#35424d;font-size:11px;font-weight:700;cursor:pointer}
+.actions .upload{border-color:var(--navy);background:var(--navy);color:#fff}.actions .delete{border-color:#e1a4a4;color:#b73737}
+.photo-editor p{margin:10px 2px 0;color:#7c8790;font-size:11px}
+.community-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.community-item{padding:10px;border:1px solid #e1e6ea;border-radius:13px;background:#f7f8f9}
+.mini{position:relative;height:190px;margin-bottom:10px;overflow:hidden;border:1px dashed #bfc8cf;border-radius:10px;background:#edf0f2;cursor:pointer}
+.mini span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#77838c;font-size:12px}.mini img{width:100%;height:100%;object-fit:cover}
+.msg{display:none;position:fixed;right:24px;bottom:24px;z-index:100;max-width:340px;padding:14px 18px;border-radius:10px;color:#fff;box-shadow:0 10px 28px rgba(0,0,0,.2)}
+.msg.show{display:block}.msg.ok{background:#17384f}.msg.err{background:#a52b2b}
+.progress{display:none;margin-top:12px;padding:12px;border-radius:9px;background:#eef5f7;color:#38505e;font-size:13px}.progress.show{display:block}
+@media(max-width:850px){.wrap{padding:14px}.head,.panel-head{align-items:flex-start;flex-direction:column}.head button,.save-page{width:100%}.grid,.fields,.editor{grid-template-columns:1fr}.full{grid-column:auto}.community-grid{grid-template-columns:1fr 1fr}.stage{height:380px}}
+@media(max-width:520px){.wrap{padding:9px}.head{padding:21px}.head h1{font-size:24px}.card,.panel{padding:16px}.stage{height:340px}.actions{grid-template-columns:1fr 1fr}.community-grid{grid-template-columns:1fr 1fr}.mini{height:145px}}
 </style>
 </head>
-
 <body>
-
-<div class="wrap">
-
-  <header class="header">
-    <small>CATALOG MANAGER</small>
-    <h1>분양 등록·수정</h1>
-    <p>분양정보와 카탈로그 기본정보를 저장합니다.</p>
+<div class="wrap" id="saleAdmin">
+  <header class="head">
+    <div><small>CATALOG MANAGER</small><h1>분양 등록·수정</h1><p>기본정보, 8페이지 문구와 사진을 한 번에 저장합니다.</p></div>
+    <button id="saveAll" type="button">전체 저장</button>
   </header>
 
   <section class="card">
-    <h2>관리자 인증</h2>
-
-    <label for="adminKey">관리자 비밀번호</label>
-    <input
-      id="adminKey"
-      type="password"
-      placeholder="관리자 비밀번호 입력"
-      autocomplete="current-password"
-    >
+    <h2>관리자 인증 · 분양 기본정보</h2>
+    <div class="grid">
+      <label><span>관리자 비밀번호</span><input id="adminKey" type="password" autocomplete="current-password"></label>
+      <label><span>분양현장 코드</span><input id="projectCode" maxlength="40" placeholder="예: GJSALE001"></label>
+      <label><span>단지명</span><input id="projectName" placeholder="단지명 입력"></label>
+      <label><span>분양 상태</span><select id="saleStatus"><option>분양 중</option><option>분양 예정</option><option>분양 종료</option></select></label>
+      <label><span>지역</span><input id="area" placeholder="예: 광주광역시 광산구"></label>
+      <label><span>입주 예정</span><input id="moveInDate" placeholder="예: 2029년 3월"></label>
+      <label><span>상담 전화번호</span><input id="contactPhone" type="tel" placeholder="062-000-0000"></label>
+      <label><span>모델하우스 주소</span><input id="modelhouseAddress" placeholder="주소 입력"></label>
+      <label><span>총 세대수</span><input data-field="households" placeholder="예: 1,520세대"></label>
+      <label><span>주요 평형</span><input data-field="types" placeholder="예: 84A · 84B"></label>
+    </div>
+    <div id="progress" class="progress"></div>
   </section>
 
-  <section class="card">
-    <h2>분양 기본정보</h2>
+  <nav class="tabs">
+    <button class="active" type="button">1 표지</button><button type="button">2 입지</button>
+    <button type="button">3 프리미엄</button><button type="button">4 단지</button>
+    <button type="button">5 평면 A</button><button type="button">6 평면 B</button>
+    <button type="button">7 커뮤니티</button><button type="button">8 상담</button>
+  </nav>
 
-    <div class="row">
-      <div>
-        <label for="projectCode">분양현장 코드</label>
-        <input
-          id="projectCode"
-          type="text"
-          placeholder="예: GJSALE001"
-          maxlength="40"
-        >
-        <div class="help">영문 대문자·숫자·-·_ 사용</div>
+  <main>
+    <section class="panel active">
+      <div class="panel-head"><div><small>PAGE 01</small><h2>표지</h2></div><button class="save-page" type="button">전체 저장</button></div>
+      <div class="editor">
+        <div class="photo-editor" data-key="cover"><div class="stage"><img alt=""><div class="empty">대표 조감도 또는 실내사진</div></div><input class="file" type="file" accept="image/*"><div class="actions"><button class="upload">사진 업로드</button><button class="out">축소</button><button class="in">확대</button><button class="left">왼쪽 회전</button><button class="right">오른쪽 회전</button><button class="delete">삭제</button></div><p>사진을 움직여 중심 위치를 조절합니다.</p></div>
+        <div class="fields"><label><span>영문 소제목</span><input data-field="coverEyebrow" value="PREMIUM RESIDENCE"></label><label><span>브랜드 문구</span><input data-field="coverBrand" value="THE FIRST LIFE"></label><label class="full"><span>표지 제목</span><input data-field="coverTitle" placeholder="단지명을 입력해 주세요"></label><label class="full"><span>대표 문구</span><textarea data-field="coverDescription" rows="4"></textarea></label></div>
       </div>
+    </section>
 
-      <div>
-        <label for="projectName">단지명</label>
-        <input
-          id="projectName"
-          type="text"
-          placeholder="단지명 입력"
-        >
+    <section class="panel">
+      <div class="panel-head"><div><small>PAGE 02</small><h2>입지환경</h2></div><button class="save-page" type="button">전체 저장</button></div>
+      <div class="editor">
+        <div class="photo-editor" data-key="location"><div class="stage"><img alt=""><div class="empty">항공사진 또는 입지지도</div></div><input class="file" type="file" accept="image/*"><div class="actions"><button class="upload">사진 업로드</button><button class="out">축소</button><button class="in">확대</button><button class="left">왼쪽 회전</button><button class="right">오른쪽 회전</button><button class="delete">삭제</button></div></div>
+        <div class="fields"><label class="full"><span>제목</span><input data-field="locationTitle" value="모든 가치가 하나로 모이는 완벽한 입지"></label><label class="full"><span>설명</span><textarea data-field="locationDescription" rows="3"></textarea></label><label><span>교통환경</span><input data-field="trafficText"></label><label><span>교육환경</span><input data-field="educationText"></label><label><span>생활환경</span><input data-field="lifeText"></label><label><span>자연환경</span><input data-field="natureText"></label></div>
       </div>
-    </div>
+    </section>
 
-    <div class="row">
-      <div>
-        <label for="saleStatus">분양 상태</label>
-        <select id="saleStatus">
-          <option value="분양 중">분양 중</option>
-          <option value="분양 예정">분양 예정</option>
-          <option value="분양 종료">분양 종료</option>
-        </select>
+    <section class="panel">
+      <div class="panel-head"><div><small>PAGE 03</small><h2>프리미엄 6</h2></div><button class="save-page" type="button">전체 저장</button></div>
+      <div class="editor">
+        <div class="photo-editor" data-key="premium"><div class="stage"><img alt=""><div class="empty">실내 또는 특화설계 이미지</div></div><input class="file" type="file" accept="image/*"><div class="actions"><button class="upload">사진 업로드</button><button class="out">축소</button><button class="in">확대</button><button class="left">왼쪽 회전</button><button class="right">오른쪽 회전</button><button class="delete">삭제</button></div></div>
+        <div class="fields"><label class="full"><span>페이지 제목</span><input data-field="premiumTitle" value="삶의 품격을 높이는 프리미엄 6"></label><label><span>프리미엄 1</span><input data-field="premium1"></label><label><span>프리미엄 2</span><input data-field="premium2"></label><label><span>프리미엄 3</span><input data-field="premium3"></label><label><span>프리미엄 4</span><input data-field="premium4"></label><label><span>프리미엄 5</span><input data-field="premium5"></label><label><span>프리미엄 6</span><input data-field="premium6"></label></div>
       </div>
+    </section>
 
-      <div>
-        <label for="area">지역</label>
-        <input
-          id="area"
-          type="text"
-          placeholder="예: 광주광역시 광산구"
-        >
+    <section class="panel">
+      <div class="panel-head"><div><small>PAGE 04</small><h2>단지소개</h2></div><button class="save-page" type="button">전체 저장</button></div>
+      <div class="editor">
+        <div class="photo-editor" data-key="complex"><div class="stage"><img alt=""><div class="empty">단지 조감도</div></div><input class="file" type="file" accept="image/*"><div class="actions"><button class="upload">사진 업로드</button><button class="out">축소</button><button class="in">확대</button><button class="left">왼쪽 회전</button><button class="right">오른쪽 회전</button><button class="delete">삭제</button></div></div>
+        <div class="fields"><label class="full"><span>페이지 제목</span><input data-field="complexTitle" value="자연과 건축이 어우러진 아름다운 단지"></label><label class="full"><span>단지 설명</span><textarea data-field="complexDescription" rows="4"></textarea></label><label><span>특징 1</span><input data-field="complex1"></label><label><span>특징 2</span><input data-field="complex2"></label><label><span>특징 3</span><input data-field="complex3"></label><label><span>특징 4</span><input data-field="complex4"></label></div>
       </div>
-    </div>
+    </section>
 
-    <div class="row">
-      <div>
-        <label for="moveInDate">입주 예정</label>
-        <input
-          id="moveInDate"
-          type="text"
-          placeholder="예: 2029년 3월"
-        >
+    <section class="panel">
+      <div class="panel-head"><div><small>PAGE 05</small><h2>평면도 A</h2></div><button class="save-page" type="button">전체 저장</button></div>
+      <div class="editor">
+        <div class="photo-editor" data-key="unitA"><div class="stage floor"><img alt=""><div class="empty">평면도 A 이미지</div></div><input class="file" type="file" accept="image/*"><div class="actions"><button class="upload">사진 업로드</button><button class="out">축소</button><button class="in">확대</button><button class="left">왼쪽 회전</button><button class="right">오른쪽 회전</button><button class="delete">삭제</button></div></div>
+        <div class="fields"><label><span>평형명</span><input data-field="unitAName" value="84A TYPE"></label><label><span>세대수</span><input data-field="unitACount"></label><label><span>전용면적</span><input data-field="unitAPrivate"></label><label><span>공급면적</span><input data-field="unitASupply"></label><label><span>계약면적</span><input data-field="unitAContract"></label><label><span>특징 1</span><input data-field="unitAFeature1"></label><label><span>특징 2</span><input data-field="unitAFeature2"></label><label><span>특징 3</span><input data-field="unitAFeature3"></label></div>
       </div>
+    </section>
 
-      <div>
-        <label for="contactPhone">상담 전화번호</label>
-        <input
-          id="contactPhone"
-          type="tel"
-          placeholder="062-000-0000"
-        >
+    <section class="panel">
+      <div class="panel-head"><div><small>PAGE 06</small><h2>평면도 B</h2></div><button class="save-page" type="button">전체 저장</button></div>
+      <div class="editor">
+        <div class="photo-editor" data-key="unitB"><div class="stage floor"><img alt=""><div class="empty">평면도 B 이미지</div></div><input class="file" type="file" accept="image/*"><div class="actions"><button class="upload">사진 업로드</button><button class="out">축소</button><button class="in">확대</button><button class="left">왼쪽 회전</button><button class="right">오른쪽 회전</button><button class="delete">삭제</button></div></div>
+        <div class="fields"><label><span>평형명</span><input data-field="unitBName" value="84B TYPE"></label><label><span>세대수</span><input data-field="unitBCount"></label><label><span>전용면적</span><input data-field="unitBPrivate"></label><label><span>공급면적</span><input data-field="unitBSupply"></label><label><span>계약면적</span><input data-field="unitBContract"></label><label><span>특징 1</span><input data-field="unitBFeature1"></label><label><span>특징 2</span><input data-field="unitBFeature2"></label><label><span>특징 3</span><input data-field="unitBFeature3"></label></div>
       </div>
-    </div>
+    </section>
 
-    <label for="modelhouseAddress">모델하우스 주소</label>
-    <input
-      id="modelhouseAddress"
-      type="text"
-      placeholder="모델하우스 주소 입력"
-    >
-  </section>
-
-  <section class="card">
-    <h2>카탈로그 기본정보</h2>
-
-    <div class="row">
-      <div>
-        <label for="households">총 세대수</label>
-        <input
-          id="households"
-          type="text"
-          placeholder="예: 1,520세대"
-        >
+    <section class="panel">
+      <div class="panel-head"><div><small>PAGE 07</small><h2>커뮤니티</h2></div><button class="save-page" type="button">전체 저장</button></div>
+      <div class="fields" style="margin-bottom:18px"><label class="full"><span>페이지 제목</span><input data-field="communityTitle" value="일상을 특별하게 만드는 다양한 커뮤니티"></label></div>
+      <div class="community-grid">
+        <div class="community-item"><div class="mini" data-key="community1"><span>사진 1 업로드</span></div><input data-field="communityName1" placeholder="클럽 라운지"></div>
+        <div class="community-item"><div class="mini" data-key="community2"><span>사진 2 업로드</span></div><input data-field="communityName2" placeholder="피트니스센터"></div>
+        <div class="community-item"><div class="mini" data-key="community3"><span>사진 3 업로드</span></div><input data-field="communityName3" placeholder="골프연습장"></div>
+        <div class="community-item"><div class="mini" data-key="community4"><span>사진 4 업로드</span></div><input data-field="communityName4" placeholder="독서실"></div>
+        <div class="community-item"><div class="mini" data-key="community5"><span>사진 5 업로드</span></div><input data-field="communityName5" placeholder="어린이집"></div>
+        <div class="community-item"><div class="mini" data-key="community6"><span>사진 6 업로드</span></div><input data-field="communityName6" placeholder="게스트하우스"></div>
       </div>
+    </section>
 
-      <div>
-        <label for="types">주요 평형</label>
-        <input
-          id="types"
-          type="text"
-          placeholder="예: 84A · 84B"
-        >
+    <section class="panel">
+      <div class="panel-head"><div><small>PAGE 08</small><h2>상담·방문예약</h2></div><button class="save-page" type="button">전체 저장</button></div>
+      <div class="editor">
+        <div class="photo-editor" data-key="contact"><div class="stage"><img alt=""><div class="empty">모델하우스 대표 이미지</div></div><input class="file" type="file" accept="image/*"><div class="actions"><button class="upload">사진 업로드</button><button class="out">축소</button><button class="in">확대</button><button class="left">왼쪽 회전</button><button class="right">오른쪽 회전</button><button class="delete">삭제</button></div></div>
+        <div class="fields"><label class="full"><span>마지막 페이지 제목</span><input data-field="contactTitle" value="당신의 새로운 시작을 직접 만나보세요"></label><label class="full"><span>안내 문구</span><textarea data-field="contactDescription" rows="4"></textarea></label><label><span>상담 전화번호</span><input data-field="contactPagePhone" type="tel"></label><label><span>모델하우스 주소</span><input data-field="contactAddress"></label><label><span>버튼 문구</span><input data-field="visitButtonText" value="방문예약 신청"></label><label><span>고객 포인트</span><input data-field="rewardPoint" value="3,000포인트"></label></div>
       </div>
-    </div>
-
-    <label for="description">대표 소개문구</label>
-    <textarea
-      id="description"
-      placeholder="분양단지 대표 소개문구 입력"
-    ></textarea>
-
-    <button
-      id="saveBtn"
-      class="save-btn"
-      type="button"
-    >
-      전체 저장
-    </button>
-
-    <div id="message" class="message"></div>
-  </section>
-
+    </section>
+  </main>
 </div>
+<div id="msg" class="msg"></div>
 
 <script>
 (function(){
 "use strict";
+const root=document.getElementById("saleAdmin");
+const $=(s,p=root)=>p.querySelector(s), $$=(s,p=root)=>Array.from(p.querySelectorAll(s));
+const SAVE_API="/api/sale-save", UPLOAD_API="/api/sale-upload";
+const imageState={};
 
-const API_URL="/api/sale-save";
-const $=id=>document.getElementById(id);
+const tabs=$$(".tabs button"), panels=$$(".panel");
+tabs.forEach((b,i)=>b.onclick=()=>{tabs.forEach(x=>x.classList.remove("active"));panels.forEach(x=>x.classList.remove("active"));b.classList.add("active");panels[i].classList.add("active")});
 
-const saveBtn=$("saveBtn");
-const message=$("message");
+function notify(text,error=false){const box=document.getElementById("msg");box.textContent=text;box.className="msg show "+(error?"err":"ok");setTimeout(()=>box.className="msg",2600)}
+function dataUrl(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)})}
 
-function showMessage(text,error){
-  message.textContent=text;
-  message.className="message "+(error?"error":"success");
+$$(".photo-editor").forEach(ed=>{
+  const key=ed.dataset.key, stage=$(".stage",ed), img=$("img",ed), empty=$(".empty",ed), file=$(".file",ed);
+  const st=imageState[key]={file:null,dataUrl:"",url:"",scale:1,rotation:0,x:0,y:0,drag:false,sx:0,sy:0};
+  const draw=()=>img.style.transform=`translate(calc(-50% + ${st.x}px),calc(-50% + ${st.y}px)) scale(${st.scale}) rotate(${st.rotation}deg)`;
+  const fit=()=>{const r=Math.max(stage.clientWidth/img.naturalWidth,stage.clientHeight/img.naturalHeight);img.style.width=img.naturalWidth*r+"px";img.style.height=img.naturalHeight*r+"px"};
+  $(".upload",ed).onclick=()=>file.click();
+  file.onchange=async()=>{const f=file.files&&file.files[0];if(!f)return;if(!["image/jpeg","image/png","image/webp"].includes(f.type)){notify("JPG, PNG, WEBP 이미지만 가능합니다.",true);file.value="";return}st.file=f;st.dataUrl=await dataUrl(f);img.onload=()=>{fit();img.style.display="block";empty.style.display="none";st.scale=1;st.rotation=0;st.x=0;st.y=0;draw()};img.src=st.dataUrl};
+  $(".in",ed).onclick=()=>{st.scale=Math.min(3,st.scale+.1);draw()};
+  $(".out",ed).onclick=()=>{st.scale=Math.max(.3,st.scale-.1);draw()};
+  $(".left",ed).onclick=()=>{st.rotation-=90;draw()};
+  $(".right",ed).onclick=()=>{st.rotation+=90;draw()};
+  $(".delete",ed).onclick=()=>{st.file=null;st.dataUrl="";st.url="";img.removeAttribute("src");img.style.display="none";empty.style.display="flex";file.value=""};
+  stage.onpointerdown=e=>{if(!img.src)return;st.drag=true;st.sx=e.clientX-st.x;st.sy=e.clientY-st.y;try{stage.setPointerCapture(e.pointerId)}catch(_){}};
+  stage.onpointermove=e=>{if(!st.drag)return;st.x=e.clientX-st.sx;st.y=e.clientY-st.sy;draw()};
+  stage.onpointerup=stage.onpointercancel=()=>st.drag=false;
+});
+
+$$(".mini").forEach(box=>{
+  const key=box.dataset.key, st=imageState[key]={file:null,dataUrl:"",url:"",scale:1,rotation:0,x:0,y:0};
+  box.onclick=()=>{const input=document.createElement("input");input.type="file";input.accept="image/*";input.onchange=async()=>{const f=input.files&&input.files[0];if(!f)return;if(!["image/jpeg","image/png","image/webp"].includes(f.type)){notify("JPG, PNG, WEBP 이미지만 가능합니다.",true);return}st.file=f;st.dataUrl=await dataUrl(f);let img=box.querySelector("img");if(!img){img=document.createElement("img");box.appendChild(img)}img.src=st.dataUrl;const span=box.querySelector("span");if(span)span.style.display="none"};input.click()}
+});
+
+function collect(){
+  const c={};
+  $$("[data-field]").forEach(el=>c[el.dataset.field]=el.value.trim());
+  Object.entries(imageState).forEach(([k,v])=>{c[k+"ImageUrl"]=v.url||"";c[k+"Transform"]={scale:v.scale||1,rotation:v.rotation||0,x:v.x||0,y:v.y||0}});
+  return c;
 }
 
-async function saveSale(){
+async function uploadOne(key,st,projectCode,adminKey,index,total){
+  if(!st.file||!st.dataUrl)return st.url||"";
+  document.getElementById("progress").className="progress show";
+  document.getElementById("progress").textContent=`사진 업로드 중 ${index}/${total}`;
+  const res=await fetch(UPLOAD_API,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Key":adminKey},body:JSON.stringify({project_code:projectCode,image_key:key,file_name:key,mime_type:st.file.type,base64:st.dataUrl})});
+  const out=await res.json().catch(()=>({}));
+  if(!res.ok||!out.ok)throw new Error(out.message||`${key} 이미지 업로드 실패`);
+  st.url=out.url;
+  return out.url;
+}
 
-  const adminKey=$("adminKey").value.trim();
-  const projectCode=$("projectCode")
-    .value.trim().toUpperCase();
-  const projectName=$("projectName").value.trim();
-
-  if(!adminKey){
-    showMessage("관리자 비밀번호를 입력해 주세요.",true);
-    $("adminKey").focus();
-    return;
-  }
-
-  if(!projectCode){
-    showMessage("분양현장 코드를 입력해 주세요.",true);
-    $("projectCode").focus();
-    return;
-  }
-
-  if(!/^[A-Z0-9_-]{3,40}$/.test(projectCode)){
-    showMessage("분양현장 코드 형식을 확인해 주세요.",true);
-    $("projectCode").focus();
-    return;
-  }
-
-  if(!projectName){
-    showMessage("단지명을 입력해 주세요.",true);
-    $("projectName").focus();
-    return;
-  }
-
-  const payload={
-    project_code:projectCode,
-    project_name:projectName,
-    sale_status:$("saleStatus").value,
-    area:$("area").value.trim(),
-    move_in_date:$("moveInDate").value.trim(),
-    contact_phone:$("contactPhone").value.trim(),
-    modelhouse_address:
-      $("modelhouseAddress").value.trim(),
-
-    catalog_data:{
-      households:$("households").value.trim(),
-      types:$("types").value.trim(),
-      description:$("description").value.trim()
-    },
-
-    is_active:true
-  };
-
-  const oldText=saveBtn.textContent;
-
-  saveBtn.disabled=true;
-  saveBtn.textContent="저장 중...";
-
+async function saveAll(){
+  const adminKey=$("#adminKey").value.trim(), projectCode=$("#projectCode").value.trim().toUpperCase(), projectName=$("#projectName").value.trim();
+  if(!adminKey){notify("관리자 비밀번호를 입력해 주세요.",true);return}
+  if(!/^[A-Z0-9_-]{3,40}$/.test(projectCode)){notify("분양현장 코드를 확인해 주세요.",true);return}
+  if(!projectName){notify("단지명을 입력해 주세요.",true);return}
+  const btn=$("#saveAll"), old=btn.textContent;btn.disabled=true;btn.textContent="저장 중...";
   try{
-
-    const response=await fetch(API_URL,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "X-Admin-Key":adminKey
-      },
-      body:JSON.stringify(payload)
-    });
-
-    let result={};
-
-    try{
-      result=await response.json();
-    }catch(e){}
-
-    if(!response.ok||!result.ok){
-      throw new Error(
-        result.message||
-        result.error||
-        "분양정보 저장에 실패했습니다."
-      );
-    }
-
-    showMessage(
-      "분양정보가 정상적으로 저장되었습니다.",
-      false
-    );
-
-  }catch(error){
-
-    console.error("sale save error:",error);
-
-    showMessage(
-      error.message||
-      "분양정보 저장에 실패했습니다.",
-      true
-    );
-
-  }finally{
-    saveBtn.disabled=false;
-    saveBtn.textContent=oldText;
-  }
+    const entries=Object.entries(imageState).filter(([,v])=>v.file);
+    for(let i=0;i<entries.length;i++)await uploadOne(entries[i][0],entries[i][1],projectCode,adminKey,i+1,entries.length);
+    const payload={project_code:projectCode,project_name:projectName,sale_status:$("#saleStatus").value,area:$("#area").value.trim(),move_in_date:$("#moveInDate").value.trim(),contact_phone:$("#contactPhone").value.trim(),modelhouse_address:$("#modelhouseAddress").value.trim(),catalog_data:collect(),is_active:true};
+    const res=await fetch(SAVE_API,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Key":adminKey},body:JSON.stringify(payload)});
+    const out=await res.json().catch(()=>({}));
+    if(!res.ok||!out.ok)throw new Error(out.message||"분양정보 저장 실패");
+    notify("분양정보와 사진이 저장되었습니다.");
+    document.getElementById("progress").className="progress";
+  }catch(e){notify(e.message||"저장에 실패했습니다.",true)}
+  finally{btn.disabled=false;btn.textContent=old}
 }
 
-saveBtn.addEventListener("click",saveSale);
-
+$("#saveAll").onclick=saveAll;
+$$(".save-page").forEach(b=>b.onclick=saveAll);
 })();
 </script>
-
 </body>
 </html>
