@@ -1,166 +1,149 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>분양 등록·수정 관리자</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>분양 등록·수정 관리자</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 20px;
-      background: #f4f6f8;
-      font-family: Arial, "Noto Sans KR", sans-serif;
-      color: #17202a;
-    }
-
-    .wrap {
-      width: 100%;
-      max-width: 720px;
-      margin: 0 auto;
-    }
-
-    .header {
-      background: #12354a;
-      color: white;
-      padding: 25px;
-      border-radius: 18px;
-      margin-bottom: 18px;
-    }
-
-    .header small {
-      color: #e0b25b;
-      font-weight: bold;
-    }
-
-    .header h1 {
-      margin: 8px 0 5px;
-      font-size: 28px;
-    }
-
-    .header p {
-      margin: 0;
-      font-size: 14px;
-      opacity: .9;
-    }
-
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 22px;
-      margin-bottom: 16px;
-      box-shadow: 0 3px 12px rgba(0,0,0,.06);
-    }
-
-    .card h2 {
-      margin: 0 0 18px;
-      font-size: 20px;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid #d7dde3;
-      border-radius: 9px;
-      font-size: 15px;
-      background: white;
-      margin-bottom: 15px;
-    }
-
-    textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
-    button {
-      width: 100%;
-      border: 0;
-      border-radius: 10px;
-      padding: 15px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .save-btn {
-      background: #c79b4b;
-      color: #111;
-    }
-
-    .save-btn:disabled {
-      opacity: .6;
-      cursor: wait;
-    }
-
-    .message {
-      display: none;
-      margin-top: 15px;
-      padding: 13px;
-      border-radius: 9px;
-      font-size: 14px;
-    }
-
-    .message.success {
-      display: block;
-      background: #e8f7ed;
-      color: #146c2e;
-    }
-
-    .message.error {
-      display: block;
-      background: #fdecec;
-      color: #b42318;
-    }
-
-    @media(max-width:600px) {
-      body {
-        padding: 12px;
-      }
-
-      .row {
-        grid-template-columns: 1fr;
-        gap: 0;
-      }
-
-      .header h1 {
-        font-size: 24px;
-      }
-    }
-  </style>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:20px;
+  background:#f3f5f7;
+  color:#17212b;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR","Segoe UI",Arial,sans-serif
+}
+.wrap{
+  width:100%;
+  max-width:760px;
+  margin:auto
+}
+.header{
+  padding:26px;
+  margin-bottom:18px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#102536,#17384f);
+  color:#fff
+}
+.header small{
+  color:#d3b16e;
+  font-weight:800;
+  letter-spacing:1.5px
+}
+.header h1{
+  margin:8px 0 6px;
+  font-size:28px
+}
+.header p{
+  margin:0;
+  color:#d5e0e6;
+  font-size:13px
+}
+.card{
+  padding:23px;
+  margin-bottom:16px;
+  border:1px solid #dfe4e8;
+  border-radius:16px;
+  background:#fff
+}
+.card h2{
+  margin:0 0 20px;
+  font-size:20px
+}
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px
+}
+label{
+  display:block;
+  margin-bottom:6px;
+  color:#52606c;
+  font-size:12px;
+  font-weight:700
+}
+input,select,textarea{
+  width:100%;
+  margin-bottom:15px;
+  border:1px solid #d8dee3;
+  border-radius:9px;
+  outline:none;
+  background:#fff;
+  font:inherit
+}
+input,select{
+  height:44px;
+  padding:0 12px
+}
+textarea{
+  min-height:95px;
+  padding:12px;
+  resize:vertical
+}
+input:focus,select:focus,textarea:focus{
+  border-color:#b8914f;
+  box-shadow:0 0 0 3px rgba(184,145,79,.12)
+}
+.help{
+  margin:-7px 0 15px;
+  color:#7b8790;
+  font-size:11px
+}
+.save-btn{
+  width:100%;
+  height:50px;
+  border:0;
+  border-radius:10px;
+  background:#b8914f;
+  color:#102536;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer
+}
+.save-btn:disabled{
+  opacity:.6;
+  cursor:wait
+}
+.message{
+  display:none;
+  margin-top:14px;
+  padding:13px;
+  border-radius:9px;
+  font-size:13px
+}
+.message.success{
+  display:block;
+  background:#e9f7ee;
+  color:#176c36
+}
+.message.error{
+  display:block;
+  background:#fdecec;
+  color:#a92b2b
+}
+@media(max-width:600px){
+  body{padding:11px}
+  .row{grid-template-columns:1fr;gap:0}
+  .header{padding:22px}
+  .header h1{font-size:24px}
+  .card{padding:17px}
+}
+</style>
 </head>
 
 <body>
 
 <div class="wrap">
 
-  <div class="header">
+  <header class="header">
     <small>CATALOG MANAGER</small>
     <h1>분양 등록·수정</h1>
-    <p>분양 기본정보를 서버에 저장합니다.</p>
-  </div>
+    <p>분양정보와 카탈로그 기본정보를 저장합니다.</p>
+  </header>
 
-  <div class="card">
-
-    <h2>분양 기본정보</h2>
+  <section class="card">
+    <h2>관리자 인증</h2>
 
     <label for="adminKey">관리자 비밀번호</label>
     <input
@@ -169,8 +152,22 @@
       placeholder="관리자 비밀번호 입력"
       autocomplete="current-password"
     >
+  </section>
+
+  <section class="card">
+    <h2>분양 기본정보</h2>
 
     <div class="row">
+      <div>
+        <label for="projectCode">분양현장 코드</label>
+        <input
+          id="projectCode"
+          type="text"
+          placeholder="예: GJSALE001"
+          maxlength="40"
+        >
+        <div class="help">영문 대문자·숫자·-·_ 사용</div>
+      </div>
 
       <div>
         <label for="projectName">단지명</label>
@@ -180,19 +177,17 @@
           placeholder="단지명 입력"
         >
       </div>
+    </div>
 
+    <div class="row">
       <div>
-        <label for="status">분양 상태</label>
-        <select id="status">
+        <label for="saleStatus">분양 상태</label>
+        <select id="saleStatus">
           <option value="분양 중">분양 중</option>
           <option value="분양 예정">분양 예정</option>
           <option value="분양 종료">분양 종료</option>
         </select>
       </div>
-
-    </div>
-
-    <div class="row">
 
       <div>
         <label for="area">지역</label>
@@ -202,58 +197,63 @@
           placeholder="예: 광주광역시 광산구"
         >
       </div>
+    </div>
 
+    <div class="row">
       <div>
-        <label for="moveIn">입주 예정</label>
+        <label for="moveInDate">입주 예정</label>
         <input
-          id="moveIn"
+          id="moveInDate"
           type="text"
           placeholder="예: 2029년 3월"
         >
       </div>
 
-    </div>
-
-    <div class="row">
-
       <div>
-        <label for="phone">상담 전화번호</label>
+        <label for="contactPhone">상담 전화번호</label>
         <input
-          id="phone"
+          id="contactPhone"
           type="tel"
           placeholder="062-000-0000"
         >
       </div>
+    </div>
 
+    <label for="modelhouseAddress">모델하우스 주소</label>
+    <input
+      id="modelhouseAddress"
+      type="text"
+      placeholder="모델하우스 주소 입력"
+    >
+  </section>
+
+  <section class="card">
+    <h2>카탈로그 기본정보</h2>
+
+    <div class="row">
       <div>
-        <label for="address">모델하우스 주소</label>
+        <label for="households">총 세대수</label>
         <input
-          id="address"
+          id="households"
           type="text"
-          placeholder="주소 입력"
+          placeholder="예: 1,520세대"
         >
       </div>
 
+      <div>
+        <label for="types">주요 평형</label>
+        <input
+          id="types"
+          type="text"
+          placeholder="예: 84A · 84B"
+        >
+      </div>
     </div>
 
-    <label for="households">총 세대수</label>
-    <input
-      id="households"
-      type="text"
-      placeholder="예: 1,520세대"
-    >
-
-    <label for="types">주요 평형</label>
-    <input
-      id="types"
-      type="text"
-      placeholder="예: 84A · 84B"
-    >
-
-    <label for="description">분양 설명</label>
+    <label for="description">대표 소개문구</label>
     <textarea
       id="description"
-      placeholder="분양 소개 내용을 입력하세요."
+      placeholder="분양단지 대표 소개문구 입력"
     ></textarea>
 
     <button
@@ -265,111 +265,127 @@
     </button>
 
     <div id="message" class="message"></div>
-
-  </div>
+  </section>
 
 </div>
 
-
 <script>
-(function () {
-  "use strict";
+(function(){
+"use strict";
 
-  const API_URL = "/api/sale-save";
+const API_URL="/api/sale-save";
+const $=id=>document.getElementById(id);
 
-  const $ = id => document.getElementById(id);
+const saveBtn=$("saveBtn");
+const message=$("message");
 
-  const saveBtn = $("saveBtn");
-  const message = $("message");
+function showMessage(text,error){
+  message.textContent=text;
+  message.className="message "+(error?"error":"success");
+}
 
-  function showMessage(text, isError) {
-    message.textContent = text;
-    message.className =
-      "message " + (isError ? "error" : "success");
+async function saveSale(){
+
+  const adminKey=$("adminKey").value.trim();
+  const projectCode=$("projectCode")
+    .value.trim().toUpperCase();
+  const projectName=$("projectName").value.trim();
+
+  if(!adminKey){
+    showMessage("관리자 비밀번호를 입력해 주세요.",true);
+    $("adminKey").focus();
+    return;
   }
 
-  async function saveSale() {
-
-    const adminKey = $("adminKey").value.trim();
-    const projectName = $("projectName").value.trim();
-
-    if (!adminKey) {
-      showMessage("관리자 비밀번호를 입력해 주세요.", true);
-      return;
-    }
-
-    if (!projectName) {
-      showMessage("단지명을 입력해 주세요.", true);
-      return;
-    }
-
-    const data = {
-      project_name: projectName,
-      status: $("status").value,
-      area: $("area").value.trim(),
-      move_in: $("moveIn").value.trim(),
-      phone: $("phone").value.trim(),
-      address: $("address").value.trim(),
-      households: $("households").value.trim(),
-      types: $("types").value.trim(),
-      description: $("description").value.trim()
-    };
-
-    const oldText = saveBtn.textContent;
-
-    saveBtn.disabled = true;
-    saveBtn.textContent = "저장 중...";
-
-    try {
-
-      const response = await fetch(API_URL, {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-          "x-sale-admin-key": adminKey
-        },
-
-        body: JSON.stringify(data)
-      });
-
-      let result = {};
-
-      try {
-        result = await response.json();
-      } catch (e) {}
-
-      if (!response.ok) {
-        throw new Error(
-          result.error ||
-          result.message ||
-          "저장에 실패했습니다."
-        );
-      }
-
-      showMessage(
-        "분양정보가 정상적으로 저장되었습니다.",
-        false
-      );
-
-    } catch (error) {
-
-      console.error(error);
-
-      showMessage(
-        error.message || "저장에 실패했습니다.",
-        true
-      );
-
-    } finally {
-
-      saveBtn.disabled = false;
-      saveBtn.textContent = oldText;
-
-    }
+  if(!projectCode){
+    showMessage("분양현장 코드를 입력해 주세요.",true);
+    $("projectCode").focus();
+    return;
   }
 
-  saveBtn.addEventListener("click", saveSale);
+  if(!/^[A-Z0-9_-]{3,40}$/.test(projectCode)){
+    showMessage("분양현장 코드 형식을 확인해 주세요.",true);
+    $("projectCode").focus();
+    return;
+  }
+
+  if(!projectName){
+    showMessage("단지명을 입력해 주세요.",true);
+    $("projectName").focus();
+    return;
+  }
+
+  const payload={
+    project_code:projectCode,
+    project_name:projectName,
+    sale_status:$("saleStatus").value,
+    area:$("area").value.trim(),
+    move_in_date:$("moveInDate").value.trim(),
+    contact_phone:$("contactPhone").value.trim(),
+    modelhouse_address:
+      $("modelhouseAddress").value.trim(),
+
+    catalog_data:{
+      households:$("households").value.trim(),
+      types:$("types").value.trim(),
+      description:$("description").value.trim()
+    },
+
+    is_active:true
+  };
+
+  const oldText=saveBtn.textContent;
+
+  saveBtn.disabled=true;
+  saveBtn.textContent="저장 중...";
+
+  try{
+
+    const response=await fetch(API_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "X-Admin-Key":adminKey
+      },
+      body:JSON.stringify(payload)
+    });
+
+    let result={};
+
+    try{
+      result=await response.json();
+    }catch(e){}
+
+    if(!response.ok||!result.ok){
+      throw new Error(
+        result.message||
+        result.error||
+        "분양정보 저장에 실패했습니다."
+      );
+    }
+
+    showMessage(
+      "분양정보가 정상적으로 저장되었습니다.",
+      false
+    );
+
+  }catch(error){
+
+    console.error("sale save error:",error);
+
+    showMessage(
+      error.message||
+      "분양정보 저장에 실패했습니다.",
+      true
+    );
+
+  }finally{
+    saveBtn.disabled=false;
+    saveBtn.textContent=oldText;
+  }
+}
+
+saveBtn.addEventListener("click",saveSale);
 
 })();
 </script>
