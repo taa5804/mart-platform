@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>전자쿠폰</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  min-height:100%;
+}
+
+body{
+  background:#f3f6f8;
+  color:#172033;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Noto Sans KR",
+    "Segoe UI",
+    Arial,
+    sans-serif;
+}
+
+.wrap{
+  width:100%;
+  max-width:430px;
+  margin:0 auto;
+  padding:18px 14px 35px;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:4px 4px 14px;
+}
+
+.brand{
+  color:#16845a;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:1.8px;
+}
+
+.title{
+  color:#7b8490;
+  font-size:12px;
+  font-weight:700;
+}
+
+.card{
+  position:relative;
+  overflow:hidden;
+  padding:28px 22px 24px;
+  border:1px solid #e1e6ea;
+  border-radius:22px;
+  background:#fff;
+  box-shadow:0 14px 40px rgba(20,35,50,.10);
+}
+
+.badge{
+  display:inline-flex;
+  padding:7px 10px;
+  border-radius:999px;
+  background:#e8f6ef;
+  color:#16845a;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:1px;
+}
+
+h1{
+  margin:16px 0 8px;
+  color:#132238;
+  font-size:25px;
+  line-height:1.3;
+}
+
+.desc{
+  margin:0;
+  color:#727d89;
+  font-size:12px;
+  line-height:1.7;
+}
+
+.divider{
+  height:1px;
+  margin:22px 0 18px;
+  background:#e8ebee;
+}
+
+.info{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+}
+
+.row span{
+  color:#8a949f;
+  font-size:11px;
+}
+
+.row strong{
+  color:#202b3a;
+  font-size:12px;
+  text-align:right;
+  word-break:break-all;
+}
+
+.qr-box{
+  margin-top:22px;
+  padding:18px 12px 15px;
+  border-radius:16px;
+  background:#f7f9fa;
+  text-align:center;
+}
+
+#qr{
+  width:190px;
+  height:190px;
+  margin:0 auto;
+  padding:8px;
+  background:#fff;
+  border:1px solid #e3e7ea;
+  border-radius:10px;
+}
+
+#qr img,
+#qr canvas{
+  display:block;
+  width:100% !important;
+  height:100% !important;
+}
+
+.qr-text{
+  margin:11px 0 0;
+  color:#7d8791;
+  font-size:10px;
+}
+
+.status{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  margin-top:16px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:800;
+}
+
+.available{
+  background:#e8f6ef;
+  color:#16845a;
+}
+
+.used{
+  background:#edf0f2;
+  color:#707983;
+}
+
+.expired,
+.error{
+  background:#fbeaea;
+  color:#c0392b;
+}
+
+.loading{
+  padding:50px 20px;
+  text-align:center;
+  color:#7b858f;
+  font-size:13px;
+}
+
+.notice{
+  margin-top:14px;
+  padding:18px;
+  border:1px solid #e5e9ec;
+  border-radius:16px;
+  background:#fff;
+}
+
+.notice h3{
+  margin:0 0 10px;
+  font-size:13px;
+}
+
+.notice ul{
+  margin:0;
+  padding-left:17px;
+}
+
+.notice li{
+  margin:5px 0;
+  color:#7b858f;
+  font-size:10px;
+  line-height:1.55;
+}
+
+.hidden{
+  display:none !important;
+}
+
+@media(max-width:380px){
+
+  .wrap{
+    padding-left:10px;
+    padding-right:10px;
+  }
+
+  .card{
+    padding-left:18px;
+    padding-right:18px;
+  }
+
+  #qr{
+    width:170px;
+    height:170px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="top">
+    <span class="brand">WOORI APT</span>
+    <span class="title">전자쿠폰</span>
+  </div>
+
+  <div id="loading" class="loading">
+    전자쿠폰을 불러오는 중입니다.
+  </div>
+
+  <div id="couponArea" class="hidden">
+
+    <div class="card">
+
+      <div class="badge">SPECIAL BENEFIT</div>
+
+      <h1>분양 고객 전자쿠폰</h1>
+
+      <p class="desc">
+        분양정보 확인 완료 고객에게 발행되는<br>
+        1회용 전자쿠폰입니다.
+      </p>
+
+      <div class="divider"></div>
+
+      <div class="info">
+
+        <div class="row">
+          <span>분양현장</span>
+          <strong id="projectCode">-</strong>
+        </div>
+
+        <div class="row">
+          <span>쿠폰번호</span>
+          <strong id="couponCode">-</strong>
+        </div>
+
+        <div class="row">
+          <span>발행일</span>
+          <strong id="issuedAt">-</strong>
+        </div>
+
+        <div class="row">
+          <span>유효기간</span>
+          <strong id="expiresAt">-</strong>
+        </div>
+
+      </div>
+
+      <div class="qr-box">
+        <div id="qr"></div>
+
+        <p class="qr-text">
+          매장 직원에게 이 QR을 보여주세요.
+        </p>
+      </div>
+
+      <div id="status" class="status available">
+        사용 가능
+      </div>
+
+    </div>
+
+    <div class="notice">
+
+      <h3>이용 안내</h3>
+
+      <ul>
+        <li>본 쿠폰은 1회만 사용할 수 있습니다.</li>
+        <li>유효기간이 지나면 사용할 수 없습니다.</li>
+        <li>매장 직원의 쿠폰 확인 후 사용 처리됩니다.</li>
+        <li>사용 완료된 쿠폰은 다시 사용할 수 없습니다.</li>
+      </ul>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+(function(){
+
+  "use strict";
+
+  const API_URL =
+    "https://wooriapt.ai.kr/api/get-electronic-coupon";
+
+  const loading =
+    document.getElementById("loading");
+
+  const couponArea =
+    document.getElementById("couponArea");
+
+  const projectCode =
+    document.getElementById("projectCode");
+
+  const couponCode =
+    document.getElementById("couponCode");
+
+  const issuedAt =
+    document.getElementById("issuedAt");
+
+  const expiresAt =
+    document.getElementById("expiresAt");
+
+  const status =
+    document.getElementById("status");
+
+  const qr =
+    document.getElementById("qr");
+
+
+  function formatDate(value){
+
+    if(!value) return "-";
+
+    const date = new Date(value);
+
+    if(Number.isNaN(date.getTime())){
+      return value;
+    }
+
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth()+1).padStart(2,"0");
+    const dd = String(date.getDate()).padStart(2,"0");
+
+    return yyyy + "." + mm + "." + dd;
+  }
+
+
+  function setStatus(value){
+
+    status.className = "status";
+
+    if(value === "used"){
+
+      status.classList.add("used");
+      status.textContent = "사용완료";
+
+    }else if(value === "expired"){
+
+      status.classList.add("expired");
+      status.textContent = "사용기간 만료";
+
+    }else{
+
+      status.classList.add("available");
+      status.textContent = "사용 가능";
+    }
+  }
+
+
+  function showError(message){
+
+    loading.className = "status error";
+    loading.textContent = message;
+  }
+
+
+  async function loadCoupon(){
+
+    const params =
+      new URLSearchParams(window.location.search);
+
+    const code =
+      (
+        params.get("coupon") ||
+        params.get("coupon_code") ||
+        ""
+      ).trim().toUpperCase();
+
+
+    if(!code){
+
+      showError("전자쿠폰 번호가 없습니다.");
+      return;
+    }
+
+
+    try{
+
+      const response =
+        await fetch(
+          API_URL +
+          "?coupon_code=" +
+          encodeURIComponent(code)
+        );
+
+      const result =
+        await response.json();
+
+
+      if(!response.ok || !result.ok){
+
+        throw new Error(
+          result.message ||
+          "전자쿠폰을 불러오지 못했습니다."
+        );
+      }
+
+
+      const coupon = result.coupon;
+
+
+      projectCode.textContent =
+        coupon.project_code || "-";
+
+      couponCode.textContent =
+        coupon.coupon_code || "-";
+
+      issuedAt.textContent =
+        formatDate(coupon.issued_at);
+
+      expiresAt.textContent =
+        formatDate(coupon.expires_at);
+
+      setStatus(coupon.status);
+
+
+      qr.innerHTML = "";
+
+      if(window.QRCode){
+
+        new QRCode(qr,{
+          text: coupon.coupon_code,
+          width:174,
+          height:174,
+          correctLevel:QRCode.CorrectLevel.M
+        });
+
+      }
+
+
+      loading.classList.add("hidden");
+
+      couponArea.classList.remove("hidden");
+
+
+    }catch(error){
+
+      console.error(
+        "전자쿠폰 조회 오류:",
+        error
+      );
+
+      showError(
+        error.message ||
+        "전자쿠폰을 불러오지 못했습니다."
+      );
+    }
+
+  }
+
+
+  loadCoupon();
+
+})();
+</script>
+
+</body>
+</html>
