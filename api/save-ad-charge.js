@@ -52,6 +52,7 @@ module.exports = async function handler(req, res) {
   try {
 
     const {
+      project_code,
       company_name,
       site_name,
       charge_amount,
@@ -106,11 +107,25 @@ module.exports = async function handler(req, res) {
       .from("ad_charge_history")
       .insert([
         {
-          company_name: company_name.trim(),
-          site_name: site_name.trim(),
-          charge_amount: amount,
-          charge_date: charge_date,
-          memo: memo ? memo.trim() : null
+          project_code:
+            project_code
+              ? String(project_code).trim().toUpperCase()
+              : null,
+
+          company_name:
+            company_name.trim(),
+
+          site_name:
+            site_name.trim(),
+
+          charge_amount:
+            amount,
+
+          charge_date:
+            charge_date,
+
+          memo:
+            memo ? memo.trim() : null
         }
       ])
       .select()
@@ -118,6 +133,7 @@ module.exports = async function handler(req, res) {
 
 
     if (error) {
+
       console.error(
         "ad_charge_history insert error:",
         error
