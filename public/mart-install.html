@@ -312,6 +312,7 @@
 
     const params=new URLSearchParams(location.search);
     const qrCode=cleanQr(params.get("qr"));
+    const resume=params.get("resume")==="1";
     const storePath="/74";
 
     let serviceWorkerPromise=null;
@@ -527,6 +528,13 @@
       }catch(e){console.warn(e)}
 
       const pending=loadPending();
+      const browser=getBrowserInfo();
+
+      /* 아이폰 홈 화면 앱에서 mart-open.html을 거쳐 resume=1로 돌아온 경우:
+         설치 안내를 다시 보여주지 않고 곧바로 푸시 알림 승인 단계로 이동합니다.
+         삼성/안드로이드 기존 분기는 변경하지 않습니다. */
+      if(resume&&browser.ios&&pending){showPushCardOnce();return}
+
       if(isInstalledApp()&&pending){showPushCardOnce();return}
       if(pending){showCard("install");prepareInstallStep();return}
       showCard("register")
