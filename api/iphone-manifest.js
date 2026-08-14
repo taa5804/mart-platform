@@ -1,8 +1,13 @@
-export function GET(request) {
-  const url = new URL(request.url);
+module.exports = async (req, res) => {
+  if (req.method !== "GET") {
+    return res.status(405).json({
+      ok: false,
+      message: "GET 요청만 사용할 수 있습니다."
+    });
+  }
 
   const registrationKey = String(
-    url.searchParams.get("reg") || ""
+    req.query.reg || ""
   )
     .trim()
     .toLowerCase();
@@ -43,18 +48,18 @@ export function GET(request) {
     ]
   };
 
-  return new Response(
-    JSON.stringify(manifest),
-    {
-      status: 200,
-      headers: {
-        "Content-Type":
-          "application/manifest+json; charset=utf-8",
-        "Cache-Control":
-          "no-store, no-cache, must-revalidate, max-age=0",
-        "Pragma": "no-cache",
-        "Expires": "0"
-      }
-    }
+  res.setHeader(
+    "Content-Type",
+    "application/manifest+json; charset=utf-8"
   );
-}
+
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, max-age=0"
+  );
+
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+
+  return res.status(200).json(manifest);
+};
