@@ -1,0 +1,27 @@
+{
+  "id": "/woorigage-android",
+  "name": "우리가게",
+  "short_name": "우리가게",
+  "description": "자동차 차량이동 요청 및 우리가게 알림",
+  "start_url": "/72-android.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "orientation": "portrait",
+  "lang": "ko-KR",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
