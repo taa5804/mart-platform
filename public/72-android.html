@@ -222,7 +222,7 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260816-ANDROID-NO-BYPASS-5SEC-01";
+  "20260816-ANDROID-NORMAL-INSTALL-TEST-01";
 
 
 const params =
@@ -926,20 +926,11 @@ installBtn.addEventListener(
       }
 
       /*
-       * 최초 자동차 QR 등록에서는
-       * isInstalledApp() 값만으로 설치 완료를 인정하지 않습니다.
-       *
-       * 이번 등록 과정에서 실제 appinstalled 이벤트가 발생해
-       * installConfirmed === true 가 되어야만 다음 단계로 진행합니다.
+       * 정상 설치 방식 테스트:
+       * 설치 버튼에서는 isInstalledApp()을 검사하지 않습니다.
+       * beforeinstallprompt로 확보한 실제 설치 이벤트를
+       * 바로 prompt()에 사용합니다.
        */
-      if(
-        isInstalledApp() &&
-        !installConfirmed
-      ){
-        throw new Error(
-          "이번 등록 과정의 앱 설치 완료가 확인되지 않았습니다. 앱 설치를 다시 진행해 주세요."
-        );
-      }
 
       const browser =
         getBrowserInfo();
@@ -966,19 +957,18 @@ installBtn.addEventListener(
         );
 
       /*
-       * 정상 동작본과 동일하게
-       * 버튼을 누른 시점에도 beforeinstallprompt를 다시 기다립니다.
+       * 정상 설치 방식:
+       * 이미 beforeinstallprompt에서 확보한 이벤트를
+       * 설치 버튼 클릭에서 바로 사용합니다.
        */
       const promptEvent =
-        await waitForInstallPrompt(
-          5000
-        );
+        deferredInstallPrompt;
 
       if(
         !promptEvent
       ){
         throw new Error(
-          "앱 설치창을 불러오지 못했습니다. Chrome 또는 삼성 인터넷에서 다시 시도해 주세요."
+          "앱 설치 준비가 되지 않았습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요."
         );
       }
 
@@ -1024,31 +1014,13 @@ installBtn.addEventListener(
         "설치 완료 확인 중...";
 
       /*
-       * appinstalled 이벤트가 늦게 오는 경우를 기다립니다.
-       * 이 시간 동안에도 직접 pushCard로 넘기지 않습니다.
+       * 정상 설치 방식:
+       * 여기서는 appinstalled를 별도로 기다리거나
+       * 타이머로 설치 성공/실패를 판정하지 않습니다.
+       *
+       * 실제 설치 완료 후 window의 appinstalled 이벤트가
+       * 발생하면 그 이벤트에서 pushCard로 이동합니다.
        */
-      for(
-        let i = 0;
-        i < 60 &&
-        !installConfirmed;
-        i++
-      ){
-        await new Promise(
-          resolve =>
-            setTimeout(
-              resolve,
-              250
-            )
-        );
-      }
-
-      if(
-        !installConfirmed
-      ){
-        throw new Error(
-          "앱 실제 설치 완료가 확인되지 않았습니다."
-        );
-      }
 
     }catch(error){
 
