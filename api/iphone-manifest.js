@@ -17,8 +17,8 @@ module.exports = async (req, res) => {
       .test(registrationKey);
 
   const startUrl = validRegistrationKey
-    ? `/mart-open.html?reg=${encodeURIComponent(registrationKey)}`
-    : "/mart-open.html";
+    ? `/72-iphone.html?reg=${encodeURIComponent(registrationKey)}`
+    : "/72-iphone.html";
 
   const manifest = {
     id: "/woorigage-app",
