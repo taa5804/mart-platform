@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#16a34a">
-  <link rel="manifest" href="/mart-manifest.webmanifest">
+  <link id="appManifestLink" rel="manifest" href="/mart-manifest.webmanifest">
   <title>우리APT 자동차 QR</title>
   <style>
     *{box-sizing:border-box}
@@ -91,8 +91,8 @@
     </div>
 
     <div id="browserGuide" class="browser-guide"></div>
-    <button id="continueButton" type="button" disabled>앱 설치 준비 중...</button>
-    <div id="installStatus" class="status waiting">앱 설치를 준비하고 있습니다.</div>
+    <button id="continueButton" type="button">계속하기</button>
+    <div id="installStatus" class="status"></div>
   </section>
 
   <section id="pushCard" class="card">
@@ -137,7 +137,7 @@
     const LAST_QR_KEY="wooriapt_vehicle_last_qr";
     const CALLER_KEY="wooriapt_vehicle_caller_session";
     const INSTALL_RELOAD_KEY="wooriapt_vehicle_install_reload_done";
-    const BUILD_VERSION="20260804-FINAL-REGFLOW-01";
+    const BUILD_VERSION="20260816-S24-INSTALL-RESTORE-01";
 
     const params=new URLSearchParams(location.search);
     let qrCode=cleanQr(params.get("qr")||localStorage.getItem(LAST_QR_KEY));
@@ -149,6 +149,7 @@
     let pushCardOpened=false;
     let installPreparationTimer=null;
 
+    const appManifestLink=document.getElementById("appManifestLink");
     const loadingCard=document.getElementById("loadingCard");
     const browserCard=document.getElementById("browserCard");
     const registerCard=document.getElementById("registerCard");
@@ -198,6 +199,70 @@
     }
 
     function hideBrowserGuide(){browserGuide.classList.remove("show");browserGuide.innerHTML=""}
+
+    function showBrowserGuide(title,html){
+      browserGuide.innerHTML="<strong>"+title+"</strong>"+html;
+      browserGuide.classList.add("show")
+    }
+
+    function waitForInstallPrompt(timeoutMs=5000){
+      if(deferredInstallPrompt)return Promise.resolve(deferredInstallPrompt);
+
+      return new Promise(resolve=>{
+        let finished=false;
+
+        const done=value=>{
+          if(finished)return;
+          finished=true;
+          clearTimeout(timer);
+          removeEventListener("beforeinstallprompt",onPrompt);
+          resolve(value)
+        };
+
+        const onPrompt=e=>{
+          e.preventDefault();
+          deferredInstallPrompt=e;
+          done(e)
+        };
+
+        addEventListener("beforeinstallprompt",onPrompt,{once:true});
+        const timer=setTimeout(()=>done(deferredInstallPrompt),timeoutMs)
+      })
+    }
+
+    function showManualInstallGuide(){
+      const b=getBrowserInfo();
+
+      if(b.inApp){
+        showBrowserGuide(
+          "현재 앱 내부 브라우저입니다.",
+          "화면 오른쪽 위의 메뉴(⋮ 또는 공유)를 누른 뒤 <b>다른 브라우저로 열기</b>를 선택해 주세요.<br>Chrome에서 다시 열면 앱을 설치할 수 있습니다."
+        );
+        setStatus(installStatus,"Chrome에서 다시 열어 주세요.","error");
+        continueButton.textContent="다시 확인하기";
+        return
+      }
+
+      if(b.samsung){
+        showBrowserGuide(
+          "삼성 인터넷 앱 설치 방법",
+          "브라우저 메뉴(≡ 또는 ⋮)를 누른 뒤 <b>현재 페이지 추가</b> 또는 <b>홈 화면에 추가</b>를 선택해 주세요."
+        );
+        setStatus(installStatus,"홈 화면에 추가한 뒤 계속 진행해 주세요.","waiting");
+        continueButton.textContent="설치 완료 후 계속";
+        continueButton.dataset.manualReady="1";
+        return
+      }
+
+      showBrowserGuide(
+        "앱 설치 방법",
+        "Chrome 오른쪽 위 메뉴(⋮)에서 <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>를 선택해 주세요."
+      );
+      setStatus(installStatus,"앱을 설치한 뒤 계속 진행해 주세요.","waiting");
+      continueButton.textContent="설치 완료 후 계속";
+      continueButton.dataset.manualReady="1"
+    }
+
     function showCard(name){Object.values(cards).forEach(c=>c.classList.remove("active"));cards[name].classList.add("active");scrollTo(0,0)}
     function setStatus(el,msg,type){el.textContent=msg||"";el.className="status";if(type)el.classList.add(type)}
     function showError(msg){errorMessage.textContent=msg;showCard("error")}
@@ -312,6 +377,15 @@
         throw new Error("아이폰 등록키를 발급하지 못했습니다.");
       }
 
+      /*
+       * 아이폰에서 홈 화면에 추가되는 앱의 최초 시작 주소만
+       * /mart-open.html?reg=등록키 로 연결한다.
+       * Android·삼성 인터넷은 기존 정적 매니페스트를 그대로 사용한다.
+       */
+      appManifestLink.href=
+        "/api/iphone-manifest?reg="+
+        encodeURIComponent(registrationKey);
+
       return registrationKey;
     }
 
@@ -331,37 +405,29 @@
       normalInstallGuide.style.display="block";
       iphoneSteps.classList.remove("show");
       continueButton.style.display="block";
-      continueButton.disabled=true;
-      continueButton.textContent="앱 설치 준비 중...";
-      setStatus(installStatus,"앱 설치를 준비하고 있습니다.","waiting");
+      continueButton.disabled=false;
+      continueButton.textContent="계속하기";
+      continueButton.dataset.manualReady="";
+      hideBrowserGuide();
 
-      try{
-        await prepareServiceWorker()
-      }catch(e){
-        setTimeout(prepareInstallStep,1500);
-        return
-      }
+      setStatus(
+        installStatus,
+        "계속하기를 누르면 앱 설치를 시작합니다.",
+        "waiting"
+      );
+
+      /*
+       * S24/Android:
+       * 서비스워커는 미리 준비하되 설치 버튼을 막아두지 않습니다.
+       * 예전 정상 동작 방식으로 복구합니다.
+       */
+      prepareServiceWorker().catch(
+        error=>console.warn("서비스워커 사전 준비 실패:",error)
+      );
 
       if(deferredInstallPrompt){
-        enableInstallButton();
-        return
+        enableInstallButton()
       }
-
-      installPreparationTimer=setTimeout(()=>{
-        if(deferredInstallPrompt){
-          enableInstallButton();
-          return
-        }
-
-        if(!sessionStorage.getItem(INSTALL_RELOAD_KEY)){
-          sessionStorage.setItem(INSTALL_RELOAD_KEY,"1");
-          location.reload();
-          return
-        }
-
-        setStatus(installStatus,"앱 설치를 준비하고 있습니다. 잠시만 기다려 주세요.","waiting");
-        setTimeout(prepareInstallStep,2000)
-      },5000)
     }
 
     async function waitForPermission(){
@@ -502,13 +568,11 @@
         );
 
         try{
-          const registrationKey=
-            await prepareIphoneRegistration(qrCode,phone);
+          await prepareIphoneRegistration(qrCode,phone);
 
-          location.replace(
-            "/iphone-install.html?reg="+
-            encodeURIComponent(registrationKey)
-          );
+          setStatus(registerStatus,"","");
+          showCard("install");
+          prepareInstallStep();
         }catch(error){
           setStatus(
             registerStatus,
@@ -553,6 +617,7 @@
 
     continueButton.addEventListener("click",async()=>{
       if(continueButton.disabled)return;
+
       const pending=loadPending();
 
       if(!pending){
@@ -560,32 +625,114 @@
         return
       }
 
-      if(!deferredInstallPrompt){
-        prepareInstallStep();
+      const browser=getBrowserInfo();
+
+      /*
+       * iPhone은 기존 등록키 + 홈화면 추가 흐름 그대로 유지
+       */
+      if(browser.ios){
+        if(isInstalledApp()){
+          hideBrowserGuide();
+          showPushCardOnce();
+          return
+        }
+
+        showIosInstallGuide();
+        return
+      }
+
+      /*
+       * 삼성 인터넷에서 사용자가 수동으로 홈 화면 추가를 마친 뒤
+       * 다시 누른 경우 다음 단계로 진행
+       */
+      if(continueButton.dataset.manualReady==="1"){
+        if(isInstalledApp()){
+          hideBrowserGuide();
+          showPushCardOnce();
+          return
+        }
+
+        showManualInstallGuide();
         return
       }
 
       continueButton.disabled=true;
-      continueButton.textContent="앱 설치 중...";
-      setStatus(installStatus,"표시되는 설치 창에서 설치를 눌러 주세요.","waiting");
+      continueButton.textContent="확인 중...";
+      hideBrowserGuide();
 
       try{
-        const promptEvent=deferredInstallPrompt;
-        deferredInstallPrompt=null;
-        await promptEvent.prompt();
-        const result=await promptEvent.userChoice;
+        prepareServiceWorker().catch(
+          error=>console.warn("서비스워커 사전 준비 실패:",error)
+        );
 
-        if(result.outcome!=="accepted"){
-          setStatus(installStatus,"앱 설치가 취소되었습니다. 계속하기를 다시 눌러 주세요.","error");
+        if(isInstalledApp()){
+          showPushCardOnce();
+          return
+        }
+
+        setStatus(
+          installStatus,
+          "앱 설치 가능 상태를 확인하고 있습니다.",
+          "waiting"
+        );
+
+        /*
+         * 이미 잡힌 이벤트가 없더라도 최대 5초 동안
+         * beforeinstallprompt를 다시 기다립니다.
+         */
+        const promptEvent=
+          deferredInstallPrompt ||
+          await waitForInstallPrompt(5000);
+
+        if(promptEvent){
+          continueButton.textContent="앱 설치 중...";
+          setStatus(
+            installStatus,
+            "표시되는 설치 창에서 설치를 눌러 주세요.",
+            "waiting"
+          );
+
+          deferredInstallPrompt=null;
+
+          await promptEvent.prompt();
+          const result=await promptEvent.userChoice;
+
+          if(result.outcome==="accepted"){
+            setStatus(
+              installStatus,
+              "앱 설치가 선택되었습니다.",
+              "success"
+            );
+            continueButton.textContent="설치 완료 후 계속";
+            continueButton.dataset.manualReady="1";
+            continueButton.disabled=false;
+            return
+          }
+
+          setStatus(
+            installStatus,
+            "앱 설치가 취소되었습니다. 계속하기를 다시 눌러 주세요.",
+            "error"
+          );
           continueButton.textContent="계속하기";
           continueButton.disabled=false;
           return
         }
 
-        setStatus(installStatus,"앱을 설치하고 있습니다. 잠시만 기다려 주세요.","waiting")
+        /*
+         * 설치 이벤트가 나오지 않는 삼성 인터넷/Chrome 환경은
+         * 메뉴를 통한 홈 화면 추가 안내로 전환
+         */
+        showManualInstallGuide();
+
       }catch(e){
-        setStatus(installStatus,e.message||"앱 설치에 실패했습니다.","error");
-        continueButton.textContent="다시 시도하기";
+        setStatus(
+          installStatus,
+          e.message||"앱 설치에 실패했습니다.",
+          "error"
+        );
+        continueButton.textContent="다시 시도하기"
+      }finally{
         continueButton.disabled=false
       }
     });
@@ -603,25 +750,7 @@
         const pending=loadPending();
         if(!pending)throw new Error("등록 정보를 찾을 수 없습니다. QR을 다시 스캔해 주세요.");
         const token=await createFcmToken();
-        const registerResult=await callApi({
-          action:"register",
-          qr_code:pending.qr_code,
-          owner_phone:pending.owner_phone,
-          push_token:token,
-          platform:"web",
-          user_agent:navigator.userAgent
-        },10000);
-
-        localStorage.setItem("wooriapt_app_registered","1");
-        localStorage.setItem("wooriapt_registered_phone",pending.owner_phone);
-
-        if(registerResult.customer_id){
-          localStorage.setItem(
-            "wooriapt_customer_id",
-            String(registerResult.customer_id)
-          );
-        }
-
+        await callApi({action:"register",qr_code:pending.qr_code,owner_phone:pending.owner_phone,push_token:token,platform:"web",user_agent:navigator.userAgent},10000);
         clearPending();
         setStatus(pushStatus,"","");
         showCard("complete")
