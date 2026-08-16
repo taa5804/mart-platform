@@ -222,7 +222,7 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260816-ANDROID-NORMAL-INSTALL-TEST-01";
+  "20260816-ANDROID-NORMAL-INSTALL-EXACT-TEST-01";
 
 
 const params =
@@ -897,15 +897,6 @@ installBtn.addEventListener(
     installBtn.disabled =
       true;
 
-    installBtn.textContent =
-      "확인 중...";
-
-    setStatus(
-      installStatus,
-      "앱 설치 가능 상태를 확인하고 있습니다.",
-      "waiting"
-    );
-
     try{
 
       const pending =
@@ -925,66 +916,32 @@ installBtn.addEventListener(
         );
       }
 
-      /*
-       * 정상 설치 방식 테스트:
-       * 설치 버튼에서는 isInstalledApp()을 검사하지 않습니다.
-       * beforeinstallprompt로 확보한 실제 설치 이벤트를
-       * 바로 prompt()에 사용합니다.
-       */
-
-      const browser =
-        getBrowserInfo();
-
-      /*
-       * 앱 내부 브라우저에서는 설치 이벤트가 정상적으로
-       * 발생하지 않을 수 있으므로 설치된 것으로 처리하지 않습니다.
-       */
       if(
-        browser.inApp
+        !deferredInstallPrompt
       ){
         throw new Error(
-          "Chrome 또는 삼성 인터넷에서 다시 열어 앱을 설치해 주세요."
+          "앱 설치창을 불러오지 못했습니다. 기기 신호를 기다리는 중이니 잠시 후 다시 눌러주세요."
         );
       }
-
-      prepareServiceWorker()
-        .catch(
-          error =>
-            console.warn(
-              "서비스워커 사전 준비:",
-              error
-            )
-        );
-
-      /*
-       * 정상 설치 방식:
-       * 이미 beforeinstallprompt에서 확보한 이벤트를
-       * 설치 버튼 클릭에서 바로 사용합니다.
-       */
-      const promptEvent =
-        deferredInstallPrompt;
-
-      if(
-        !promptEvent
-      ){
-        throw new Error(
-          "앱 설치 준비가 되지 않았습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요."
-        );
-      }
-
-      installBtn.textContent =
-        "앱 설치 중...";
 
       setStatus(
         installStatus,
-        "브라우저의 앱 설치 화면에서 설치를 선택해 주세요.",
+        "오픈된 시스템 설치 팝업창에서 [설치]를 선택해 주세요.",
         "waiting"
       );
 
-      await promptEvent.prompt();
+      installBtn.textContent =
+        "설치 팝업 확인 중...";
+
+      /*
+       * 정상 설치 당시와 동일:
+       * 저장해 둔 beforeinstallprompt 이벤트를
+       * 버튼 클릭에서 바로 실행합니다.
+       */
+      await deferredInstallPrompt.prompt();
 
       const result =
-        await promptEvent.userChoice;
+        await deferredInstallPrompt.userChoice;
 
       deferredInstallPrompt =
         null;
@@ -994,33 +951,24 @@ installBtn.addEventListener(
         "accepted"
       ){
         throw new Error(
-          "앱 설치를 완료해 주세요."
+          "등록을 완료하려면 앱 설치를 완료해야 합니다."
         );
       }
 
       /*
-       * 중요:
-       * 여기서는 푸시 단계로 이동하지 않습니다.
-       * 실제 appinstalled 이벤트가 발생해야만
-       * 위 appinstalled 핸들러가 pushCard를 표시합니다.
+       * 정상 설치 당시와 동일:
+       * 여기서 푸시 화면으로 직접 이동하지 않습니다.
+       * appinstalled 이벤트가 발생하면 전역 핸들러가
+       * pushCard로 이동합니다.
        */
       setStatus(
         installStatus,
-        "앱 설치 완료를 확인하고 있습니다.",
+        "갤럭시 시스템에서 앱 아이콘을 생성하고 있습니다. 잠시만 기다려 주세요.",
         "waiting"
       );
 
       installBtn.textContent =
-        "설치 완료 확인 중...";
-
-      /*
-       * 정상 설치 방식:
-       * 여기서는 appinstalled를 별도로 기다리거나
-       * 타이머로 설치 성공/실패를 판정하지 않습니다.
-       *
-       * 실제 설치 완료 후 window의 appinstalled 이벤트가
-       * 발생하면 그 이벤트에서 pushCard로 이동합니다.
-       */
+        "바탕화면 아이콘 생성 중...";
 
     }catch(error){
 
@@ -1268,12 +1216,8 @@ doneBtn.addEventListener(
   "click",
   () => {
 
-    window.location.replace(
-      "/72.html?qr=" +
-      encodeURIComponent(
-        qrCode
-      )
-    );
+    window.location.href =
+      "/mart-open.html";
   }
 );
 
