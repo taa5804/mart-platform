@@ -222,7 +222,7 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260816-ANDROID-INSTALL-EVENT-02";
+  "20260816-ANDROID-NO-BYPASS-5SEC-01";
 
 
 const params =
@@ -926,14 +926,20 @@ installBtn.addEventListener(
       }
 
       /*
-       * 최초 등록에서는 isInstalledApp()을 설치 완료 판정에 사용하지 않습니다.
-       * 이번 등록 과정에서 실제 appinstalled 이벤트가 발생해야
-       * installConfirmed === true가 됩니다.
+       * 최초 자동차 QR 등록에서는
+       * isInstalledApp() 값만으로 설치 완료를 인정하지 않습니다.
        *
-       * 설치 버튼을 누르는 순간 standalone 상태가 어떻게 보이는지와
-       * 실제 OS 설치 완료 여부를 혼동하지 않기 위해 이 단계에서는
-       * isInstalledApp() 검사를 하지 않습니다.
+       * 이번 등록 과정에서 실제 appinstalled 이벤트가 발생해
+       * installConfirmed === true 가 되어야만 다음 단계로 진행합니다.
        */
+      if(
+        isInstalledApp() &&
+        !installConfirmed
+      ){
+        throw new Error(
+          "이번 등록 과정의 앱 설치 완료가 확인되지 않았습니다. 앱 설치를 다시 진행해 주세요."
+        );
+      }
 
       const browser =
         getBrowserInfo();
@@ -1018,15 +1024,31 @@ installBtn.addEventListener(
         "설치 완료 확인 중...";
 
       /*
-       * 여기서는 더 이상 5초 타이머로 설치 실패를 판정하지 않습니다.
-       *
-       * 사용자가 [설치]를 승인하면 이 핸들러는 여기서 끝납니다.
-       * 실제 설치 완료 여부는 window의 appinstalled 이벤트에서만
-       * installConfirmed=true로 확정하고 pushCard로 이동합니다.
-       *
-       * 따라서 WebAPK 생성이나 Android 설치 처리에 시간이 더 걸려도
-       * 5초 때문에 설치 실패로 잘못 처리하지 않습니다.
+       * appinstalled 이벤트가 늦게 오는 경우를 기다립니다.
+       * 이 시간 동안에도 직접 pushCard로 넘기지 않습니다.
        */
+      for(
+        let i = 0;
+        i < 60 &&
+        !installConfirmed;
+        i++
+      ){
+        await new Promise(
+          resolve =>
+            setTimeout(
+              resolve,
+              250
+            )
+        );
+      }
+
+      if(
+        !installConfirmed
+      ){
+        throw new Error(
+          "앱 실제 설치 완료가 확인되지 않았습니다."
+        );
+      }
 
     }catch(error){
 
