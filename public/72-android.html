@@ -222,29 +222,98 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260816-ANDROID-SPLIT-01";
+  "20260816-ANDROID-SPLIT-02";
 
+const PENDING_KEY =
+  "wooriapt_vehicle_android_pending";
+
+const LAST_QR_KEY =
+  "wooriapt_vehicle_android_last_qr";
 
 const params =
   new URLSearchParams(
     window.location.search
   );
 
-
-const qrCode =
-  String(
-    params.get("qr") || ""
-  )
+function cleanQr(value){
+  return String(value || "")
     .trim()
     .toUpperCase()
-    .replace(
-      /[^A-Z0-9_-]/g,
-      ""
-    );
+    .replace(/[^A-Z0-9_-]/g,"");
+}
 
+function loadPending(){
+  try{
+    const raw =
+      localStorage.getItem(
+        PENDING_KEY
+      );
 
-const PENDING_KEY =
-  "wooriapt_vehicle_android_pending";
+    if(!raw){
+      return null;
+    }
+
+    const data =
+      JSON.parse(raw);
+
+    const pendingQr =
+      cleanQr(
+        data.qr_code
+      );
+
+    const pendingPhone =
+      String(
+        data.owner_phone || ""
+      ).replace(
+        /[^0-9]/g,
+        ""
+      );
+
+    if(
+      !pendingQr ||
+      !/^01[016789][0-9]{7,8}$/.test(
+        pendingPhone
+      )
+    ){
+      return null;
+    }
+
+    return {
+      qr_code:
+        pendingQr,
+      owner_phone:
+        pendingPhone
+    };
+
+  }catch(error){
+    return null;
+  }
+}
+
+const startupPending =
+  loadPending();
+
+const qrCode =
+  cleanQr(
+    params.get("qr") ||
+    (
+      startupPending &&
+      startupPending.qr_code
+        ? startupPending.qr_code
+        : ""
+    ) ||
+    localStorage.getItem(
+      LAST_QR_KEY
+    ) ||
+    ""
+  );
+
+if(qrCode){
+  localStorage.setItem(
+    LAST_QR_KEY,
+    qrCode
+  );
+}
 
 
 let deferredInstallPrompt = null;
@@ -454,6 +523,71 @@ function isInstalledApp(){
     ).matches ||
     window.navigator.standalone === true
   );
+}
+
+
+function getAndroidBrowserInfo(){
+
+  const ua =
+    navigator.userAgent || "";
+
+  const android =
+    /android/i.test(ua);
+
+  const samsung =
+    /samsungbrowser/i.test(ua);
+
+  const inApp =
+    /kakaotalk|naver\(inapp|naverapp|line\/|instagram|fbav|fban|\bGSA\//i
+      .test(ua) ||
+    /;\s*wv\)/i.test(ua);
+
+  const chrome =
+    android &&
+    /chrome\//i.test(ua) &&
+    !samsung &&
+    !inApp &&
+    !/edga|edg\/|opr\/|opera/i.test(ua);
+
+  return {
+    android,
+    samsung,
+    inApp,
+    chrome
+  };
+}
+
+
+function openCurrentPageInChrome(){
+
+  const current =
+    new URL(
+      window.location.href
+    );
+
+  const scheme =
+    current.protocol.replace(
+      ":",
+      ""
+    );
+
+  const intentUrl =
+    "intent://" +
+    current.host +
+    current.pathname +
+    current.search +
+    current.hash +
+    "#Intent;scheme=" +
+    scheme +
+    ";package=com.android.chrome" +
+    ";S.browser_fallback_url=" +
+    encodeURIComponent(
+      current.href
+    ) +
+    ";end";
+
+  window.location.href =
+    intentUrl;
 }
 
 
@@ -741,6 +875,11 @@ registerBtn.addEventListener(
       })
     );
 
+    localStorage.setItem(
+      LAST_QR_KEY,
+      qrCode
+    );
+
 
     /*
      * 서비스워커 사전 준비
@@ -771,6 +910,56 @@ registerBtn.addEventListener(
 installBtn.addEventListener(
   "click",
   async () => {
+
+    /*
+     * 과거 S24 정상본 기준:
+     * Android에서 실제 Chrome이 아니면
+     * 먼저 같은 주소를 Chrome으로 넘깁니다.
+     *
+     * Chrome으로 넘어간 뒤 전화번호를 입력하고
+     * 설치를 진행하게 하므로 브라우저별 저장공간 혼선을 막습니다.
+     */
+    const browser =
+      getAndroidBrowserInfo();
+
+    if(
+      browser.android &&
+      !browser.chrome &&
+      !isInstalledApp()
+    ){
+      setStatus(
+        installStatus,
+        "Chrome으로 이동합니다.",
+        "waiting"
+      );
+
+      installBtn.disabled =
+        true;
+
+      installBtn.textContent =
+        "Chrome으로 이동 중...";
+
+      openCurrentPageInChrome();
+
+      setTimeout(
+        () => {
+          installBtn.disabled =
+            false;
+
+          installBtn.textContent =
+            "앱 설치";
+
+          setStatus(
+            installStatus,
+            "Chrome이 열리지 않으면 Chrome 앱에서 같은 자동차 QR 주소를 다시 열어 주세요.",
+            "error"
+          );
+        },
+        1800
+      );
+
+      return;
+    }
 
     /*
      * 이미 설치된 앱 내부라면
@@ -1169,17 +1358,82 @@ doneBtn.addEventListener(
  * =====================================================
  */
 
-if(
-  !qrCode
-){
+(function startAndroidRegistration(){
 
-  errorText.textContent =
-    "올바른 자동차 QR 주소가 아닙니다.";
+  /*
+   * 설치된 앱이 다시 열린 경우:
+   * 등록 대기정보가 있으면 푸시 단계부터 이어서 진행합니다.
+   */
+  if(
+    isInstalledApp() &&
+    startupPending &&
+    startupPending.qr_code
+  ){
+    prepareServiceWorker()
+      .catch(
+        error =>
+          console.warn(
+            "서비스워커 준비:",
+            error
+          )
+      );
+
+    showCard(
+      pushCard
+    );
+
+    return;
+  }
+
+  /*
+   * 이미 등록을 끝낸 뒤 앱 아이콘으로 일반 실행한 경우
+   * Android 등록화면에 머물지 않고 우리가게 시작화면으로 이동합니다.
+   */
+  if(
+    isInstalledApp() &&
+    !startupPending
+  ){
+    window.location.replace(
+      "/mart-open.html"
+    );
+
+    return;
+  }
+
+  if(
+    !qrCode
+  ){
+    errorText.textContent =
+      "올바른 자동차 QR 주소가 아닙니다.";
+
+    showCard(
+      errorCard
+    );
+
+    return;
+  }
+
+  /*
+   * S24/Android는 설치 절차를 Chrome 한 곳으로 고정합니다.
+   * 전화번호를 입력하기 전에 Chrome으로 넘기므로
+   * 삼성 인터넷과 Chrome의 localStorage가 섞이지 않습니다.
+   */
+  const browser =
+    getAndroidBrowserInfo();
+
+  if(
+    browser.android &&
+    !browser.chrome
+  ){
+    openCurrentPageInChrome();
+    return;
+  }
 
   showCard(
-    errorCard
+    registerCard
   );
-}
+
+})();
 </script>
 
 </body>
