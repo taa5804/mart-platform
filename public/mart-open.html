@@ -6,13 +6,71 @@
 <meta name="theme-color" content="#16a34a">
 <title>우리가게</title>
 
+<!--
+  =====================================================
+  iPhone 전용 동적 Manifest 연결
+  =====================================================
+-->
+<script>
+(function(){
+  "use strict";
+
+  const params =
+    new URLSearchParams(window.location.search);
+
+  const registrationKey =
+    String(params.get("reg") || "")
+      .trim()
+      .toLowerCase();
+
+  const validRegistrationKey =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+      .test(registrationKey);
+
+  const ua =
+    navigator.userAgent || "";
+
+  const isIOS =
+    /iPhone|iPad|iPod/i.test(ua) ||
+    (
+      navigator.platform === "MacIntel" &&
+      navigator.maxTouchPoints > 1
+    );
+
+  /*
+   * iPhone + 정상 registrationKey일 때만
+   * 동적 manifest를 연결합니다.
+   *
+   * 삼성·안드로이드는 건드리지 않습니다.
+   */
+  if(
+    isIOS &&
+    validRegistrationKey
+  ){
+    const manifest =
+      document.createElement("link");
+
+    manifest.rel =
+      "manifest";
+
+    manifest.href =
+      "/api/iphone-manifest?reg=" +
+      encodeURIComponent(registrationKey);
+
+    document.head.appendChild(manifest);
+  }
+})();
+</script>
+
 <style>
 *{box-sizing:border-box}
+
 html,body{
   width:100%;
   min-height:100%;
   margin:0;
 }
+
 body{
   min-height:100vh;
   display:flex;
@@ -29,6 +87,7 @@ body{
     Arial,
     sans-serif;
 }
+
 .status-card{
   display:none;
   width:100%;
@@ -39,20 +98,24 @@ body{
   box-shadow:0 10px 35px rgba(15,23,42,.1);
   text-align:center;
 }
+
 .status-card.show{
   display:block;
 }
+
 .status-title{
   margin:0 0 12px;
   font-size:23px;
   font-weight:800;
 }
+
 .status-text{
   margin:0;
   color:#64748b;
   font-size:16px;
   line-height:1.7;
 }
+
 .error{
   color:#dc2626;
 }
@@ -62,12 +125,21 @@ body{
 <body>
 
 <div id="statusCard" class="status-card">
-  <div id="statusTitle" class="status-title">
+
+  <div
+    id="statusTitle"
+    class="status-title"
+  >
     등록정보 확인 중
   </div>
-  <div id="statusText" class="status-text">
+
+  <div
+    id="statusText"
+    class="status-text"
+  >
     잠시만 기다려 주세요.
   </div>
+
 </div>
 
 <script>
@@ -75,9 +147,12 @@ body{
   "use strict";
 
   /*
+   * =====================================================
    * 기존 삼성·안드로이드용 저장키
    * 변경하지 않습니다.
+   * =====================================================
    */
+
   const PENDING_KEY =
     "wooriapt_mart_pending_registration";
 
@@ -87,20 +162,38 @@ body{
   const STORE_URL_KEY =
     "wooriapt_store_url";
 
+
   const params =
-    new URLSearchParams(window.location.search);
+    new URLSearchParams(
+      window.location.search
+    );
+
 
   /*
-   * 아이폰 전용 동적 manifest가 전달하는 등록키
+   * =====================================================
+   * iPhone 동적 Manifest가
+   * start_url을 통해 전달하는 registrationKey
+   * =====================================================
    */
+
   const registrationKey =
-    String(params.get("reg") || "")
+    String(
+      params.get("reg") || ""
+    )
       .trim()
       .toLowerCase();
+
 
   const validRegistrationKey =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       .test(registrationKey);
+
+
+  /*
+   * =====================================================
+   * 현재 PWA 설치 실행 여부
+   * =====================================================
+   */
 
   const standalone =
     window.matchMedia(
@@ -108,17 +201,32 @@ body{
     ).matches ||
     window.navigator.standalone === true;
 
+
   const statusCard =
-    document.getElementById("statusCard");
+    document.getElementById(
+      "statusCard"
+    );
 
   const statusTitle =
-    document.getElementById("statusTitle");
+    document.getElementById(
+      "statusTitle"
+    );
 
   const statusText =
-    document.getElementById("statusText");
+    document.getElementById(
+      "statusText"
+    );
 
-  function showStatus(title,text,isError){
-    statusCard.classList.add("show");
+
+  function showStatus(
+    title,
+    text,
+    isError
+  ){
+
+    statusCard.classList.add(
+      "show"
+    );
 
     statusTitle.textContent =
       title || "";
@@ -132,118 +240,190 @@ body{
         : "status-text";
   }
 
+
   /*
    * =====================================================
-   * 아이폰 전용 등록 복원
+   * iPhone 전용 등록 복원
    *
-   * 중요:
-   * Safari에서 저장했던 localStorage를 가져오는 것이 아니라
-   * registration_key로 서버에서 QR + 전화번호를 다시 받아
-   * 설치된 PWA 자신의 localStorage에 새로 저장합니다.
+   * Safari localStorage를 복사하지 않습니다.
    *
-   * 삼성·안드로이드는 이 분기를 사용하지 않습니다.
+   * Manifest start_url에 포함된
+   * registrationKey를 이용하여
+   * 서버에서 등록정보를 다시 가져옵니다.
+   *
+   * 그리고 설치된 PWA 자신의
+   * localStorage에 새로 저장합니다.
+   *
+   * 삼성·안드로이드는 이 분기를
+   * 사용하지 않습니다.
    * =====================================================
    */
+
   async function restoreIphoneRegistration(){
+
     showStatus(
       "등록정보 확인 중",
       "잠시만 기다려 주세요.",
       false
     );
 
+
     try{
+
       const response =
         await fetch(
           "/api/iphone-registration?reg=" +
-          encodeURIComponent(registrationKey),
+          encodeURIComponent(
+            registrationKey
+          ),
           {
             method:"GET",
-            cache:"no-store"
+            cache:"no-store",
+            headers:{
+              "Accept":"application/json"
+            }
           }
         );
 
-      const data =
-        await response.json();
+
+      let data = null;
+
+
+      try{
+
+        data =
+          await response.json();
+
+      }catch(e){
+
+        throw new Error(
+          "등록정보 응답을 확인할 수 없습니다."
+        );
+      }
+
 
       if(
         !response.ok ||
         !data ||
         data.ok !== true
       ){
+
         throw new Error(
-          data && data.message
+          data &&
+          data.message
             ? data.message
             : "등록정보를 확인할 수 없습니다."
         );
       }
 
+
       const qrCode =
-        String(data.qr_code || "")
+        String(
+          data.qr_code || ""
+        )
           .trim()
           .toUpperCase();
 
+
       const phone =
-        String(data.phone || "")
-          .replace(/[^0-9]/g,"");
+        String(
+          data.phone || ""
+        )
+          .replace(
+            /[^0-9]/g,
+            ""
+          );
+
 
       if(!qrCode){
+
         throw new Error(
           "QR 등록정보가 없습니다."
         );
       }
 
+
       if(
-        !/^01[016789][0-9]{7,8}$/.test(phone)
+        !/^01[016789][0-9]{7,8}$/.test(
+          phone
+        )
       ){
+
         throw new Error(
           "휴대전화 등록정보를 확인할 수 없습니다."
         );
       }
 
+
       /*
-       * 여기서부터는 설치된 아이폰 PWA 자신의 저장공간입니다.
-       * mart-install.html에서도 동일한 값을 읽을 수 있습니다.
+       * =================================================
+       * 설치된 iPhone PWA 저장공간에
+       * 등록정보 저장
+       * =================================================
        */
+
+      const storeUrl =
+        String(
+          data.store_url ||
+          data.store_code ||
+          "/74"
+        ).trim() || "/74";
+
+
       localStorage.setItem(
         PENDING_KEY,
         JSON.stringify({
-          qr_code:qrCode,
-          owner_phone:phone,
+          qr_code:
+            qrCode,
+
+          owner_phone:
+            phone,
+
           store_path:
-            data.store_url ||
-            data.store_code ||
-            "/74",
+            storeUrl,
+
           store_url:
-            data.store_url ||
-            "/74"
+            storeUrl
         })
       );
 
+
       localStorage.setItem(
         STORE_PATH_KEY,
-        data.store_url || "/74"
+        storeUrl
       );
+
 
       localStorage.setItem(
         STORE_URL_KEY,
-        data.store_url || "/74"
+        storeUrl
       );
 
+
       /*
+       * =================================================
        * 기존 mart-install.html로 이동
-       * 설치된 앱이므로 기존 코드가 pushCard를 바로 띄웁니다.
+       *
+       * 기존 pushCard 흐름 그대로 사용
+       * =================================================
        */
+
       window.location.replace(
         "/mart-install.html?qr=" +
-        encodeURIComponent(qrCode) +
+        encodeURIComponent(
+          qrCode
+        ) +
         "&resume=1"
       );
 
+
     }catch(error){
+
       console.error(
         "iPhone registration restore error:",
         error
       );
+
 
       showStatus(
         "등록정보 확인 실패",
@@ -255,42 +435,54 @@ body{
     }
   }
 
+
   /*
    * =====================================================
-   * 아이폰 전용 진입
+   * iPhone 설치 앱 전용 진입
+   *
+   * standalone + reg가 있을 때만 실행
    * =====================================================
    */
+
   if(
     standalone &&
     validRegistrationKey
   ){
+
     restoreIphoneRegistration();
+
     return;
   }
 
+
   /*
    * =====================================================
-   * 아래부터는 기존 삼성·안드로이드 흐름
-   * 기존 로직을 그대로 유지합니다.
+   * 아래부터 기존 삼성·안드로이드 흐름
+   * 변경하지 않습니다.
    * =====================================================
    */
 
   let pending = null;
 
+
   try{
+
     pending =
       JSON.parse(
         localStorage.getItem(
           PENDING_KEY
         ) || "null"
       );
+
   }catch(e){}
+
 
   if(
     standalone &&
     pending &&
     pending.qr_code
   ){
+
     const target =
       "/mart-install.html?qr=" +
       encodeURIComponent(
@@ -298,9 +490,14 @@ body{
       ) +
       "&resume=1";
 
-    window.location.replace(target);
+
+    window.location.replace(
+      target
+    );
+
     return;
   }
+
 
   const saved =
     localStorage.getItem(
@@ -311,8 +508,11 @@ body{
     ) ||
     "/74";
 
+
   const target =
-    /^https?:\/\//i.test(saved)
+    /^https?:\/\//i.test(
+      saved
+    )
       ? saved
       : "https://wooriapt.ai.kr" +
         (
@@ -321,7 +521,10 @@ body{
             : "/" + saved
         );
 
-  window.location.replace(target);
+
+  window.location.replace(
+    target
+  );
 
 })();
 </script>
