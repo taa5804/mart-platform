@@ -135,8 +135,8 @@ button:disabled{
   <h1>Android 앱 설치</h1>
 
   <div class="guide">
-    앱이 실제로 설치되어야<br>
-    다음 단계로 진행됩니다.
+    아래 버튼을 눌러<br>
+    우리가게 앱을 설치해 주세요.
   </div>
 
   <button id="installBtn" type="button">
@@ -172,8 +172,8 @@ button:disabled{
   </p>
 
   <div class="status success">
-    등록이 정상적으로 완료되었습니다.<br>
-    이 화면에서 등록 절차가 끝납니다.
+    등록이 완료되었습니다.<br>
+    이제 차량이동 요청 알림을 받을 수 있습니다.
   </div>
 </section>
 
@@ -223,7 +223,7 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260817-ANDROID-REG-FINAL-01";
+  "20260817-ANDROID-FAST-INSTALL-01";
 
 
 const params =
@@ -768,21 +768,41 @@ window.addEventListener(
     );
 
     /*
-     * 설치 완료 직후 브라우저에서 푸시 화면으로 넘어가지 않습니다.
-     * 홈 화면에 실제로 설치된 우리가게 앱을 실행해야 다음 단계가 열립니다.
+     * 실제 설치 완료 신호가 확인되면
+     * 즉시 푸시 알림 허용 단계로 이동합니다.
      */
     setStatus(
       installStatus,
-      "앱 설치가 완료되었습니다. 홈 화면의 ‘우리가게’ 앱을 실행해 주세요.",
+      "앱 설치가 완료되었습니다.",
       "success"
     );
 
-    installBtn.disabled =
-      true;
-
-    installBtn.textContent =
-      "설치 완료 · 앱을 실행해 주세요";
+    showCard(
+      pushCard
+    );
   }
+);
+
+
+/*
+ * =====================================================
+ * 설치 사전 준비
+ * 페이지가 열리는 즉시 Service Worker와 설치 프롬프트를 준비합니다.
+ * =====================================================
+ */
+prepareServiceWorker()
+  .catch(
+    error =>
+      console.warn(
+        "서비스워커 사전 준비:",
+        error
+      )
+  );
+
+waitForInstallPrompt(
+  1500
+).catch(
+  () => null
 );
 
 
@@ -909,7 +929,7 @@ installBtn.addEventListener(
 
     setStatus(
       installStatus,
-      "앱 설치 가능 상태를 확인하고 있습니다.",
+      "앱 설치를 준비하고 있습니다.",
       "waiting"
     );
 
@@ -972,7 +992,7 @@ installBtn.addEventListener(
        */
       const promptEvent =
         await waitForInstallPrompt(
-          5000
+          1500
         );
 
       if(
@@ -988,7 +1008,7 @@ installBtn.addEventListener(
 
       setStatus(
         installStatus,
-        "브라우저의 앱 설치 화면에서 설치를 선택해 주세요.",
+        "표시되는 설치창에서 ‘설치’를 눌러 주세요.",
         "waiting"
       );
 
@@ -1017,12 +1037,12 @@ installBtn.addEventListener(
        */
       setStatus(
         installStatus,
-        "앱 설치 완료를 확인하고 있습니다.",
+        "앱을 설치하고 있습니다.",
         "waiting"
       );
 
       installBtn.textContent =
-        "설치 완료 확인 중...";
+        "앱 설치 중...";
 
       /*
        * 여기서는 더 이상 5초 타이머로 설치 실패를 판정하지 않습니다.
