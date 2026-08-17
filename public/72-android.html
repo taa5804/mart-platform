@@ -224,7 +224,7 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260817-ANDROID-APPINSTALLED-THEN-COMPLETE-FINAL-01";
+  "20260817-ANDROID-SEQUENCE-REFLECTED-FINAL-01";
 
 
 const params =
@@ -763,17 +763,19 @@ window.addEventListener(
     deferredInstallPrompt = null;
 
     /*
-     * 실제 앱 설치 완료 신호가 온 시점.
-     * 휴대폰의 "앱이 설치됨" 시스템 표시가 먼저 보인 뒤
-     * 등록완료 화면으로 전환합니다.
+     * 실제 앱 설치 완료 신호.
+     * 고객에게는 별도 내부 상태를 표시하지 않고,
+     * 최종 완료 조건에만 반영합니다.
      */
-    if(
-      registrationInProgress &&
-      !registrationFinished
-    ){
-      appInstalledAfterPush = true;
-      finishRegistrationIfReady();
-    }
+    installConfirmed = true;
+    appInstalledAfterPush = true;
+
+    localStorage.setItem(
+      INSTALL_CONFIRMED_KEY,
+      "1"
+    );
+
+    finishRegistrationIfReady();
   }
 );
 
@@ -899,7 +901,7 @@ registerBtn.addEventListener(
 
 
     showCard(
-      pushCard
+      installCard
     );
   }
 );
@@ -989,42 +991,11 @@ installBtn.addEventListener(
       }
 
       /*
-       * 빠른 확인 방식
-       * 설치 승인 후 실제 appinstalled 신호가 오면 즉시 푸시 단계로 이동합니다.
-       * 3초 안에 신호가 오지 않아도 푸시 단계로 넘기지 않습니다.
-       * 설치 화면을 유지하고 실제 설치 완료 신호를 계속 기다립니다.
+       * 사용자가 시스템 설치창에서 앱 추가를 승인하면
+       * 앱 설치는 계속 진행되고, 푸시 알림 허용 화면으로 이동합니다.
        */
-      setStatus(
-        installStatus,
-        "앱을 설치하고 있습니다.",
-        "waiting"
-      );
-
-      if(
-        installConfirmed
-      ){
-        showCard(
-          pushCard
-        );
-        return;
-      }
-
-      setTimeout(
-        () => {
-          if(
-            !installConfirmed
-          ){
-            setStatus(
-              installStatus,
-              "앱 설치가 진행중입니다. 화면을 닫지 마세요.",
-              "waiting"
-            );
-
-            installBtn.textContent =
-              "앱 설치 진행중...";
-          }
-        },
-        3000
+      showCard(
+        pushCard
       );
 
     }catch(error){
@@ -1112,13 +1083,14 @@ pushBtn.addEventListener(
 
     registrationInProgress = true;
     serverRegistrationDone = false;
-    appInstalledAfterPush = false;
 
     /*
-     * 과거 설치 확인값은 이번 완료판정에 사용하지 않습니다.
+     * 앱 설치는 앞 단계에서 이미 진행 중이므로
+     * 설치 완료 상태를 여기서 다시 초기화하지 않습니다.
      */
-    installConfirmed = false;
-    localStorage.removeItem(INSTALL_CONFIRMED_KEY);
+    appInstalledAfterPush =
+      installConfirmed ||
+      localStorage.getItem(INSTALL_CONFIRMED_KEY) === "1";
 
     pushBtn.disabled =
       true;
@@ -1220,34 +1192,6 @@ pushBtn.addEventListener(
             "푸시 알림을 허용해 주세요."
           );
         }
-      }
-
-
-      /*
-       * 이번 푸시 등록 과정에서 앱 설치를 시작합니다.
-       * 등록완료는 userChoice가 아니라 새 appinstalled 신호가 기준입니다.
-       */
-      const currentInstallPrompt =
-        deferredInstallPrompt ||
-        await waitForInstallPrompt(5000);
-
-      if(!currentInstallPrompt){
-        throw new Error(
-          "앱 설치창을 불러오지 못했습니다. 다시 시도해 주세요."
-        );
-      }
-
-      await currentInstallPrompt.prompt();
-
-      const currentInstallChoice =
-        await currentInstallPrompt.userChoice;
-
-      deferredInstallPrompt = null;
-
-      if(currentInstallChoice.outcome !== "accepted"){
-        throw new Error(
-          "앱 설치를 완료해 주세요."
-        );
       }
 
 
