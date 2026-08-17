@@ -224,7 +224,7 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260817-ANDROID-APPINSTALLED-TRIGGER-FINAL-01";
+  "20260817-ANDROID-APPINSTALLED-IMMEDIATE-COMPLETE-01";
 
 
 const params =
@@ -765,14 +765,26 @@ window.addEventListener(
     /*
      * 완료 기준:
      * 푸시 알림 버튼을 누른 뒤 이번 설치에서
-     * 새로 들어온 appinstalled 신호만 인정합니다.
+     * 새로 들어온 appinstalled 신호가 오는 그 순간
+     * 바로 등록 완료 화면을 표시하고 끝냅니다.
      */
     if(
       registrationInProgress &&
       !registrationFinished
     ){
       appInstalledAfterPush = true;
-      finishRegistrationIfReady();
+      registrationFinished = true;
+      registrationInProgress = false;
+
+      localStorage.removeItem(PENDING_KEY);
+      localStorage.removeItem(INSTALL_CONFIRMED_KEY);
+
+      localStorage.setItem(
+        COMPLETED_KEY_PREFIX + qrCode,
+        "1"
+      );
+
+      showCard(completeCard);
     }
   }
 );
@@ -1328,16 +1340,10 @@ pushBtn.addEventListener(
 
 
       /*
-       * 서버 등록 성공만 기록합니다.
-       * 여기서는 등록완료 화면을 띄우지 않습니다.
+       * 서버 등록 성공 여부는 기록만 합니다.
+       * 등록 완료 화면의 기준은 오직 이번 appinstalled 신호입니다.
        */
       serverRegistrationDone = true;
-
-      /*
-       * 이번 푸시 이후 새 appinstalled 신호가 이미 들어왔다면
-       * 여기서 등록완료, 아직이면 appinstalled를 계속 기다립니다.
-       */
-      finishRegistrationIfReady();
 
 
     }catch(error){
