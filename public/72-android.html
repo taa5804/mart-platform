@@ -102,6 +102,12 @@ button:disabled{
 .waiting{
   color:#1d4ed8;
 }
+
+.hidden{display:none!important}
+
+.secondary{
+  background:#0f172a;
+}
 </style>
 </head>
 
@@ -160,6 +166,14 @@ button:disabled{
   </button>
 
   <div id="pushStatus" class="status"></div>
+
+  <button
+    id="retrySecurityBtn"
+    type="button"
+    class="secondary hidden"
+  >
+    다시 확인
+  </button>
 </section>
 
 
@@ -167,12 +181,12 @@ button:disabled{
   <h1>등록 완료</h1>
 
   <p>
-    앱 설치와 푸시 알림 등록이<br>
-    모두 완료되었습니다.
+    우리가게 앱 설치와<br>
+    자동차 QR 등록이 완료되었습니다.
   </p>
 
   <div class="status success">
-    등록이 완료되었습니다.<br>
+    등록이 정상적으로 완료되었습니다.<br>
     이제 차량이동 요청 알림을 받을 수 있습니다.
   </div>
 </section>
@@ -223,7 +237,7 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260817-ANDROID-FAST-INSTALL-02";
+  "20260817-ANDROID-PARALLEL-SECURITY-02";
 
 
 const params =
@@ -250,8 +264,26 @@ const PENDING_KEY =
 const INSTALL_CONFIRMED_KEY =
   "wooriapt_vehicle_android_install_confirmed";
 
+const COMPLETED_KEY_PREFIX =
+  "wooriapt_vehicle_android_completed_";
+
 
 let deferredInstallPrompt = null;
+
+let installCompletedPromiseResolve =
+  null;
+
+let installCompletedPromise =
+  new Promise(
+    resolve => {
+      installCompletedPromiseResolve =
+        resolve;
+    }
+  );
+
+let pushTokenPromise =
+  null;
+
 
 let installConfirmed = false;
 
@@ -320,6 +352,12 @@ const pushBtn =
     "pushBtn"
   );
 
+
+const retrySecurityBtn =
+  document.getElementById(
+    "retrySecurityBtn"
+  );
+
 const pushStatus =
   document.getElementById(
     "pushStatus"
@@ -357,6 +395,63 @@ function showCard(card){
   window.scrollTo(
     0,
     0
+  );
+}
+
+
+function getSecurityErrorMessage(error){
+
+  const message =
+    String(
+      error?.message || error || ""
+    );
+
+  if(
+    /denied|차단|permission/i.test(
+      message
+    )
+  ){
+    return "알림이 차단되어 있습니다.";
+  }
+
+  if(
+    /설치창|install|브라우저|Chrome|삼성 인터넷/i.test(
+      message
+    )
+  ){
+    return "앱 설치가 차단되어 있습니다.";
+  }
+
+  return "";
+}
+
+
+function showSecurityRetry(message){
+
+  setStatus(
+    pushStatus,
+    message,
+    "error"
+  );
+
+  retrySecurityBtn.classList.remove(
+    "hidden"
+  );
+
+  pushBtn.classList.add(
+    "hidden"
+  );
+}
+
+
+function hideSecurityRetry(){
+
+  retrySecurityBtn.classList.add(
+    "hidden"
+  );
+
+  pushBtn.classList.remove(
+    "hidden"
   );
 }
 
@@ -767,19 +862,16 @@ window.addEventListener(
       "1"
     );
 
-    /*
-     * 실제 설치 완료 신호가 확인되면
-     * 즉시 푸시 알림 허용 단계로 이동합니다.
-     */
-    setStatus(
-      installStatus,
-      "앱 설치가 완료되었습니다.",
-      "success"
-    );
+    if(
+      installCompletedPromiseResolve
+    ){
+      installCompletedPromiseResolve(
+        true
+      );
 
-    showCard(
-      pushCard
-    );
+      installCompletedPromiseResolve =
+        null;
+    }
   }
 );
 
@@ -925,11 +1017,11 @@ installBtn.addEventListener(
       true;
 
     installBtn.textContent =
-      "확인 중...";
+      "앱 설치 중...";
 
     setStatus(
       installStatus,
-      "앱 설치를 준비하고 있습니다.",
+      "표시되는 설치창에서 ‘설치’를 눌러 주세요.",
       "waiting"
     );
 
@@ -952,23 +1044,9 @@ installBtn.addEventListener(
         );
       }
 
-      /*
-       * 최초 등록에서는 isInstalledApp()을 설치 완료 판정에 사용하지 않습니다.
-       * 이번 등록 과정에서 실제 appinstalled 이벤트가 발생해야
-       * installConfirmed === true가 됩니다.
-       *
-       * 설치 버튼을 누르는 순간 standalone 상태가 어떻게 보이는지와
-       * 실제 OS 설치 완료 여부를 혼동하지 않기 위해 이 단계에서는
-       * isInstalledApp() 검사를 하지 않습니다.
-       */
-
       const browser =
         getBrowserInfo();
 
-      /*
-       * 앱 내부 브라우저에서는 설치 이벤트가 정상적으로
-       * 발생하지 않을 수 있으므로 설치된 것으로 처리하지 않습니다.
-       */
       if(
         browser.inApp
       ){
@@ -977,20 +1055,8 @@ installBtn.addEventListener(
         );
       }
 
-      prepareServiceWorker()
-        .catch(
-          error =>
-            console.warn(
-              "서비스워커 사전 준비:",
-              error
-            )
-        );
-
-      /*
-       * 정상 동작본과 동일하게
-       * 버튼을 누른 시점에도 beforeinstallprompt를 다시 기다립니다.
-       */
       const promptEvent =
+        deferredInstallPrompt ||
         await waitForInstallPrompt(
           1500
         );
@@ -999,18 +1065,9 @@ installBtn.addEventListener(
         !promptEvent
       ){
         throw new Error(
-          "앱 설치창을 불러오지 못했습니다. Chrome 또는 삼성 인터넷에서 다시 시도해 주세요."
+          "앱 설치창을 불러오지 못했습니다. 다시 시도해 주세요."
         );
       }
-
-      installBtn.textContent =
-        "앱 설치 중...";
-
-      setStatus(
-        installStatus,
-        "표시되는 설치창에서 ‘설치’를 눌러 주세요.",
-        "waiting"
-      );
 
       await promptEvent.prompt();
 
@@ -1030,30 +1087,18 @@ installBtn.addEventListener(
       }
 
       /*
-       * 중요:
-       * 여기서는 푸시 단계로 이동하지 않습니다.
-       * 실제 appinstalled 이벤트가 발생해야만
-       * 위 appinstalled 핸들러가 pushCard를 표시합니다.
+       * 설치 승인 직후 즉시 푸시 허용 화면으로 이동합니다.
+       * 실제 앱 설치는 Android가 뒤에서 계속 진행합니다.
        */
-      setStatus(
-        installStatus,
-        "앱을 설치하고 있습니다.",
-        "waiting"
+      showCard(
+        pushCard
       );
 
-      installBtn.textContent =
-        "앱 설치 중...";
-
-      /*
-       * 여기서는 더 이상 5초 타이머로 설치 실패를 판정하지 않습니다.
-       *
-       * 사용자가 [설치]를 승인하면 이 핸들러는 여기서 끝납니다.
-       * 실제 설치 완료 여부는 window의 appinstalled 이벤트에서만
-       * installConfirmed=true로 확정하고 pushCard로 이동합니다.
-       *
-       * 따라서 WebAPK 생성이나 Android 설치 처리에 시간이 더 걸려도
-       * 5초 때문에 설치 실패로 잘못 처리하지 않습니다.
-       */
+      setStatus(
+        pushStatus,
+        "푸시 알림을 허용해 주세요.",
+        "waiting"
+      );
 
     }catch(error){
 
@@ -1087,16 +1132,19 @@ pushBtn.addEventListener(
   "click",
   async () => {
 
+    hideSecurityRetry();
+
     pushBtn.disabled =
       true;
 
+    pushBtn.textContent =
+      "등록 진행 중...";
 
     setStatus(
       pushStatus,
-      "푸시 알림을 등록하고 있습니다.",
+      "등록 중입니다. 완료될 때까지 화면을 닫지 마세요.",
       "waiting"
     );
-
 
     try{
 
@@ -1107,36 +1155,15 @@ pushBtn.addEventListener(
           ) || "null"
         );
 
-
       if(
         !pending ||
         !pending.qr_code ||
         !pending.owner_phone
       ){
-
         throw new Error(
           "등록 정보를 찾을 수 없습니다."
         );
       }
-
-
-      /*
-       * 철칙:
-       * 이번 최초 등록 과정에서 appinstalled 이벤트가 발생하여
-       * installConfirmed === true 가 되기 전에는
-       * 푸시 등록 및 서버 최종 등록을 절대 진행하지 않습니다.
-       *
-       * isInstalledApp() 값만으로는 통과시키지 않습니다.
-       */
-      if(
-        !installConfirmed
-      ){
-
-        throw new Error(
-          "앱 설치 완료가 확인되지 않았습니다. 앱 설치 단계부터 다시 진행해 주세요."
-        );
-      }
-
 
       if(
         !(
@@ -1144,98 +1171,105 @@ pushBtn.addEventListener(
           in window
         )
       ){
-
         throw new Error(
           "이 기기에서는 알림을 지원하지 않습니다."
         );
       }
 
-
       if(
         Notification.permission ===
         "denied"
       ){
-
         throw new Error(
           "알림 권한이 차단되어 있습니다."
         );
       }
 
-
       if(
         Notification.permission !==
         "granted"
       ){
-
         const permission =
           await Notification
             .requestPermission();
-
 
         if(
           permission !==
           "granted"
         ){
-
           throw new Error(
             "푸시 알림을 허용해 주세요."
           );
         }
       }
 
+      /*
+       * 푸시 토큰 발급을 즉시 시작합니다.
+       * 동시에 Android의 앱 설치 완료(appinstalled)를 기다립니다.
+       */
+      pushTokenPromise =
+        (async () => {
+
+          if(
+            !firebase.apps.length
+          ){
+            firebase.initializeApp(
+              FIREBASE_CONFIG
+            );
+          }
+
+          const registration =
+            await prepareServiceWorker();
+
+          const messaging =
+            firebase.messaging();
+
+          const token =
+            await messaging.getToken({
+              vapidKey:
+                VAPID_KEY,
+
+              serviceWorkerRegistration:
+                registration
+            });
+
+          if(
+            !token
+          ){
+            throw new Error(
+              "푸시 토큰을 발급하지 못했습니다."
+            );
+          }
+
+          return token;
+        })();
 
       /*
-       * Firebase 시작
+       * 설치가 이미 완료된 경우에는 즉시 통과합니다.
+       * 아직 설치 중이면 appinstalled가 올 때까지 자동 대기합니다.
        */
+      const installPromise =
+        installConfirmed ||
+        localStorage.getItem(
+          INSTALL_CONFIRMED_KEY
+        ) === "1"
+          ? Promise.resolve(
+              true
+            )
+          : installCompletedPromise;
 
-      if(
-        !firebase.apps.length
-      ){
-
-        firebase.initializeApp(
-          FIREBASE_CONFIG
-        );
-      }
-
-
-      const registration =
-        await prepareServiceWorker();
-
-
-      const messaging =
-        firebase.messaging();
-
-
-      const token =
-        await messaging.getToken({
-          vapidKey:
-            VAPID_KEY,
-
-          serviceWorkerRegistration:
-            registration
-        });
-
-
-      if(
-        !token
-      ){
-
-        throw new Error(
-          "푸시 토큰을 발급하지 못했습니다."
-        );
-      }
-
+      const [
+        token
+      ] =
+        await Promise.all([
+          pushTokenPromise,
+          installPromise
+        ]);
 
       /*
-       * =================================================
-       * 여기에서 처음으로
-       * 자동차 QR 최종 등록완료 처리
-       *
-       * 앱 설치 + 푸시 허용 + 토큰 발급
-       * 모두 성공해야 register 실행
-       * =================================================
+       * 앱 설치 완료 + 푸시 토큰 발급이 둘 다 끝난 뒤에만
+       * 자동차 QR을 서버에 최종 등록합니다.
        */
-
       await callApi({
         action:
           "register",
@@ -1259,11 +1293,6 @@ pushBtn.addEventListener(
           navigator.userAgent
       });
 
-
-      /*
-       * 최종 등록 성공 후만
-       * 임시 등록정보 제거
-       */
       localStorage.removeItem(
         PENDING_KEY
       );
@@ -1272,24 +1301,106 @@ pushBtn.addEventListener(
         INSTALL_CONFIRMED_KEY
       );
 
+      localStorage.setItem(
+        COMPLETED_KEY_PREFIX +
+          pending.qr_code,
+        "1"
+      );
 
       showCard(
         completeCard
       );
 
-
     }catch(error){
 
-      setStatus(
-        pushStatus,
-        error.message ||
-        "푸시 알림 등록에 실패했습니다.",
-        "error"
-      );
+      const securityMessage =
+        getSecurityErrorMessage(
+          error
+        );
 
+      if(
+        securityMessage
+      ){
+        showSecurityRetry(
+          securityMessage
+        );
+      }else{
+        setStatus(
+          pushStatus,
+          error instanceof Error
+            ? error.message
+            : "등록에 실패했습니다.",
+          "error"
+        );
+
+        pushBtn.disabled =
+          false;
+
+        pushBtn.textContent =
+          "푸시 알림 허용";
+      }
+    }
+  }
+);
+
+
+retrySecurityBtn.addEventListener(
+  "click",
+  async () => {
+
+    retrySecurityBtn.disabled =
+      true;
+
+    retrySecurityBtn.textContent =
+      "확인 중...";
+
+    try{
+
+      if(
+        !(
+          "Notification"
+          in window
+        )
+      ){
+        throw new Error(
+          "이 기기에서는 알림을 지원하지 않습니다."
+        );
+      }
+
+      if(
+        Notification.permission ===
+        "denied"
+      ){
+        setStatus(
+          pushStatus,
+          "알림이 차단되어 있습니다.",
+          "error"
+        );
+
+        return;
+      }
+
+      hideSecurityRetry();
 
       pushBtn.disabled =
         false;
+
+      pushBtn.textContent =
+        "푸시 알림 허용";
+
+      setStatus(
+        pushStatus,
+        "설정이 확인되었습니다.",
+        "success"
+      );
+
+    }finally{
+
+      retrySecurityBtn.disabled =
+        false;
+
+      retrySecurityBtn.textContent =
+        "다시 확인";
     }
   }
 );
@@ -1302,45 +1413,6 @@ pushBtn.addEventListener(
  */
 (function startAndroidRegistration(){
 
-  let startupPending = null;
-
-  try{
-    startupPending =
-      JSON.parse(
-        localStorage.getItem(
-          PENDING_KEY
-        ) || "null"
-      );
-  }catch(error){
-    startupPending = null;
-  }
-
-  /*
-   * 핵심:
-   * 새 QR을 스캔했는데 이전 테스트의 pending 정보가 남아 있으면
-   * 이전 정보를 즉시 삭제하고 반드시 전화번호 등록부터 다시 시작합니다.
-   */
-  if(
-    startupPending &&
-    startupPending.qr_code &&
-    qrCode &&
-    startupPending.qr_code !== qrCode
-  ){
-    localStorage.removeItem(
-      PENDING_KEY
-    );
-
-    localStorage.removeItem(
-      INSTALL_CONFIRMED_KEY
-    );
-
-    startupPending = null;
-    installConfirmed = false;
-  }
-
-  /*
-   * 현재 URL의 QR이 없으면 오류
-   */
   if(
     !qrCode
   ){
@@ -1355,62 +1427,75 @@ pushBtn.addEventListener(
   }
 
   /*
-   * 같은 QR을 등록하던 중,
-   * 실제 앱 설치 완료 + 설치된 앱 실행 상태일 때만
-   * 푸시 알림 허용 단계로 이어갑니다.
+   * 최종 등록 완료된 QR은 푸시 승인 화면을 다시 열지 않습니다.
    */
   if(
-    isInstalledApp() &&
-    startupPending &&
-    startupPending.qr_code === qrCode &&
     localStorage.getItem(
-      INSTALL_CONFIRMED_KEY
+      COMPLETED_KEY_PREFIX +
+        qrCode
     ) === "1"
   ){
-    installConfirmed =
-      true;
-
-    prepareServiceWorker()
-      .catch(
-        error =>
-          console.warn(
-            "서비스워커 준비:",
-            error
-          )
-      );
-
     showCard(
-      pushCard
+      completeCard
     );
 
     return;
   }
 
+  let startupPending =
+    null;
+
+  try{
+    startupPending =
+      JSON.parse(
+        localStorage.getItem(
+          PENDING_KEY
+        ) || "null"
+      );
+  }catch(error){
+    startupPending =
+      null;
+  }
+
   /*
-   * 같은 QR의 등록 도중 브라우저를 다시 열었거나 새로고침한 경우
-   * 설치 단계부터 이어갑니다.
-   * 다른 QR의 pending은 위에서 이미 제거됩니다.
+   * 다른 QR의 이전 pending은 제거
    */
   if(
     startupPending &&
-    startupPending.qr_code === qrCode &&
-    !isInstalledApp()
+    startupPending.qr_code &&
+    startupPending.qr_code !== qrCode
+  ){
+    localStorage.removeItem(
+      PENDING_KEY
+    );
+
+    localStorage.removeItem(
+      INSTALL_CONFIRMED_KEY
+    );
+
+    startupPending =
+      null;
+
+    installConfirmed =
+      false;
+  }
+
+  /*
+   * 같은 QR 등록 도중이면 설치 단계로 이어갑니다.
+   */
+  if(
+    startupPending &&
+    startupPending.qr_code === qrCode
   ){
     showCard(
       installCard
     );
 
-    setStatus(
-      installStatus,
-      "앱 설치를 진행해 주세요.",
-      "waiting"
-    );
-
     return;
   }
 
   /*
-   * 그 외에는 반드시 전화번호 등록 화면부터 시작
+   * 새 QR은 반드시 전화번호 등록부터 시작
    */
   showCard(
     registerCard
