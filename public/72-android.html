@@ -1089,8 +1089,7 @@ pushBtn.addEventListener(
      * 설치 완료 상태를 여기서 다시 초기화하지 않습니다.
      */
     appInstalledAfterPush =
-      installConfirmed ||
-      localStorage.getItem(INSTALL_CONFIRMED_KEY) === "1";
+      installConfirmed;
 
     pushBtn.disabled =
       true;
