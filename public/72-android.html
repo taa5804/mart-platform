@@ -772,25 +772,7 @@ window.addEventListener(
       !registrationFinished
     ){
       appInstalledAfterPush = true;
-
-      if(
-        registrationFinished
-      ){
-        return;
-      }
-
-      registrationFinished = true;
-      registrationInProgress = false;
-
-      localStorage.removeItem(PENDING_KEY);
-      localStorage.removeItem(INSTALL_CONFIRMED_KEY);
-
-      localStorage.setItem(
-        COMPLETED_KEY_PREFIX + qrCode,
-        "1"
-      );
-
-      showCard(completeCard);
+      finishRegistrationIfReady();
     }
   }
 );
@@ -1350,6 +1332,7 @@ pushBtn.addEventListener(
        * 등록 완료 화면의 기준은 오직 이번 appinstalled 신호입니다.
        */
       serverRegistrationDone = true;
+      finishRegistrationIfReady();
 
 
     }catch(error){
@@ -1414,21 +1397,6 @@ pushBtn.addEventListener(
       errorCard
     );
 
-    return;
-  }
-
-  /*
-   * 이 QR은 이미 등록 완료됨:
-   * 푸시 승인 화면을 다시 보여주지 않습니다.
-   */
-  if(
-    localStorage.getItem(
-      COMPLETED_KEY_PREFIX + qrCode
-    ) === "1"
-  ){
-    registrationFinished = true;
-    registrationInProgress = false;
-    showCard(completeCard);
     return;
   }
 
