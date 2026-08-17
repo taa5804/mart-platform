@@ -781,13 +781,17 @@ function prepareServiceWorker(){
 
       }else{
 
-        try{
-          await registration.update();
-        }catch(error){
-          console.warn(
-            error
+        /*
+         * 기존 서비스워커 업데이트는 등록 진행을 막지 않도록
+         * 백그라운드에서 실행합니다.
+         */
+        registration.update()
+          .catch(
+            error =>
+              console.warn(
+                error
+              )
           );
-        }
       }
 
 
@@ -873,6 +877,17 @@ window.addEventListener(
   }
 );
 
+
+/*
+ * Firebase 앱 초기화도 페이지가 열리는 즉시 미리 완료합니다.
+ */
+if(
+  !firebase.apps.length
+){
+  firebase.initializeApp(
+    FIREBASE_CONFIG
+  );
+}
 
 /*
  * =====================================================
@@ -1025,6 +1040,13 @@ installBtn.addEventListener(
 
     try{
 
+      const registrationStartedAt =
+        performance.now();
+
+      console.log(
+        "[자동차QR] 푸시 등록 시작"
+      );
+
       const pending =
         JSON.parse(
           localStorage.getItem(
@@ -1140,7 +1162,7 @@ pushBtn.addEventListener(
 
     setStatus(
       pushStatus,
-      "앱 설치 및 차량등록이 진행 중입니다. 화면을 닫지 마세요.",
+      "완료까지 10초정도 걸립니다.\n화면을 닫으면 등록이 완료되지 않읍니다.\n앱설치 및 차량등록이 진행중입니다.",
       "waiting"
     );
 
@@ -1250,10 +1272,21 @@ pushBtn.addEventListener(
       const token =
         await pushTokenPromise;
 
+      console.log(
+        "[자동차QR] FCM 토큰 완료:",
+        Math.round(
+          performance.now() -
+          registrationStartedAt
+        ) + "ms"
+      );
+
       /*
        * 푸시 토큰 발급이 끝나면 즉시
        * 자동차 QR을 서버에 최종 등록합니다.
        */
+      const serverStartedAt =
+        performance.now();
+
       await callApi({
         action:
           "register",
@@ -1276,6 +1309,19 @@ pushBtn.addEventListener(
         user_agent:
           navigator.userAgent
       });
+
+      console.log(
+        "[자동차QR] 서버 등록 완료:",
+        Math.round(
+          performance.now() -
+          serverStartedAt
+        ) + "ms",
+        "전체:",
+        Math.round(
+          performance.now() -
+          registrationStartedAt
+        ) + "ms"
+      );
 
       localStorage.removeItem(
         PENDING_KEY
