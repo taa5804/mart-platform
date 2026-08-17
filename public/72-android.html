@@ -224,7 +224,7 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260817-ANDROID-APPINSTALLED-THEN-COMPLETE-FINAL-01";
+  "20260817-ANDROID-REVIEWED-3X-FINAL-01";
 
 
 const params =
@@ -763,16 +763,14 @@ window.addEventListener(
     deferredInstallPrompt = null;
 
     /*
-     * 실제 앱 설치 완료 신호가 온 시점.
-     * 휴대폰의 "앱이 설치됨" 시스템 표시가 먼저 보인 뒤
-     * 등록완료 화면으로 전환합니다.
+     * 이번 등록에서 실제 앱 설치 완료 신호가 들어온 시점.
+     * 휴대폰의 "앱이 설치됨" 표시가 먼저 보이도록
+     * 0.5초 후 등록 완료 화면으로 전환합니다.
      */
     if(
       registrationInProgress &&
       !registrationFinished
     ){
-      appInstalledAfterPush = true;
-
       setTimeout(
         () => {
 
@@ -1081,33 +1079,6 @@ installBtn.addEventListener(
 
 let registrationInProgress = false;
 let registrationFinished = false;
-let serverRegistrationDone = false;
-let appInstalledAfterPush = false;
-
-function finishRegistrationIfReady(){
-
-  if(
-    registrationFinished ||
-    !registrationInProgress ||
-    !appInstalledAfterPush ||
-    !serverRegistrationDone
-  ){
-    return;
-  }
-
-  registrationFinished = true;
-  registrationInProgress = false;
-
-  localStorage.removeItem(PENDING_KEY);
-  localStorage.removeItem(INSTALL_CONFIRMED_KEY);
-
-  localStorage.setItem(
-    COMPLETED_KEY_PREFIX + qrCode,
-    "1"
-  );
-
-  showCard(completeCard);
-}
 
 
 window.addEventListener(
@@ -1135,8 +1106,6 @@ pushBtn.addEventListener(
     }
 
     registrationInProgress = true;
-    serverRegistrationDone = false;
-    appInstalledAfterPush = false;
 
     /*
      * 과거 설치 확인값은 이번 완료판정에 사용하지 않습니다.
@@ -1349,20 +1318,14 @@ pushBtn.addEventListener(
         user_agent:
           navigator.userAgent
       });
-
-
       /*
-       * 서버 등록 성공 여부는 기록만 합니다.
-       * 등록 완료 화면의 기준은 오직 이번 appinstalled 신호입니다.
+       * 서버 등록 성공은 완료 화면 전환 조건으로 사용하지 않습니다.
        */
-      serverRegistrationDone = true;
 
 
     }catch(error){
 
       registrationInProgress = false;
-      serverRegistrationDone = false;
-      appInstalledAfterPush = false;
 
       const pushTitle =
         pushCard.querySelector(
@@ -1424,19 +1387,12 @@ pushBtn.addEventListener(
   }
 
   /*
-   * 이 QR은 이미 등록 완료됨:
-   * 푸시 승인 화면을 다시 보여주지 않습니다.
+   * 시작할 때 과거 완료 이력으로 등록 완료 화면을 띄우지 않습니다.
+   * 이번 등록의 새 appinstalled 신호만 완료 화면 전환 기준입니다.
    */
-  if(
-    localStorage.getItem(
-      COMPLETED_KEY_PREFIX + qrCode
-    ) === "1"
-  ){
-    registrationFinished = true;
-    registrationInProgress = false;
-    showCard(completeCard);
-    return;
-  }
+  localStorage.removeItem(
+    COMPLETED_KEY_PREFIX + qrCode
+  );
 
   let startupPending =
     null;
