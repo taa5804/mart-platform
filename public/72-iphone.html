@@ -623,7 +623,7 @@ button:disabled{
 
       setStatus(
         installStatus,
-        "설치 후 홈 화면의 ‘우리가게’ 앱을 눌러 주세요.",
+        "등록을 완료하려면 홈 화면에 추가된 '우리가게' 앱을 눌러 실행해 주세요.",
         "waiting"
       );
     }
@@ -634,11 +634,11 @@ button:disabled{
     async () => {
       pushBtn.disabled = true;
       pushBtn.textContent =
-        "푸시 알림 등록 중...";
+        "등록 진행중";
 
       setStatus(
         pushStatus,
-        "푸시 알림을 등록하고 있습니다.",
+        "등록 진행중",
         "waiting"
       );
 
