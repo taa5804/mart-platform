@@ -773,7 +773,7 @@ window.addEventListener(
 
     setStatus(
       installStatus,
-      "앱 추가가 완료되었습니다.",
+      "앱 설치가 확인되었습니다.",
       "success"
     );
 
@@ -1091,6 +1091,9 @@ pushBtn.addEventListener(
     registrationInProgress =
       true;
 
+    const registrationStartedAt =
+      Date.now();
+
     pushBtn.disabled =
       true;
 
@@ -1309,6 +1312,23 @@ pushBtn.addEventListener(
        * 서버의 최종 register 성공 응답까지 받은 뒤에만
        * 등록완료 화면으로 전환합니다.
        */
+      /*
+       * 등록 완료 화면은 푸시 버튼을 누른 직후 미리 띄우지 않습니다.
+       * 휴대폰의 앱 설치 완료 표시가 나올 시간을 확보하기 위해
+       * 등록 진행중 화면을 최소 10초 유지한 뒤 완료 화면으로 전환합니다.
+       */
+      const elapsed =
+        Date.now() - registrationStartedAt;
+
+      const remaining =
+        Math.max(0, 10000 - elapsed);
+
+      if(remaining > 0){
+        await new Promise(
+          resolve => setTimeout(resolve, remaining)
+        );
+      }
+
       registrationInProgress =
         false;
 
