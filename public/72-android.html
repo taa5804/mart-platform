@@ -234,7 +234,7 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260817-ANDROID-REMOVE-INSTALL-PROMISE-01";
+  "20260817-ANDROID-NO-PROMISE-DIRECT-FCM-01";
 
 
 const params =
@@ -266,10 +266,6 @@ const COMPLETED_KEY_PREFIX =
 
 
 let deferredInstallPrompt = null;
-
-let pushTokenPromise =
-  null;
-
 
 let installConfirmed = false;
 
@@ -1180,57 +1176,42 @@ pushBtn.addEventListener(
       }
 
       /*
-       * 푸시 토큰 발급을 즉시 시작합니다.
-       * 동시에 Android의 앱 설치 완료(appinstalled)를 기다립니다.
+       * 예전 정상 동작 방식:
+       * Promise 중첩 없이 FCM 토큰을 직접 발급합니다.
        */
-      pushTokenPromise =
-        (async () => {
+      if(
+        !firebase.apps.length
+      ){
+        firebase.initializeApp(
+          FIREBASE_CONFIG
+        );
+      }
 
-          if(
-            !firebase.apps.length
-          ){
-            firebase.initializeApp(
-              FIREBASE_CONFIG
-            );
-          }
+      const registration =
+        await prepareServiceWorker();
 
-          const registration =
-            await prepareServiceWorker();
+      const messaging =
+        firebase.messaging();
 
-          const messaging =
-            firebase.messaging();
-
-          const token =
-            await messaging.getToken({
-              vapidKey:
-                VAPID_KEY,
-
-              serviceWorkerRegistration:
-                registration
-            });
-
-          if(
-            !token
-          ){
-            throw new Error(
-              "푸시 토큰을 발급하지 못했습니다."
-            );
-          }
-
-          return token;
-        })();
-
-      /*
-       * installCompletedPromise 대기 구조를 제거합니다.
-       * pushTokenPromise는 그대로 유지하고
-       * FCM 토큰 발급이 끝나면 바로 서버 최종 등록을 진행합니다.
-       */
       const token =
-        await pushTokenPromise;
+        await messaging.getToken({
+          vapidKey:
+            VAPID_KEY,
+
+          serviceWorkerRegistration:
+            registration
+      });
+
+      if(
+        !token
+      ){
+        throw new Error(
+          "푸시 토큰을 발급하지 못했습니다."
+        );
+      }
 
       /*
-       * 푸시 토큰 발급이 끝난 뒤
-       * 자동차 QR을 서버에 최종 등록합니다.
+       * FCM 토큰 발급 후 바로 자동차 QR을 서버에 최종 등록합니다.
        */
       await callApi({
         action:
