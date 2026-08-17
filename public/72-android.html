@@ -224,7 +224,7 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260817-ANDROID-REVIEWED-3X-FINAL-01";
+  "20260817-ANDROID-APPINSTALLED-THEN-COMPLETE-FINAL-01";
 
 
 const params =
@@ -763,38 +763,25 @@ window.addEventListener(
     deferredInstallPrompt = null;
 
     /*
-     * 이번 등록에서 실제 앱 설치 완료 신호가 들어온 시점.
-     * 휴대폰의 "앱이 설치됨" 표시가 먼저 보이도록
-     * 0.5초 후 등록 완료 화면으로 전환합니다.
+     * 실제 앱 설치 완료 신호가 들어온 경우에만 등록 완료.
+     * 푸시 버튼 클릭 자체로는 절대 등록 완료하지 않습니다.
      */
     if(
       registrationInProgress &&
       !registrationFinished
     ){
-      setTimeout(
-        () => {
+      registrationFinished = true;
+      registrationInProgress = false;
 
-          if(
-            registrationFinished
-          ){
-            return;
-          }
+      localStorage.removeItem(PENDING_KEY);
+      localStorage.removeItem(INSTALL_CONFIRMED_KEY);
 
-          registrationFinished = true;
-          registrationInProgress = false;
-
-          localStorage.removeItem(PENDING_KEY);
-          localStorage.removeItem(INSTALL_CONFIRMED_KEY);
-
-          localStorage.setItem(
-            COMPLETED_KEY_PREFIX + qrCode,
-            "1"
-          );
-
-          showCard(completeCard);
-        },
-        500
+      localStorage.setItem(
+        COMPLETED_KEY_PREFIX + qrCode,
+        "1"
       );
+
+      showCard(completeCard);
     }
   }
 );
@@ -1318,9 +1305,7 @@ pushBtn.addEventListener(
         user_agent:
           navigator.userAgent
       });
-      /*
-       * 서버 등록 성공은 완료 화면 전환 조건으로 사용하지 않습니다.
-       */
+      /* 서버 등록 성공. 화면은 계속 등록 진행중 상태를 유지합니다. */
 
 
     }catch(error){
@@ -1387,8 +1372,8 @@ pushBtn.addEventListener(
   }
 
   /*
-   * 시작할 때 과거 완료 이력으로 등록 완료 화면을 띄우지 않습니다.
-   * 이번 등록의 새 appinstalled 신호만 완료 화면 전환 기준입니다.
+   * 이번 등록에서는 과거 완료값으로 등록 완료 화면을 띄우지 않습니다.
+   * 실제 새 appinstalled 신호가 들어와야 등록 완료됩니다.
    */
   localStorage.removeItem(
     COMPLETED_KEY_PREFIX + qrCode
