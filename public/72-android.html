@@ -224,7 +224,7 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260817-ANDROID-APPINSTALLED-IMMEDIATE-COMPLETE-01";
+  "20260817-ANDROID-APPINSTALLED-THEN-COMPLETE-FINAL-01";
 
 
 const params =
@@ -763,28 +763,40 @@ window.addEventListener(
     deferredInstallPrompt = null;
 
     /*
-     * 완료 기준:
-     * 푸시 알림 버튼을 누른 뒤 이번 설치에서
-     * 새로 들어온 appinstalled 신호가 오는 그 순간
-     * 바로 등록 완료 화면을 표시하고 끝냅니다.
+     * 실제 앱 설치 완료 신호가 온 시점.
+     * 휴대폰의 "앱이 설치됨" 시스템 표시가 먼저 보인 뒤
+     * 등록완료 화면으로 전환합니다.
      */
     if(
       registrationInProgress &&
       !registrationFinished
     ){
       appInstalledAfterPush = true;
-      registrationFinished = true;
-      registrationInProgress = false;
 
-      localStorage.removeItem(PENDING_KEY);
-      localStorage.removeItem(INSTALL_CONFIRMED_KEY);
+      setTimeout(
+        () => {
 
-      localStorage.setItem(
-        COMPLETED_KEY_PREFIX + qrCode,
-        "1"
+          if(
+            registrationFinished
+          ){
+            return;
+          }
+
+          registrationFinished = true;
+          registrationInProgress = false;
+
+          localStorage.removeItem(PENDING_KEY);
+          localStorage.removeItem(INSTALL_CONFIRMED_KEY);
+
+          localStorage.setItem(
+            COMPLETED_KEY_PREFIX + qrCode,
+            "1"
+          );
+
+          showCard(completeCard);
+        },
+        500
       );
-
-      showCard(completeCard);
     }
   }
 );
