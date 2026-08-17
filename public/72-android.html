@@ -89,6 +89,7 @@ button:disabled{
   margin-top:14px;
   font-weight:700;
   line-height:1.6;
+  white-space:pre-line;
 }
 
 .error{
@@ -1242,29 +1243,15 @@ pushBtn.addEventListener(
         })();
 
       /*
-       * 설치가 이미 완료된 경우에는 즉시 통과합니다.
-       * 아직 설치 중이면 appinstalled가 올 때까지 자동 대기합니다.
+       * 설치창에서 사용자가 '설치'를 승인한 상태이므로
+       * Android의 appinstalled 완료 이벤트는 더 이상 기다리지 않습니다.
+       * 푸시 토큰이 발급되는 즉시 자동차 QR 최종 등록을 진행합니다.
        */
-      const installPromise =
-        installConfirmed ||
-        localStorage.getItem(
-          INSTALL_CONFIRMED_KEY
-        ) === "1"
-          ? Promise.resolve(
-              true
-            )
-          : installCompletedPromise;
-
-      const [
-        token
-      ] =
-        await Promise.all([
-          pushTokenPromise,
-          installPromise
-        ]);
+      const token =
+        await pushTokenPromise;
 
       /*
-       * 앱 설치 완료 + 푸시 토큰 발급이 둘 다 끝난 뒤에만
+       * 푸시 토큰 발급이 끝나면 즉시
        * 자동차 QR을 서버에 최종 등록합니다.
        */
       await callApi({
