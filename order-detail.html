@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7b4aae">
+
+<title>주문시스템 상세보기 | 우리아파트 마트 플랫폼</title>
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  width:100%;
+  min-height:100%;
+}
+
+body{
+  background:#f7f3fb;
+  color:#2f2540;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;
+  line-height:1.75;
+}
+
+.wrap{
+  width:100%;
+  max-width:820px;
+  margin:0 auto;
+  padding:18px 14px 60px;
+}
+
+.top{
+  background:linear-gradient(135deg,#6f3f9f,#a565d2);
+  color:#fff;
+  border-radius:22px;
+  padding:30px 22px;
+  box-shadow:0 12px 30px rgba(111,63,159,.18);
+}
+
+.brand{
+  font-size:14px;
+  font-weight:800;
+  margin-bottom:7px;
+  opacity:.9;
+}
+
+.top h1{
+  margin:0;
+  font-size:28px;
+  line-height:1.4;
+  letter-spacing:-1px;
+}
+
+.top p{
+  margin:10px 0 0;
+  font-size:15px;
+  opacity:.95;
+}
+
+.card{
+  margin-top:14px;
+  background:#fff;
+  border:1px solid #e6dcf0;
+  border-radius:18px;
+  padding:22px 20px;
+  box-shadow:0 6px 18px rgba(83,53,112,.055);
+}
+
+.card h2{
+  margin:0 0 11px;
+  color:#71409d;
+  font-size:20px;
+  line-height:1.45;
+  letter-spacing:-.5px;
+}
+
+.card p{
+  margin:8px 0;
+  font-size:16px;
+}
+
+.flow{
+  margin:16px 0;
+  padding:15px 13px;
+  background:#f3ebfa;
+  border-radius:13px;
+  color:#71409d;
+  text-align:center;
+  font-size:15px;
+  font-weight:900;
+  line-height:1.7;
+}
+
+.order-box{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin:18px 0;
+}
+
+.order-step{
+  background:#f6effb;
+  border:1px solid #e3d4ef;
+  border-radius:13px;
+  padding:15px 8px;
+  text-align:center;
+  color:#71409d;
+  font-size:14px;
+  font-weight:800;
+}
+
+.order-step strong{
+  display:block;
+  font-size:20px;
+  margin-bottom:4px;
+}
+
+.highlight{
+  margin-top:15px;
+  padding:16px;
+  background:#fff7dd;
+  border:1px solid #eddc97;
+  border-radius:14px;
+  color:#725d08;
+  text-align:center;
+  font-weight:800;
+}
+
+.final{
+  margin-top:16px;
+  padding:22px 18px;
+  background:linear-gradient(135deg,#f0e5f8,#faf6fd);
+  border:1px solid #ddc9ec;
+  border-radius:18px;
+  text-align:center;
+  font-size:17px;
+  font-weight:800;
+  color:#68408b;
+}
+
+.back{
+  margin-top:22px;
+  text-align:center;
+}
+
+.back button{
+  width:100%;
+  max-width:300px;
+  height:48px;
+  border:0;
+  border-radius:13px;
+  background:#12394d;
+  color:#fff;
+  font-size:15px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.footer{
+  margin-top:26px;
+  text-align:center;
+  color:#8d7a9c;
+  font-size:13px;
+}
+
+@media(max-width:600px){
+
+  .wrap{
+    padding:12px 10px 45px;
+  }
+
+  .top{
+    border-radius:18px;
+    padding:25px 18px;
+  }
+
+  .top h1{
+    font-size:24px;
+  }
+
+  .card{
+    padding:19px 16px;
+    border-radius:16px;
+  }
+
+  .card h2{
+    font-size:18px;
+  }
+
+  .card p{
+    font-size:15px;
+  }
+
+  .flow{
+    font-size:14px;
+  }
+
+  .order-box{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+
+    <div class="brand">
+      우리아파트 마트 플랫폼
+    </div>
+
+    <h1>
+      고객이 상품을 보고 바로 주문할 수 있습니다
+    </h1>
+
+    <p>
+      상품에 관심이 생긴 순간 실제 주문으로 연결합니다.
+    </p>
+
+  </header>
+
+
+  <section class="card">
+
+    <p>
+      주문시스템은 고객이 마트의 디지털 화면에서 원하는 상품을 확인한 후
+      <strong>간편하게 주문할 수 있도록 연결하는 시스템</strong>입니다.
+    </p>
+
+    <p>
+      상품을 확인한 고객이 별도로 전화하거나 상품명을 다시 설명할 필요 없이
+      <strong>원하는 상품과 수량을 선택하여 바로 주문</strong>할 수 있습니다.
+    </p>
+
+  </section>
+
+
+  <section class="card">
+
+    <h2>
+      복잡하지 않은 간편한 주문
+    </h2>
+
+    <p>
+      고객이 쉽게 사용할 수 있도록 주문과정을 간단하게 구성합니다.
+    </p>
+
+    <div class="order-box">
+
+      <div class="order-step">
+        <strong>1</strong>
+        상품 선택
+      </div>
+
+      <div class="order-step">
+        <strong>2</strong>
+        수량 선택
+      </div>
+
+      <div class="order-step">
+        <strong>3</strong>
+        주문 확인
+      </div>
+
+      <div class="order-step">
+        <strong>4</strong>
+        주문 완료
+      </div>
+
+    </div>
+
+    <div class="flow">
+      상품 선택 → 수량 선택 → 주문 확인 → 주문 완료
+    </div>
+
+    <p>
+      특가상품, 행사상품, 공동구매상품, 일반상품 등 디지털 화면에 등록된 상품을 선택하여 주문할 수 있습니다.
+    </p>
+
+  </section>
+
+
+  <section class="card">
+
+    <h2>
+      주문이 들어오면 마트에서 바로 확인
+    </h2>
+
+    <p>
+      고객의 주문이 접수되면
+      <strong>마트에서 주문내용을 바로 확인</strong>할 수 있습니다.
+    </p>
+
+    <p>
+      어떤 고객이 어떤 상품을 몇 개 주문했는지 주문내역을 확인할 수 있어
+      전화로 주문을 받고 다시 적어두는 번거로움을 줄일 수 있습니다.
+    </p>
+
+  </section>
+
+
+  <section class="card">
+
+    <h2>
+      공동구매도 주문으로 연결
+    </h2>
+
+    <p>
+      공동구매 상품도 고객이 디지털 화면에서 확인하고 바로 신청할 수 있습니다.
+    </p>
+
+    <p>
+      마트는
+      <strong>공동구매 신청수량을 실시간으로 확인</strong>할 수 있어
+      고객의 수요를 파악하고 상품 준비와 판매계획을 세우는 데 활용할 수 있습니다.
+    </p>
+
+  </section>
+
+
+  <section class="card">
+
+    <h2>
+      고객의 구매 기회를 놓치지 않습니다
+    </h2>
+
+    <p>
+      고객이 푸시알림을 통해 특가나 행사상품을 확인했을 때
+      <strong>관심이 생긴 순간 바로 주문할 수 있도록 연결</strong>하는 것이 주문시스템의 핵심입니다.
+    </p>
+
+    <div class="flow">
+      푸시알림 → 상품 확인 → 주문 → 구매
+    </div>
+
+    <div class="highlight">
+      고객의 관심을 실제 구매로 연결합니다.
+    </div>
+
+    <p>
+      고객은 편리하게 주문하고, 마트는 고객의 관심을 실제 구매로 연결하여
+      <strong>상품 판매와 매출을 높일 수 있습니다.</strong>
+    </p>
+
+  </section>
+
+
+  <div class="final">
+    고객이 상품을 확인한 순간
+    <strong>간편하게 주문까지 연결할 수 있습니다.</strong>
+  </div>
+
+
+  <div class="back">
+    <button type="button" onclick="history.back();">
+      이전 화면으로
+    </button>
+  </div>
+
+
+  <div class="footer">
+    우리아파트 마트 플랫폼
+  </div>
+
+</div>
+
+</body>
+</html>
