@@ -175,6 +175,7 @@ button:disabled{
   font-size:13px;
   font-weight:700;
   color:#d93025;
+  line-height:1.6;
 }
 
 @media(max-width:600px){
@@ -206,7 +207,6 @@ button:disabled{
   </div>
 
 
-  <!-- 기본정보 -->
   <div class="card">
 
     <h2>1. 마트 기본정보</h2>
@@ -260,7 +260,6 @@ button:disabled{
   </div>
 
 
-  <!-- 필수서류 -->
   <div class="card">
 
     <h2>2. 필수서류 첨부</h2>
@@ -271,8 +270,6 @@ button:disabled{
 
     <br>
 
-
-    <!-- 사업자등록증 -->
     <div class="upload-box">
 
       <div class="upload-title">
@@ -293,7 +290,6 @@ button:disabled{
     </div>
 
 
-    <!-- 고객 DB -->
     <div class="upload-box">
 
       <div class="upload-title">
@@ -316,7 +312,6 @@ button:disabled{
     </div>
 
 
-    <!-- 매출자료 -->
     <div class="upload-box">
 
       <div class="upload-title">
@@ -341,7 +336,6 @@ button:disabled{
   </div>
 
 
-  <!-- 동의 및 신청 -->
   <div class="card">
 
     <h2>3. 가입 신청</h2>
@@ -373,7 +367,22 @@ button:disabled{
 </div>
 
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
+
+const SUPABASE_URL =
+  "https://wpshlmjjsscmlasqtapa.supabase.co";
+
+const SUPABASE_KEY =
+  "여기에_PUBLISHABLE_KEY_붙여넣기";
+
+const sb =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
 
 const requiredTextFields = [
   "martName",
@@ -385,6 +394,7 @@ const requiredTextFields = [
   "password",
   "email"
 ];
+
 
 requiredTextFields.forEach(function(id){
 
@@ -434,16 +444,83 @@ function checkForm(){
 }
 
 
-function submitSignup(){
+function safeFileName(fileName){
+
+  const dotIndex =
+    fileName.lastIndexOf(".");
+
+  const ext =
+    dotIndex >= 0
+      ? fileName.slice(dotIndex).toLowerCase()
+      : "";
+
+  return (
+    Date.now() +
+    "_" +
+    Math.random()
+      .toString(36)
+      .slice(2,10) +
+    ext
+  );
+
+}
+
+
+async function uploadDocument(
+  userId,
+  folder,
+  file
+){
+
+  const filePath =
+    userId +
+    "/" +
+    folder +
+    "/" +
+    safeFileName(file.name);
+
+
+  const result =
+    await sb
+      .storage
+      .from("mart-signup-documents")
+      .upload(
+        filePath,
+        file,
+        {
+          cacheControl:"3600",
+          upsert:false
+        }
+      );
+
+
+  if(result.error){
+    throw result.error;
+  }
+
+
+  return result.data.path;
+
+}
+
+
+async function submitSignup(){
+
+  const msg =
+    document.getElementById("msg");
+
+  const submitBtn =
+    document.getElementById("submitBtn");
+
 
   const businessFile =
-    document.getElementById("businessFile").files.length;
+    document.getElementById("businessFile").files[0];
 
   const dbFile =
-    document.getElementById("dbFile").files.length;
+    document.getElementById("dbFile").files[0];
 
   const salesFile =
-    document.getElementById("salesFile").files.length;
+    document.getElementById("salesFile").files[0];
 
 
   if(
@@ -452,7 +529,10 @@ function submitSignup(){
     !salesFile
   ){
 
-    document.getElementById("msg").textContent =
+    msg.style.color =
+      "#d93025";
+
+    msg.textContent =
       "필수서류 3개를 모두 업로드해 주세요.";
 
     return;
@@ -460,26 +540,210 @@ function submitSignup(){
   }
 
 
-  document.getElementById("msg").style.color = "#0b7a45";
+  submitBtn.disabled = true;
 
-  document.getElementById("msg").textContent =
-    "필수서류 3개가 확인되었습니다. 가입 신청이 가능합니다.";
+  submitBtn.textContent =
+    "가입 신청 처리 중...";
+
+  msg.style.color =
+    "#68757f";
+
+  msg.textContent =
+    "회원정보와 서류를 등록하고 있습니다.";
 
 
-  /*
-    다음 단계에서 연결할 기능
+  try{
 
-    1. Supabase에 회원정보 저장
-    2. 서류 3개 Storage 업로드
-    3. 가입상태 = 승인대기
-    4. 본사 관리자 가입승인 화면 연결
-    5. 승인 → 이용료 자동계산
-    6. 계좌 + 이용료 자동문자
-    7. 입금확인 → 마트코드 자동발급
-    8. 기존 마트 관리자 자동 활성화
-    9. 다음달 미입금 → 자동 이용정지
-    10. 입금확인 → 자동 재활성화
-  */
+    const martName =
+      document
+        .getElementById("martName")
+        .value
+        .trim();
+
+    const ownerName =
+      document
+        .getElementById("ownerName")
+        .value
+        .trim();
+
+    const businessNo =
+      document
+        .getElementById("businessNo")
+        .value
+        .trim();
+
+    const address =
+      document
+        .getElementById("address")
+        .value
+        .trim();
+
+    const managerName =
+      document
+        .getElementById("managerName")
+        .value
+        .trim();
+
+    const phone =
+      document
+        .getElementById("phone")
+        .value
+        .replace(/\D/g,"");
+
+    const password =
+      document
+        .getElementById("password")
+        .value;
+
+    const email =
+      document
+        .getElementById("email")
+        .value
+        .trim();
+
+
+    /*
+      비밀번호는 mart_members 테이블에
+      저장하지 않고 Supabase Auth가 관리
+    */
+
+    const signupResult =
+      await sb.auth.signUp({
+        email:email,
+        password:password,
+        options:{
+          data:{
+            mart_name:martName,
+            phone:phone
+          }
+        }
+      });
+
+
+    if(signupResult.error){
+      throw signupResult.error;
+    }
+
+
+    if(
+      !signupResult.data ||
+      !signupResult.data.user
+    ){
+      throw new Error(
+        "회원 인증정보 생성에 실패했습니다."
+      );
+    }
+
+
+    const userId =
+      signupResult.data.user.id;
+
+
+    msg.textContent =
+      "필수서류 3개를 업로드하고 있습니다.";
+
+
+    const businessPath =
+      await uploadDocument(
+        userId,
+        "business",
+        businessFile
+      );
+
+
+    const dbPath =
+      await uploadDocument(
+        userId,
+        "db",
+        dbFile
+      );
+
+
+    const salesPath =
+      await uploadDocument(
+        userId,
+        "sales",
+        salesFile
+      );
+
+
+    msg.textContent =
+      "가입정보를 저장하고 있습니다.";
+
+
+    const insertResult =
+      await sb
+        .from("mart_members")
+        .insert({
+
+          auth_user_id:userId,
+
+          mart_name:martName,
+
+          owner_name:ownerName,
+
+          business_no:businessNo,
+
+          address:address,
+
+          manager_name:managerName,
+
+          phone:phone,
+
+          email:email,
+
+          business_file:businessPath,
+
+          db_file:dbPath,
+
+          sales_file:salesPath,
+
+          approval_status:"PENDING",
+
+          payment_status:"WAITING",
+
+          service_status:"PENDING"
+
+        });
+
+
+    if(insertResult.error){
+      throw insertResult.error;
+    }
+
+
+    msg.style.color =
+      "#0b7a45";
+
+    msg.textContent =
+      "가입 신청이 완료되었습니다. 본사 승인 대기 중입니다.";
+
+    submitBtn.textContent =
+      "가입 신청 완료";
+
+    submitBtn.disabled = true;
+
+
+  }catch(error){
+
+    console.error(error);
+
+    msg.style.color =
+      "#d93025";
+
+    msg.textContent =
+      "가입 신청 중 오류가 발생했습니다. " +
+      (
+        error.message ||
+        "다시 확인해 주세요."
+      );
+
+    submitBtn.textContent =
+      "가입 신청";
+
+    submitBtn.disabled = false;
+
+  }
 
 }
 
