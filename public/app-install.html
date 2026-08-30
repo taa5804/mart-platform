@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>앱설치</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f4f7fb;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;
+}
+.wrap{
+  width:100%;
+  max-width:420px;
+  padding:24px;
+}
+h1{
+  margin:0 0 24px;
+  text-align:center;
+  font-size:24px;
+}
+button{
+  width:100%;
+  height:58px;
+  margin:10px 0;
+  border:0;
+  border-radius:12px;
+  font-size:17px;
+  font-weight:700;
+  cursor:pointer;
+}
+.mart{
+  background:#16a34a;
+  color:#fff;
+}
+.safe{
+  background:#1165d7;
+  color:#fff;
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>설치할 앱을 선택하세요</h1>
+
+  <button
+    class="mart"
+    type="button"
+    onclick="location.href='/mart-install.html'">
+    우리아파트 마트 앱
+  </button>
+
+  <button
+    class="safe"
+    type="button"
+    onclick="alert('우리아파트 안심거래 앱 설치 경로 연결 예정')">
+    우리아파트 안심거래 앱
+  </button>
+</div>
+
+</body>
+</html>
