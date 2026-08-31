@@ -309,7 +309,6 @@
 
     let enteredPhone = "";
     let deferredInstallPrompt = null;
-    let appInstallCompleted = isStandaloneApp();
     let countdownTimer = null;
     let ownerPhoneForEmergency = "";
 
@@ -670,101 +669,57 @@
     window.addEventListener(
       "appinstalled",
       () => {
-        appInstallCompleted = true;
-        localStorage.setItem(
-          "wooriapt_carqr_app_installed",
-          "1"
-        );
+        try {
+          localStorage.setItem(
+            "woorigage_app_installed",
+            "1"
+          );
+        } catch (error) {
+          console.warn(error);
+        }
+
+        deferredInstallPrompt = null;
       }
     );
 
-    async function ensureAppInstalled() {
+    function wasAppInstalledBefore() {
       if (isStandaloneApp()) {
-        appInstallCompleted = true;
-        return;
+        return true;
       }
 
-      if (!deferredInstallPrompt) {
-        throw new Error(
-          "앱 설치창을 불러오지 못했습니다. Chrome에서 다시 접속한 후 앱을 설치해 주세요."
+      try {
+        return (
+          localStorage.getItem(
+            "woorigage_app_installed"
+          ) === "1"
         );
+      } catch (error) {
+        console.warn(error);
+        return false;
+      }
+    }
+
+    function waitForInstallPrompt(timeoutMs = 1500) {
+      if (deferredInstallPrompt) {
+        return Promise.resolve(true);
       }
 
-      const installPrompt =
-        deferredInstallPrompt;
+      return new Promise((resolve) => {
+        const startedAt = Date.now();
 
-      deferredInstallPrompt = null;
-
-      await installPrompt.prompt();
-
-      const choice =
-        await installPrompt.userChoice;
-
-      if (
-        !choice ||
-        choice.outcome !== "accepted"
-      ) {
-        throw new Error(
-          "앱 설치를 완료해야 자동차 QR을 등록할 수 있습니다."
-        );
-      }
-
-      if (appInstallCompleted) {
-        return;
-      }
-
-      await new Promise((resolve, reject) => {
-        let finished = false;
-
-        const onInstalled = () => {
-          if (finished) {
+        const timer = setInterval(() => {
+          if (deferredInstallPrompt) {
+            clearInterval(timer);
+            resolve(true);
             return;
           }
 
-          finished = true;
-          clearTimeout(timer);
-          window.removeEventListener(
-            "appinstalled",
-            onInstalled
-          );
-          resolve();
-        };
-
-        const timer = setTimeout(() => {
-          if (finished) {
-            return;
+          if (Date.now() - startedAt >= timeoutMs) {
+            clearInterval(timer);
+            resolve(false);
           }
-
-          finished = true;
-          window.removeEventListener(
-            "appinstalled",
-            onInstalled
-          );
-
-          if (
-            appInstallCompleted ||
-            localStorage.getItem(
-              "wooriapt_carqr_app_installed"
-            ) === "1"
-          ) {
-            resolve();
-            return;
-          }
-
-          reject(
-            new Error(
-              "앱 설치 완료를 확인하지 못했습니다. 앱 설치를 완료한 후 다시 눌러 주세요."
-            )
-          );
-        }, 10000);
-
-        window.addEventListener(
-          "appinstalled",
-          onInstalled
-        );
+        }, 100);
       });
-
-      appInstallCompleted = true;
     }
 
     continueButton.addEventListener(
@@ -781,13 +736,62 @@
         );
 
         try {
-          await ensureAppInstalled();
+          let installed =
+            wasAppInstalledBefore();
 
-          setStatus(
-            installStatus,
-            "앱 설치가 완료되었습니다. 푸시 알림을 허용해 주세요.",
-            "waiting"
-          );
+          if (!installed) {
+            if (!deferredInstallPrompt) {
+              await waitForInstallPrompt();
+            }
+
+            if (deferredInstallPrompt) {
+              deferredInstallPrompt.prompt();
+
+              const choice =
+                await deferredInstallPrompt.userChoice;
+
+              deferredInstallPrompt = null;
+
+              if (choice.outcome !== "accepted") {
+                throw new Error(
+                  "앱 설치를 완료해 주세요."
+                );
+              }
+
+              try {
+                localStorage.setItem(
+                  "woorigage_app_installed",
+                  "1"
+                );
+              } catch (error) {
+                console.warn(error);
+              }
+
+              installed = true;
+            } else {
+              /*
+               * Chrome은 이미 설치된 PWA에서는
+               * beforeinstallprompt를 다시 주지 않을 수 있습니다.
+               * 이 경우 기존 설치로 인정하고 푸시 등록을 계속합니다.
+               */
+              installed = true;
+
+              try {
+                localStorage.setItem(
+                  "woorigage_app_installed",
+                  "1"
+                );
+              } catch (error) {
+                console.warn(error);
+              }
+            }
+          }
+
+          if (!installed) {
+            throw new Error(
+              "앱 설치를 완료해 주세요."
+            );
+          }
 
           const fcmToken =
             await getRealFcmToken();
