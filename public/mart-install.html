@@ -2,648 +2,742 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
-
   <meta name="theme-color" content="#16a34a">
-
   <link rel="manifest" href="/mart-manifest.webmanifest">
-
-  <title>우리가게 앱 등록</title>
+  <link rel="icon" href="/icon-192.png">
+  <title>마트 사장님 앱 설치</title>
 
   <style>
-    * {
-      box-sizing: border-box;
+    *{box-sizing:border-box}
+
+    html,body{
+      width:100%;
+      min-height:100%;
+      margin:0;
     }
 
-    html,
-    body {
-      width: 100%;
-      min-height: 100%;
-      margin: 0;
-    }
-
-    body {
-      min-height: 100vh;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f4f7fb;
+    body{
+      min-height:100vh;
+      padding:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#f4f7fb;
+      color:#111827;
       font-family:
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
+        "Noto Sans KR",
         Roboto,
         Arial,
         sans-serif;
-      color: #111827;
     }
 
-    .card {
-      display: none;
-      width: 100%;
-      max-width: 420px;
-      padding: 28px 22px;
-      background: #ffffff;
-      border-radius: 18px;
-      box-shadow: 0 10px 35px rgba(15, 23, 42, 0.1);
-      text-align: center;
+    .card{
+      display:none;
+      width:100%;
+      max-width:430px;
+      padding:28px 22px;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 10px 35px rgba(15,23,42,.10);
+      text-align:center;
     }
 
-    .card.active {
-      display: block;
+    .card.active{display:block}
+
+    .logo{
+      width:92px;
+      height:92px;
+      margin:0 auto 16px;
+      border-radius:22px;
+      object-fit:cover;
+      box-shadow:0 8px 22px rgba(15,23,42,.14);
     }
 
-    h1 {
-      margin: 0 0 14px;
-      font-size: 24px;
-      line-height: 1.4;
+    h1{
+      margin:0 0 12px;
+      font-size:25px;
+      line-height:1.4;
     }
 
-    p {
-      margin: 0 0 20px;
-      color: #64748b;
-      font-size: 15px;
-      line-height: 1.7;
+    p{
+      margin:0;
+      color:#64748b;
+      font-size:15px;
+      line-height:1.75;
+      word-break:keep-all;
     }
 
-    input {
-      width: 100%;
-      height: 54px;
-      margin-bottom: 12px;
-      padding: 0 15px;
-      border: 1px solid #cbd5e1;
-      border-radius: 11px;
-      outline: none;
-      font-size: 17px;
-      text-align: center;
+    .guide{
+      margin:18px 0;
+      padding:17px 15px;
+      border-radius:12px;
+      background:#f8fafc;
+      color:#334155;
+      font-size:15px;
+      line-height:1.75;
+      word-break:keep-all;
     }
 
-    input:focus {
-      border-color: #16a34a;
-      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+    .guide strong{
+      color:#166534;
     }
 
-    button {
-      width: 100%;
-      min-height: 54px;
-      padding: 13px 16px;
-      border: 0;
-      border-radius: 11px;
-      background: #16a34a;
-      color: #ffffff;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
+    button{
+      width:100%;
+      min-height:54px;
+      padding:13px 16px;
+      border:0;
+      border-radius:11px;
+      background:#16a34a;
+      color:#fff;
+      font-size:17px;
+      font-weight:800;
+      cursor:pointer;
     }
 
-    button:disabled {
-      background: #cbd5e1;
-      color: #64748b;
-      cursor: not-allowed;
+    button:disabled{
+      background:#cbd5e1;
+      color:#64748b;
+      cursor:not-allowed;
     }
 
-    .guide {
-      margin: 16px 0 20px;
-      padding: 18px;
-      border-radius: 12px;
-      background: #f8fafc;
-      color: #334155;
-      font-size: 16px;
-      line-height: 1.8;
+    .secondary{
+      margin-top:10px;
+      background:#475569;
     }
 
-    .status {
-      min-height: 24px;
-      margin-top: 16px;
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.6;
-      word-break: keep-all;
+    .status{
+      min-height:24px;
+      margin-top:15px;
+      font-size:14px;
+      font-weight:700;
+      line-height:1.6;
+      word-break:keep-all;
     }
 
-    .success {
-      color: #15803d;
+    .success{color:#15803d}
+    .error{color:#dc2626}
+    .waiting{color:#1d4ed8}
+
+    .iphone-steps{
+      margin:18px 0;
+      padding:18px 15px;
+      border-radius:14px;
+      background:#f8fafc;
+      color:#334155;
+      text-align:left;
+      font-size:15px;
+      line-height:1.8;
     }
 
-    .error {
-      color: #dc2626;
+    .iphone-steps b{
+      color:#111827;
     }
 
-    .waiting {
-      color: #1d4ed8;
+    .share-symbol{
+      display:flex;
+      width:56px;
+      height:56px;
+      margin:12px auto;
+      align-items:center;
+      justify-content:center;
+      border:2px solid #94a3b8;
+      border-radius:13px;
+      background:#fff;
+      font-size:31px;
     }
-  
-    .browser-guide{display:none;margin:16px 0;padding:16px;border-radius:12px;background:#fff7ed;color:#9a3412;font-size:14px;line-height:1.75;text-align:left}
-    .browser-guide.show{display:block}
-    .iphone-steps{display:none;margin:16px 0 20px;padding:18px;border-radius:14px;background:#f8fafc;text-align:center}
-    .iphone-steps.show{display:block}
-    .iphone-step{margin:10px 0;color:#334155;font-size:16px;line-height:1.7}
-    .share-symbol{display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;margin:6px auto 10px;border:2px solid #94a3b8;border-radius:13px;background:#fff;font-size:31px;line-height:1}
-    .app-icon-preview{display:block;width:118px;height:118px;margin:18px auto 10px;border-radius:24px;box-shadow:0 8px 24px rgba(15,23,42,.18);object-fit:cover}
-    .app-icon-label{margin-bottom:12px;color:#111827;font-size:18px;font-weight:800}
-    .important-note{margin-top:15px;padding:14px;border-radius:11px;background:#ecfdf5;color:#166534;font-size:15px;font-weight:700;line-height:1.65}
 
+    .done-box{
+      margin-top:18px;
+      padding:15px;
+      border-radius:12px;
+      background:#ecfdf5;
+      color:#166534;
+      font-size:15px;
+      font-weight:800;
+      line-height:1.7;
+    }
   </style>
 </head>
 
 <body>
 
   <section id="loadingCard" class="card active">
-    <h1>우리가게 QR 확인 중</h1>
-    <p>잠시만 기다려 주세요.</p>
+    <img class="logo" src="/icon-192.png" alt="우리가게">
+    <h1>마트 사장님 앱 설치</h1>
+    <p>앱 설치 환경을 확인하고 있습니다.</p>
   </section>
 
-  
-  <section id="browserCard" class="card">
-    <h1>Chrome 또는 Safari에서 계속합니다</h1>
-    <div id="browserMessage" class="guide">
-      앱 설치를 위해 기본 브라우저에서 열어 주세요.
+  <section id="androidCard" class="card">
+    <img class="logo" src="/icon-192.png" alt="우리가게">
+    <h1>마트 사장님 앱 설치</h1>
+
+    <div class="guide">
+      <strong>QR 등록 없이 바로 설치할 수 있습니다.</strong><br><br>
+      아래 버튼을 누르면<br>
+      우리가게 앱 설치 화면이 열립니다.
     </div>
-    <button id="openBrowserButton" type="button">계속하기</button>
+
+    <button id="installButton" type="button" disabled>
+      앱 설치 준비 중...
+    </button>
+
+    <button id="retryButton" class="secondary" type="button" style="display:none">
+      다시 확인하기
+    </button>
+
+    <div id="androidStatus" class="status waiting">
+      앱 설치를 준비하고 있습니다.
+    </div>
+  </section>
+
+  <section id="iphoneCard" class="card">
+    <img class="logo" src="/icon-192.png" alt="우리가게">
+    <h1>아이폰 앱 설치</h1>
+
+    <div class="iphone-steps">
+      <b>1. Safari 아래의 공유 버튼을 누르세요.</b>
+
+      <div class="share-symbol">□↑</div>
+
+      <b>2. “홈 화면에 추가”를 누르세요.</b><br><br>
+
+      <b>3. 오른쪽 위 “추가”를 누르세요.</b>
+    </div>
+
+    <div class="done-box">
+      홈 화면에 생성된<br>
+      <strong>우리가게 앱</strong>을 눌러 실행하세요.
+    </div>
+
+    <div id="iphoneStatus" class="status waiting">
+      아이폰은 Safari에서 홈 화면에 추가해 주세요.
+    </div>
+  </section>
+
+  <section id="browserCard" class="card">
+    <img class="logo" src="/icon-192.png" alt="우리가게">
+    <h1>기본 브라우저에서 열어 주세요</h1>
+
+    <div id="browserGuide" class="guide">
+      앱 설치를 위해 Chrome 또는 Safari에서 열어 주세요.
+    </div>
+
+    <button id="openBrowserButton" type="button">
+      Chrome에서 계속하기
+    </button>
+
     <div id="browserStatus" class="status"></div>
   </section>
 
-  <section id="registerCard" class="card">
-    <h1>우리가게 앱 등록</h1>
+  <section id="installedCard" class="card">
+    <img class="logo" src="/icon-192.png" alt="우리가게">
+    <h1>앱이 설치되어 있습니다</h1>
 
-    <p>
-      특가·행사 알림을 받을<br>
-      휴대전화번호를 입력해 주세요.
-    </p>
+    <div class="done-box">
+      휴대전화 홈 화면의<br>
+      <strong>우리가게 앱</strong>을 눌러 이용하세요.
+    </div>
 
-    <input
-      id="phoneInput"
-      type="tel"
-      inputmode="numeric"
-      autocomplete="tel"
-      maxlength="13"
-      placeholder="010-0000-0000"
-    >
-
-    <button id="registerButton" type="button">
-      등록하기
+    <button id="openAppButton" type="button">
+      앱 화면으로 이동
     </button>
-
-    <div id="registerStatus" class="status"></div>
-  </section>
-
-  
-  <section id="installCard" class="card">
-    <h1>앱 설치가 필요합니다</h1>
-
-    <div id="normalInstallGuide" class="guide">
-      앱 설치와 푸시 알림은<br>
-      특가·행사 알림을 받기 위해<br>
-      반드시 필요합니다.<br><br>
-      계속하기를 누르면<br>
-      우리가게 앱 설치가 시작됩니다.
-    </div>
-
-    <div id="iphoneSteps" class="iphone-steps">
-      <div class="iphone-step"><b>1. Safari 아래의 공유 버튼을 누르세요.</b></div>
-      <div class="share-symbol">□↑</div>
-      <div class="iphone-step"><b>2. 홈 화면에 추가를 누르세요.</b></div>
-      <div class="iphone-step"><b>3. 오른쪽 위의 추가를 누르세요.</b></div>
-      <img class="app-icon-preview" src="/icon-192.png" alt="우리가게 앱 아이콘">
-      <div class="app-icon-label">우리가게</div>
-      <div class="important-note">
-        홈 화면에 생성된<br>
-        <b>우리가게 앱을 눌러 주세요.</b><br><br>
-        앱을 실행하면 푸시 알림 허용 화면으로 이어집니다.
-      </div>
-    </div>
-
-    <div id="browserGuide" class="browser-guide"></div>
-    <button id="continueButton" type="button" disabled>앱 설치 준비 중...</button>
-    <div id="installStatus" class="status waiting">앱 설치를 준비하고 있습니다.</div>
-  </section>
-
-
-  <section id="pushCard" class="card">
-    <h1>푸시 알림 승인</h1>
-
-    <div class="guide">
-      특가·행사 알림을 받기 위해<br>
-      푸시 알림을 허용해 주세요.
-    </div>
-
-    <button id="pushButton" type="button">
-      푸시 알림 허용
-    </button>
-
-    <div id="pushStatus" class="status"></div>
   </section>
 
   <section id="completeCard" class="card">
-    <h1>등록 완료</h1>
+    <img class="logo" src="/icon-192.png" alt="우리가게">
+    <h1>앱 설치 완료</h1>
 
-    <div class="guide">
-      우리가게 앱 설치와<br>
-      푸시 알림 등록이 완료되었습니다.
+    <div class="done-box">
+      우리가게 앱 설치가 완료되었습니다.<br>
+      홈 화면에서 앱을 실행해 주세요.
     </div>
 
-    <div class="status success">
-      이제 특가·행사 알림을 받을 수 있습니다.
-    </div>
+    <button id="completeButton" type="button">
+      확인
+    </button>
   </section>
-
-  <section id="alreadyCard" class="card">
-    <h1>이미 등록되었습니다</h1>
-
-    <div class="guide">
-      우리가게 앱과 푸시 알림 등록이<br>
-      이미 완료되어 있습니다.
-    </div>
-  </section>
-
-  <section id="errorCard" class="card">
-    <h1>접속할 수 없습니다</h1>
-    <p id="errorMessage">QR 정보를 확인할 수 없습니다.</p>
-  </section>
-
-  
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 
   <script>
     "use strict";
 
-    /* 설치 이벤트는 페이지 로딩 초기에 발생할 수 있으므로 가장 먼저 잡아 둡니다. */
-    let deferredInstallPrompt=null;
-    let installEventCaptured=false;
+    const BUILD_VERSION =
+      "20260831-MART-OWNER-INSTALL-01";
 
-    window.addEventListener("beforeinstallprompt",event=>{
-      event.preventDefault();
-      deferredInstallPrompt=event;
-      installEventCaptured=true;
+    let deferredInstallPrompt = null;
 
-      const button=document.getElementById("continueButton");
-      const card=document.getElementById("installCard");
-      const status=document.getElementById("installStatus");
+    const cards = {
+      loading:
+        document.getElementById("loadingCard"),
+      android:
+        document.getElementById("androidCard"),
+      iphone:
+        document.getElementById("iphoneCard"),
+      browser:
+        document.getElementById("browserCard"),
+      installed:
+        document.getElementById("installedCard"),
+      complete:
+        document.getElementById("completeCard")
+    };
 
-      if(button&&card&&card.classList.contains("active")){
-        clearTimeout(installPreparationTimer);
-        installPreparationTimer=null;
-        button.style.display="block";
-        button.disabled=false;
-        button.textContent="계속하기";
-        if(status){
-          status.textContent="앱 설치 준비가 완료되었습니다.";
-          status.className="status success";
-        }
+    const installButton =
+      document.getElementById("installButton");
+
+    const retryButton =
+      document.getElementById("retryButton");
+
+    const androidStatus =
+      document.getElementById("androidStatus");
+
+    const browserGuide =
+      document.getElementById("browserGuide");
+
+    const openBrowserButton =
+      document.getElementById("openBrowserButton");
+
+    const browserStatus =
+      document.getElementById("browserStatus");
+
+    const openAppButton =
+      document.getElementById("openAppButton");
+
+    const completeButton =
+      document.getElementById("completeButton");
+
+    function showCard(name){
+      Object.values(cards).forEach(function(card){
+        card.classList.remove("active");
+      });
+
+      cards[name].classList.add("active");
+      window.scrollTo(0,0);
+    }
+
+    function setStatus(element,message,type){
+      element.textContent = message || "";
+      element.className = "status";
+
+      if(type){
+        element.classList.add(type);
       }
-    });
+    }
 
-    const API_URL="https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/register-mart-push";
-    const SUPABASE_KEY="sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
-    const FIREBASE_CONFIG={apiKey:"AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",authDomain:"wooriapt-carqr.firebaseapp.com",projectId:"wooriapt-carqr",storageBucket:"wooriapt-carqr.firebasestorage.app",messagingSenderId:"101299637796",appId:"1:101299637796:web:cb69372592026b7aa192b1"};
-    const VAPID_KEY="BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
-
-    const PENDING_KEY="wooriapt_mart_pending_registration";
-    const INSTALL_RELOAD_KEY="wooriapt_mart_install_reload_done";
-    const BUILD_VERSION="20260806-MART-INSTALL-EVENT-02";
-    const STORE_PATH_KEY="wooriapt_store_path";
-    const STORE_URL_KEY="wooriapt_store_url";
-
-    const params=new URLSearchParams(location.search);
-    const qrCode=cleanQr(params.get("qr"));
-    const resume=params.get("resume")==="1";
-    const storePath="/74";
-
-    let serviceWorkerPromise=null;
-    let installPreparationTimer=null;
-    let pushRegistrationRunning=false;
-    let pushCardOpened=false;
-
-    const loadingCard=document.getElementById("loadingCard");
-    const browserCard=document.getElementById("browserCard");
-    const registerCard=document.getElementById("registerCard");
-    const installCard=document.getElementById("installCard");
-    const pushCard=document.getElementById("pushCard");
-    const completeCard=document.getElementById("completeCard");
-    const alreadyCard=document.getElementById("alreadyCard");
-    const errorCard=document.getElementById("errorCard");
-
-    const browserMessage=document.getElementById("browserMessage");
-    const openBrowserButton=document.getElementById("openBrowserButton");
-    const browserStatus=document.getElementById("browserStatus");
-    const phoneInput=document.getElementById("phoneInput");
-    const registerButton=document.getElementById("registerButton");
-    const registerStatus=document.getElementById("registerStatus");
-    const normalInstallGuide=document.getElementById("normalInstallGuide");
-    const iphoneSteps=document.getElementById("iphoneSteps");
-    const browserGuide=document.getElementById("browserGuide");
-    const continueButton=document.getElementById("continueButton");
-    const installStatus=document.getElementById("installStatus");
-    const pushButton=document.getElementById("pushButton");
-    const pushStatus=document.getElementById("pushStatus");
-    const errorMessage=document.getElementById("errorMessage");
-
-    const cards={loading:loadingCard,browser:browserCard,register:registerCard,install:installCard,push:pushCard,complete:completeCard,already:alreadyCard,error:errorCard};
-
-    function cleanQr(v){return String(v||"").trim().toUpperCase().replace(/[^A-Z0-9_-]/g,"")}
-    function normalizePhone(v){return String(v||"").replace(/[^0-9]/g,"")}
-    function isValidPhone(v){return /^01[016789][0-9]{7,8}$/.test(v)}
-    function formatPhone(v){const n=normalizePhone(v).slice(0,11);if(n.length<=3)return n;if(n.length<=7)return n.slice(0,3)+"-"+n.slice(3);return n.slice(0,3)+"-"+n.slice(3,7)+"-"+n.slice(7)}
-    function isInstalledApp(){return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}
+    function isInstalledApp(){
+      return (
+        window.matchMedia(
+          "(display-mode: standalone)"
+        ).matches ||
+        window.navigator.standalone === true
+      );
+    }
 
     function getBrowserInfo(){
-      const ua=navigator.userAgent||"";
-      const ios=/iphone|ipad|ipod/i.test(ua);
-      const android=/android/i.test(ua);
-      const samsung=/samsungbrowser/i.test(ua);
-      const googleApp=/\bGSA\//i.test(ua);
-      const androidWebView=/;\s*wv\)/i.test(ua);
-      const knownInApp=/(kakaotalk|naver\(inapp|naverapp|line\/|instagram|fbav|fban)/i.test(ua);
-      const iosInApp=ios&&(!/safari/i.test(ua)||/crios|fxios|edgios|kakaotalk|naver|instagram|fbav|fban/i.test(ua));
-      const inApp=googleApp||androidWebView||knownInApp||iosInApp;
-      const chrome=android&&/chrome\//i.test(ua)&&!samsung&&!inApp&&!/edga|edg\/|opr\/|opera/i.test(ua);
-      const safari=ios&&/safari/i.test(ua)&&!/crios|fxios|edgios/i.test(ua);
-      return{ios,android,samsung,chrome,safari,inApp}
+      const ua =
+        navigator.userAgent || "";
+
+      const ios =
+        /iphone|ipad|ipod/i.test(ua);
+
+      const android =
+        /android/i.test(ua);
+
+      const samsung =
+        /samsungbrowser/i.test(ua);
+
+      const chrome =
+        android &&
+        /chrome\//i.test(ua) &&
+        !samsung &&
+        !/edga|edg\/|opr\/|opera/i.test(ua);
+
+      const googleApp =
+        /\bGSA\//i.test(ua);
+
+      const androidWebView =
+        /;\s*wv\)/i.test(ua);
+
+      const knownInApp =
+        /(kakaotalk|naver\(inapp|naverapp|line\/|instagram|fbav|fban)/i
+          .test(ua);
+
+      const iosInApp =
+        ios &&
+        (
+          !/safari/i.test(ua) ||
+          /crios|fxios|edgios|kakaotalk|naver|instagram|fbav|fban/i
+            .test(ua)
+        );
+
+      const inApp =
+        googleApp ||
+        androidWebView ||
+        knownInApp ||
+        iosInApp;
+
+      const safari =
+        ios &&
+        /safari/i.test(ua) &&
+        !/crios|fxios|edgios/i.test(ua);
+
+      return {
+        ios,
+        android,
+        samsung,
+        chrome,
+        safari,
+        inApp
+      };
     }
 
-    function showCard(name){Object.values(cards).forEach(c=>c&&c.classList.remove("active"));if(cards[name])cards[name].classList.add("active");scrollTo(0,0)}
-    function setStatus(el,msg,type){if(!el)return;el.textContent=msg||"";el.className="status";if(type)el.classList.add(type)}
-    function showError(msg){errorMessage.textContent=msg;showCard("error")}
-    function showPushCardOnce(){if(pushCardOpened)return;pushCardOpened=true;showCard("push")}
+    async function prepareServiceWorker(){
+      if(!("serviceWorker" in navigator)){
+        throw new Error(
+          "이 브라우저에서는 앱 설치를 지원하지 않습니다."
+        );
+      }
 
-    function savePending(phone){
-      localStorage.setItem(PENDING_KEY,JSON.stringify({qr_code:qrCode,owner_phone:phone,store_path:storePath,store_url:storePath}))
+      let registration =
+        await navigator.serviceWorker
+          .getRegistration("/");
+
+      if(!registration){
+        registration =
+          await navigator.serviceWorker.register(
+            "/firebase-messaging-sw.js?v=" +
+            BUILD_VERSION,
+            {
+              scope:"/",
+              updateViaCache:"none"
+            }
+          );
+      }else{
+        try{
+          await registration.update();
+        }catch(error){
+          console.warn(error);
+        }
+      }
+
+      await navigator.serviceWorker.ready;
+
+      return registration;
     }
-    function loadPending(){
-      try{
-        const d=JSON.parse(localStorage.getItem(PENDING_KEY)||"null");
-        if(!d)return null;
-        const q=cleanQr(d.qr_code),p=normalizePhone(d.owner_phone);
-        return q===qrCode&&isValidPhone(p)?{qr_code:q,owner_phone:p,store_path:"/74",store_url:"/74"}:null
-      }catch{return null}
-    }
-    function clearPending(){localStorage.removeItem(PENDING_KEY);sessionStorage.removeItem(INSTALL_RELOAD_KEY)}
 
     function openCurrentPageInChrome(){
-      const u=new URL(location.href);
-      location.href="intent://"+u.host+u.pathname+u.search+u.hash+"#Intent;scheme="+u.protocol.replace(":","")+";package=com.android.chrome;S.browser_fallback_url="+encodeURIComponent(u.href)+";end"
+      const current =
+        new URL(location.href);
+
+      const fallback =
+        encodeURIComponent(current.href);
+
+      location.href =
+        "intent://" +
+        current.host +
+        current.pathname +
+        current.search +
+        current.hash +
+        "#Intent;scheme=" +
+        current.protocol.replace(":","") +
+        ";package=com.android.chrome;" +
+        "S.browser_fallback_url=" +
+        fallback +
+        ";end";
     }
 
-    async function callApi(payload,timeoutMs=10000){
-      const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
-      try{
-        const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+SUPABASE_KEY,apikey:SUPABASE_KEY},body:JSON.stringify(payload),signal:controller.signal});
-        const t=await r.text();let d={};try{d=t?JSON.parse(t):{}}catch{}
-        if(!r.ok||d.ok===false||d.success===false){const e=new Error(d.message||d.error||"서버 처리에 실패했습니다.");e.data=d;throw e}
-        return d
-      }catch(e){if(e.name==="AbortError")throw new Error("서버 응답이 지연되고 있습니다. 다시 시도해 주세요.");throw e}
-      finally{clearTimeout(timer)}
+    function enableAndroidInstall(){
+      installButton.disabled = false;
+      installButton.textContent = "우리가게 앱 설치";
+      retryButton.style.display = "none";
+
+      setStatus(
+        androidStatus,
+        "앱 설치 준비가 완료되었습니다.",
+        "success"
+      );
     }
 
-    function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+    function waitForInstallPrompt(){
+      let count = 0;
 
-    function prepareServiceWorker(){
-      if(serviceWorkerPromise)return serviceWorkerPromise;
-      if(!("serviceWorker" in navigator)){
-        serviceWorkerPromise=Promise.reject(new Error("이 브라우저에서는 앱 설치를 준비할 수 없습니다."));
-        serviceWorkerPromise.catch(()=>{});
-        return serviceWorkerPromise
-      }
-      serviceWorkerPromise=(async()=>{
-        let reg=await navigator.serviceWorker.getRegistration("/");
-        if(!reg)reg=await navigator.serviceWorker.register("/firebase-messaging-sw.js?v="+BUILD_VERSION,{scope:"/",updateViaCache:"none"});
-        else{try{await reg.update()}catch(e){console.warn(e)}}
-        const ready=await navigator.serviceWorker.ready;
-        return ready||reg
-      })().catch(e=>{serviceWorkerPromise=null;throw e});
-      serviceWorkerPromise.catch(()=>{});
-      return serviceWorkerPromise
+      const timer =
+        setInterval(function(){
+
+          if(deferredInstallPrompt){
+            clearInterval(timer);
+            enableAndroidInstall();
+            return;
+          }
+
+          count += 1;
+
+          if(count >= 20){
+            clearInterval(timer);
+
+            installButton.disabled = false;
+            installButton.textContent =
+              "우리가게 앱 설치";
+
+            retryButton.style.display =
+              "block";
+
+            setStatus(
+              androidStatus,
+              "설치창이 자동으로 열리지 않으면 Chrome 메뉴의 ‘앱 설치’를 선택해 주세요.",
+              "waiting"
+            );
+          }
+
+        },500);
     }
 
-    function enableInstallButton(){
-      clearTimeout(installPreparationTimer);
-      installPreparationTimer=null;
-      normalInstallGuide.style.display="block";
-      iphoneSteps.classList.remove("show");
-      continueButton.style.display="block";
-      continueButton.disabled=false;
-      continueButton.textContent="계속하기";
-      setStatus(installStatus,"앱 설치 준비가 완료되었습니다.","success")
-    }
+    window.addEventListener(
+      "beforeinstallprompt",
+      function(event){
+        event.preventDefault();
+        deferredInstallPrompt = event;
 
-    function showIosInstallGuide(){
-      normalInstallGuide.style.display="none";
-      iphoneSteps.classList.add("show");
-      continueButton.style.display="none";
-      setStatus(installStatus,"홈 화면에 추가한 뒤 우리가게 앱을 실행해 주세요.","waiting")
-    }
-
-    async function prepareInstallStep(){
-      const browser=getBrowserInfo();
-
-      if(isInstalledApp()){showPushCardOnce();return}
-
-      if(browser.ios){
-        if(!browser.safari){
-          browserGuide.classList.add("show");
-          browserGuide.innerHTML="<strong>Safari에서 열어 주세요.</strong>아래 공유 메뉴에서 Safari로 열기 또는 브라우저에서 열기를 선택해 주세요.";
-        }else{
-          browserGuide.classList.remove("show");
-          browserGuide.innerHTML="";
+        if(
+          cards.android.classList.contains(
+            "active"
+          )
+        ){
+          enableAndroidInstall();
         }
-        showIosInstallGuide();
-        return
       }
+    );
 
-      normalInstallGuide.style.display="block";
-      iphoneSteps.classList.remove("show");
-      continueButton.style.display="block";
-      continueButton.disabled=true;
-      continueButton.textContent="앱 설치 준비 중...";
-      setStatus(installStatus,"앱 설치를 준비하고 있습니다.","waiting");
-
-      try{await prepareServiceWorker()}catch(e){
-        setStatus(installStatus,e.message||"앱 설치 준비에 실패했습니다.","error");
-        setTimeout(prepareInstallStep,1500);
-        return
+    window.addEventListener(
+      "appinstalled",
+      function(){
+        deferredInstallPrompt = null;
+        showCard("complete");
       }
+    );
 
-      if(deferredInstallPrompt||installEventCaptured){
-        enableInstallButton();
-        return
+    installButton.addEventListener(
+      "click",
+      async function(){
+
+        if(isInstalledApp()){
+          showCard("installed");
+          return;
+        }
+
+        installButton.disabled = true;
+        installButton.textContent =
+          "설치창 여는 중...";
+
+        setStatus(
+          androidStatus,
+          "표시되는 설치 창에서 ‘설치’를 눌러 주세요.",
+          "waiting"
+        );
+
+        try{
+          if(!deferredInstallPrompt){
+            await prepareServiceWorker();
+
+            for(
+              let i=0;
+              i<20 && !deferredInstallPrompt;
+              i++
+            ){
+              await new Promise(function(resolve){
+                setTimeout(resolve,150);
+              });
+            }
+          }
+
+          if(!deferredInstallPrompt){
+            installButton.disabled = false;
+            installButton.textContent =
+              "우리가게 앱 설치";
+
+            retryButton.style.display =
+              "block";
+
+            setStatus(
+              androidStatus,
+              "Chrome 오른쪽 위 메뉴에서 ‘앱 설치’를 선택해 주세요.",
+              "waiting"
+            );
+
+            return;
+          }
+
+          const promptEvent =
+            deferredInstallPrompt;
+
+          deferredInstallPrompt = null;
+
+          await promptEvent.prompt();
+
+          const result =
+            await promptEvent.userChoice;
+
+          if(result.outcome !== "accepted"){
+            installButton.disabled = false;
+            installButton.textContent =
+              "우리가게 앱 설치";
+
+            setStatus(
+              androidStatus,
+              "앱 설치가 취소되었습니다. 다시 눌러 주세요.",
+              "error"
+            );
+
+            return;
+          }
+
+          setStatus(
+            androidStatus,
+            "앱을 설치하고 있습니다.",
+            "waiting"
+          );
+
+        }catch(error){
+          installButton.disabled = false;
+          installButton.textContent =
+            "우리가게 앱 설치";
+
+          setStatus(
+            androidStatus,
+            error.message ||
+            "앱 설치를 시작하지 못했습니다.",
+            "error"
+          );
+        }
       }
+    );
 
-      /* manifest와 service worker를 브라우저가 평가할 시간을 주고 설치 이벤트를 기다립니다. */
-      let checks=0;
-      const waitForInstallEvent=()=>{
+    retryButton.addEventListener(
+      "click",
+      async function(){
+        retryButton.style.display =
+          "none";
+
+        installButton.disabled = true;
+        installButton.textContent =
+          "앱 설치 준비 중...";
+
+        setStatus(
+          androidStatus,
+          "앱 설치를 다시 확인하고 있습니다.",
+          "waiting"
+        );
+
+        try{
+          await prepareServiceWorker();
+        }catch(error){
+          console.warn(error);
+        }
+
+        waitForInstallPrompt();
+      }
+    );
+
+    openBrowserButton.addEventListener(
+      "click",
+      function(){
+        const browser =
+          getBrowserInfo();
+
+        if(browser.android){
+          openCurrentPageInChrome();
+          return;
+        }
+
+        setStatus(
+          browserStatus,
+          "Safari의 공유 메뉴에서 ‘Safari에서 열기’를 선택해 주세요.",
+          "waiting"
+        );
+      }
+    );
+
+    openAppButton.addEventListener(
+      "click",
+      function(){
+        location.href =
+          "/mart-open.html";
+      }
+    );
+
+    completeButton.addEventListener(
+      "click",
+      function(){
+        location.href =
+          "/mart-open.html";
+      }
+    );
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      async function(){
+
+        if(isInstalledApp()){
+          showCard("installed");
+          return;
+        }
+
+        const browser =
+          getBrowserInfo();
+
+        if(browser.inApp){
+          browserGuide.innerHTML =
+            browser.ios
+              ? "아이폰에서는 Safari로 열어야 앱을 홈 화면에 추가할 수 있습니다."
+              : "안드로이드에서는 Chrome으로 열어야 앱 설치가 가능합니다.";
+
+          openBrowserButton.textContent =
+            browser.ios
+              ? "Safari에서 계속하기"
+              : "Chrome에서 계속하기";
+
+          showCard("browser");
+          return;
+        }
+
+        if(browser.ios){
+          showCard("iphone");
+          return;
+        }
+
+        showCard("android");
+
+        try{
+          await prepareServiceWorker();
+        }catch(error){
+          setStatus(
+            androidStatus,
+            error.message ||
+            "앱 설치 준비에 실패했습니다.",
+            "error"
+          );
+
+          retryButton.style.display =
+            "block";
+
+          return;
+        }
+
         if(deferredInstallPrompt){
-          enableInstallButton();
-          return
-        }
-        checks+=1;
-        if(checks<20){
-          installPreparationTimer=setTimeout(waitForInstallEvent,500);
-          return
+          enableAndroidInstall();
+          return;
         }
 
-        /* 한 번만 새로고침하여 Chrome이 PWA 설치 가능 상태를 다시 계산하게 합니다. */
-        if(!sessionStorage.getItem(INSTALL_RELOAD_KEY)){
-          sessionStorage.setItem(INSTALL_RELOAD_KEY,"1");
-          location.reload();
-          return
-        }
-
-        setStatus(installStatus,"앱 설치 정보를 다시 확인하고 있습니다.","waiting");
-        installPreparationTimer=setTimeout(prepareInstallStep,1500)
-      };
-      waitForInstallEvent()
-    }
-
-    async function waitForPermission(){
-      if(!("Notification" in window))throw new Error("이 기기에서는 알림을 지원하지 않습니다.");
-      if(Notification.permission==="denied")throw new Error("알림 권한이 차단되어 있습니다. 브라우저의 사이트 설정에서 알림을 허용해 주세요.");
-      if(Notification.permission==="default"){
-        const result=await Notification.requestPermission();
-        if(result==="denied")throw new Error("푸시 알림을 허용해 주세요.")
+        waitForInstallPrompt();
       }
-      for(let i=0;i<15&&Notification.permission==="default";i++)await sleep(200);
-      if(Notification.permission!=="granted")throw new Error("푸시 알림을 허용해 주세요.")
-    }
-
-    async function createFcmToken(){
-      await waitForPermission();
-      if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
-      const messaging=firebase.messaging(),registration=await prepareServiceWorker();
-      const token=await messaging.getToken({vapidKey:VAPID_KEY,serviceWorkerRegistration:registration});
-      if(!token)throw new Error("푸시 알림 토큰을 발급하지 못했습니다.");
-      return token
-    }
-
-    async function checkRegisteredStatus(){
-      if(!qrCode){showError("올바른 입간판 QR 주소가 아닙니다.");return}
-      try{
-        const d=await callApi({action:"status",qr_code:qrCode,registration_type:"mart"});
-        if(d.registered===true){clearPending();showCard("already");return}
-      }catch(e){console.warn(e)}
-
-      const pending=loadPending();
-      const browser=getBrowserInfo();
-
-      /* 아이폰 홈 화면 앱에서 mart-open.html을 거쳐 resume=1로 돌아온 경우:
-         설치 안내를 다시 보여주지 않고 곧바로 푸시 알림 승인 단계로 이동합니다.
-         삼성/안드로이드 기존 분기는 변경하지 않습니다. */
-      if(resume&&browser.ios&&pending){showPushCardOnce();return}
-
-      if(isInstalledApp()&&pending){showPushCardOnce();return}
-      if(pending){showCard("install");prepareInstallStep();return}
-      showCard("register")
-    }
-
-    phoneInput.addEventListener("input",e=>e.target.value=formatPhone(e.target.value));
-
-    registerButton.addEventListener("click",()=>{
-      const phone=normalizePhone(phoneInput.value);
-      if(!isValidPhone(phone)){setStatus(registerStatus,"휴대전화번호를 정확히 입력해 주세요.","error");phoneInput.focus();return}
-      savePending(phone);
-      setStatus(registerStatus,"","");
-      showCard("install");
-      prepareInstallStep()
-    });
-
-    addEventListener("appinstalled",()=>{
-      deferredInstallPrompt=null;
-      sessionStorage.removeItem(INSTALL_RELOAD_KEY);
-      if(loadPending()&&installCard.classList.contains("active"))showPushCardOnce()
-    });
-
-    openBrowserButton.addEventListener("click",()=>{
-      const browser=getBrowserInfo();
-      if(browser.android){openCurrentPageInChrome();return}
-      setStatus(browserStatus,"Safari의 공유 메뉴에서 ‘Safari에서 열기’를 선택해 주세요.","waiting")
-    });
-
-    continueButton.addEventListener("click",async()=>{
-      if(continueButton.disabled)return;
-      const pending=loadPending();
-      if(!pending){showCard("register");return}
-      if(!deferredInstallPrompt){
-        continueButton.disabled=true;
-        continueButton.textContent="설치창 준비 중...";
-        setStatus(installStatus,"앱 설치창을 준비하고 있습니다.","waiting");
-        for(let i=0;i<20&&!deferredInstallPrompt;i++)await sleep(150);
-        if(!deferredInstallPrompt){
-          continueButton.disabled=false;
-          continueButton.textContent="계속하기";
-          prepareInstallStep();
-          return
-        }
-      }
-
-      continueButton.disabled=true;
-      continueButton.textContent="앱 설치 중...";
-      setStatus(installStatus,"표시되는 설치 창에서 설치를 눌러 주세요.","waiting");
-
-      try{
-        const promptEvent=deferredInstallPrompt;
-        deferredInstallPrompt=null;
-        await promptEvent.prompt();
-        const result=await promptEvent.userChoice;
-        if(result.outcome!=="accepted"){
-          setStatus(installStatus,"앱 설치가 취소되었습니다. 계속하기를 다시 눌러 주세요.","error");
-          continueButton.textContent="계속하기";
-          continueButton.disabled=false;
-          return
-        }
-        setStatus(installStatus,"앱을 설치하고 있습니다. 잠시만 기다려 주세요.","waiting")
-      }catch(e){
-        setStatus(installStatus,e.message||"앱 설치에 실패했습니다.","error");
-        continueButton.textContent="다시 시도하기";
-        continueButton.disabled=false
-      }
-    });
-
-    pushButton.addEventListener("click",async()=>{
-      if(pushRegistrationRunning)return;
-      pushRegistrationRunning=true;
-      pushButton.disabled=true;
-      pushButton.textContent="푸시 알림 등록 중...";
-      setStatus(pushStatus,"푸시 알림을 등록하고 있습니다. 버튼을 다시 누르지 마세요.","waiting");
-      try{
-        const pending=loadPending();
-        if(!pending)throw new Error("등록 정보를 찾을 수 없습니다. QR을 다시 스캔해 주세요.");
-        const token=await createFcmToken();
-        await callApi({action:"register",registration_type:"mart",qr_code:pending.qr_code,owner_phone:pending.owner_phone,push_token:token,store_path:"/74",store_url:"/74",platform:"web",user_agent:navigator.userAgent},15000);
-        localStorage.setItem("wooriapt_mart_push_token",token);
-        localStorage.setItem(STORE_PATH_KEY,"/74");
-        localStorage.setItem(STORE_URL_KEY,"/74");
-        clearPending();
-        setStatus(pushStatus,"","");
-        showCard("complete")
-      }catch(e){
-        setStatus(pushStatus,e.message||"푸시 알림 등록에 실패했습니다.","error");
-        pushButton.disabled=false;
-        pushButton.textContent="푸시 알림 허용"
-      }finally{pushRegistrationRunning=false}
-    });
-
-    addEventListener("DOMContentLoaded",()=>{
-      const browser=getBrowserInfo();
-
-      if(browser.inApp){
-        browserMessage.innerHTML=browser.ios
-          ?"아이폰에서는 Safari로 열어야 홈 화면에 앱을 추가할 수 있습니다."
-          :"안드로이드에서는 Chrome으로 열어야 앱을 설치할 수 있습니다.";
-        showCard("browser");
-        return
-      }
-
-      if(browser.android&&(browser.chrome||browser.samsung)){
-        prepareServiceWorker().catch(e=>console.warn("초기 서비스워커 준비 실패:",e))
-      }
-
-      checkRegisteredStatus()
-    });
+    );
   </script>
+
 </body>
 </html>
