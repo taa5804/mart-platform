@@ -204,7 +204,7 @@ const VAPID_KEY =
 
 const FIREBASE_CONFIG = {
   apiKey:
-    "AIzaSyB3nZdmUrj2wsKPQpOV8dLso7i17fZo0Hc",
+    "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
 
   authDomain:
     "wooriapt-carqr.firebaseapp.com",
@@ -224,7 +224,7 @@ const FIREBASE_CONFIG = {
 
 
 const BUILD_VERSION =
-  "20260817-ANDROID-SEQUENCE-REFLECTED-FINAL-01";
+  "20260817-ANDROID-PUSH-PROGRESS-FINAL-01";
 
 
 const params =
@@ -254,6 +254,9 @@ const INSTALL_CONFIRMED_KEY =
 
 const COMPLETED_KEY_PREFIX =
   "wooriapt_vehicle_android_completed_";
+
+const OWNER_PHONE_KEY_PREFIX =
+  "wooriapt_vehicle_android_owner_phone_";
 
 let deferredInstallPrompt = null;
 
@@ -638,6 +641,98 @@ async function callApi(payload){
 
 /*
  * =====================================================
+ * FCM 토큰 자동갱신
+ * =====================================================
+ */
+
+let tokenRefreshInProgress = false;
+
+async function refreshFcmTokenSilently(){
+
+  if(
+    tokenRefreshInProgress ||
+    !qrCode ||
+    localStorage.getItem(
+      COMPLETED_KEY_PREFIX + qrCode
+    ) !== "1"
+  ){
+    return;
+  }
+
+  if(
+    !("Notification" in window) ||
+    Notification.permission !== "granted"
+  ){
+    return;
+  }
+
+  const ownerPhone =
+    normalizePhone(
+      localStorage.getItem(
+        OWNER_PHONE_KEY_PREFIX + qrCode
+      ) || ""
+    );
+
+  if(!validPhone(ownerPhone)){
+    return;
+  }
+
+  tokenRefreshInProgress = true;
+
+  try{
+
+    if(!firebase.apps.length){
+      firebase.initializeApp(
+        FIREBASE_CONFIG
+      );
+    }
+
+    const registration =
+      await prepareServiceWorker();
+
+    const messaging =
+      firebase.messaging();
+
+    const token =
+      await messaging.getToken({
+        vapidKey:
+          VAPID_KEY,
+        serviceWorkerRegistration:
+          registration
+      });
+
+    if(!token){
+      return;
+    }
+
+    await callApi({
+      action:
+        "refresh_token",
+      qr_code:
+        qrCode,
+      owner_phone:
+        ownerPhone,
+      push_token:
+        token,
+      platform:
+        "android",
+      user_agent:
+        navigator.userAgent
+    });
+
+  }catch(error){
+    console.warn(
+      "FCM 토큰 자동갱신:",
+      error
+    );
+  }finally{
+    tokenRefreshInProgress = false;
+  }
+}
+
+
+/*
+ * =====================================================
  * 서비스워커
  * =====================================================
  */
@@ -666,25 +761,39 @@ function prepareServiceWorker(){
       }
 
 
-      const registration =
+      let registration =
         await navigator
           .serviceWorker
-          .register(
-            "/firebase-messaging-sw.js?v=" +
-            BUILD_VERSION,
-            {
-              scope:"/",
-              updateViaCache:"none"
-            }
+          .getRegistration(
+            "/"
           );
 
 
-      try{
-        await registration.update();
-      }catch(error){
-        console.warn(
-          error
-        );
+      if(
+        !registration
+      ){
+
+        registration =
+          await navigator
+            .serviceWorker
+            .register(
+              "/firebase-messaging-sw.js?v=" +
+              BUILD_VERSION,
+              {
+                scope:"/",
+                updateViaCache:"none"
+              }
+            );
+
+      }else{
+
+        try{
+          await registration.update();
+        }catch(error){
+          console.warn(
+            error
+          );
+        }
       }
 
 
@@ -746,22 +855,30 @@ window.addEventListener(
   "appinstalled",
   () => {
 
-    deferredInstallPrompt = null;
+    installConfirmed =
+      true;
 
-    /*
-     * 실제 앱 설치 완료 신호.
-     * 고객에게는 별도 내부 상태를 표시하지 않고,
-     * 최종 완료 조건에만 반영합니다.
-     */
-    installConfirmed = true;
-    appInstalledAfterPush = true;
+    deferredInstallPrompt =
+      null;
 
     localStorage.setItem(
       INSTALL_CONFIRMED_KEY,
       "1"
     );
 
-    finishRegistrationIfReady();
+    setStatus(
+      installStatus,
+      "앱 설치가 확인되었습니다.",
+      "success"
+    );
+
+    /*
+     * 실제 앱 설치 완료가 확인된 순간에만
+     * 푸시 알림 승인 단계로 이동합니다.
+     */
+    showCard(
+      pushCard
+    );
   }
 );
 
@@ -977,11 +1094,42 @@ installBtn.addEventListener(
       }
 
       /*
-       * 사용자가 시스템 설치창에서 앱 추가를 승인하면
-       * 앱 설치는 계속 진행되고, 푸시 알림 허용 화면으로 이동합니다.
+       * 빠른 확인 방식
+       * 설치 승인 후 실제 appinstalled 신호가 오면 즉시 푸시 단계로 이동합니다.
+       * 3초 안에 신호가 오지 않아도 푸시 단계로 넘기지 않습니다.
+       * 설치 화면을 유지하고 실제 설치 완료 신호를 계속 기다립니다.
        */
-      showCard(
-        pushCard
+      setStatus(
+        installStatus,
+        "앱을 설치하고 있습니다.",
+        "waiting"
+      );
+
+      if(
+        installConfirmed
+      ){
+        showCard(
+          pushCard
+        );
+        return;
+      }
+
+      setTimeout(
+        () => {
+          if(
+            !installConfirmed
+          ){
+            setStatus(
+              installStatus,
+              "앱 설치가 진행중입니다. 화면을 닫지 마세요.",
+              "waiting"
+            );
+
+            installBtn.textContent =
+              "앱 설치 진행중...";
+          }
+        },
+        3000
       );
 
     }catch(error){
@@ -1013,35 +1161,6 @@ installBtn.addEventListener(
  */
 
 let registrationInProgress = false;
-let registrationFinished = false;
-let serverRegistrationDone = false;
-let appInstalledAfterPush = false;
-
-function finishRegistrationIfReady(){
-
-  if(
-    registrationFinished ||
-    !registrationInProgress ||
-    !appInstalledAfterPush ||
-    !serverRegistrationDone
-  ){
-    return;
-  }
-
-  registrationFinished = true;
-  registrationInProgress = false;
-
-  localStorage.removeItem(PENDING_KEY);
-  localStorage.removeItem(INSTALL_CONFIRMED_KEY);
-
-  localStorage.setItem(
-    COMPLETED_KEY_PREFIX + qrCode,
-    "1"
-  );
-
-  showCard(completeCard);
-}
-
 
 window.addEventListener(
   "beforeunload",
@@ -1060,20 +1179,15 @@ pushBtn.addEventListener(
   "click",
   async () => {
 
-    if(
-      registrationFinished ||
-      registrationInProgress
-    ){
+    if(registrationInProgress){
       return;
     }
 
-    registrationInProgress = true;
-    serverRegistrationDone = false;
+    registrationInProgress =
+      true;
 
-    /*
-     * 앱 설치는 앞 단계에서 이미 진행 중이므로
-     * 설치 완료 상태를 여기서 다시 초기화하지 않습니다.
-     */
+    const registrationStartedAt =
+      Date.now();
 
     pushBtn.disabled =
       true;
@@ -1128,6 +1242,24 @@ pushBtn.addEventListener(
 
         throw new Error(
           "등록 정보를 찾을 수 없습니다."
+        );
+      }
+
+
+      /*
+       * 철칙:
+       * 이번 최초 등록 과정에서 appinstalled 이벤트가 발생하여
+       * installConfirmed === true 가 되기 전에는
+       * 푸시 등록 및 서버 최종 등록을 절대 진행하지 않습니다.
+       *
+       * isInstalledApp() 값만으로는 통과시키지 않습니다.
+       */
+      if(
+        !installConfirmed
+      ){
+
+        throw new Error(
+          "앱 설치 완료가 확인되지 않았습니다. 앱 설치 단계부터 다시 진행해 주세요."
         );
       }
 
@@ -1253,20 +1385,64 @@ pushBtn.addEventListener(
           navigator.userAgent
       });
 
+      localStorage.setItem(
+        OWNER_PHONE_KEY_PREFIX + qrCode,
+        normalizePhone(
+          pending.owner_phone
+        )
+      );
+
 
       /*
-       * 서버 등록 성공 여부는 기록만 합니다.
-       * 등록 완료 화면의 기준은 오직 이번 appinstalled 신호입니다.
+       * 최종 등록 성공 후만
+       * 임시 등록정보 제거
        */
-      serverRegistrationDone = true;
-      finishRegistrationIfReady();
+      localStorage.removeItem(
+        PENDING_KEY
+      );
+
+      localStorage.removeItem(
+        INSTALL_CONFIRMED_KEY
+      );
+
+      localStorage.setItem(
+        COMPLETED_KEY_PREFIX + qrCode,
+        "1"
+      );
+
+      /*
+       * 서버의 최종 register 성공 응답까지 받은 뒤에만
+       * 등록완료 화면으로 전환합니다.
+       */
+      /*
+       * 등록 완료 화면은 푸시 버튼을 누른 직후 미리 띄우지 않습니다.
+       * 휴대폰의 앱 설치 완료 표시가 나올 시간을 확보하기 위해
+       * 등록 진행중 화면을 최소 10초 유지한 뒤 완료 화면으로 전환합니다.
+       */
+      const elapsed =
+        Date.now() - registrationStartedAt;
+
+      const remaining =
+        Math.max(0, 10000 - elapsed);
+
+      if(remaining > 0){
+        await new Promise(
+          resolve => setTimeout(resolve, remaining)
+        );
+      }
+
+      registrationInProgress =
+        false;
+
+      showCard(
+        completeCard
+      );
 
 
     }catch(error){
 
-      registrationInProgress = false;
-      serverRegistrationDone = false;
-      appInstalledAfterPush = false;
+      registrationInProgress =
+        false;
 
       const pushTitle =
         pushCard.querySelector(
@@ -1327,6 +1503,24 @@ pushBtn.addEventListener(
     return;
   }
 
+  /*
+   * 이 QR은 이미 등록 완료됨:
+   * 푸시 승인 화면을 다시 보여주지 않습니다.
+   */
+  if(
+    localStorage.getItem(
+      COMPLETED_KEY_PREFIX + qrCode
+    ) === "1"
+  ){
+    showCard(
+      completeCard
+    );
+
+    refreshFcmTokenSilently();
+
+    return;
+  }
+
   let startupPending =
     null;
 
@@ -1366,13 +1560,32 @@ pushBtn.addEventListener(
   }
 
   /*
-   * 같은 QR 등록 도중이면 푸시 단계로 이어갑니다.
+   * 같은 QR을 등록 중이고 설치된 앱에서 다시 열린 경우
+   * 푸시 단계로 이어가기
+   */
+  if(
+    isInstalledApp() &&
+    startupPending &&
+    startupPending.qr_code === qrCode
+  ){
+    showCard(
+      pushCard
+    );
+
+    return;
+  }
+
+  /*
+   * 같은 QR 등록 도중이면 설치 단계 이어가기
    */
   if(
     startupPending &&
     startupPending.qr_code === qrCode
   ){
-    showCard(pushCard);
+    showCard(
+      installCard
+    );
+
     return;
   }
 
@@ -1384,6 +1597,27 @@ pushBtn.addEventListener(
   );
 
 })();
+
+
+document.addEventListener(
+  "visibilitychange",
+  () => {
+    if(
+      document.visibilityState ===
+      "visible"
+    ){
+      refreshFcmTokenSilently();
+    }
+  }
+);
+
+window.addEventListener(
+  "focus",
+  () => {
+    refreshFcmTokenSilently();
+  }
+);
+
 </script>
 
 </body>
