@@ -255,6 +255,9 @@ const INSTALL_CONFIRMED_KEY =
 const COMPLETED_KEY_PREFIX =
   "wooriapt_vehicle_android_completed_";
 
+const OWNER_PHONE_KEY_PREFIX =
+  "wooriapt_vehicle_android_owner_phone_";
+
 let deferredInstallPrompt = null;
 
 let installConfirmed = false;
@@ -633,6 +636,99 @@ async function callApi(payload){
 
 
   return data;
+}
+
+
+/*
+ * =====================================================
+ * FCM 토큰 자동갱신
+ * 기존 등록/설치/푸시 흐름은 변경하지 않음
+ * =====================================================
+ */
+
+let tokenRefreshInProgress = false;
+
+async function refreshFcmTokenSilently(){
+
+  if(
+    tokenRefreshInProgress ||
+    !qrCode ||
+    localStorage.getItem(
+      COMPLETED_KEY_PREFIX + qrCode
+    ) !== "1"
+  ){
+    return;
+  }
+
+  if(
+    !("Notification" in window) ||
+    Notification.permission !== "granted"
+  ){
+    return;
+  }
+
+  const ownerPhone =
+    normalizePhone(
+      localStorage.getItem(
+        OWNER_PHONE_KEY_PREFIX + qrCode
+      ) || ""
+    );
+
+  if(!validPhone(ownerPhone)){
+    return;
+  }
+
+  tokenRefreshInProgress = true;
+
+  try{
+
+    if(!firebase.apps.length){
+      firebase.initializeApp(
+        FIREBASE_CONFIG
+      );
+    }
+
+    const registration =
+      await prepareServiceWorker();
+
+    const messaging =
+      firebase.messaging();
+
+    const token =
+      await messaging.getToken({
+        vapidKey:
+          VAPID_KEY,
+        serviceWorkerRegistration:
+          registration
+      });
+
+    if(!token){
+      return;
+    }
+
+    await callApi({
+      action:
+        "refresh_token",
+      qr_code:
+        qrCode,
+      owner_phone:
+        ownerPhone,
+      push_token:
+        token,
+      platform:
+        "android",
+      user_agent:
+        navigator.userAgent
+    });
+
+  }catch(error){
+    console.warn(
+      "FCM 토큰 자동갱신:",
+      error
+    );
+  }finally{
+    tokenRefreshInProgress = false;
+  }
 }
 
 
@@ -1290,6 +1386,13 @@ pushBtn.addEventListener(
           navigator.userAgent
       });
 
+      localStorage.setItem(
+        OWNER_PHONE_KEY_PREFIX + qrCode,
+        normalizePhone(
+          pending.owner_phone
+        )
+      );
+
 
       /*
        * 최종 등록 성공 후만
@@ -1414,6 +1517,8 @@ pushBtn.addEventListener(
       completeCard
     );
 
+    refreshFcmTokenSilently();
+
     return;
   }
 
@@ -1493,6 +1598,25 @@ pushBtn.addEventListener(
   );
 
 })();
+
+document.addEventListener(
+  "visibilitychange",
+  () => {
+    if(
+      document.visibilityState ===
+      "visible"
+    ){
+      refreshFcmTokenSilently();
+    }
+  }
+);
+
+window.addEventListener(
+  "focus",
+  () => {
+    refreshFcmTokenSilently();
+  }
+);
 </script>
 
 </body>
