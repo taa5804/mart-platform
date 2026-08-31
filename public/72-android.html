@@ -311,6 +311,7 @@
     let deferredInstallPrompt = null;
     let countdownTimer = null;
     let ownerPhoneForEmergency = "";
+    let existingRegistered = false;
 
     const loadingCard = document.getElementById("loadingCard");
     const registerCard = document.getElementById("registerCard");
@@ -530,11 +531,17 @@
         }
 
         if (data.registered === true) {
-          updateRequestScreen(data);
-          showCard(requestCard);
+          existingRegistered = true;
+          setStatus(
+            registerStatus,
+            "등록된 QR입니다. 차주 휴대전화번호를 입력해 푸시 알림을 다시 확인해 주세요.",
+            "waiting"
+          );
+          showCard(registerCard);
           return;
         }
 
+        existingRegistered = false;
         showCard(registerCard);
       } catch (error) {
         showError(
@@ -798,7 +805,9 @@
 
           const data =
             await callVehicleApi({
-              action: "register",
+              action: existingRegistered
+                ? "refresh_token"
+                : "register",
               qr_code: qrCode,
               owner_phone: enteredPhone,
               push_token: fcmToken,
@@ -816,7 +825,9 @@
 
           setStatus(
             installStatus,
-            "등록이 완료되었습니다.",
+            existingRegistered
+              ? "푸시 알림 설정과 FCM 토큰 확인이 완료되었습니다."
+              : "등록이 완료되었습니다.",
             "success"
           );
 
