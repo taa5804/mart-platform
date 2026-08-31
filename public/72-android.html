@@ -204,7 +204,7 @@ const VAPID_KEY =
 
 const FIREBASE_CONFIG = {
   apiKey:
-    "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
+    "AIzaSyB3nZdmUrj2wsKPQpOV8dLso7i17fZo0Hc",
 
   authDomain:
     "wooriapt-carqr.firebaseapp.com",
@@ -666,39 +666,25 @@ function prepareServiceWorker(){
       }
 
 
-      let registration =
+      const registration =
         await navigator
           .serviceWorker
-          .getRegistration(
-            "/"
+          .register(
+            "/firebase-messaging-sw.js?v=" +
+            BUILD_VERSION,
+            {
+              scope:"/",
+              updateViaCache:"none"
+            }
           );
 
 
-      if(
-        !registration
-      ){
-
-        registration =
-          await navigator
-            .serviceWorker
-            .register(
-              "/firebase-messaging-sw.js?v=" +
-              BUILD_VERSION,
-              {
-                scope:"/",
-                updateViaCache:"none"
-              }
-            );
-
-      }else{
-
-        try{
-          await registration.update();
-        }catch(error){
-          console.warn(
-            error
-          );
-        }
+      try{
+        await registration.update();
+      }catch(error){
+        console.warn(
+          error
+        );
       }
 
 
@@ -1088,7 +1074,6 @@ pushBtn.addEventListener(
      * 앱 설치는 앞 단계에서 이미 진행 중이므로
      * 설치 완료 상태를 여기서 다시 초기화하지 않습니다.
      */
-    appInstalledAfterPush = false;
 
     pushBtn.disabled =
       true;
