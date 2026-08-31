@@ -103,6 +103,16 @@ button:disabled{
 .waiting{
   color:#1d4ed8;
 }
+
+
+/* 차량이동요청 화면 - 기존 등록/앱/푸시 로직은 변경하지 않음 */
+.call-title{font-size:24px;margin:0 0 12px}
+.call-guide{color:#64748b;line-height:1.7;margin-bottom:14px}
+.call-status{margin-top:14px;font-weight:800;line-height:1.6;color:#334155;white-space:pre-line}
+.call-message{margin-top:12px;font-weight:700;line-height:1.6;white-space:pre-line}
+#moveBtn{background:#2563eb}
+#emergencyBtn{background:#dc2626}
+
 </style>
 </head>
 
@@ -176,6 +186,27 @@ button:disabled{
     등록이 완료되었습니다.<br>
     이제 차량이동 요청 알림을 받을 수 있습니다.
   </div>
+</section>
+
+
+<section id="callCard" class="card">
+  <h1 class="call-title">차량이동 요청</h1>
+
+  <div class="call-guide">
+    차주에게 차량이동 요청 알림을 보냅니다.<br>
+    요청은 3분 간격으로 최대 3회 가능합니다.
+  </div>
+
+  <button id="moveBtn" type="button">
+    차량이동요청
+  </button>
+
+  <button id="emergencyBtn" type="button" disabled>
+    긴급통화
+  </button>
+
+  <div id="callStatus" class="call-status"></div>
+  <div id="callMessage" class="call-message"></div>
 </section>
 
 
@@ -330,6 +361,32 @@ const pushStatus =
   );
 
 
+
+const callCard =
+  document.getElementById(
+    "callCard"
+  );
+
+const moveBtn =
+  document.getElementById(
+    "moveBtn"
+  );
+
+const emergencyBtn =
+  document.getElementById(
+    "emergencyBtn"
+  );
+
+const callStatus =
+  document.getElementById(
+    "callStatus"
+  );
+
+const callMessage =
+  document.getElementById(
+    "callMessage"
+  );
+
 const errorText =
   document.getElementById(
     "errorText"
@@ -341,6 +398,7 @@ const cards = [
   installCard,
   pushCard,
   completeCard,
+  callCard,
   errorCard
 ];
 
@@ -635,6 +693,277 @@ async function callApi(payload){
   return data;
 }
 
+
+/*
+ * =====================================================
+ * 등록된 QR 차량이동요청
+ * 과거 정상 로직 복구:
+ * QR 스캔 -> 서버 status -> registered=true -> callCard
+ * =====================================================
+ */
+
+const CALLER_SESSION_KEY_PREFIX =
+  "wooriapt_vehicle_caller_session_";
+
+let callTimer = null;
+let currentCallState = {
+  request_count: 0,
+  next_allowed_at: null,
+  emergency_enabled: false
+};
+
+function getCallerSessionId(){
+  const key =
+    CALLER_SESSION_KEY_PREFIX + qrCode;
+
+  let value =
+    sessionStorage.getItem(key);
+
+  if(!value){
+    value =
+      (crypto.randomUUID
+        ? crypto.randomUUID()
+        : "caller-" + Date.now() + "-" + Math.random().toString(36).slice(2));
+
+    sessionStorage.setItem(
+      key,
+      value
+    );
+  }
+
+  return value;
+}
+
+function setCallMessage(text,type){
+  callMessage.textContent =
+    text || "";
+
+  callMessage.className =
+    "call-message" +
+    (type ? " " + type : "");
+}
+
+function remainingSeconds(iso){
+  if(!iso){
+    return 0;
+  }
+
+  return Math.max(
+    0,
+    Math.ceil(
+      (new Date(iso).getTime() - Date.now()) / 1000
+    )
+  );
+}
+
+function renderCallState(state){
+  currentCallState = {
+    request_count:
+      Number(state.request_count || 0),
+    next_allowed_at:
+      state.next_allowed_at || null,
+    emergency_enabled:
+      state.emergency_enabled === true
+  };
+
+  const count =
+    currentCallState.request_count;
+
+  const remain =
+    remainingSeconds(
+      currentCallState.next_allowed_at
+    );
+
+  if(count >= 3){
+    moveBtn.disabled = true;
+    moveBtn.textContent =
+      "차량이동요청 3회 완료";
+
+    emergencyBtn.disabled =
+      !currentCallState.emergency_enabled;
+
+    callStatus.textContent =
+      currentCallState.emergency_enabled
+        ? "3회 요청 완료 · 긴급통화 가능"
+        : "3회 요청 완료 · 긴급통화 대기 중";
+
+    return;
+  }
+
+  emergencyBtn.disabled = true;
+
+  if(remain > 0){
+    const minutes =
+      Math.floor(remain / 60);
+    const seconds =
+      remain % 60;
+
+    moveBtn.disabled = true;
+    moveBtn.textContent =
+      "다음 요청 " +
+      minutes +
+      "분 " +
+      seconds +
+      "초 후";
+  }else{
+    moveBtn.disabled = false;
+    moveBtn.textContent =
+      count === 0
+        ? "차량이동요청"
+        : (count + 1) + "차 차량이동요청";
+  }
+
+  callStatus.textContent =
+    "차량이동요청 " +
+    count +
+    "/3회";
+}
+
+async function loadVehicleStatus(){
+  return await callApi({
+    action: "status",
+    qr_code: qrCode
+  });
+}
+
+async function refreshCallState(){
+  const status =
+    await loadVehicleStatus();
+
+  if(status.registered !== true){
+    return false;
+  }
+
+  renderCallState(status);
+  return true;
+}
+
+function startCallStateTimer(){
+  if(callTimer){
+    clearInterval(callTimer);
+  }
+
+  callTimer =
+    setInterval(
+      async () => {
+        try{
+          const before =
+            currentCallState.emergency_enabled;
+
+          renderCallState(
+            currentCallState
+          );
+
+          if(
+            currentCallState.request_count >= 3 &&
+            !before
+          ){
+            await refreshCallState();
+          }
+        }catch(error){
+          console.warn(
+            "차량이동 상태 갱신:",
+            error
+          );
+        }
+      },
+      1000
+    );
+}
+
+moveBtn.addEventListener(
+  "click",
+  async () => {
+    moveBtn.disabled = true;
+    setCallMessage(
+      "차주에게 차량이동 요청을 보내고 있습니다.",
+      "waiting"
+    );
+
+    try{
+      const result =
+        await callApi({
+          action: "request",
+          qr_code: qrCode,
+          caller_session_id:
+            getCallerSessionId()
+        });
+
+      renderCallState(result);
+
+      setCallMessage(
+        result.message ||
+          "차량이동요청이 전송되었습니다.",
+        "success"
+      );
+    }catch(error){
+      setCallMessage(
+        error.message ||
+          "차량이동요청 전송에 실패했습니다.",
+        "error"
+      );
+
+      try{
+        await refreshCallState();
+      }catch(e){
+        moveBtn.disabled = false;
+      }
+    }
+  }
+);
+
+emergencyBtn.addEventListener(
+  "click",
+  async () => {
+    emergencyBtn.disabled = true;
+    setCallMessage(
+      "긴급통화를 확인하고 있습니다.",
+      "waiting"
+    );
+
+    try{
+      const result =
+        await callApi({
+          action: "emergency",
+          qr_code: qrCode,
+          caller_session_id:
+            getCallerSessionId()
+        });
+
+      if(
+        result.emergency_enabled !== true ||
+        !result.owner_phone
+      ){
+        throw new Error(
+          result.message ||
+            "긴급통화를 사용할 수 없습니다."
+        );
+      }
+
+      setCallMessage(
+        "긴급통화를 연결합니다.",
+        "success"
+      );
+
+      window.location.href =
+        "tel:" +
+        String(result.owner_phone)
+          .replace(/[^0-9]/g, "");
+    }catch(error){
+      setCallMessage(
+        error.message ||
+          "긴급통화 연결에 실패했습니다.",
+        "error"
+      );
+
+      try{
+        await refreshCallState();
+      }catch(e){
+        emergencyBtn.disabled = false;
+      }
+    }
+  }
+);
 
 /*
  * =====================================================
@@ -1386,7 +1715,7 @@ pushBtn.addEventListener(
  * 시작검사
  * =====================================================
  */
-(function startAndroidRegistration(){
+(async function startAndroidRegistration(){
 
   if(
     !qrCode
@@ -1402,8 +1731,36 @@ pushBtn.addEventListener(
   }
 
   /*
-   * 이 QR은 이미 등록 완료됨:
-   * 푸시 승인 화면을 다시 보여주지 않습니다.
+   * 가장 먼저 서버의 실제 등록상태 확인
+   * 등록된 QR이면 차량이동요청 화면으로 바로 이동
+   */
+  try{
+    const vehicleStatus =
+      await loadVehicleStatus();
+
+    if(
+      vehicleStatus.registered === true
+    ){
+      renderCallState(
+        vehicleStatus
+      );
+
+      showCard(
+        callCard
+      );
+
+      startCallStateTimer();
+      return;
+    }
+  }catch(error){
+    console.warn(
+      "자동차 QR 상태 확인:",
+      error
+    );
+  }
+
+  /*
+   * 아래부터는 기존 Android 등록/앱/푸시 로직 그대로
    */
   if(
     localStorage.getItem(
@@ -1432,9 +1789,6 @@ pushBtn.addEventListener(
       null;
   }
 
-  /*
-   * 다른 QR의 이전 pending은 제거
-   */
   if(
     startupPending &&
     startupPending.qr_code &&
@@ -1455,10 +1809,6 @@ pushBtn.addEventListener(
       false;
   }
 
-  /*
-   * 같은 QR을 등록 중이고 설치된 앱에서 다시 열린 경우
-   * 푸시 단계로 이어가기
-   */
   if(
     isInstalledApp() &&
     startupPending &&
@@ -1471,9 +1821,6 @@ pushBtn.addEventListener(
     return;
   }
 
-  /*
-   * 같은 QR 등록 도중이면 설치 단계 이어가기
-   */
   if(
     startupPending &&
     startupPending.qr_code === qrCode
@@ -1485,14 +1832,11 @@ pushBtn.addEventListener(
     return;
   }
 
-  /*
-   * 새 QR은 무조건 전화번호 등록부터
-   */
   showCard(
     registerCard
   );
 
-})();
+})()
 </script>
 
 </body>
