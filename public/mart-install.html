@@ -20,6 +20,70 @@
 
 <title>우리가게 앱 설치</title>
 
+<!-- =====================================================
+     아이폰 입간판 QR 전용 동적 Manifest
+===================================================== -->
+<script>
+(function(){
+  "use strict";
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const qr =
+    String(
+      params.get("qr") || ""
+    )
+      .trim()
+      .toUpperCase();
+
+  const path =
+    String(
+      params.get("path") ||
+      params.get("store_path") ||
+      "74"
+    )
+      .replace(
+        /[^0-9]/g,
+        ""
+      ) || "74";
+
+  const ua =
+    navigator.userAgent || "";
+
+  const isIOS =
+    /iPhone|iPad|iPod/i.test(ua) ||
+    (
+      navigator.platform === "MacIntel" &&
+      navigator.maxTouchPoints > 1
+    );
+
+  if(
+    isIOS &&
+    qr
+  ){
+
+    const manifest =
+      document.getElementById(
+        "manifestLink"
+      );
+
+    if(manifest){
+
+      manifest.href =
+        "/api/iphone-manifest" +
+        "?qr=" +
+        encodeURIComponent(qr) +
+        "&path=" +
+        encodeURIComponent(path);
+
+    }
+  }
+})();
+</script>
+
 <style>
 *{
   box-sizing:border-box;
@@ -55,20 +119,12 @@ body{
 
 .card{
   display:none;
-
   width:100%;
   max-width:430px;
-
   padding:28px 22px;
-
   border-radius:18px;
-
   background:#ffffff;
-
-  box-shadow:
-    0 10px 35px
-    rgba(15,23,42,.10);
-
+  box-shadow:0 10px 35px rgba(15,23,42,.10);
   text-align:center;
 }
 
@@ -79,49 +135,34 @@ body{
 .logo{
   width:92px;
   height:92px;
-
   margin:0 auto 16px;
-
   border-radius:22px;
-
   object-fit:cover;
-
-  box-shadow:
-    0 8px 22px
-    rgba(15,23,42,.14);
+  box-shadow:0 8px 22px rgba(15,23,42,.14);
 }
 
 h1{
   margin:0 0 12px;
-
   font-size:25px;
   line-height:1.4;
 }
 
 p{
   margin:0;
-
   color:#64748b;
-
   font-size:15px;
   line-height:1.75;
-
   word-break:keep-all;
 }
 
 .guide{
   margin:18px 0;
-
   padding:17px 15px;
-
   border-radius:12px;
-
   background:#f8fafc;
   color:#334155;
-
   font-size:15px;
   line-height:1.75;
-
   word-break:keep-all;
 }
 
@@ -132,43 +173,33 @@ p{
 button{
   width:100%;
   min-height:54px;
-
   padding:13px 16px;
-
   border:0;
   border-radius:11px;
-
   background:#16a34a;
   color:#ffffff;
-
   font-size:17px;
   font-weight:800;
-
   cursor:pointer;
 }
 
 button:disabled{
   background:#cbd5e1;
   color:#64748b;
-
   cursor:not-allowed;
 }
 
 .secondary{
   margin-top:10px;
-
   background:#475569;
 }
 
 .status{
   min-height:24px;
-
   margin-top:15px;
-
   font-size:14px;
   font-weight:700;
   line-height:1.6;
-
   word-break:keep-all;
 }
 
@@ -186,16 +217,11 @@ button:disabled{
 
 .iphone-steps{
   margin:18px 0;
-
   padding:18px 15px;
-
   border-radius:14px;
-
   background:#f8fafc;
   color:#334155;
-
   text-align:left;
-
   font-size:15px;
   line-height:1.8;
 }
@@ -206,33 +232,23 @@ button:disabled{
 
 .share-symbol{
   display:flex;
-
   width:56px;
   height:56px;
-
   margin:12px auto;
-
   align-items:center;
   justify-content:center;
-
   border:2px solid #94a3b8;
   border-radius:13px;
-
   background:#ffffff;
-
   font-size:31px;
 }
 
 .done-box{
   margin-top:18px;
-
   padding:15px;
-
   border-radius:12px;
-
   background:#ecfdf5;
   color:#166534;
-
   font-size:15px;
   font-weight:800;
   line-height:1.7;
@@ -240,64 +256,44 @@ button:disabled{
 
 .qr-box{
   margin:14px 0;
-
   padding:11px 12px;
-
   border:1px solid #bbf7d0;
   border-radius:10px;
-
   background:#f0fdf4;
-
   color:#166534;
-
   font-size:13px;
   line-height:1.6;
-
   word-break:break-all;
 }
 </style>
 </head>
 
-
 <body>
-
-
-<!-- =====================================================
-     로딩
-===================================================== -->
 
 <section
   id="loadingCard"
   class="card active"
 >
-
   <img
     class="logo"
     src="/icon-192.png"
     alt="우리가게"
   >
 
-  <h1 id="loadingTitle">
+  <h1>
     우리가게 앱 설치
   </h1>
 
   <p>
     앱 설치 환경을 확인하고 있습니다.
   </p>
-
 </section>
 
-
-
-<!-- =====================================================
-     안드로이드 설치
-===================================================== -->
 
 <section
   id="androidCard"
   class="card"
 >
-
   <img
     class="logo"
     src="/icon-192.png"
@@ -308,20 +304,16 @@ button:disabled{
     우리가게 앱 설치
   </h1>
 
-
   <div
     id="androidGuide"
     class="guide"
-  >
-  </div>
-
+  ></div>
 
   <div
     id="qrInfo"
     class="qr-box"
     style="display:none"
   ></div>
-
 
   <button
     id="installButton"
@@ -330,7 +322,6 @@ button:disabled{
   >
     앱 설치 준비 중...
   </button>
-
 
   <button
     id="retryButton"
@@ -341,27 +332,19 @@ button:disabled{
     다시 확인하기
   </button>
 
-
   <div
     id="androidStatus"
     class="status waiting"
   >
     앱 설치를 준비하고 있습니다.
   </div>
-
 </section>
 
-
-
-<!-- =====================================================
-     아이폰 설치
-===================================================== -->
 
 <section
   id="iphoneCard"
   class="card"
 >
-
   <img
     class="logo"
     src="/icon-192.png"
@@ -371,7 +354,6 @@ button:disabled{
   <h1>
     아이폰 앱 설치
   </h1>
-
 
   <div class="iphone-steps">
 
@@ -395,7 +377,6 @@ button:disabled{
 
   </div>
 
-
   <div
     id="iphoneDoneBox"
     class="done-box"
@@ -404,27 +385,19 @@ button:disabled{
     <strong>우리가게 앱</strong>을 눌러 실행하세요.
   </div>
 
-
   <div
     id="iphoneStatus"
     class="status waiting"
   >
     아이폰은 Safari에서 홈 화면에 추가해 주세요.
   </div>
-
 </section>
 
-
-
-<!-- =====================================================
-     기본 브라우저 안내
-===================================================== -->
 
 <section
   id="browserCard"
   class="card"
 >
-
   <img
     class="logo"
     src="/icon-192.png"
@@ -435,14 +408,12 @@ button:disabled{
     기본 브라우저에서 열어 주세요
   </h1>
 
-
   <div
     id="browserGuide"
     class="guide"
   >
     앱 설치를 위해 Chrome 또는 Safari에서 열어 주세요.
   </div>
-
 
   <button
     id="openBrowserButton"
@@ -451,25 +422,17 @@ button:disabled{
     Chrome에서 계속하기
   </button>
 
-
   <div
     id="browserStatus"
     class="status"
   ></div>
-
 </section>
 
-
-
-<!-- =====================================================
-     입간판 QR 푸시 승인
-===================================================== -->
 
 <section
   id="pushCard"
   class="card"
 >
-
   <img
     class="logo"
     src="/icon-192.png"
@@ -479,7 +442,6 @@ button:disabled{
   <h1>
     푸시 알림 허용
   </h1>
-
 
   <div class="guide">
 
@@ -494,7 +456,6 @@ button:disabled{
 
   </div>
 
-
   <button
     id="pushButton"
     type="button"
@@ -502,25 +463,17 @@ button:disabled{
     푸시 알림 허용
   </button>
 
-
   <div
     id="pushStatus"
     class="status"
   ></div>
-
 </section>
 
-
-
-<!-- =====================================================
-     이미 설치
-===================================================== -->
 
 <section
   id="installedCard"
   class="card"
 >
-
   <img
     class="logo"
     src="/icon-192.png"
@@ -531,19 +484,11 @@ button:disabled{
     앱이 설치되어 있습니다
   </h1>
 
-
   <div class="done-box">
-
     휴대전화 홈 화면의<br>
-
-    <strong>
-      우리가게 앱
-    </strong>
-
+    <strong>우리가게 앱</strong>
     을 이용할 수 있습니다.
-
   </div>
-
 
   <button
     id="openAppButton"
@@ -551,20 +496,13 @@ button:disabled{
   >
     계속하기
   </button>
-
 </section>
 
-
-
-<!-- =====================================================
-     완료
-===================================================== -->
 
 <section
   id="completeCard"
   class="card"
 >
-
   <img
     class="logo"
     src="/icon-192.png"
@@ -575,7 +513,6 @@ button:disabled{
     앱 설치 완료
   </h1>
 
-
   <div
     id="completeMessage"
     class="done-box"
@@ -583,19 +520,15 @@ button:disabled{
     우리가게 앱 설치가 완료되었습니다.
   </div>
 
-
   <button
     id="completeButton"
     type="button"
   >
     우리가게 열기
   </button>
-
 </section>
 
 
-
-<!-- Firebase -->
 <script
   src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"
 ></script>
@@ -609,14 +542,8 @@ button:disabled{
 "use strict";
 
 
-/*
- * =====================================================
- * 기본 설정
- * =====================================================
- */
-
 const BUILD_VERSION =
-  "20260831-MART-SIGNBOARD-01";
+  "20260831-MART-SIGNBOARD-02";
 
 
 const API_URL =
@@ -653,13 +580,6 @@ const VAPID_KEY =
   "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
 
 
-
-/*
- * =====================================================
- * 저장키
- * =====================================================
- */
-
 const PENDING_KEY =
   "wooriapt_mart_pending_registration";
 
@@ -672,13 +592,6 @@ const STORE_URL_KEY =
 const PUSH_TOKEN_KEY =
   "wooriapt_mart_push_token";
 
-
-
-/*
- * =====================================================
- * URL 확인
- * =====================================================
- */
 
 const params =
   new URLSearchParams(
@@ -707,11 +620,9 @@ function cleanStorePath(value){
         ""
       );
 
-
   if(!digits){
     return "";
   }
-
 
   return "/" +
     String(
@@ -738,24 +649,9 @@ const storeCode =
     .toUpperCase();
 
 
-const resume =
-  params.get("resume") === "1";
-
-
-/*
- * QR이 있으면 입간판 고객 모드
- * QR이 없으면 기존 마트 사장님 설치 모드
- */
 const SIGNBOARD_MODE =
   !!qrCode;
 
-
-
-/*
- * =====================================================
- * 화면 요소
- * =====================================================
- */
 
 let deferredInstallPrompt =
   null;
@@ -876,13 +772,6 @@ const pushStatus =
   );
 
 
-
-/*
- * =====================================================
- * 공통 함수
- * =====================================================
- */
-
 function showCard(name){
 
   Object.values(
@@ -897,11 +786,9 @@ function showCard(name){
     }
   );
 
-
   cards[name].classList.add(
     "active"
   );
-
 
   window.scrollTo(
     0,
@@ -920,14 +807,11 @@ function setStatus(
     return;
   }
 
-
   element.textContent =
     message || "";
 
-
   element.className =
     "status";
-
 
   if(type){
 
@@ -953,18 +837,10 @@ function isInstalledApp(){
 }
 
 
-
-/*
- * =====================================================
- * 브라우저 확인
- * =====================================================
- */
-
 function getBrowserInfo(){
 
   const ua =
     navigator.userAgent || "";
-
 
   const ios =
     /iphone|ipad|ipod/i
@@ -975,15 +851,12 @@ function getBrowserInfo(){
       navigator.maxTouchPoints > 1
     );
 
-
   const android =
     /android/i.test(ua);
-
 
   const samsung =
     /samsungbrowser/i
       .test(ua);
-
 
   const chrome =
     android &&
@@ -992,19 +865,15 @@ function getBrowserInfo(){
     !/edga|edg\/|opr\/|opera/i
       .test(ua);
 
-
   const googleApp =
     /\bGSA\//i.test(ua);
-
 
   const androidWebView =
     /;\s*wv\)/i.test(ua);
 
-
   const knownInApp =
     /(kakaotalk|naver\(inapp|naverapp|line\/|instagram|fbav|fban)/i
       .test(ua);
-
 
   const iosInApp =
     ios &&
@@ -1014,20 +883,17 @@ function getBrowserInfo(){
         .test(ua)
     );
 
-
   const inApp =
     googleApp ||
     androidWebView ||
     knownInApp ||
     iosInApp;
 
-
   const safari =
     ios &&
     /safari/i.test(ua) &&
     !/crios|fxios|edgios/i
       .test(ua);
-
 
   return {
 
@@ -1042,21 +908,11 @@ function getBrowserInfo(){
 }
 
 
-
-/*
- * =====================================================
- * 입간판 QR 정보 저장
- *
- * 전화번호는 저장하지 않습니다.
- * =====================================================
- */
-
 function saveSignboardPending(){
 
   if(!SIGNBOARD_MODE){
     return;
   }
-
 
   const data = {
 
@@ -1083,18 +939,15 @@ function saveSignboardPending(){
 
   };
 
-
   localStorage.setItem(
     PENDING_KEY,
     JSON.stringify(data)
   );
 
-
   localStorage.setItem(
     STORE_PATH_KEY,
     storePath
   );
-
 
   localStorage.setItem(
     STORE_URL_KEY,
@@ -1112,15 +965,12 @@ function loadSignboardPending(){
         PENDING_KEY
       );
 
-
     if(!saved){
       return null;
     }
 
-
     const data =
       JSON.parse(saved);
-
 
     if(
       !data ||
@@ -1128,7 +978,6 @@ function loadSignboardPending(){
     ){
       return null;
     }
-
 
     return data;
 
@@ -1139,13 +988,6 @@ function loadSignboardPending(){
   }
 }
 
-
-
-/*
- * =====================================================
- * 매장 화면 이동
- * =====================================================
- */
 
 function openStore(){
 
@@ -1159,7 +1001,6 @@ function openStore(){
     storePath ||
     "/74";
 
-
   const target =
     /^https?:\/\//i.test(
       saved
@@ -1172,19 +1013,11 @@ function openStore(){
             : "/" + saved
         );
 
-
   window.location.replace(
     target
   );
 }
 
-
-
-/*
- * =====================================================
- * Service Worker
- * =====================================================
- */
 
 async function prepareServiceWorker(){
 
@@ -1201,12 +1034,10 @@ async function prepareServiceWorker(){
 
   }
 
-
   let registration =
     await navigator
       .serviceWorker
       .getRegistration("/");
-
 
   if(!registration){
 
@@ -1236,22 +1067,13 @@ async function prepareServiceWorker(){
 
   }
 
-
   await navigator
     .serviceWorker
     .ready;
 
-
   return registration;
 }
 
-
-
-/*
- * =====================================================
- * API
- * =====================================================
- */
 
 function withTimeout(
   promise,
@@ -1319,13 +1141,10 @@ async function callApi(payload){
 
     );
 
-
   const text =
     await response.text();
 
-
   let data = {};
-
 
   try{
 
@@ -1340,7 +1159,6 @@ async function callApi(payload){
 
   }
 
-
   if(
     !response.ok ||
     data.ok === false ||
@@ -1354,25 +1172,15 @@ async function callApi(payload){
         "서버 처리에 실패했습니다."
       );
 
-
     apiError.data =
       data;
-
 
     throw apiError;
   }
 
-
   return data;
 }
 
-
-
-/*
- * =====================================================
- * FCM 푸시 토큰
- * =====================================================
- */
 
 async function createFcmToken(){
 
@@ -1389,11 +1197,9 @@ async function createFcmToken(){
 
   }
 
-
   const permission =
     await Notification
       .requestPermission();
-
 
   if(
     permission !==
@@ -1406,7 +1212,6 @@ async function createFcmToken(){
 
   }
 
-
   if(!window.firebase){
 
     throw new Error(
@@ -1414,7 +1219,6 @@ async function createFcmToken(){
     );
 
   }
-
 
   if(
     !firebase.apps.length
@@ -1426,14 +1230,11 @@ async function createFcmToken(){
 
   }
 
-
   const messaging =
     firebase.messaging();
 
-
   const registration =
     await prepareServiceWorker();
-
 
   const token =
     await withTimeout(
@@ -1454,7 +1255,6 @@ async function createFcmToken(){
 
     );
 
-
   if(!token){
 
     throw new Error(
@@ -1463,17 +1263,9 @@ async function createFcmToken(){
 
   }
 
-
   return token;
 }
 
-
-
-/*
- * =====================================================
- * Chrome 열기
- * =====================================================
- */
 
 function openCurrentPageInChrome(){
 
@@ -1482,12 +1274,10 @@ function openCurrentPageInChrome(){
       location.href
     );
 
-
   const fallback =
     encodeURIComponent(
       current.href
     );
-
 
   location.href =
 
@@ -1516,26 +1306,16 @@ function openCurrentPageInChrome(){
 }
 
 
-
-/*
- * =====================================================
- * 안드로이드 설치 준비
- * =====================================================
- */
-
 function enableAndroidInstall(){
 
   installButton.disabled =
     false;
 
-
   installButton.textContent =
     "우리가게 앱 설치";
 
-
   retryButton.style.display =
     "none";
-
 
   setStatus(
     androidStatus,
@@ -1548,7 +1328,6 @@ function enableAndroidInstall(){
 function waitForInstallPrompt(){
 
   let count = 0;
-
 
   const timer =
     setInterval(
@@ -1567,9 +1346,7 @@ function waitForInstallPrompt(){
           return;
         }
 
-
         count += 1;
-
 
         if(
           count >= 20
@@ -1579,18 +1356,14 @@ function waitForInstallPrompt(){
             timer
           );
 
-
           installButton.disabled =
             false;
-
 
           installButton.textContent =
             "우리가게 앱 설치";
 
-
           retryButton.style.display =
             "block";
-
 
           setStatus(
             androidStatus,
@@ -1606,23 +1379,14 @@ function waitForInstallPrompt(){
 }
 
 
-
-/*
- * =====================================================
- * beforeinstallprompt
- * =====================================================
- */
-
 window.addEventListener(
   "beforeinstallprompt",
   function(event){
 
     event.preventDefault();
 
-
     deferredInstallPrompt =
       event;
-
 
     if(
       cards.android
@@ -1640,20 +1404,12 @@ window.addEventListener(
 );
 
 
-
-/*
- * =====================================================
- * 설치 완료 이벤트
- * =====================================================
- */
-
 window.addEventListener(
   "appinstalled",
   function(){
 
     deferredInstallPrompt =
       null;
-
 
     if(
       SIGNBOARD_MODE
@@ -1667,7 +1423,6 @@ window.addEventListener(
 
     }
 
-
     showCard(
       "complete"
     );
@@ -1675,13 +1430,6 @@ window.addEventListener(
   }
 );
 
-
-
-/*
- * =====================================================
- * 설치 버튼
- * =====================================================
- */
 
 installButton.addEventListener(
   "click",
@@ -1710,14 +1458,11 @@ installButton.addEventListener(
       return;
     }
 
-
     installButton.disabled =
       true;
 
-
     installButton.textContent =
       "설치창 여는 중...";
-
 
     setStatus(
       androidStatus,
@@ -1725,11 +1470,9 @@ installButton.addEventListener(
       "waiting"
     );
 
-
     try{
 
       await prepareServiceWorker();
-
 
       for(
         let i=0;
@@ -1751,7 +1494,6 @@ installButton.addEventListener(
 
       }
 
-
       if(
         !deferredInstallPrompt
       ){
@@ -1759,14 +1501,11 @@ installButton.addEventListener(
         installButton.disabled =
           false;
 
-
         installButton.textContent =
           "우리가게 앱 설치";
 
-
         retryButton.style.display =
           "block";
-
 
         setStatus(
           androidStatus,
@@ -1774,25 +1513,19 @@ installButton.addEventListener(
           "waiting"
         );
 
-
         return;
       }
-
 
       const promptEvent =
         deferredInstallPrompt;
 
-
       deferredInstallPrompt =
         null;
 
-
       await promptEvent.prompt();
-
 
       const result =
         await promptEvent.userChoice;
-
 
       if(
         result.outcome !==
@@ -1802,10 +1535,8 @@ installButton.addEventListener(
         installButton.disabled =
           false;
 
-
         installButton.textContent =
           "우리가게 앱 설치";
-
 
         setStatus(
           androidStatus,
@@ -1813,19 +1544,13 @@ installButton.addEventListener(
           "error"
         );
 
-
         return;
       }
-
 
       if(
         SIGNBOARD_MODE
       ){
 
-        /*
-         * 설치 승인 직후
-         * 푸시 단계 표시
-         */
         showCard(
           "push"
         );
@@ -1840,16 +1565,13 @@ installButton.addEventListener(
 
       }
 
-
     }catch(error){
 
       installButton.disabled =
         false;
 
-
       installButton.textContent =
         "우리가게 앱 설치";
-
 
       setStatus(
         androidStatus,
@@ -1864,13 +1586,6 @@ installButton.addEventListener(
 );
 
 
-
-/*
- * =====================================================
- * 다시 확인
- * =====================================================
- */
-
 retryButton.addEventListener(
   "click",
   async function(){
@@ -1878,21 +1593,17 @@ retryButton.addEventListener(
     retryButton.style.display =
       "none";
 
-
     installButton.disabled =
       true;
 
-
     installButton.textContent =
       "앱 설치 준비 중...";
-
 
     setStatus(
       androidStatus,
       "앱 설치를 다시 확인하고 있습니다.",
       "waiting"
     );
-
 
     try{
 
@@ -1904,20 +1615,11 @@ retryButton.addEventListener(
 
     }
 
-
     waitForInstallPrompt();
 
   }
 );
 
-
-
-/*
- * =====================================================
- * 푸시 알림 허용
- * 입간판 QR에서만 사용
- * =====================================================
- */
 
 pushButton.addEventListener(
   "click",
@@ -1929,14 +1631,11 @@ pushButton.addEventListener(
       return;
     }
 
-
     pushButton.disabled =
       true;
 
-
     pushButton.textContent =
       "푸시 알림 등록 중...";
-
 
     setStatus(
       pushStatus,
@@ -1944,15 +1643,12 @@ pushButton.addEventListener(
       "waiting"
     );
 
-
     try{
 
       saveSignboardPending();
 
-
       const pending =
         loadSignboardPending();
-
 
       if(
         !pending
@@ -1964,14 +1660,9 @@ pushButton.addEventListener(
 
       }
 
-
       const fcmToken =
         await createFcmToken();
 
-
-      /*
-       * 입간판은 전화번호를 사용하지 않습니다.
-       */
       await callApi({
 
         action:
@@ -2012,12 +1703,10 @@ pushButton.addEventListener(
 
       });
 
-
       localStorage.setItem(
         PUSH_TOKEN_KEY,
         fcmToken
       );
-
 
       localStorage.setItem(
         STORE_PATH_KEY,
@@ -2025,13 +1714,11 @@ pushButton.addEventListener(
         storePath
       );
 
-
       localStorage.setItem(
         STORE_URL_KEY,
         pending.store_url ||
         storePath
       );
-
 
       setStatus(
         pushStatus,
@@ -2039,10 +1726,8 @@ pushButton.addEventListener(
         "success"
       );
 
-
       completeTitle.textContent =
         "등록 완료";
-
 
       completeMessage.innerHTML =
 
@@ -2052,11 +1737,9 @@ pushButton.addEventListener(
 
         "이제 마트 행사 알림을 받을 수 있습니다.";
 
-
       showCard(
         "complete"
       );
-
 
     }catch(error){
 
@@ -2065,14 +1748,11 @@ pushButton.addEventListener(
         error
       );
 
-
       pushButton.disabled =
         false;
 
-
       pushButton.textContent =
         "푸시 알림 허용";
-
 
       setStatus(
         pushStatus,
@@ -2087,20 +1767,12 @@ pushButton.addEventListener(
 );
 
 
-
-/*
- * =====================================================
- * 기본 브라우저 버튼
- * =====================================================
- */
-
 openBrowserButton.addEventListener(
   "click",
   function(){
 
     const browser =
       getBrowserInfo();
-
 
     if(
       browser.android
@@ -2111,7 +1783,6 @@ openBrowserButton.addEventListener(
       return;
     }
 
-
     setStatus(
       browserStatus,
       "Safari의 공유 메뉴에서 ‘Safari에서 열기’를 선택해 주세요.",
@@ -2121,13 +1792,6 @@ openBrowserButton.addEventListener(
   }
 );
 
-
-
-/*
- * =====================================================
- * 이미 설치 버튼
- * =====================================================
- */
 
 openAppButton.addEventListener(
   "click",
@@ -2146,20 +1810,12 @@ openAppButton.addEventListener(
       return;
     }
 
-
     location.href =
       "/mart-open.html";
 
   }
 );
 
-
-
-/*
- * =====================================================
- * 완료 버튼
- * =====================================================
- */
 
 completeButton.addEventListener(
   "click",
@@ -2174,7 +1830,6 @@ completeButton.addEventListener(
       return;
     }
 
-
     location.href =
       "/mart-open.html";
 
@@ -2182,34 +1837,21 @@ completeButton.addEventListener(
 );
 
 
-
-/*
- * =====================================================
- * 초기 실행
- * =====================================================
- */
-
 document.addEventListener(
   "DOMContentLoaded",
   async function(){
 
-
     /*
-     * -----------------------------------------------
      * 입간판 QR
-     * -----------------------------------------------
      */
-
     if(
       SIGNBOARD_MODE
     ){
 
       saveSignboardPending();
 
-
       androidTitle.textContent =
         "우리가게 앱 설치";
-
 
       androidGuide.innerHTML =
 
@@ -2221,20 +1863,14 @@ document.addEventListener(
 
         "전화번호 등록은 필요하지 않습니다.";
 
-
       qrInfo.style.display =
         "block";
-
 
       qrInfo.textContent =
         "입간판 QR : " +
         qrCode;
 
 
-      /*
-       * 설치된 PWA에서
-       * QR 정보가 있는 상태로 다시 들어온 경우
-       */
       if(
         isInstalledApp()
       ){
@@ -2262,14 +1898,12 @@ document.addEventListener(
 
             : "안드로이드에서는 Chrome으로 열어야 우리가게 앱 설치가 가능합니다.";
 
-
         openBrowserButton.textContent =
           browser.ios
 
             ? "Safari에서 계속하기"
 
             : "Chrome에서 계속하기";
-
 
         showCard(
           "browser"
@@ -2293,13 +1927,11 @@ document.addEventListener(
 
           "푸시 알림을 허용해 주세요.";
 
-
         document.getElementById(
           "iphoneStatus"
         ).textContent =
 
           "앱 설치 후 푸시 알림 허용 단계가 진행됩니다.";
-
 
         showCard(
           "iphone"
@@ -2327,10 +1959,8 @@ document.addEventListener(
           "error"
         );
 
-
         retryButton.style.display =
           "block";
-
 
         return;
       }
@@ -2352,17 +1982,13 @@ document.addEventListener(
     }
 
 
-
     /*
-     * -----------------------------------------------
-     * QR 없는 경우
+     * QR 없음
      * 기존 마트 사장님 직접 설치
-     * -----------------------------------------------
      */
 
     androidTitle.textContent =
       "마트 사장님 앱 설치";
-
 
     androidGuide.innerHTML =
 
@@ -2371,7 +1997,6 @@ document.addEventListener(
       "아래 버튼을 누르면<br>" +
 
       "우리가게 앱 설치 화면이 열립니다.";
-
 
     qrInfo.style.display =
       "none";
@@ -2404,14 +2029,12 @@ document.addEventListener(
 
           : "안드로이드에서는 Chrome으로 열어야 앱 설치가 가능합니다.";
 
-
       openBrowserButton.textContent =
         browser.ios
 
           ? "Safari에서 계속하기"
 
           : "Chrome에서 계속하기";
-
 
       showCard(
         "browser"
@@ -2451,10 +2074,8 @@ document.addEventListener(
         "error"
       );
 
-
       retryButton.style.display =
         "block";
-
 
       return;
     }
