@@ -278,4 +278,2204 @@ button:disabled{
   >
 
   <h1 id="loadingTitle">
-    우리가
+    우리가게 앱 설치
+  </h1>
+
+  <p>
+    앱 설치 환경을 확인하고 있습니다.
+  </p>
+
+</section>
+
+
+
+<!-- =====================================================
+     안드로이드 설치
+===================================================== -->
+
+<section
+  id="androidCard"
+  class="card"
+>
+
+  <img
+    class="logo"
+    src="/icon-192.png"
+    alt="우리가게"
+  >
+
+  <h1 id="androidTitle">
+    우리가게 앱 설치
+  </h1>
+
+
+  <div
+    id="androidGuide"
+    class="guide"
+  >
+  </div>
+
+
+  <div
+    id="qrInfo"
+    class="qr-box"
+    style="display:none"
+  ></div>
+
+
+  <button
+    id="installButton"
+    type="button"
+    disabled
+  >
+    앱 설치 준비 중...
+  </button>
+
+
+  <button
+    id="retryButton"
+    class="secondary"
+    type="button"
+    style="display:none"
+  >
+    다시 확인하기
+  </button>
+
+
+  <div
+    id="androidStatus"
+    class="status waiting"
+  >
+    앱 설치를 준비하고 있습니다.
+  </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     아이폰 설치
+===================================================== -->
+
+<section
+  id="iphoneCard"
+  class="card"
+>
+
+  <img
+    class="logo"
+    src="/icon-192.png"
+    alt="우리가게"
+  >
+
+  <h1>
+    아이폰 앱 설치
+  </h1>
+
+
+  <div class="iphone-steps">
+
+    <b>
+      1. Safari 아래의 공유 버튼을 누르세요.
+    </b>
+
+    <div class="share-symbol">
+      □↑
+    </div>
+
+    <b>
+      2. “홈 화면에 추가”를 누르세요.
+    </b>
+
+    <br><br>
+
+    <b>
+      3. 오른쪽 위 “추가”를 누르세요.
+    </b>
+
+  </div>
+
+
+  <div
+    id="iphoneDoneBox"
+    class="done-box"
+  >
+    홈 화면에 생성된<br>
+    <strong>우리가게 앱</strong>을 눌러 실행하세요.
+  </div>
+
+
+  <div
+    id="iphoneStatus"
+    class="status waiting"
+  >
+    아이폰은 Safari에서 홈 화면에 추가해 주세요.
+  </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     기본 브라우저 안내
+===================================================== -->
+
+<section
+  id="browserCard"
+  class="card"
+>
+
+  <img
+    class="logo"
+    src="/icon-192.png"
+    alt="우리가게"
+  >
+
+  <h1>
+    기본 브라우저에서 열어 주세요
+  </h1>
+
+
+  <div
+    id="browserGuide"
+    class="guide"
+  >
+    앱 설치를 위해 Chrome 또는 Safari에서 열어 주세요.
+  </div>
+
+
+  <button
+    id="openBrowserButton"
+    type="button"
+  >
+    Chrome에서 계속하기
+  </button>
+
+
+  <div
+    id="browserStatus"
+    class="status"
+  ></div>
+
+</section>
+
+
+
+<!-- =====================================================
+     입간판 QR 푸시 승인
+===================================================== -->
+
+<section
+  id="pushCard"
+  class="card"
+>
+
+  <img
+    class="logo"
+    src="/icon-192.png"
+    alt="우리가게"
+  >
+
+  <h1>
+    푸시 알림 허용
+  </h1>
+
+
+  <div class="guide">
+
+    <strong>
+      우리가게 행사 알림을 받기 위해
+      알림을 허용해 주세요.
+    </strong>
+
+    <br><br>
+
+    전화번호 등록은 필요하지 않습니다.
+
+  </div>
+
+
+  <button
+    id="pushButton"
+    type="button"
+  >
+    푸시 알림 허용
+  </button>
+
+
+  <div
+    id="pushStatus"
+    class="status"
+  ></div>
+
+</section>
+
+
+
+<!-- =====================================================
+     이미 설치
+===================================================== -->
+
+<section
+  id="installedCard"
+  class="card"
+>
+
+  <img
+    class="logo"
+    src="/icon-192.png"
+    alt="우리가게"
+  >
+
+  <h1>
+    앱이 설치되어 있습니다
+  </h1>
+
+
+  <div class="done-box">
+
+    휴대전화 홈 화면의<br>
+
+    <strong>
+      우리가게 앱
+    </strong>
+
+    을 이용할 수 있습니다.
+
+  </div>
+
+
+  <button
+    id="openAppButton"
+    type="button"
+  >
+    계속하기
+  </button>
+
+</section>
+
+
+
+<!-- =====================================================
+     완료
+===================================================== -->
+
+<section
+  id="completeCard"
+  class="card"
+>
+
+  <img
+    class="logo"
+    src="/icon-192.png"
+    alt="우리가게"
+  >
+
+  <h1 id="completeTitle">
+    앱 설치 완료
+  </h1>
+
+
+  <div
+    id="completeMessage"
+    class="done-box"
+  >
+    우리가게 앱 설치가 완료되었습니다.
+  </div>
+
+
+  <button
+    id="completeButton"
+    type="button"
+  >
+    우리가게 열기
+  </button>
+
+</section>
+
+
+
+<!-- Firebase -->
+<script
+  src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"
+></script>
+
+<script
+  src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"
+></script>
+
+
+<script>
+"use strict";
+
+
+/*
+ * =====================================================
+ * 기본 설정
+ * =====================================================
+ */
+
+const BUILD_VERSION =
+  "20260831-MART-SIGNBOARD-01";
+
+
+const API_URL =
+  "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/send-vehicle-push";
+
+
+const SUPABASE_KEY =
+  "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
+
+
+const FIREBASE_CONFIG = {
+
+  apiKey:
+    "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
+
+  authDomain:
+    "wooriapt-carqr.firebaseapp.com",
+
+  projectId:
+    "wooriapt-carqr",
+
+  storageBucket:
+    "wooriapt-carqr.firebasestorage.app",
+
+  messagingSenderId:
+    "101299637796",
+
+  appId:
+    "1:101299637796:web:cb69372592026b7aa192b1"
+};
+
+
+const VAPID_KEY =
+  "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
+
+
+
+/*
+ * =====================================================
+ * 저장키
+ * =====================================================
+ */
+
+const PENDING_KEY =
+  "wooriapt_mart_pending_registration";
+
+const STORE_PATH_KEY =
+  "wooriapt_store_path";
+
+const STORE_URL_KEY =
+  "wooriapt_store_url";
+
+const PUSH_TOKEN_KEY =
+  "wooriapt_mart_push_token";
+
+
+
+/*
+ * =====================================================
+ * URL 확인
+ * =====================================================
+ */
+
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+
+const qrCode =
+  String(
+    params.get("qr") || ""
+  )
+    .trim()
+    .toUpperCase()
+    .replace(
+      /[^A-Z0-9_-]/g,
+      ""
+    );
+
+
+function cleanStorePath(value){
+
+  const digits =
+    String(value || "")
+      .replace(
+        /[^0-9]/g,
+        ""
+      );
+
+
+  if(!digits){
+    return "";
+  }
+
+
+  return "/" +
+    String(
+      Number(digits)
+    );
+}
+
+
+const storePath =
+  cleanStorePath(
+    params.get("path") ||
+    params.get("store_path")
+  ) ||
+  "/74";
+
+
+const storeCode =
+  String(
+    params.get("store") ||
+    params.get("store_code") ||
+    ""
+  )
+    .trim()
+    .toUpperCase();
+
+
+const resume =
+  params.get("resume") === "1";
+
+
+/*
+ * QR이 있으면 입간판 고객 모드
+ * QR이 없으면 기존 마트 사장님 설치 모드
+ */
+const SIGNBOARD_MODE =
+  !!qrCode;
+
+
+
+/*
+ * =====================================================
+ * 화면 요소
+ * =====================================================
+ */
+
+let deferredInstallPrompt =
+  null;
+
+
+const cards = {
+
+  loading:
+    document.getElementById(
+      "loadingCard"
+    ),
+
+  android:
+    document.getElementById(
+      "androidCard"
+    ),
+
+  iphone:
+    document.getElementById(
+      "iphoneCard"
+    ),
+
+  browser:
+    document.getElementById(
+      "browserCard"
+    ),
+
+  push:
+    document.getElementById(
+      "pushCard"
+    ),
+
+  installed:
+    document.getElementById(
+      "installedCard"
+    ),
+
+  complete:
+    document.getElementById(
+      "completeCard"
+    )
+};
+
+
+const installButton =
+  document.getElementById(
+    "installButton"
+  );
+
+const retryButton =
+  document.getElementById(
+    "retryButton"
+  );
+
+const androidStatus =
+  document.getElementById(
+    "androidStatus"
+  );
+
+const androidTitle =
+  document.getElementById(
+    "androidTitle"
+  );
+
+const androidGuide =
+  document.getElementById(
+    "androidGuide"
+  );
+
+const qrInfo =
+  document.getElementById(
+    "qrInfo"
+  );
+
+const browserGuide =
+  document.getElementById(
+    "browserGuide"
+  );
+
+const openBrowserButton =
+  document.getElementById(
+    "openBrowserButton"
+  );
+
+const browserStatus =
+  document.getElementById(
+    "browserStatus"
+  );
+
+const openAppButton =
+  document.getElementById(
+    "openAppButton"
+  );
+
+const completeButton =
+  document.getElementById(
+    "completeButton"
+  );
+
+const completeTitle =
+  document.getElementById(
+    "completeTitle"
+  );
+
+const completeMessage =
+  document.getElementById(
+    "completeMessage"
+  );
+
+const pushButton =
+  document.getElementById(
+    "pushButton"
+  );
+
+const pushStatus =
+  document.getElementById(
+    "pushStatus"
+  );
+
+
+
+/*
+ * =====================================================
+ * 공통 함수
+ * =====================================================
+ */
+
+function showCard(name){
+
+  Object.values(
+    cards
+  ).forEach(
+    function(card){
+
+      card.classList.remove(
+        "active"
+      );
+
+    }
+  );
+
+
+  cards[name].classList.add(
+    "active"
+  );
+
+
+  window.scrollTo(
+    0,
+    0
+  );
+}
+
+
+function setStatus(
+  element,
+  message,
+  type
+){
+
+  if(!element){
+    return;
+  }
+
+
+  element.textContent =
+    message || "";
+
+
+  element.className =
+    "status";
+
+
+  if(type){
+
+    element.classList.add(
+      type
+    );
+
+  }
+}
+
+
+function isInstalledApp(){
+
+  return (
+
+    window.matchMedia(
+      "(display-mode: standalone)"
+    ).matches ||
+
+    window.navigator.standalone === true
+
+  );
+}
+
+
+
+/*
+ * =====================================================
+ * 브라우저 확인
+ * =====================================================
+ */
+
+function getBrowserInfo(){
+
+  const ua =
+    navigator.userAgent || "";
+
+
+  const ios =
+    /iphone|ipad|ipod/i
+      .test(ua) ||
+    (
+      navigator.platform ===
+        "MacIntel" &&
+      navigator.maxTouchPoints > 1
+    );
+
+
+  const android =
+    /android/i.test(ua);
+
+
+  const samsung =
+    /samsungbrowser/i
+      .test(ua);
+
+
+  const chrome =
+    android &&
+    /chrome\//i.test(ua) &&
+    !samsung &&
+    !/edga|edg\/|opr\/|opera/i
+      .test(ua);
+
+
+  const googleApp =
+    /\bGSA\//i.test(ua);
+
+
+  const androidWebView =
+    /;\s*wv\)/i.test(ua);
+
+
+  const knownInApp =
+    /(kakaotalk|naver\(inapp|naverapp|line\/|instagram|fbav|fban)/i
+      .test(ua);
+
+
+  const iosInApp =
+    ios &&
+    (
+      !/safari/i.test(ua) ||
+      /crios|fxios|edgios|kakaotalk|naver|instagram|fbav|fban/i
+        .test(ua)
+    );
+
+
+  const inApp =
+    googleApp ||
+    androidWebView ||
+    knownInApp ||
+    iosInApp;
+
+
+  const safari =
+    ios &&
+    /safari/i.test(ua) &&
+    !/crios|fxios|edgios/i
+      .test(ua);
+
+
+  return {
+
+    ios,
+    android,
+    samsung,
+    chrome,
+    safari,
+    inApp
+
+  };
+}
+
+
+
+/*
+ * =====================================================
+ * 입간판 QR 정보 저장
+ *
+ * 전화번호는 저장하지 않습니다.
+ * =====================================================
+ */
+
+function saveSignboardPending(){
+
+  if(!SIGNBOARD_MODE){
+    return;
+  }
+
+
+  const data = {
+
+    registration_type:
+      "mart",
+
+    source_type:
+      "signboard",
+
+    qr_code:
+      qrCode,
+
+    owner_phone:
+      "",
+
+    store_code:
+      storeCode,
+
+    store_path:
+      storePath,
+
+    store_url:
+      storePath
+
+  };
+
+
+  localStorage.setItem(
+    PENDING_KEY,
+    JSON.stringify(data)
+  );
+
+
+  localStorage.setItem(
+    STORE_PATH_KEY,
+    storePath
+  );
+
+
+  localStorage.setItem(
+    STORE_URL_KEY,
+    storePath
+  );
+}
+
+
+function loadSignboardPending(){
+
+  try{
+
+    const saved =
+      localStorage.getItem(
+        PENDING_KEY
+      );
+
+
+    if(!saved){
+      return null;
+    }
+
+
+    const data =
+      JSON.parse(saved);
+
+
+    if(
+      !data ||
+      !data.qr_code
+    ){
+      return null;
+    }
+
+
+    return data;
+
+  }catch(error){
+
+    return null;
+
+  }
+}
+
+
+
+/*
+ * =====================================================
+ * 매장 화면 이동
+ * =====================================================
+ */
+
+function openStore(){
+
+  const saved =
+    localStorage.getItem(
+      STORE_URL_KEY
+    ) ||
+    localStorage.getItem(
+      STORE_PATH_KEY
+    ) ||
+    storePath ||
+    "/74";
+
+
+  const target =
+    /^https?:\/\//i.test(
+      saved
+    )
+      ? saved
+      : "https://wooriapt.ai.kr" +
+        (
+          saved.charAt(0) === "/"
+            ? saved
+            : "/" + saved
+        );
+
+
+  window.location.replace(
+    target
+  );
+}
+
+
+
+/*
+ * =====================================================
+ * Service Worker
+ * =====================================================
+ */
+
+async function prepareServiceWorker(){
+
+  if(
+    !(
+      "serviceWorker" in
+      navigator
+    )
+  ){
+
+    throw new Error(
+      "이 브라우저에서는 앱 설치를 지원하지 않습니다."
+    );
+
+  }
+
+
+  let registration =
+    await navigator
+      .serviceWorker
+      .getRegistration("/");
+
+
+  if(!registration){
+
+    registration =
+      await navigator
+        .serviceWorker
+        .register(
+          "/firebase-messaging-sw.js?v=" +
+          BUILD_VERSION,
+          {
+            scope:"/",
+            updateViaCache:"none"
+          }
+        );
+
+  }else{
+
+    try{
+
+      await registration.update();
+
+    }catch(error){
+
+      console.warn(error);
+
+    }
+
+  }
+
+
+  await navigator
+    .serviceWorker
+    .ready;
+
+
+  return registration;
+}
+
+
+
+/*
+ * =====================================================
+ * API
+ * =====================================================
+ */
+
+function withTimeout(
+  promise,
+  milliseconds,
+  message
+){
+
+  return Promise.race([
+
+    promise,
+
+    new Promise(
+      function(_,reject){
+
+        setTimeout(
+          function(){
+
+            reject(
+              new Error(message)
+            );
+
+          },
+          milliseconds
+        );
+
+      }
+    )
+
+  ]);
+}
+
+
+async function callApi(payload){
+
+  const response =
+    await withTimeout(
+
+      fetch(
+        API_URL,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json",
+
+            "Authorization":
+              "Bearer " +
+              SUPABASE_KEY,
+
+            "apikey":
+              SUPABASE_KEY
+          },
+
+          body:
+            JSON.stringify(
+              payload
+            )
+        }
+      ),
+
+      15000,
+
+      "서버 응답이 없습니다. 다시 눌러 주세요."
+
+    );
+
+
+  const text =
+    await response.text();
+
+
+  let data = {};
+
+
+  try{
+
+    data =
+      text
+        ? JSON.parse(text)
+        : {};
+
+  }catch(error){
+
+    data = {};
+
+  }
+
+
+  if(
+    !response.ok ||
+    data.ok === false ||
+    data.success === false
+  ){
+
+    const apiError =
+      new Error(
+        data.message ||
+        data.error ||
+        "서버 처리에 실패했습니다."
+      );
+
+
+    apiError.data =
+      data;
+
+
+    throw apiError;
+  }
+
+
+  return data;
+}
+
+
+
+/*
+ * =====================================================
+ * FCM 푸시 토큰
+ * =====================================================
+ */
+
+async function createFcmToken(){
+
+  if(
+    !(
+      "Notification" in
+      window
+    )
+  ){
+
+    throw new Error(
+      "이 기기에서는 알림을 지원하지 않습니다."
+    );
+
+  }
+
+
+  const permission =
+    await Notification
+      .requestPermission();
+
+
+  if(
+    permission !==
+    "granted"
+  ){
+
+    throw new Error(
+      "푸시 알림을 허용해 주세요."
+    );
+
+  }
+
+
+  if(!window.firebase){
+
+    throw new Error(
+      "Firebase 프로그램을 불러오지 못했습니다."
+    );
+
+  }
+
+
+  if(
+    !firebase.apps.length
+  ){
+
+    firebase.initializeApp(
+      FIREBASE_CONFIG
+    );
+
+  }
+
+
+  const messaging =
+    firebase.messaging();
+
+
+  const registration =
+    await prepareServiceWorker();
+
+
+  const token =
+    await withTimeout(
+
+      messaging.getToken({
+
+        vapidKey:
+          VAPID_KEY,
+
+        serviceWorkerRegistration:
+          registration
+
+      }),
+
+      20000,
+
+      "푸시 알림 등록 시간이 초과되었습니다."
+
+    );
+
+
+  if(!token){
+
+    throw new Error(
+      "푸시 알림 토큰을 발급하지 못했습니다."
+    );
+
+  }
+
+
+  return token;
+}
+
+
+
+/*
+ * =====================================================
+ * Chrome 열기
+ * =====================================================
+ */
+
+function openCurrentPageInChrome(){
+
+  const current =
+    new URL(
+      location.href
+    );
+
+
+  const fallback =
+    encodeURIComponent(
+      current.href
+    );
+
+
+  location.href =
+
+    "intent://" +
+
+    current.host +
+
+    current.pathname +
+
+    current.search +
+
+    current.hash +
+
+    "#Intent;scheme=" +
+
+    current.protocol
+      .replace(":","") +
+
+    ";package=com.android.chrome;" +
+
+    "S.browser_fallback_url=" +
+
+    fallback +
+
+    ";end";
+}
+
+
+
+/*
+ * =====================================================
+ * 안드로이드 설치 준비
+ * =====================================================
+ */
+
+function enableAndroidInstall(){
+
+  installButton.disabled =
+    false;
+
+
+  installButton.textContent =
+    "우리가게 앱 설치";
+
+
+  retryButton.style.display =
+    "none";
+
+
+  setStatus(
+    androidStatus,
+    "앱 설치 준비가 완료되었습니다.",
+    "success"
+  );
+}
+
+
+function waitForInstallPrompt(){
+
+  let count = 0;
+
+
+  const timer =
+    setInterval(
+      function(){
+
+        if(
+          deferredInstallPrompt
+        ){
+
+          clearInterval(
+            timer
+          );
+
+          enableAndroidInstall();
+
+          return;
+        }
+
+
+        count += 1;
+
+
+        if(
+          count >= 20
+        ){
+
+          clearInterval(
+            timer
+          );
+
+
+          installButton.disabled =
+            false;
+
+
+          installButton.textContent =
+            "우리가게 앱 설치";
+
+
+          retryButton.style.display =
+            "block";
+
+
+          setStatus(
+            androidStatus,
+            "설치창이 자동으로 열리지 않으면 Chrome 메뉴의 ‘앱 설치’를 선택해 주세요.",
+            "waiting"
+          );
+
+        }
+
+      },
+      500
+    );
+}
+
+
+
+/*
+ * =====================================================
+ * beforeinstallprompt
+ * =====================================================
+ */
+
+window.addEventListener(
+  "beforeinstallprompt",
+  function(event){
+
+    event.preventDefault();
+
+
+    deferredInstallPrompt =
+      event;
+
+
+    if(
+      cards.android
+        .classList
+        .contains(
+          "active"
+        )
+    ){
+
+      enableAndroidInstall();
+
+    }
+
+  }
+);
+
+
+
+/*
+ * =====================================================
+ * 설치 완료 이벤트
+ * =====================================================
+ */
+
+window.addEventListener(
+  "appinstalled",
+  function(){
+
+    deferredInstallPrompt =
+      null;
+
+
+    if(
+      SIGNBOARD_MODE
+    ){
+
+      showCard(
+        "push"
+      );
+
+      return;
+
+    }
+
+
+    showCard(
+      "complete"
+    );
+
+  }
+);
+
+
+
+/*
+ * =====================================================
+ * 설치 버튼
+ * =====================================================
+ */
+
+installButton.addEventListener(
+  "click",
+  async function(){
+
+    if(
+      isInstalledApp()
+    ){
+
+      if(
+        SIGNBOARD_MODE
+      ){
+
+        showCard(
+          "push"
+        );
+
+      }else{
+
+        showCard(
+          "installed"
+        );
+
+      }
+
+      return;
+    }
+
+
+    installButton.disabled =
+      true;
+
+
+    installButton.textContent =
+      "설치창 여는 중...";
+
+
+    setStatus(
+      androidStatus,
+      "표시되는 설치 창에서 ‘설치’를 눌러 주세요.",
+      "waiting"
+    );
+
+
+    try{
+
+      await prepareServiceWorker();
+
+
+      for(
+        let i=0;
+        i<20 &&
+        !deferredInstallPrompt;
+        i++
+      ){
+
+        await new Promise(
+          function(resolve){
+
+            setTimeout(
+              resolve,
+              150
+            );
+
+          }
+        );
+
+      }
+
+
+      if(
+        !deferredInstallPrompt
+      ){
+
+        installButton.disabled =
+          false;
+
+
+        installButton.textContent =
+          "우리가게 앱 설치";
+
+
+        retryButton.style.display =
+          "block";
+
+
+        setStatus(
+          androidStatus,
+          "Chrome 오른쪽 위 메뉴에서 ‘앱 설치’를 선택해 주세요.",
+          "waiting"
+        );
+
+
+        return;
+      }
+
+
+      const promptEvent =
+        deferredInstallPrompt;
+
+
+      deferredInstallPrompt =
+        null;
+
+
+      await promptEvent.prompt();
+
+
+      const result =
+        await promptEvent.userChoice;
+
+
+      if(
+        result.outcome !==
+        "accepted"
+      ){
+
+        installButton.disabled =
+          false;
+
+
+        installButton.textContent =
+          "우리가게 앱 설치";
+
+
+        setStatus(
+          androidStatus,
+          "앱 설치가 취소되었습니다. 다시 눌러 주세요.",
+          "error"
+        );
+
+
+        return;
+      }
+
+
+      if(
+        SIGNBOARD_MODE
+      ){
+
+        /*
+         * 설치 승인 직후
+         * 푸시 단계 표시
+         */
+        showCard(
+          "push"
+        );
+
+      }else{
+
+        setStatus(
+          androidStatus,
+          "앱을 설치하고 있습니다.",
+          "waiting"
+        );
+
+      }
+
+
+    }catch(error){
+
+      installButton.disabled =
+        false;
+
+
+      installButton.textContent =
+        "우리가게 앱 설치";
+
+
+      setStatus(
+        androidStatus,
+        error.message ||
+        "앱 설치를 시작하지 못했습니다.",
+        "error"
+      );
+
+    }
+
+  }
+);
+
+
+
+/*
+ * =====================================================
+ * 다시 확인
+ * =====================================================
+ */
+
+retryButton.addEventListener(
+  "click",
+  async function(){
+
+    retryButton.style.display =
+      "none";
+
+
+    installButton.disabled =
+      true;
+
+
+    installButton.textContent =
+      "앱 설치 준비 중...";
+
+
+    setStatus(
+      androidStatus,
+      "앱 설치를 다시 확인하고 있습니다.",
+      "waiting"
+    );
+
+
+    try{
+
+      await prepareServiceWorker();
+
+    }catch(error){
+
+      console.warn(error);
+
+    }
+
+
+    waitForInstallPrompt();
+
+  }
+);
+
+
+
+/*
+ * =====================================================
+ * 푸시 알림 허용
+ * 입간판 QR에서만 사용
+ * =====================================================
+ */
+
+pushButton.addEventListener(
+  "click",
+  async function(){
+
+    if(
+      !SIGNBOARD_MODE
+    ){
+      return;
+    }
+
+
+    pushButton.disabled =
+      true;
+
+
+    pushButton.textContent =
+      "푸시 알림 등록 중...";
+
+
+    setStatus(
+      pushStatus,
+      "푸시 알림을 설정하고 있습니다.",
+      "waiting"
+    );
+
+
+    try{
+
+      saveSignboardPending();
+
+
+      const pending =
+        loadSignboardPending();
+
+
+      if(
+        !pending
+      ){
+
+        throw new Error(
+          "입간판 QR 정보를 확인할 수 없습니다."
+        );
+
+      }
+
+
+      const fcmToken =
+        await createFcmToken();
+
+
+      /*
+       * 입간판은 전화번호를 사용하지 않습니다.
+       */
+      await callApi({
+
+        action:
+          "register",
+
+        registration_type:
+          "mart",
+
+        source_type:
+          "signboard",
+
+        qr_code:
+          pending.qr_code,
+
+        owner_phone:
+          null,
+
+        push_token:
+          fcmToken,
+
+        store_code:
+          pending.store_code ||
+          null,
+
+        store_path:
+          pending.store_path ||
+          storePath,
+
+        store_url:
+          pending.store_url ||
+          storePath,
+
+        platform:
+          "web",
+
+        user_agent:
+          navigator.userAgent
+
+      });
+
+
+      localStorage.setItem(
+        PUSH_TOKEN_KEY,
+        fcmToken
+      );
+
+
+      localStorage.setItem(
+        STORE_PATH_KEY,
+        pending.store_path ||
+        storePath
+      );
+
+
+      localStorage.setItem(
+        STORE_URL_KEY,
+        pending.store_url ||
+        storePath
+      );
+
+
+      setStatus(
+        pushStatus,
+        "푸시 알림 등록이 완료되었습니다.",
+        "success"
+      );
+
+
+      completeTitle.textContent =
+        "등록 완료";
+
+
+      completeMessage.innerHTML =
+
+        "우리가게 앱 설치와<br>" +
+
+        "푸시 알림 등록이 완료되었습니다.<br><br>" +
+
+        "이제 마트 행사 알림을 받을 수 있습니다.";
+
+
+      showCard(
+        "complete"
+      );
+
+
+    }catch(error){
+
+      console.error(
+        "mart signboard push error:",
+        error
+      );
+
+
+      pushButton.disabled =
+        false;
+
+
+      pushButton.textContent =
+        "푸시 알림 허용";
+
+
+      setStatus(
+        pushStatus,
+        error.message ||
+        "푸시 알림 등록에 실패했습니다.",
+        "error"
+      );
+
+    }
+
+  }
+);
+
+
+
+/*
+ * =====================================================
+ * 기본 브라우저 버튼
+ * =====================================================
+ */
+
+openBrowserButton.addEventListener(
+  "click",
+  function(){
+
+    const browser =
+      getBrowserInfo();
+
+
+    if(
+      browser.android
+    ){
+
+      openCurrentPageInChrome();
+
+      return;
+    }
+
+
+    setStatus(
+      browserStatus,
+      "Safari의 공유 메뉴에서 ‘Safari에서 열기’를 선택해 주세요.",
+      "waiting"
+    );
+
+  }
+);
+
+
+
+/*
+ * =====================================================
+ * 이미 설치 버튼
+ * =====================================================
+ */
+
+openAppButton.addEventListener(
+  "click",
+  function(){
+
+    if(
+      SIGNBOARD_MODE
+    ){
+
+      saveSignboardPending();
+
+      showCard(
+        "push"
+      );
+
+      return;
+    }
+
+
+    location.href =
+      "/mart-open.html";
+
+  }
+);
+
+
+
+/*
+ * =====================================================
+ * 완료 버튼
+ * =====================================================
+ */
+
+completeButton.addEventListener(
+  "click",
+  function(){
+
+    if(
+      SIGNBOARD_MODE
+    ){
+
+      openStore();
+
+      return;
+    }
+
+
+    location.href =
+      "/mart-open.html";
+
+  }
+);
+
+
+
+/*
+ * =====================================================
+ * 초기 실행
+ * =====================================================
+ */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async function(){
+
+
+    /*
+     * -----------------------------------------------
+     * 입간판 QR
+     * -----------------------------------------------
+     */
+
+    if(
+      SIGNBOARD_MODE
+    ){
+
+      saveSignboardPending();
+
+
+      androidTitle.textContent =
+        "우리가게 앱 설치";
+
+
+      androidGuide.innerHTML =
+
+        "<strong>우리가게 앱을 설치해 주세요.</strong><br><br>" +
+
+        "앱 설치 후 푸시 알림을 허용하면<br>" +
+
+        "해당 마트의 특가·행사 알림을 받을 수 있습니다.<br><br>" +
+
+        "전화번호 등록은 필요하지 않습니다.";
+
+
+      qrInfo.style.display =
+        "block";
+
+
+      qrInfo.textContent =
+        "입간판 QR : " +
+        qrCode;
+
+
+      /*
+       * 설치된 PWA에서
+       * QR 정보가 있는 상태로 다시 들어온 경우
+       */
+      if(
+        isInstalledApp()
+      ){
+
+        showCard(
+          "push"
+        );
+
+        return;
+      }
+
+
+      const browser =
+        getBrowserInfo();
+
+
+      if(
+        browser.inApp
+      ){
+
+        browserGuide.innerHTML =
+          browser.ios
+
+            ? "아이폰에서는 Safari로 열어야 우리가게 앱을 홈 화면에 추가할 수 있습니다."
+
+            : "안드로이드에서는 Chrome으로 열어야 우리가게 앱 설치가 가능합니다.";
+
+
+        openBrowserButton.textContent =
+          browser.ios
+
+            ? "Safari에서 계속하기"
+
+            : "Chrome에서 계속하기";
+
+
+        showCard(
+          "browser"
+        );
+
+        return;
+      }
+
+
+      if(
+        browser.ios
+      ){
+
+        document.getElementById(
+          "iphoneDoneBox"
+        ).innerHTML =
+
+          "홈 화면에 생성된<br>" +
+
+          "<strong>우리가게 앱</strong>을 눌러 실행한 뒤<br>" +
+
+          "푸시 알림을 허용해 주세요.";
+
+
+        document.getElementById(
+          "iphoneStatus"
+        ).textContent =
+
+          "앱 설치 후 푸시 알림 허용 단계가 진행됩니다.";
+
+
+        showCard(
+          "iphone"
+        );
+
+        return;
+      }
+
+
+      showCard(
+        "android"
+      );
+
+
+      try{
+
+        await prepareServiceWorker();
+
+      }catch(error){
+
+        setStatus(
+          androidStatus,
+          error.message ||
+          "앱 설치 준비에 실패했습니다.",
+          "error"
+        );
+
+
+        retryButton.style.display =
+          "block";
+
+
+        return;
+      }
+
+
+      if(
+        deferredInstallPrompt
+      ){
+
+        enableAndroidInstall();
+
+        return;
+      }
+
+
+      waitForInstallPrompt();
+
+      return;
+    }
+
+
+
+    /*
+     * -----------------------------------------------
+     * QR 없는 경우
+     * 기존 마트 사장님 직접 설치
+     * -----------------------------------------------
+     */
+
+    androidTitle.textContent =
+      "마트 사장님 앱 설치";
+
+
+    androidGuide.innerHTML =
+
+      "<strong>QR 등록 없이 바로 설치할 수 있습니다.</strong><br><br>" +
+
+      "아래 버튼을 누르면<br>" +
+
+      "우리가게 앱 설치 화면이 열립니다.";
+
+
+    qrInfo.style.display =
+      "none";
+
+
+    if(
+      isInstalledApp()
+    ){
+
+      showCard(
+        "installed"
+      );
+
+      return;
+    }
+
+
+    const browser =
+      getBrowserInfo();
+
+
+    if(
+      browser.inApp
+    ){
+
+      browserGuide.innerHTML =
+        browser.ios
+
+          ? "아이폰에서는 Safari로 열어야 앱을 홈 화면에 추가할 수 있습니다."
+
+          : "안드로이드에서는 Chrome으로 열어야 앱 설치가 가능합니다.";
+
+
+      openBrowserButton.textContent =
+        browser.ios
+
+          ? "Safari에서 계속하기"
+
+          : "Chrome에서 계속하기";
+
+
+      showCard(
+        "browser"
+      );
+
+      return;
+    }
+
+
+    if(
+      browser.ios
+    ){
+
+      showCard(
+        "iphone"
+      );
+
+      return;
+    }
+
+
+    showCard(
+      "android"
+    );
+
+
+    try{
+
+      await prepareServiceWorker();
+
+    }catch(error){
+
+      setStatus(
+        androidStatus,
+        error.message ||
+        "앱 설치 준비에 실패했습니다.",
+        "error"
+      );
+
+
+      retryButton.style.display =
+        "block";
+
+
+      return;
+    }
+
+
+    if(
+      deferredInstallPrompt
+    ){
+
+      enableAndroidInstall();
+
+      return;
+    }
+
+
+    waitForInstallPrompt();
+
+  }
+);
+
+</script>
+
+</body>
+</html>
