@@ -309,6 +309,7 @@
 
     let enteredPhone = "";
     let deferredInstallPrompt = null;
+    let appInstallCompleted = isStandaloneApp();
     let countdownTimer = null;
     let ownerPhoneForEmergency = "";
 
@@ -666,6 +667,106 @@
       }
     );
 
+    window.addEventListener(
+      "appinstalled",
+      () => {
+        appInstallCompleted = true;
+        localStorage.setItem(
+          "wooriapt_carqr_app_installed",
+          "1"
+        );
+      }
+    );
+
+    async function ensureAppInstalled() {
+      if (isStandaloneApp()) {
+        appInstallCompleted = true;
+        return;
+      }
+
+      if (!deferredInstallPrompt) {
+        throw new Error(
+          "앱 설치창을 불러오지 못했습니다. Chrome에서 다시 접속한 후 앱을 설치해 주세요."
+        );
+      }
+
+      const installPrompt =
+        deferredInstallPrompt;
+
+      deferredInstallPrompt = null;
+
+      await installPrompt.prompt();
+
+      const choice =
+        await installPrompt.userChoice;
+
+      if (
+        !choice ||
+        choice.outcome !== "accepted"
+      ) {
+        throw new Error(
+          "앱 설치를 완료해야 자동차 QR을 등록할 수 있습니다."
+        );
+      }
+
+      if (appInstallCompleted) {
+        return;
+      }
+
+      await new Promise((resolve, reject) => {
+        let finished = false;
+
+        const onInstalled = () => {
+          if (finished) {
+            return;
+          }
+
+          finished = true;
+          clearTimeout(timer);
+          window.removeEventListener(
+            "appinstalled",
+            onInstalled
+          );
+          resolve();
+        };
+
+        const timer = setTimeout(() => {
+          if (finished) {
+            return;
+          }
+
+          finished = true;
+          window.removeEventListener(
+            "appinstalled",
+            onInstalled
+          );
+
+          if (
+            appInstallCompleted ||
+            localStorage.getItem(
+              "wooriapt_carqr_app_installed"
+            ) === "1"
+          ) {
+            resolve();
+            return;
+          }
+
+          reject(
+            new Error(
+              "앱 설치 완료를 확인하지 못했습니다. 앱 설치를 완료한 후 다시 눌러 주세요."
+            )
+          );
+        }, 10000);
+
+        window.addEventListener(
+          "appinstalled",
+          onInstalled
+        );
+      });
+
+      appInstallCompleted = true;
+    }
+
     continueButton.addEventListener(
       "click",
       async () => {
@@ -680,16 +781,13 @@
         );
 
         try {
-          if (
-            deferredInstallPrompt &&
-            !isStandaloneApp()
-          ) {
-            deferredInstallPrompt.prompt();
+          await ensureAppInstalled();
 
-            await deferredInstallPrompt.userChoice;
-
-            deferredInstallPrompt = null;
-          }
+          setStatus(
+            installStatus,
+            "앱 설치가 완료되었습니다. 푸시 알림을 허용해 주세요.",
+            "waiting"
+          );
 
           const fcmToken =
             await getRealFcmToken();
