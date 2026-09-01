@@ -59,18 +59,13 @@ a{
   color:inherit;
 }
 
-img{
-  max-width:100%;
-  display:block;
-}
-
 button{
   font-family:inherit;
 }
 
 #pageScale{
   width:100%;
-  zoom:1;
+  zoom:.55;
 }
 
 .wrap{
@@ -80,7 +75,7 @@ button{
 
 
 /* ================================
-   상단 HERO
+   HERO
 ================================ */
 
 .hero{
@@ -147,9 +142,7 @@ button{
 
 .eyebrow{
   font-size:15px;
-
   margin:0 0 6px;
-
   color:#323f36;
 }
 
@@ -209,9 +202,7 @@ button{
 
 .quick-card .ico{
   font-size:23px;
-
   line-height:1;
-
   margin-bottom:4px;
 }
 
@@ -309,9 +300,7 @@ button{
 
 .mart-top{
   position:absolute;
-
   inset:0 0 auto 0;
-
   height:68px;
 
   background:
@@ -365,11 +354,8 @@ button{
 
 .owner-head{
   display:flex;
-
   align-items:center;
-
   gap:8px;
-
   margin-bottom:9px;
 }
 
@@ -385,8 +371,6 @@ button{
   place-items:center;
 
   font-size:24px;
-
-  flex-shrink:0;
 }
 
 .owner-card b{
@@ -454,10 +438,6 @@ button{
 
   font-size:13px;
   line-height:1.4;
-
-  box-shadow:
-    0 8px 20px
-    rgba(11,122,59,.22);
 }
 
 
@@ -502,10 +482,6 @@ button{
   background:#fff;
 
   padding:13px 10px 10px;
-
-  box-shadow:
-    0 7px 22px
-    rgba(20,76,41,.04);
 }
 
 .flow{
@@ -549,9 +525,7 @@ button{
 
 .step .ico{
   font-size:24px;
-
   line-height:1;
-
   margin-bottom:5px;
 }
 
@@ -661,7 +635,6 @@ button{
 
 .save-card h3{
   margin:0;
-
   font-size:27px;
 }
 
@@ -671,7 +644,6 @@ button{
 
 .save-card p{
   margin:9px 0 0;
-
   font-size:17px;
 }
 
@@ -787,7 +759,6 @@ button{
 
 /* ================================
    FOOTER
-   위 콘텐츠 폭과 동일하게 수정
 ================================ */
 
 footer{
@@ -819,13 +790,11 @@ footer .wrap{
 
 .footer-brand{
   font-weight:900;
-
   font-size:20px;
 }
 
 .footer-note{
   font-size:13px;
-
   opacity:.85;
 }
 
@@ -932,39 +901,14 @@ footer .wrap{
     width:100%;
   }
 
-  .bubble{
-    width:120px;
-
-    font-size:11px;
-  }
-
   .flow{
     grid-template-columns:repeat(4,1fr);
-  }
-
-  .step{
-    min-height:105px;
-
-    margin:0;
-
-    padding:3px 5px 5px;
-  }
-
-  .step:nth-child(4n){
-    border-right:0;
-  }
-
-  .step:nth-child(-n+4){
-    border-bottom:1px solid #e2ebe5;
   }
 
   .features{
     grid-template-columns:repeat(2,1fr);
   }
 
-  .feature:last-child{
-    grid-column:1/-1;
-  }
 }
 
 
@@ -975,10 +919,7 @@ footer .wrap{
 @media(max-width:640px){
 
   .wrap{
-    width:min(
-      calc(100% - 16px),
-      1180px
-    );
+    width:min(calc(100% - 16px),1180px);
   }
 
   .hero-in{
@@ -1004,8 +945,6 @@ footer .wrap{
     gap:7px;
 
     font-size:17px;
-
-    letter-spacing:-.6px;
   }
 
   .brand-mark{
@@ -1013,32 +952,18 @@ footer .wrap{
     height:29px;
 
     font-size:17px;
-
-    border-width:2px;
-
-    border-radius:8px;
   }
 
   .eyebrow{
     font-size:11px;
-
-    margin-bottom:3px;
   }
 
   .hero h1{
     font-size:24px;
-
-    line-height:1.12;
-
-    letter-spacing:-1px;
   }
 
   .lead{
-    margin:5px 0 6px;
-
     font-size:11px;
-
-    line-height:1.35;
   }
 
   .quick{
@@ -1051,39 +976,20 @@ footer .wrap{
 
   .quick-card{
     min-height:45px;
-
-    border-radius:8px;
   }
 
   .quick-card .ico{
     font-size:17px;
-
-    margin-bottom:2px;
   }
 
   .quick-card b{
     font-size:8px;
-
-    line-height:1.2;
   }
 
   .cta{
     min-width:0;
 
-    width:auto;
-
-    margin-top:0;
-
     padding:7px 15px;
-
-    font-size:12px;
-
-    border-radius:8px;
-  }
-
-  .cta span{
-    width:17px;
-    height:17px;
 
     font-size:12px;
   }
@@ -1091,194 +997,27 @@ footer .wrap{
   .hero-visual{
     height:135px;
     min-height:135px;
-
-    align-items:flex-end;
   }
 
   .mart-figure{
     height:130px;
-
     width:88%;
-
-    border-radius:18px 18px 9px 9px;
-  }
-
-  .mart-top{
-    height:30px;
-  }
-
-  .shelves{
-    height:88px;
-
-    background:
-      linear-gradient(
-        #d8e7dc 0 2px,
-        transparent 2px 29px,
-        #d8e7dc 29px 31px,
-        transparent 31px 58px,
-        #d8e7dc 58px 60px,
-        transparent 60px
-      );
-  }
-
-  .owner-card{
-    right:5%;
-
-    bottom:7px;
-
-    width:53%;
-
-    padding:5px;
-
-    border-radius:9px;
-  }
-
-  .owner-head{
-    gap:4px;
-
-    margin-bottom:3px;
-  }
-
-  .avatar{
-    width:21px;
-    height:21px;
-
-    font-size:13px;
-  }
-
-  .owner-card b{
-    font-size:8px;
-  }
-
-  .owner-card small{
-    font-size:6px;
-  }
-
-  .dashboard{
-    padding:3px;
-
-    border-radius:6px;
-  }
-
-  .bars{
-    height:23px;
-
-    gap:2px;
-  }
-
-  .bar{
-    border-radius:2px 2px 0 0;
-  }
-
-  .bubble{
-    left:4%;
-
-    top:22px;
-
-    width:78px;
-
-    padding:7px 4px;
-
-    font-size:7px;
-
-    line-height:1.35;
-  }
-
-  .flow-section{
-    padding:8px 0 10px;
-  }
-
-  .section-title{
-    margin-bottom:6px;
-
-    font-size:16px;
-
-    letter-spacing:-.5px;
-  }
-
-  .flow-box{
-    padding:5px 4px;
-
-    border-radius:10px;
   }
 
   .flow{
     grid-template-columns:repeat(4,1fr);
   }
 
-  .step{
-    min-height:79px;
-
-    padding:3px 3px 4px;
-  }
-
-  .step:nth-child(4n){
-    border-right:0;
-  }
-
-  .step:nth-child(-n+4){
-    border-bottom:1px solid #e2ebe5;
-  }
-
-  .num{
-    width:16px;
-    height:16px;
-
-    margin-bottom:2px;
-
-    font-size:8px;
-  }
-
-  .step .ico{
-    font-size:15px;
-
-    margin-bottom:2px;
-  }
-
-  .step b{
-    font-size:8px;
-
-    margin-bottom:2px;
-
-    line-height:1.15;
-  }
-
-  .step p{
-    font-size:6.8px;
-
-    line-height:1.25;
-  }
-
-  .section{
-    padding:32px 0;
-  }
-
   .features{
     grid-template-columns:1fr;
-  }
-
-  .feature:last-child{
-    grid-column:auto;
   }
 
   .saving{
     grid-template-columns:1fr;
   }
 
-  .save-card h3{
-    font-size:23px;
-  }
-
   .bottom-in{
     display:block;
-  }
-
-  .bottom-in h2{
-    font-size:29px;
-  }
-
-  .bottom-in .cta{
-    margin-top:20px;
   }
 
   .footer-in{
@@ -1291,15 +1030,9 @@ footer .wrap{
     width:calc(100% - 16px);
   }
 
-  .footer-note{
-    margin-top:6px;
-  }
-
   .zoom-control{
     right:8px;
     bottom:8px;
-
-    border-radius:10px;
   }
 
   .zoom-control button{
@@ -1316,6 +1049,7 @@ footer .wrap{
 
     font-size:10px;
   }
+
 }
 
 </style>
@@ -1405,14 +1139,13 @@ footer .wrap{
     </div>
 
 
-    <div class="hero-visual" aria-hidden="true">
+    <div class="hero-visual">
 
       <div class="mart-figure">
 
         <div class="mart-top"></div>
 
         <div class="shelves"></div>
-
 
         <div class="bubble">
           복잡한 홍보는 그만!<br>
@@ -1484,72 +1217,56 @@ footer .wrap{
           <div class="num">1</div>
           <div class="ico">📣</div>
           <b>디지털 홍보</b>
-          <p>
-            마트·상품·행사 정보를 다양한 채널에 알립니다.
-          </p>
+          <p>마트·상품·행사 정보를 다양한 채널에 알립니다.</p>
         </div>
 
         <div class="step">
           <div class="num">2</div>
           <div class="ico">👥</div>
           <b>신규고객 유입</b>
-          <p>
-            홍보를 본 고객이 마트 플랫폼을 통해 방문합니다.
-          </p>
+          <p>홍보를 본 고객이 마트 플랫폼을 통해 방문합니다.</p>
         </div>
 
         <div class="step">
           <div class="num">3</div>
           <div class="ico">🗄️</div>
           <b>고객 DB 확보</b>
-          <p>
-            플랫폼 이용 고객을 기반으로 지속적인 홍보 기반을 만듭니다.
-          </p>
+          <p>플랫폼 이용 고객을 기반으로 지속적인 홍보 기반을 만듭니다.</p>
         </div>
 
         <div class="step">
           <div class="num">4</div>
           <div class="ico">🔔</div>
           <b>주 2회 무료 푸시알림</b>
-          <p>
-            행사·특가 정보를 발송비용 없이 고객에게 알립니다.
-          </p>
+          <p>행사·특가 정보를 발송비용 없이 고객에게 알립니다.</p>
         </div>
 
         <div class="step">
           <div class="num">5</div>
           <div class="ico">🏷️</div>
           <b>행사·특가 지속 홍보</b>
-          <p>
-            새로운 행사와 특가 상품을 지속적으로 노출합니다.
-          </p>
+          <p>새로운 행사와 특가 상품을 지속적으로 노출합니다.</p>
         </div>
 
         <div class="step">
           <div class="num">6</div>
           <div class="ico">🔄</div>
           <b>재방문 증가</b>
-          <p>
-            지속적인 정보 전달로 고객의 재방문을 유도합니다.
-          </p>
+          <p>지속적인 정보 전달로 고객의 재방문을 유도합니다.</p>
         </div>
 
         <div class="step">
           <div class="num">7</div>
           <div class="ico">🛒</div>
           <b>구매 증가</b>
-          <p>
-            방문과 재방문이 늘어나면서 구매 기회도 함께 늘어납니다.
-          </p>
+          <p>방문과 재방문이 늘어나면서 구매 기회도 함께 늘어납니다.</p>
         </div>
 
         <div class="step">
           <div class="num">8</div>
           <div class="ico">📈</div>
           <b>마트 매출 증가</b>
-          <p>
-            지속적인 고객 유입과 재방문이 매출 증가로 이어질 수 있습니다.
-          </p>
+          <p>지속적인 고객 유입과 재방문이 매출 증가로 이어질 수 있습니다.</p>
         </div>
 
       </div>
@@ -1574,87 +1291,33 @@ footer .wrap{
     <div class="features">
 
       <article class="feature">
-
-        <h3>
-          주 2회 무료 푸시알림
-        </h3>
-
-        <div class="bigico">
-          📱
-        </div>
-
-        <p>
-          행사·세일·신상품 소식을 고객에게 푸시알림으로 전달합니다.
-        </p>
-
+        <h3>주 2회 무료 푸시알림</h3>
+        <div class="bigico">📱</div>
+        <p>행사·세일·신상품 소식을 고객에게 푸시알림으로 전달합니다.</p>
       </article>
 
-
       <article class="feature">
-
-        <h3>
-          모바일 전단지
-        </h3>
-
-        <div class="bigico">
-          📰
-        </div>
-
-        <p>
-          마트 행사정보와 상품을 모바일에서 쉽고 빠르게 확인할 수 있습니다.
-        </p>
-
+        <h3>모바일 전단지</h3>
+        <div class="bigico">📰</div>
+        <p>마트 행사정보와 상품을 모바일에서 쉽고 빠르게 확인할 수 있습니다.</p>
       </article>
 
-
       <article class="feature">
-
-        <h3>
-          고객 DB 확보
-        </h3>
-
-        <div class="bigico">
-          🗂️
-        </div>
-
-        <p>
-          플랫폼 이용 고객을 기반으로 지속적인 디지털 홍보 기반을 확보합니다.
-        </p>
-
+        <h3>고객 DB 확보</h3>
+        <div class="bigico">🗂️</div>
+        <p>플랫폼 이용 고객을 기반으로 지속적인 디지털 홍보 기반을 확보합니다.</p>
       </article>
 
-
       <article class="feature">
-
-        <h3>
-          행사·특가 지속 홍보
-        </h3>
-
-        <div class="bigico">
-          🎯
-        </div>
-
-        <p>
-          오늘특가·행사상품·공동구매 등 마트 상품을 지속적으로 알릴 수 있습니다.
-        </p>
-
+        <h3>행사·특가 지속 홍보</h3>
+        <div class="bigico">🎯</div>
+        <p>오늘특가·행사상품·공동구매 등 마트 상품을 지속적으로 알릴 수 있습니다.</p>
       </article>
 
-
       <article class="feature">
-
-        <h3>
-          디지털 홍보
-        </h3>
-
-        <div class="bigico">
-          📊
-        </div>
-
-        <p>
-          종이 전단지와 문자 중심의 홍보를 모바일 기반 디지털 홍보로 확장합니다.
-        </p>
-
+        <h3>디지털 홍보</h3>
+        <div class="bigico">📊</div>
+        <p>종이 전단지와 문자 중심의 홍보를 모바일 기반 디지털 홍보로 확장합니다.</p>
       </article>
 
     </div>
@@ -1667,9 +1330,7 @@ footer .wrap{
 
         <h3>
           문자 홍보비는 줄이고,
-          <strong>
-            고객 접점은 넓히고
-          </strong>
+          <strong>고객 접점은 넓히고</strong>
         </h3>
 
         <p>
@@ -1684,21 +1345,15 @@ footer .wrap{
         <div class="compare">
           <b>기존 문자 홍보</b>
           <br>
-          <small>
-            발송 건수에 따라 비용 발생
-          </small>
+          <small>발송 건수에 따라 비용 발생</small>
         </div>
 
-        <div class="vs">
-          VS
-        </div>
+        <div class="vs">VS</div>
 
         <div class="compare good">
           <b>플랫폼 푸시알림</b>
           <br>
-          <small>
-            주 2회 발송비용 0원
-          </small>
+          <small>주 2회 발송비용 0원</small>
         </div>
 
       </div>
@@ -1779,8 +1434,8 @@ footer .wrap{
 
   <button
     type="button"
-    id="zoomOut"
     aria-label="축소"
+    onclick="changeMartZoom(-5)"
   >
     −
   </button>
@@ -1794,8 +1449,8 @@ footer .wrap{
 
   <button
     type="button"
-    id="zoomIn"
     aria-label="확대"
+    onclick="changeMartZoom(5)"
   >
     +
   </button>
@@ -1805,76 +1460,56 @@ footer .wrap{
 
 
 <script>
-(function(){
 
-  "use strict";
+var currentZoom = 55;
 
-  const pageScale =
+function applyMartZoom(){
+
+  var pageScale =
     document.getElementById("pageScale");
 
-  const zoomOut =
-    document.getElementById("zoomOut");
-
-  const zoomIn =
-    document.getElementById("zoomIn");
-
-  const zoomValue =
+  var zoomValue =
     document.getElementById("zoomValue");
 
-
-  const MIN_ZOOM = 40;
-  const MAX_ZOOM = 130;
-  const STEP = 5;
-
-  let currentZoom = 55;
-
-
-  function applyZoom(){
-
-    pageScale.style.zoom =
-      String(currentZoom / 100);
-
-    zoomValue.textContent =
-      currentZoom + "%";
-
+  if(!pageScale){
+    return;
   }
 
+  pageScale.style.zoom =
+    String(currentZoom / 100);
 
-  zoomOut.addEventListener(
-    "click",
-    function(){
+  if(zoomValue){
+    zoomValue.textContent =
+      currentZoom + "%";
+  }
 
-      currentZoom =
-        Math.max(
-          MIN_ZOOM,
-          currentZoom - STEP
-        );
-
-      applyZoom();
-
-    }
-  );
+}
 
 
-  zoomIn.addEventListener(
-    "click",
-    function(){
+function changeMartZoom(amount){
 
-      currentZoom =
-        Math.min(
-          MAX_ZOOM,
-          currentZoom + STEP
-        );
+  currentZoom =
+    currentZoom + amount;
 
-      applyZoom();
+  if(currentZoom < 40){
+    currentZoom = 40;
+  }
 
-    }
-  );
+  if(currentZoom > 200){
+    currentZoom = 200;
+  }
+
+  applyMartZoom();
+
+}
 
 
-  applyZoom();
+window.changeMartZoom =
+  changeMartZoom;
 
-})();
+
+applyMartZoom();
+
 </script>
 
 
