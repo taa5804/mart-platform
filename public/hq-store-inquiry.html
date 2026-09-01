@@ -1,438 +1,660 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#15803d">
+<title>가맹점 문의 | 본사 관리자</title>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
-  >
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%}
 
-  <meta name="theme-color" content="#15803d">
+body{
+  min-height:100vh;
+  padding:20px 14px 40px;
+  background:#f4f7f5;
+  color:#111827;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
 
-  <title>가맹점 문의 | 본사 관리자</title>
+.wrap{
+  width:100%;
+  max-width:760px;
+  margin:0 auto;
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+.back{
+  margin-bottom:14px;
+  padding:11px 15px;
+  border:0;
+  border-radius:8px;
+  background:#374151;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
 
-    html,
-    body {
-      width: 100%;
-      min-height: 100%;
-      margin: 0;
-    }
+.header{
+  padding:21px 19px;
+  border-radius:15px;
+  background:#15803d;
+  color:#fff;
+}
 
-    body {
-      min-height: 100vh;
-      padding: 22px 14px 40px;
-      background: #f4f7f5;
-      color: #111827;
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-    }
+.header h1{
+  margin:0;
+  font-size:24px;
+}
 
-    .wrap {
-      width: 100%;
-      max-width: 680px;
-      margin: 0 auto;
-    }
+.header p{
+  margin:7px 0 0;
+  font-size:14px;
+  opacity:.9;
+}
 
-    .header {
-      padding: 22px;
-      border-radius: 18px;
-      background: linear-gradient(
-        135deg,
-        #166534,
-        #15803d
-      );
-      color: #fff;
-    }
+.card{
+  margin-top:15px;
+  padding:17px;
+  border:1px solid #dde5df;
+  border-radius:13px;
+  background:#fff;
+}
 
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
+label{
+  display:block;
+  margin-bottom:7px;
+  font-size:14px;
+  font-weight:700;
+}
 
-    .header p {
-      margin: 8px 0 0;
-      font-size: 14px;
-      line-height: 1.6;
-      color: rgba(255,255,255,.86);
-    }
+.store-row{
+  display:flex;
+  gap:8px;
+}
 
-    .back {
-      display: inline-block;
-      margin-bottom: 14px;
-      color: #166534;
-      font-size: 14px;
-      font-weight: 700;
-      text-decoration: none;
-    }
+input,
+textarea{
+  width:100%;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  font-size:15px;
+  outline:none;
+}
 
-    .card {
-      margin-top: 16px;
-      padding: 20px;
-      border: 1px solid #e0e7e2;
-      border-radius: 16px;
-      background: #fff;
-      box-shadow:
-        0 6px 20px
-        rgba(15,23,42,.05);
-    }
+input{
+  height:45px;
+  padding:0 11px;
+}
 
-    label {
-      display: block;
-      margin: 0 0 7px;
-      color: #374151;
-      font-size: 14px;
-      font-weight: 800;
-    }
+textarea{
+  min-height:100px;
+  padding:11px;
+  resize:vertical;
+}
 
-    input,
-    textarea {
-      width: 100%;
-      border: 1px solid #cbd5e1;
-      border-radius: 10px;
-      background: #fff;
-      color: #111827;
-      font-size: 16px;
-      outline: none;
-    }
+input:focus,
+textarea:focus{
+  border-color:#15803d;
+}
 
-    input {
-      height: 50px;
-      padding: 0 14px;
-    }
+button{
+  border:0;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer;
+}
 
-    textarea {
-      min-height: 140px;
-      padding: 14px;
-      resize: vertical;
-      line-height: 1.6;
-    }
+.check{
+  flex:0 0 80px;
+  background:#475569;
+  color:#fff;
+}
 
-    input:focus,
-    textarea:focus {
-      border-color: #16a34a;
-      box-shadow:
-        0 0 0 3px
-        rgba(22,163,74,.12);
-    }
+.store-name{
+  display:none;
+  margin-top:10px;
+  padding:11px;
+  border-radius:8px;
+  background:#f0fdf4;
+  color:#166534;
+  font-size:14px;
+  font-weight:700;
+}
 
-    .field {
-      margin-top: 17px;
-    }
+.messages{
+  min-height:240px;
+  max-height:460px;
+  overflow-y:auto;
+  padding:12px;
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+  background:#f8fafc;
+}
 
-    .field:first-child {
-      margin-top: 0;
-    }
+.empty{
+  padding:70px 10px;
+  text-align:center;
+  color:#94a3b8;
+  font-size:14px;
+}
 
-    .send-button {
-      width: 100%;
-      min-height: 52px;
-      margin-top: 18px;
-      border: 0;
-      border-radius: 11px;
-      background: #15803d;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 800;
-      cursor: pointer;
-    }
+.msg{
+  margin-bottom:12px;
+}
 
-    .notice {
-      margin-top: 13px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      background: #f1f5f9;
-      color: #475569;
-      font-size: 13px;
-      line-height: 1.6;
-    }
+.msg.hq{
+  text-align:right;
+}
 
-    .conversation-title {
-      margin: 24px 2px 10px;
-      font-size: 17px;
-      font-weight: 800;
-    }
+.bubble{
+  display:inline-block;
+  max-width:82%;
+  padding:10px 12px;
+  border-radius:10px;
+  background:#fff;
+  border:1px solid #e2e8f0;
+  text-align:left;
+  line-height:1.5;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
 
-    .conversation {
-      padding: 18px;
-      border: 1px solid #e0e7e2;
-      border-radius: 16px;
-      background: #fff;
-    }
+.msg.hq .bubble{
+  background:#dcfce7;
+  border-color:#bbf7d0;
+}
 
-    .empty {
-      padding: 24px 10px;
-      color: #94a3b8;
-      font-size: 14px;
-      text-align: center;
-    }
+.sender{
+  margin-bottom:4px;
+  color:#64748b;
+  font-size:11px;
+}
 
-    #page {
-      display: none;
-    }
+.send{
+  width:100%;
+  min-height:47px;
+  margin-top:9px;
+  background:#15803d;
+  color:#fff;
+  font-size:15px;
+}
 
-    #loading {
-      min-height: 60vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #64748b;
-      font-size: 15px;
-    }
-  </style>
+.send:disabled,
+.check:disabled{
+  opacity:.55;
+}
+
+.notice{
+  min-height:20px;
+  margin-top:10px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.error{color:#dc2626}
+.success{color:#15803d}
+
+@media(max-width:500px){
+  body{padding:14px 10px 30px}
+}
+</style>
 </head>
 
 <body>
 
-  <main class="wrap">
+<main class="wrap">
 
-    <div id="loading">
-      본사 관리자 확인 중입니다.
-    </div>
+<button
+  class="back"
+  type="button"
+  onclick="location.href='/hq-dashboard.html'"
+>
+← 본사 관리자
+</button>
 
-    <section id="page">
+<header class="header">
+  <h1>가맹점 문의</h1>
+  <p>가맹점과 문의 및 답변을 주고받습니다.</p>
+</header>
 
-      <a
-        class="back"
-        href="/hq-dashboard.html"
-      >
-        ← 본사 관리자
-      </a>
+<section class="card">
 
-      <header class="header">
-        <h1>가맹점 문의</h1>
+<label for="storeId">마트번호</label>
 
-        <p>
-          마트번호를 입력하여 해당 가맹점과 문의 내용을 주고받습니다.
-        </p>
-      </header>
+<div class="store-row">
+  <input
+    id="storeId"
+    placeholder="마트번호 입력"
+    autocomplete="off"
+  >
 
+  <button
+    id="checkButton"
+    class="check"
+    type="button"
+  >
+    확인
+  </button>
+</div>
 
-      <section class="card">
+<div
+  id="storeName"
+  class="store-name"
+></div>
 
-        <div class="field">
-          <label for="storeId">
-            마트번호
-          </label>
+<div
+  id="notice"
+  class="notice"
+></div>
 
-          <input
-            id="storeId"
-            type="text"
-            autocomplete="off"
-            placeholder="마트번호 입력"
-          >
-        </div>
-
-
-        <div class="field">
-          <label for="message">
-            문의내용
-          </label>
-
-          <textarea
-            id="message"
-            placeholder="가맹점에 전달할 내용을 입력하세요."
-          ></textarea>
-        </div>
+</section>
 
 
-        <button
-          id="sendButton"
-          class="send-button"
-          type="button"
-        >
-          보내기
-        </button>
+<section class="card">
+
+<div
+  id="messages"
+  class="messages"
+>
+  <div class="empty">
+    마트번호를 입력하고 확인해 주세요.
+  </div>
+</div>
+
+</section>
 
 
-        <div class="notice">
-          승인된 가맹점의 마트번호만 사용할 수 있도록
-          다음 단계에서 서버와 연결합니다.
-        </div>
+<section class="card">
 
-      </section>
+<label for="message">내용</label>
 
+<textarea
+  id="message"
+  placeholder="문의 또는 답변을 입력하세요."
+  disabled
+></textarea>
 
-      <div class="conversation-title">
-        문의 내역
-      </div>
+<button
+  id="sendButton"
+  class="send"
+  type="button"
+  disabled
+>
+전송
+</button>
 
-      <section class="conversation">
-        <div
-          id="conversationList"
-          class="empty"
-        >
-          마트번호를 입력하면 해당 가맹점의 문의 내역이 표시됩니다.
-        </div>
-      </section>
+</section>
 
-    </section>
-
-  </main>
+</main>
 
 
-  <script>
-    (function () {
-      "use strict";
+<script>
+(function(){
 
-      const FUNCTION_URL =
-        "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-admin-account";
+"use strict";
 
-      const SESSION_KEY =
-        "wooriapt_hq_admin_session";
+const FUNCTION_URL =
+  "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-admin-account";
 
-      const LOGIN_PAGE =
-        "/hq-account.html";
+const SESSION_KEY =
+  "wooriapt_hq_admin_session";
+
+const LOGIN_PAGE =
+  "/hq-account.html";
+
+let currentStoreId = "";
+
+const storeId =
+  document.getElementById("storeId");
+
+const storeName =
+  document.getElementById("storeName");
+
+const checkButton =
+  document.getElementById("checkButton");
+
+const messages =
+  document.getElementById("messages");
+
+const message =
+  document.getElementById("message");
+
+const sendButton =
+  document.getElementById("sendButton");
+
+const notice =
+  document.getElementById("notice");
 
 
-      const loading =
-        document.getElementById("loading");
-
-      const page =
-        document.getElementById("page");
-
-      const sendButton =
-        document.getElementById("sendButton");
+function session(){
+  return localStorage.getItem(
+    SESSION_KEY
+  ) || "";
+}
 
 
-      function getSession() {
-        return (
-          localStorage.getItem(
-            SESSION_KEY
-          ) || ""
-        );
+function showNotice(text,error){
+  notice.textContent=text || "";
+  notice.className=
+    "notice " +
+    (error ? "error" : "success");
+}
+
+
+function escapeHtml(value){
+  const div=document.createElement("div");
+  div.textContent=
+    value == null ? "" : String(value);
+  return div.innerHTML;
+}
+
+
+async function api(action,data){
+
+  const response=
+    await fetch(
+      FUNCTION_URL,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify(
+          Object.assign(
+            {
+              action:action,
+              session_token:session()
+            },
+            data || {}
+          )
+        )
       }
+    );
+
+  const text=
+    await response.text();
+
+  let result={};
+
+  try{
+    result=text ? JSON.parse(text) : {};
+  }catch(e){
+    result={};
+  }
+
+  if(
+    response.status===401
+  ){
+    localStorage.removeItem(
+      SESSION_KEY
+    );
+
+    location.replace(
+      LOGIN_PAGE
+    );
+
+    throw new Error(
+      "로그인이 만료되었습니다."
+    );
+  }
+
+  if(
+    !response.ok ||
+    result.ok===false
+  ){
+    throw new Error(
+      result.message ||
+      "처리에 실패했습니다."
+    );
+  }
+
+  return result;
+}
 
 
-      async function validateSession() {
+function renderMessages(list){
 
-        const token =
-          getSession();
+  messages.innerHTML="";
 
-        if (!token) {
-          location.replace(
-            LOGIN_PAGE
-          );
+  if(
+    !Array.isArray(list) ||
+    list.length===0
+  ){
+    messages.innerHTML=
+      '<div class="empty">문의내역이 없습니다.</div>';
 
-          return;
-        }
+    return;
+  }
 
+  list.forEach(function(item){
 
-        try {
+    const box=
+      document.createElement("div");
 
-          const response =
-            await fetch(
-              FUNCTION_URL,
-              {
-                method: "POST",
+    const isHQ=
+      String(
+        item.sender_type || ""
+      ).toUpperCase()==="HQ";
 
-                headers: {
-                  "Content-Type":
-                    "application/json"
-                },
+    box.className=
+      "msg " +
+      (isHQ ? "hq" : "store");
 
-                body:
-                  JSON.stringify({
-                    action:
-                      "validate_session",
+    box.innerHTML=
+      '<div class="sender">' +
+      (isHQ ? "본사" : "가맹점") +
+      '</div>' +
 
-                    session_token:
-                      token
-                  })
-              }
-            );
+      '<div class="bubble">' +
+      escapeHtml(
+        item.message || ""
+      ) +
+      '</div>';
 
+    messages.appendChild(box);
 
-          const data =
-            await response.json();
+  });
 
-
-          if (
-            !response.ok ||
-            data.ok === false
-          ) {
-            throw new Error(
-              "로그인 확인 실패"
-            );
-          }
+  messages.scrollTop=
+    messages.scrollHeight;
+}
 
 
-          loading.style.display =
-            "none";
+async function loadMessages(){
 
-          page.style.display =
-            "block";
+  if(!currentStoreId){
+    return;
+  }
 
-
-        } catch (error) {
-
-          localStorage.removeItem(
-            SESSION_KEY
-          );
-
-          location.replace(
-            LOGIN_PAGE
-          );
-        }
+  const result=
+    await api(
+      "hq_inquiry_list",
+      {
+        store_id:currentStoreId
       }
+    );
+
+  renderMessages(
+    result.inquiries ||
+    result.messages ||
+    []
+  );
+}
 
 
-      sendButton.addEventListener(
-        "click",
-        function () {
+async function checkStore(){
 
-          const storeId =
-            document
-              .getElementById("storeId")
-              .value
-              .trim();
+  const id=
+    storeId.value.trim();
 
-          const message =
-            document
-              .getElementById("message")
-              .value
-              .trim();
+  if(!id){
+    showNotice(
+      "마트번호를 입력해 주세요.",
+      true
+    );
 
+    return;
+  }
 
-          if (!storeId) {
-            alert(
-              "마트번호를 입력하세요."
-            );
+  checkButton.disabled=true;
 
-            return;
-          }
+  showNotice(
+    "확인 중...",
+    false
+  );
 
+  try{
 
-          if (!message) {
-            alert(
-              "문의내용을 입력하세요."
-            );
-
-            return;
-          }
-
-
-          alert(
-            "다음 단계에서 문의 전송 기능을 연결합니다."
-          );
+    const result=
+      await api(
+        "hq_store_check",
+        {
+          store_id:id
         }
       );
 
+    currentStoreId=
+      result.store.store_id;
 
-      validateSession();
+    storeId.value=
+      currentStoreId;
 
-    })();
-  </script>
+    storeName.textContent=
+      (result.store.store_name || "") +
+      " (" +
+      currentStoreId +
+      ")";
+
+    storeName.style.display=
+      "block";
+
+    message.disabled=false;
+    sendButton.disabled=false;
+
+    showNotice(
+      "",
+      false
+    );
+
+    await loadMessages();
+
+  }catch(error){
+
+    currentStoreId="";
+
+    storeName.style.display=
+      "none";
+
+    message.disabled=true;
+    sendButton.disabled=true;
+
+    messages.innerHTML=
+      '<div class="empty">마트번호를 확인해 주세요.</div>';
+
+    showNotice(
+      error.message,
+      true
+    );
+
+  }finally{
+
+    checkButton.disabled=false;
+
+  }
+}
+
+
+async function sendMessage(){
+
+  if(!currentStoreId){
+    return;
+  }
+
+  const text=
+    message.value.trim();
+
+  if(!text){
+    showNotice(
+      "내용을 입력해 주세요.",
+      true
+    );
+
+    return;
+  }
+
+  sendButton.disabled=true;
+
+  try{
+
+    const result=
+      await api(
+        "hq_inquiry_send",
+        {
+          store_id:currentStoreId,
+          message:text
+        }
+      );
+
+    message.value="";
+
+    showNotice(
+      result.message ||
+      "전송되었습니다.",
+      false
+    );
+
+    await loadMessages();
+
+  }catch(error){
+
+    showNotice(
+      error.message,
+      true
+    );
+
+  }finally{
+
+    sendButton.disabled=false;
+
+  }
+}
+
+
+checkButton.addEventListener(
+  "click",
+  checkStore
+);
+
+
+sendButton.addEventListener(
+  "click",
+  sendMessage
+);
+
+
+storeId.addEventListener(
+  "keydown",
+  function(event){
+
+    if(event.key==="Enter"){
+      checkStore();
+    }
+
+  }
+);
+
+
+if(!session()){
+  location.replace(
+    LOGIN_PAGE
+  );
+}
+
+})();
+</script>
 
 </body>
 </html>
