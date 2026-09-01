@@ -230,6 +230,13 @@
     >
       계정
     </button>
+
+    <button
+      class="menuBtn"
+      onclick="showMenu('inquiry',this)"
+    >
+      본사 문의
+    </button>
   </div>
 
   <div id="today" class="sa-section active">
@@ -372,6 +379,15 @@
       >
         로그아웃
       </button>
+    </div>
+  </div>
+
+  <div id="inquiry" class="sa-section">
+    <div class="sa-box">
+      <b>본사 문의</b>
+      <div id="inquiryList" style="margin-top:12px;min-height:160px;max-height:350px;overflow-y:auto;padding:10px;background:#f7f7f7;border-radius:8px;">문의내역이 없습니다.</div>
+      <textarea id="inquiryMessage" placeholder="본사에 문의할 내용을 입력하세요." style="height:100px;"></textarea>
+      <button class="sa-btn" onclick="sendInquiry()">전송</button>
     </div>
   </div>
 
@@ -592,6 +608,10 @@ function showMenu(id, button) {
   button
     .classList
     .add('active');
+
+  if (id === 'inquiry') {
+    loadInquiries();
+  }
 }
 
 function renderInputs() {
@@ -1818,5 +1838,68 @@ async function changePassword() {
     );
   }
 }
+
+async function loadInquiries() {
+  if (!currentStoreId) return;
+  try {
+    const data = await getRows(
+      'store_inquiry_messages',
+      '?store_id=eq.' + encodeURIComponent(currentStoreId) + '&select=*&order=created_at.asc'
+    );
+    const list = document.getElementById('inquiryList');
+    if (!data.length) {
+      list.innerHTML = '문의내역이 없습니다.';
+      return;
+    }
+    list.innerHTML = '';
+    data.forEach(item => {
+      const box = document.createElement('div');
+      box.style.marginBottom = '10px';
+      box.style.padding = '10px';
+      box.style.background = '#fff';
+      box.style.borderRadius = '7px';
+      const sender = document.createElement('b');
+      sender.textContent = String(item.sender_type || '').toUpperCase() === 'HQ' ? '본사' : '마트';
+      const text = document.createElement('div');
+      text.style.marginTop = '5px';
+      text.style.whiteSpace = 'pre-wrap';
+      text.textContent = item.message || '';
+      box.appendChild(sender);
+      box.appendChild(text);
+      list.appendChild(box);
+    });
+    list.scrollTop = list.scrollHeight;
+  } catch (error) {
+    alert('문의내역 불러오기 실패: ' + error.message);
+  }
+}
+
+async function sendInquiry() {
+  const input = document.getElementById('inquiryMessage');
+  const text = input.value.trim();
+  if (!text) {
+    alert('문의내용을 입력하세요.');
+    return;
+  }
+  try {
+    const response = await fetch(api('store_inquiry_messages'), {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({
+        store_id: currentStoreId,
+        sender_type: 'STORE',
+        message: text,
+        created_at: new Date().toISOString()
+      })
+    });
+    if (!response.ok) throw new Error(await response.text());
+    input.value = '';
+    await loadInquiries();
+    alert('본사에 전달되었습니다.');
+  } catch (error) {
+    alert('문의 전송 실패: ' + error.message);
+  }
+}
+
 </script>
 </div>
