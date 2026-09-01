@@ -2,15 +2,13 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
   >
-
   <meta name="theme-color" content="#15803d">
 
-  <title>본사 관리자</title>
+  <title>가맹점 소통 | 본사 관리자</title>
 
   <style>
     * {
@@ -38,6 +36,12 @@
         sans-serif;
     }
 
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
     .wrap {
       width: 100%;
       max-width: 680px;
@@ -55,14 +59,14 @@
       color: #fff;
       box-shadow:
         0 12px 30px
-        rgba(21, 128, 61, 0.2);
+        rgba(21, 128, 61, 0.20);
     }
 
     .header-top {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
     }
 
     .header h1 {
@@ -73,130 +77,169 @@
 
     .header p {
       margin: 8px 0 0;
-      color: rgba(255, 255, 255, 0.86);
+      color: rgba(255, 255, 255, 0.88);
       font-size: 14px;
       line-height: 1.6;
     }
 
-    .admin-id {
+    .back-button {
       flex-shrink: 0;
-      padding: 7px 11px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.16);
+      min-height: 38px;
+      padding: 0 13px;
+      border: 1px solid
+        rgba(255, 255, 255, 0.35);
+      border-radius: 10px;
+      background:
+        rgba(255, 255, 255, 0.14);
+      color: #fff;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
+      cursor: pointer;
     }
 
-    .status-box {
-      margin-top: 14px;
-      padding: 13px 15px;
-      border: 1px solid #d8e8dc;
-      border-radius: 12px;
+    .card {
+      margin-top: 16px;
+      padding: 20px;
+      border: 1px solid #dfe8e1;
+      border-radius: 16px;
       background: #fff;
-      color: #375343;
-      font-size: 14px;
-      line-height: 1.55;
+      box-shadow:
+        0 6px 20px
+        rgba(15, 23, 42, 0.05);
     }
 
-    .menu-title {
-      margin: 24px 2px 12px;
-      color: #26362c;
-      font-size: 17px;
+    .card-title {
+      margin: 0 0 6px;
+      color: #1f2937;
+      font-size: 18px;
       font-weight: 800;
     }
 
-    .menu-grid {
-      display: grid;
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-      gap: 12px;
+    .card-description {
+      margin: 0 0 18px;
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.6;
     }
 
-    .menu-card {
-      min-height: 150px;
-      padding: 20px 17px;
-      border: 1px solid #e0e7e2;
-      border-radius: 16px;
+    .field {
+      margin-top: 15px;
+    }
+
+    .field:first-of-type {
+      margin-top: 0;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 7px;
+      color: #374151;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .required {
+      color: #dc2626;
+    }
+
+    .input,
+    .textarea {
+      width: 100%;
+      border: 1px solid #cfdad2;
+      border-radius: 11px;
       background: #fff;
       color: #111827;
-      text-decoration: none;
-      box-shadow:
-        0 6px 20px
-        rgba(15, 23, 42, 0.06);
-      cursor: pointer;
+      outline: none;
       transition:
-        transform 0.15s ease,
+        border-color 0.15s ease,
         box-shadow 0.15s ease;
     }
 
-    .menu-card:active {
-      transform: scale(0.98);
-    }
-
-    .menu-card:hover {
-      box-shadow:
-        0 10px 26px
-        rgba(15, 23, 42, 0.1);
-    }
-
-    .menu-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 46px;
-      height: 46px;
-      margin-bottom: 16px;
-      border-radius: 13px;
-      background: #edf7f0;
-      font-size: 23px;
-    }
-
-    .menu-card strong {
-      display: block;
-      color: #1f2937;
-      font-size: 17px;
-      line-height: 1.35;
-    }
-
-    .menu-card span {
-      display: block;
-      margin-top: 7px;
-      color: #64748b;
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .menu-card.disabled {
-      opacity: 0.65;
-      cursor: default;
-    }
-
-    .ready {
-      display: inline-block;
-      width: auto !important;
-      margin-top: 10px !important;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: #f1f5f9;
-      color: #64748b !important;
-      font-size: 11px !important;
-      font-weight: 700;
-    }
-
-    .logout-button {
-      width: 100%;
-      min-height: 52px;
-      margin-top: 18px;
-      border: 0;
-      border-radius: 12px;
-      background: #374151;
-      color: #fff;
+    .input {
+      height: 50px;
+      padding: 0 14px;
       font-size: 16px;
+    }
+
+    .textarea {
+      min-height: 150px;
+      padding: 14px;
+      resize: vertical;
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .input:focus,
+    .textarea:focus {
+      border-color: #15803d;
+      box-shadow:
+        0 0 0 3px
+        rgba(21, 128, 61, 0.10);
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns:
+        minmax(0, 1fr) 110px;
+      gap: 9px;
+    }
+
+    .search-button {
+      min-height: 50px;
+      border: 0;
+      border-radius: 11px;
+      background: #166534;
+      color: #fff;
+      font-size: 15px;
       font-weight: 800;
       cursor: pointer;
     }
 
-    .logout-button:disabled {
+    .search-button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .store-box {
+      display: none;
+      margin-top: 14px;
+      padding: 15px;
+      border: 1px solid #d9e7dd;
+      border-radius: 12px;
+      background: #f7fbf8;
+    }
+
+    .store-box.show {
+      display: block;
+    }
+
+    .store-name {
+      color: #166534;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .store-info {
+      margin-top: 6px;
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .send-button {
+      width: 100%;
+      min-height: 54px;
+      margin-top: 18px;
+      border: 0;
+      border-radius: 12px;
+      background: #15803d;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .send-button:disabled {
       opacity: 0.6;
       cursor: wait;
     }
@@ -210,6 +253,10 @@
       line-height: 1.55;
     }
 
+    .message.show {
+      display: block;
+    }
+
     .message.error {
       display: block;
       border: 1px solid #efb8b8;
@@ -217,11 +264,73 @@
       color: #a02020;
     }
 
+    .message.success {
+      display: block;
+      border: 1px solid #bbdfc5;
+      background: #effaf2;
+      color: #166534;
+    }
+
     .message.waiting {
       display: block;
       border: 1px solid #bfdbfe;
       background: #eff6ff;
       color: #1d4ed8;
+    }
+
+    .section-title {
+      margin: 24px 2px 10px;
+      color: #26362c;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .history-empty {
+      padding: 24px 15px;
+      color: #64748b;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .history-item {
+      padding: 15px;
+      border: 1px solid #e0e7e2;
+      border-radius: 13px;
+      background: #fff;
+    }
+
+    .history-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .history-store {
+      color: #166534;
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .history-date {
+      flex-shrink: 0;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .history-content {
+      margin-top: 9px;
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
     #loadingScreen {
@@ -256,21 +365,41 @@
       font-size: 14px;
     }
 
-    #dashboard {
+    #pageContent {
       display: none;
     }
 
     @media (max-width: 470px) {
-      .menu-grid {
-        grid-template-columns: 1fr;
+      body {
+        padding:
+          16px 12px 30px;
       }
 
-      .menu-card {
-        min-height: auto;
+      .header {
+        padding: 21px 18px;
       }
 
-      .header-top {
+      .header h1 {
+        font-size: 22px;
+      }
+
+      .card {
+        padding: 17px;
+      }
+
+      .search-row {
+        grid-template-columns:
+          minmax(0, 1fr) 92px;
+      }
+
+      .search-button {
+        font-size: 14px;
+      }
+
+      .history-top {
         align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
       }
     }
   </style>
@@ -282,7 +411,10 @@
 
     <section id="loadingScreen">
       <div class="loading-card">
-        <strong>본사 관리자 확인 중</strong>
+        <strong>
+          본사 관리자 확인 중
+        </strong>
+
         <span>
           로그인 정보를 확인하고 있습니다.
         </span>
@@ -290,198 +422,158 @@
     </section>
 
 
-    <section id="dashboard">
+    <section id="pageContent">
 
       <header class="header">
+
         <div class="header-top">
+
           <div>
-            <h1>본사 관리자</h1>
+            <h1>
+              가맹점 소통
+            </h1>
 
             <p>
-              플랫폼의 주요 운영 기능을 관리합니다.
+              마트번호를 입력하여
+              가맹점과 소통할 수 있습니다.
             </p>
           </div>
 
-          <div
-            id="adminIdLabel"
-            class="admin-id"
+          <button
+            class="back-button"
+            type="button"
+            id="backButton"
           >
-            admin
-          </div>
+            관리자 홈
+          </button>
+
         </div>
+
       </header>
 
 
-      <div class="menu-title">
-        운영 현황
-      </div>
+      <section class="card">
 
-      <div class="status-box">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <h2 class="card-title">
+          가맹점 찾기
+        </h2>
 
-          <div style="background:#fff;border:1px solid #d9e7dd;border-radius:12px;padding:14px;text-align:center">
-            <div style="font-size:13px;color:#64748b">등록 매장</div>
-            <div id="storeCount" style="font-size:28px;font-weight:700;color:#166534">-</div>
+        <p class="card-description">
+          소통할 가맹점의 마트번호를 입력하세요.
+        </p>
+
+
+        <div class="field">
+
+          <label
+            class="label"
+            for="storeCode"
+          >
+            마트번호
+            <span class="required">*</span>
+          </label>
+
+          <div class="search-row">
+
+            <input
+              id="storeCode"
+              class="input"
+              type="text"
+              inputmode="text"
+              autocomplete="off"
+              placeholder="마트번호 입력"
+            >
+
+            <button
+              id="searchButton"
+              class="search-button"
+              type="button"
+            >
+              확인
+            </button>
+
           </div>
 
-          <div style="background:#fff;border:1px solid #d9e7dd;border-radius:12px;padding:14px;text-align:center">
-            <div style="font-size:13px;color:#64748b">운영 중 매장</div>
-            <div id="activeStoreCount" style="font-size:28px;font-weight:700;color:#166534">-</div>
-          </div>
-
-          <div style="background:#fff;border:1px solid #d9e7dd;border-radius:12px;padding:14px;text-align:center">
-            <div style="font-size:13px;color:#64748b">메인 배너</div>
-            <div id="bannerCount" style="font-size:28px;font-weight:700;color:#166534">-</div>
-          </div>
-
-          <div style="background:#fff;border:1px solid #d9e7dd;border-radius:12px;padding:14px;text-align:center">
-            <div style="font-size:13px;color:#64748b">쿠폰 발행</div>
-            <div id="couponCount" style="font-size:28px;font-weight:700;color:#166534">-</div>
-          </div>
-
-        </div>
-      </div>
-
-
-      <div class="menu-title">
-        관리 메뉴
-      </div>
-
-
-      <div class="menu-grid">
-
-        <a
-          class="menu-card"
-          href="/hq-password.html"
-        >
-          <div class="menu-icon">
-            🔐
-          </div>
-
-          <strong>
-            계정관리
-          </strong>
-
-          <span>
-            본사 관리자 비밀번호를 변경합니다.
-          </span>
-        </a>
-
-
-        <a
-          class="menu-card"
-          href="/main-banner.html"
-        >
-          <div class="menu-icon">
-            🖼️
-          </div>
-
-          <strong>
-            메인 배너관리
-          </strong>
-
-          <span>
-            매장을 선택하고 배너 2개를 관리합니다.
-          </span>
-        </a>
-
-
-        <a
-          class="menu-card"
-          href="/hq-store-account.html"
-        >
-          <div class="menu-icon">
-            🏪
-          </div>
-
-          <strong>
-            가맹점 승인관리
-          </strong>
-
-          <span>
-            가맹점 신청과 승인 상태를 관리합니다.
-          </span>
-        </a>
-
-
-        <a
-          class="menu-card"
-          href="/hq-store-inquiry.html"
-        >
-          <div class="menu-icon">
-            💬
-          </div>
-
-          <strong>
-            가맹점 소통
-          </strong>
-
-          <span>
-            가맹점과 본사의 소통 내용을 관리합니다.
-          </span>
-        </a>
-
-
-        <div
-          class="menu-card disabled"
-          onclick="showPreparing('결제·계좌관리')"
-        >
-          <div class="menu-icon">
-            💳
-          </div>
-
-          <strong>
-            결제·계좌관리
-          </strong>
-
-          <span>
-            입금계좌와 결제 정보를 관리합니다.
-          </span>
-
-          <span class="ready">
-            준비 중
-          </span>
         </div>
 
 
         <div
-          class="menu-card disabled"
-          onclick="showPreparing('쿠폰관리')"
+          id="storeBox"
+          class="store-box"
         >
-          <div class="menu-icon">
-            🎟️
+
+          <div
+            id="storeName"
+            class="store-name"
+          >
           </div>
 
-          <strong>
-            쿠폰관리
-          </strong>
+          <div
+            id="storeInfo"
+            class="store-info"
+          >
+          </div>
 
-          <span>
-            쿠폰 발행과 사용 상태를 관리합니다.
-          </span>
-
-          <span class="ready">
-            준비 중
-          </span>
         </div>
 
+
+        <div class="field">
+
+          <label
+            class="label"
+            for="inquiryContent"
+          >
+            내용
+            <span class="required">*</span>
+          </label>
+
+          <textarea
+            id="inquiryContent"
+            class="textarea"
+            placeholder="가맹점에 전달할 내용을 입력하세요."
+          ></textarea>
+
+        </div>
+
+
+        <button
+          id="sendButton"
+          class="send-button"
+          type="button"
+        >
+          보내기
+        </button>
+
+
+        <div
+          id="messageBox"
+          class="message"
+          aria-live="polite"
+        ></div>
+
+      </section>
+
+
+      <div class="section-title">
+        소통 내역
       </div>
 
 
-      <button
-        id="logoutButton"
-        class="logout-button"
-        type="button"
-      >
-        로그아웃
-      </button>
+      <section class="card">
 
+        <div
+          id="historyList"
+          class="history-list"
+        >
 
-      <div
-        id="messageBox"
-        class="message"
-        aria-live="polite"
-      ></div>
+          <div class="history-empty">
+            마트번호를 확인하면
+            해당 가맹점의 소통 내역이 표시됩니다.
+          </div>
+
+        </div>
+
+      </section>
 
     </section>
 
@@ -492,39 +584,71 @@
     (function () {
       "use strict";
 
-      const FUNCTION_URL =
+
+      const ADMIN_FUNCTION_URL =
         "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-admin-account";
 
-      const STATS_FUNCTION_URL =
-        "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-dashboard-stats";
+      const INQUIRY_FUNCTION_URL =
+        "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-store-inquiry";
 
       const SESSION_KEY =
         "wooriapt_hq_admin_session";
 
-      const ADMIN_ID_KEY =
-        "wooriapt_hq_admin_id";
-
       const LOGIN_PAGE =
         "/hq-account.html";
+
+      const DASHBOARD_PAGE =
+        "/hq-dashboard.html";
+
 
       const loadingScreen =
         document.getElementById(
           "loadingScreen"
         );
 
-      const dashboard =
+      const pageContent =
         document.getElementById(
-          "dashboard"
+          "pageContent"
         );
 
-      const adminIdLabel =
+      const backButton =
         document.getElementById(
-          "adminIdLabel"
+          "backButton"
         );
 
-      const logoutButton =
+      const storeCodeInput =
         document.getElementById(
-          "logoutButton"
+          "storeCode"
+        );
+
+      const searchButton =
+        document.getElementById(
+          "searchButton"
+        );
+
+      const storeBox =
+        document.getElementById(
+          "storeBox"
+        );
+
+      const storeName =
+        document.getElementById(
+          "storeName"
+        );
+
+      const storeInfo =
+        document.getElementById(
+          "storeInfo"
+        );
+
+      const inquiryContent =
+        document.getElementById(
+          "inquiryContent"
+        );
+
+      const sendButton =
+        document.getElementById(
+          "sendButton"
         );
 
       const messageBox =
@@ -532,11 +656,20 @@
           "messageBox"
         );
 
+      const historyList =
+        document.getElementById(
+          "historyList"
+        );
+
+
+      let selectedStore = null;
+
 
       function showMessage(
         text,
         type
       ) {
+
         messageBox.textContent =
           text || "";
 
@@ -550,24 +683,42 @@
       }
 
 
-      function clearSession() {
-        localStorage.removeItem(
-          SESSION_KEY
-        );
+      function clearMessage() {
 
-        localStorage.removeItem(
-          ADMIN_ID_KEY
-        );
+        messageBox.textContent = "";
+
+        messageBox.className =
+          "message";
       }
 
 
-      async function callApi(
-        action,
-        payload
+      function clearStore() {
+
+        selectedStore = null;
+
+        storeBox.classList.remove(
+          "show"
+        );
+
+        storeName.textContent = "";
+
+        storeInfo.textContent = "";
+
+        historyList.innerHTML =
+          '<div class="history-empty">' +
+          '마트번호를 확인하면 해당 가맹점의 소통 내역이 표시됩니다.' +
+          '</div>';
+      }
+
+
+      async function postJson(
+        url,
+        body
       ) {
+
         const response =
           await fetch(
-            FUNCTION_URL,
+            url,
             {
               method: "POST",
 
@@ -578,34 +729,36 @@
 
               body:
                 JSON.stringify(
-                  Object.assign(
-                    {
-                      action: action
-                    },
-                    payload || {}
-                  )
+                  body || {}
                 )
             }
           );
 
+
         const text =
           await response.text();
+
 
         let data = {};
 
         try {
+
           data =
             text
               ? JSON.parse(text)
               : {};
+
         } catch (error) {
+
           data = {};
         }
+
 
         if (
           !response.ok ||
           data.ok === false
         ) {
+
           throw new Error(
             data.message ||
             data.error ||
@@ -613,207 +766,511 @@
           );
         }
 
+
         return data;
       }
 
 
-      async function loadDashboardStats() {
-        const storeCount =
-          document.getElementById("storeCount");
+      async function validateSession() {
 
-        const activeStoreCount =
-          document.getElementById("activeStoreCount");
-
-        const bannerCount =
-          document.getElementById("bannerCount");
-
-        const couponCount =
-          document.getElementById("couponCount");
-
-        try {
-          const response =
-            await fetch(
-              STATS_FUNCTION_URL,
-              {
-                method: "POST",
-
-                headers: {
-                  "Content-Type":
-                    "application/json"
-                },
-
-                body:
-                  JSON.stringify({})
-              }
-            );
-
-          const text =
-            await response.text();
-
-          let data = {};
-
-          try {
-            data =
-              text
-                ? JSON.parse(text)
-                : {};
-          } catch (error) {
-            data = {};
-          }
-
-          if (
-            !response.ok ||
-            data.ok === false
-          ) {
-            throw new Error(
-              data.message ||
-              data.error ||
-              "운영 현황을 불러오지 못했습니다."
-            );
-          }
-
-          storeCount.textContent =
-            Number(
-              data.store_count || 0
-            ).toLocaleString("ko-KR");
-
-          activeStoreCount.textContent =
-            Number(
-              data.active_store_count || 0
-            ).toLocaleString("ko-KR");
-
-          bannerCount.textContent =
-            Number(
-              data.banner_count || 0
-            ).toLocaleString("ko-KR");
-
-          couponCount.textContent =
-            Number(
-              data.coupon_count || 0
-            ).toLocaleString("ko-KR");
-
-        } catch (error) {
-          console.error(
-            "운영 현황 불러오기 실패:",
-            error
-          );
-
-          storeCount.textContent = "-";
-          activeStoreCount.textContent = "-";
-          bannerCount.textContent = "-";
-          couponCount.textContent = "-";
-        }
-      }
-
-
-      async function checkLogin() {
         const token =
           localStorage.getItem(
             SESSION_KEY
           ) || "";
 
+
         if (!token) {
+
           location.replace(
             LOGIN_PAGE
           );
 
-          return;
+          return null;
         }
 
+
         try {
-          const data =
-            await callApi(
-              "validate_session",
-              {
-                session_token:
-                  token
-              }
-            );
 
-          const adminId =
-            data.admin_id ||
-            localStorage.getItem(
-              ADMIN_ID_KEY
-            ) ||
-            "admin";
+          await postJson(
+            ADMIN_FUNCTION_URL,
+            {
+              action:
+                "validate_session",
 
-          localStorage.setItem(
-            ADMIN_ID_KEY,
-            adminId
+              session_token:
+                token
+            }
           );
 
-          adminIdLabel.textContent =
-            adminId;
 
           loadingScreen.style.display =
             "none";
 
-          dashboard.style.display =
+          pageContent.style.display =
             "block";
 
-          await loadDashboardStats();
+
+          return token;
 
         } catch (error) {
-          clearSession();
+
+          localStorage.removeItem(
+            SESSION_KEY
+          );
 
           location.replace(
             LOGIN_PAGE
           );
+
+          return null;
         }
       }
 
 
-      window.showPreparing =
-        function (menuName) {
-          alert(
-            menuName +
-            " 기능은 다음 단계에서 연결합니다."
-          );
-        };
+      function renderHistory(
+        items
+      ) {
+
+        historyList.innerHTML = "";
 
 
-      logoutButton.addEventListener(
-        "click",
-        async function () {
-          const token =
-            localStorage.getItem(
-              SESSION_KEY
-            ) || "";
+        if (
+          !Array.isArray(items) ||
+          items.length === 0
+        ) {
 
-          try {
-            logoutButton.disabled =
-              true;
+          historyList.innerHTML =
+            '<div class="history-empty">' +
+            '등록된 소통 내역이 없습니다.' +
+            '</div>';
 
-            showMessage(
-              "로그아웃하고 있습니다.",
-              "waiting"
-            );
+          return;
+        }
 
-            if (token) {
-              await callApi(
-                "logout",
-                {
-                  session_token:
-                    token
-                }
+
+        items.forEach(
+          function (item) {
+
+            const box =
+              document.createElement(
+                "div"
               );
-            }
 
-          } catch (error) {
-            console.warn(error);
+            box.className =
+              "history-item";
 
-          } finally {
-            clearSession();
 
-            location.replace(
-              LOGIN_PAGE
+            const top =
+              document.createElement(
+                "div"
+              );
+
+            top.className =
+              "history-top";
+
+
+            const store =
+              document.createElement(
+                "div"
+              );
+
+            store.className =
+              "history-store";
+
+            store.textContent =
+              item.sender_name ||
+              item.sender_type ||
+              "본사";
+
+
+            const date =
+              document.createElement(
+                "div"
+              );
+
+            date.className =
+              "history-date";
+
+            date.textContent =
+              item.created_at
+                ? new Date(
+                    item.created_at
+                  ).toLocaleString(
+                    "ko-KR"
+                  )
+                : "";
+
+
+            const content =
+              document.createElement(
+                "div"
+              );
+
+            content.className =
+              "history-content";
+
+            content.textContent =
+              item.content ||
+              item.message ||
+              "";
+
+
+            top.appendChild(
+              store
             );
+
+            top.appendChild(
+              date
+            );
+
+            box.appendChild(
+              top
+            );
+
+            box.appendChild(
+              content
+            );
+
+            historyList.appendChild(
+              box
+            );
+          }
+        );
+      }
+
+
+      async function searchStore() {
+
+        clearMessage();
+
+        clearStore();
+
+
+        const storeCode =
+          storeCodeInput.value
+            .trim();
+
+
+        if (!storeCode) {
+
+          showMessage(
+            "마트번호를 입력해 주세요.",
+            "error"
+          );
+
+          storeCodeInput.focus();
+
+          return;
+        }
+
+
+        const token =
+          localStorage.getItem(
+            SESSION_KEY
+          ) || "";
+
+
+        try {
+
+          searchButton.disabled =
+            true;
+
+          showMessage(
+            "가맹점 정보를 확인하고 있습니다.",
+            "waiting"
+          );
+
+
+          const data =
+            await postJson(
+              INQUIRY_FUNCTION_URL,
+              {
+                action:
+                  "get_store",
+
+                session_token:
+                  token,
+
+                store_code:
+                  storeCode
+              }
+            );
+
+
+          const store =
+            data.store ||
+            data.data ||
+            null;
+
+
+          if (!store) {
+
+            throw new Error(
+              "해당 마트번호의 가맹점을 찾을 수 없습니다."
+            );
+          }
+
+
+          selectedStore =
+            store;
+
+
+          storeName.textContent =
+            store.store_name ||
+            store.name ||
+            "가맹점";
+
+
+          const info = [];
+
+
+          if (
+            store.store_code ||
+            storeCode
+          ) {
+
+            info.push(
+              "마트번호: " +
+              (
+                store.store_code ||
+                storeCode
+              )
+            );
+          }
+
+
+          if (store.owner_name) {
+
+            info.push(
+              "대표자: " +
+              store.owner_name
+            );
+          }
+
+
+          if (store.phone) {
+
+            info.push(
+              "연락처: " +
+              store.phone
+            );
+          }
+
+
+          storeInfo.textContent =
+            info.join(" · ");
+
+
+          storeBox.classList.add(
+            "show"
+          );
+
+
+          renderHistory(
+            data.inquiries ||
+            data.messages ||
+            []
+          );
+
+
+          showMessage(
+            "가맹점을 확인했습니다.",
+            "success"
+          );
+
+
+        } catch (error) {
+
+          clearStore();
+
+          showMessage(
+            error.message ||
+            "가맹점 확인에 실패했습니다.",
+            "error"
+          );
+
+        } finally {
+
+          searchButton.disabled =
+            false;
+        }
+      }
+
+
+      async function sendInquiry() {
+
+        clearMessage();
+
+
+        if (!selectedStore) {
+
+          showMessage(
+            "먼저 마트번호를 입력하고 가맹점을 확인해 주세요.",
+            "error"
+          );
+
+          storeCodeInput.focus();
+
+          return;
+        }
+
+
+        const content =
+          inquiryContent.value
+            .trim();
+
+
+        if (!content) {
+
+          showMessage(
+            "전달할 내용을 입력해 주세요.",
+            "error"
+          );
+
+          inquiryContent.focus();
+
+          return;
+        }
+
+
+        const token =
+          localStorage.getItem(
+            SESSION_KEY
+          ) || "";
+
+
+        const storeCode =
+          selectedStore.store_code ||
+          storeCodeInput.value.trim();
+
+
+        try {
+
+          sendButton.disabled =
+            true;
+
+          showMessage(
+            "내용을 보내고 있습니다.",
+            "waiting"
+          );
+
+
+          const data =
+            await postJson(
+              INQUIRY_FUNCTION_URL,
+              {
+                action:
+                  "send_message",
+
+                session_token:
+                  token,
+
+                store_code:
+                  storeCode,
+
+                content:
+                  content,
+
+                sender_type:
+                  "HQ"
+              }
+            );
+
+
+          inquiryContent.value =
+            "";
+
+
+          if (
+            Array.isArray(
+              data.inquiries
+            )
+          ) {
+
+            renderHistory(
+              data.inquiries
+            );
+
+          } else {
+
+            await searchStore();
+          }
+
+
+          showMessage(
+            "가맹점에 내용을 보냈습니다.",
+            "success"
+          );
+
+
+        } catch (error) {
+
+          showMessage(
+            error.message ||
+            "내용을 보내지 못했습니다.",
+            "error"
+          );
+
+        } finally {
+
+          sendButton.disabled =
+            false;
+        }
+      }
+
+
+      backButton.addEventListener(
+        "click",
+        function () {
+
+          location.href =
+            DASHBOARD_PAGE;
+        }
+      );
+
+
+      searchButton.addEventListener(
+        "click",
+        searchStore
+      );
+
+
+      storeCodeInput.addEventListener(
+        "keydown",
+        function (event) {
+
+          if (
+            event.key ===
+            "Enter"
+          ) {
+
+            event.preventDefault();
+
+            searchStore();
           }
         }
       );
 
 
-      checkLogin();
+      storeCodeInput.addEventListener(
+        "input",
+        function () {
+
+          clearStore();
+
+          clearMessage();
+        }
+      );
+
+
+      sendButton.addEventListener(
+        "click",
+        sendInquiry
+      );
+
+
+      validateSession();
+
     })();
   </script>
 
