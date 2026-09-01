@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta
   name="viewport"
-  content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"
+  content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
 >
 <meta name="theme-color" content="#15803d">
 
-<title>가맹점 승인관리 | 본사 관리자</title>
+<title>가맹점 승인 | 본사 관리자</title>
 
 <style>
 *{
@@ -38,16 +38,13 @@ body{
 
 .wrap{
   width:100%;
-  max-width:1100px;
+  max-width:850px;
   margin:0 auto;
-}
-
-.top{
-  margin-bottom:16px;
 }
 
 .back-button{
   min-height:42px;
+  margin-bottom:14px;
   padding:0 15px;
   border:0;
   border-radius:8px;
@@ -68,112 +65,46 @@ body{
     #15803d
   );
   color:#fff;
-  box-shadow:
-    0 10px 26px
-    rgba(21,128,61,.18);
 }
 
 .header h1{
   margin:0;
   font-size:24px;
-  line-height:1.35;
 }
 
 .header p{
   margin:7px 0 0;
   color:rgba(255,255,255,.86);
   font-size:14px;
-  line-height:1.6;
 }
 
 .card{
-  margin-bottom:16px;
   padding:18px;
-  border:1px solid #ddd;
-  border-radius:12px;
+  border:1px solid #dde5df;
+  border-radius:14px;
   background:#fff;
 }
 
-.card h2{
-  margin:0 0 16px;
-  font-size:22px;
-}
-
-.card h3{
-  margin:0 0 15px;
-  font-size:18px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.full{
-  grid-column:1/-1;
-}
-
-label{
-  display:block;
-  margin-bottom:5px;
-  font-size:13px;
-  font-weight:700;
-}
-
-input{
+.search{
   width:100%;
-  height:44px;
-  padding:0 11px;
-  border:1px solid #ccc;
-  border-radius:7px;
-  background:#fff;
-  color:#111827;
-  font-size:14px;
+  height:46px;
+  margin-bottom:14px;
+  padding:0 12px;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  font-size:15px;
   outline:none;
 }
 
-input:focus{
+.search:focus{
   border-color:#15803d;
-  box-shadow:
-    0 0 0 3px
-    rgba(21,128,61,.08);
+  box-shadow:0 0 0 3px rgba(21,128,61,.08);
 }
 
-.buttons{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:15px;
-}
-
-button{
-  border:0;
-  border-radius:7px;
-  padding:10px 15px;
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.green{
-  background:#15803d;
-}
-
-.blue{
-  background:#2563eb;
-}
-
-.gray{
-  background:#475569;
-}
-
-.orange{
-  background:#f59e0b;
-}
-
-.red{
-  background:#dc2626;
+.count{
+  margin:0 0 12px;
+  color:#64748b;
+  font-size:14px;
 }
 
 .table-wrap{
@@ -182,69 +113,66 @@ button{
 
 table{
   width:100%;
-  min-width:800px;
+  min-width:650px;
   border-collapse:collapse;
 }
 
 th,
 td{
-  padding:10px;
-  border-bottom:1px solid #ddd;
+  padding:12px 10px;
+  border-bottom:1px solid #e5e7eb;
   text-align:left;
-  font-size:13px;
+  font-size:14px;
 }
 
 th{
-  background:#f5f5f5;
+  background:#f8fafc;
+  color:#475569;
 }
 
-tbody tr{
+.status{
+  font-weight:700;
+}
+
+.pending{
+  color:#d97706;
+}
+
+.active{
+  color:#15803d;
+}
+
+.approve-button{
+  min-width:72px;
+  min-height:38px;
+  border:0;
+  border-radius:7px;
+  background:#15803d;
+  color:#fff;
+  font-weight:700;
   cursor:pointer;
 }
 
-tbody tr:hover{
-  background:#f0fdf4;
+.approve-button:disabled{
+  opacity:.5;
+  cursor:default;
 }
 
-tbody tr.selected{
-  background:#dcfce7;
-}
-
-#message{
-  margin-top:12px;
+.message{
+  margin-top:14px;
+  font-size:14px;
   font-weight:700;
 }
 
-#selectedStore{
-  padding:12px;
-  border-radius:7px;
-  background:#f5f5f5;
-}
-
-.status-pending{
-  color:#d97706;
-  font-weight:700;
-}
-
-.status-active{
-  color:#15803d;
-  font-weight:700;
-}
-
-.status-suspended{
+.error{
   color:#dc2626;
-  font-weight:700;
 }
 
-@media(max-width:700px){
-  .grid{
-    grid-template-columns:1fr;
-  }
+.success{
+  color:#15803d;
+}
 
-  .full{
-    grid-column:auto;
-  }
-
+@media(max-width:600px){
   body{
     padding:14px 10px 30px;
   }
@@ -260,169 +188,35 @@ tbody tr.selected{
 
 <main class="wrap">
 
-  <div class="top">
-    <button
-      type="button"
-      class="back-button"
-      id="backButton"
-    >
-      ← 본사 관리자
-    </button>
-  </div>
+  <button
+    id="backButton"
+    class="back-button"
+    type="button"
+  >
+    ← 본사 관리자
+  </button>
 
 
   <header class="header">
-    <h1>가맹점 승인관리</h1>
-
+    <h1>가맹점 승인</h1>
     <p>
-      가맹점 신청정보와 사용 상태를 관리합니다.
+      승인대기 가맹점을 확인하고 승인합니다.
     </p>
   </header>
 
 
   <section class="card">
 
-    <h3>신규 매장 등록 / 수정</h3>
-
-    <div class="grid">
-
-      <div>
-        <label for="storeId">
-          매장 ID *
-        </label>
-
-        <input
-          id="storeId"
-          placeholder="STORE0001"
-        >
-      </div>
-
-
-      <div>
-        <label for="adminId">
-          로그인 ID *
-        </label>
-
-        <input
-          id="adminId"
-        >
-      </div>
-
-
-      <div>
-        <label for="password">
-          초기 비밀번호 *
-        </label>
-
-        <input
-          id="password"
-          type="password"
-          placeholder="영문+숫자 8자 이상"
-        >
-      </div>
-
-
-      <div>
-        <label for="storeName">
-          매장명 *
-        </label>
-
-        <input
-          id="storeName"
-        >
-      </div>
-
-
-      <div>
-        <label for="ownerName">
-          대표자
-        </label>
-
-        <input
-          id="ownerName"
-        >
-      </div>
-
-
-      <div>
-        <label for="phone">
-          전화번호
-        </label>
-
-        <input
-          id="phone"
-        >
-      </div>
-
-
-      <div>
-        <label for="regionName">
-          권역
-        </label>
-
-        <input
-          id="regionName"
-        >
-      </div>
-
-
-      <div class="full">
-        <label for="address">
-          주소
-        </label>
-
-        <input
-          id="address"
-        >
-      </div>
-
-    </div>
-
-
-    <div class="buttons">
-
-      <button
-        id="createButton"
-        class="green"
-        type="button"
-      >
-        신규 매장 등록
-      </button>
-
-      <button
-        id="updateButton"
-        class="blue"
-        type="button"
-      >
-        정보 수정
-      </button>
-
-      <button
-        id="clearButton"
-        class="gray"
-        type="button"
-      >
-        입력 초기화
-      </button>
-
-    </div>
-
-
-    <div id="message"></div>
-
-  </section>
-
-
-  <section class="card">
-
-    <h3>등록 매장</h3>
-
     <input
       id="search"
-      placeholder="매장명 · 매장ID · 대표자 · 전화번호 검색"
+      class="search"
+      placeholder="마트번호 · 마트명 검색"
     >
 
-    <p id="count">
+    <p
+      id="count"
+      class="count"
+    >
       불러오는 중...
     </p>
 
@@ -433,13 +227,10 @@ tbody tr.selected{
 
         <thead>
           <tr>
-            <th>매장 ID</th>
-            <th>매장명</th>
-            <th>로그인 ID</th>
-            <th>대표자</th>
-            <th>전화번호</th>
-            <th>권역</th>
+            <th>마트번호</th>
+            <th>마트명</th>
             <th>상태</th>
+            <th>처리</th>
           </tr>
         </thead>
 
@@ -449,53 +240,11 @@ tbody tr.selected{
 
     </div>
 
-  </section>
 
-
-  <section class="card">
-
-    <h3>선택 매장 관리</h3>
-
-    <div id="selectedStore">
-      매장을 선택해 주세요.
-    </div>
-
-
-    <div class="buttons">
-
-      <button
-        id="activateButton"
-        class="green"
-        type="button"
-      >
-        사용 승인
-      </button>
-
-      <button
-        id="suspendButton"
-        class="orange"
-        type="button"
-      >
-        사용 정지
-      </button>
-
-      <button
-        id="resetButton"
-        class="blue"
-        type="button"
-      >
-        비밀번호 초기화
-      </button>
-
-      <button
-        id="deleteButton"
-        class="red"
-        type="button"
-      >
-        매장 삭제
-      </button>
-
-    </div>
+    <div
+      id="message"
+      class="message"
+    ></div>
 
   </section>
 
@@ -522,15 +271,27 @@ const DASHBOARD_PAGE =
 
 
 let stores = [];
-let selected = null;
 
 
-const $ =
-  function(selector){
-    return document.querySelector(
-      selector
-    );
-  };
+const searchInput =
+  document.getElementById(
+    "search"
+  );
+
+const storeTable =
+  document.getElementById(
+    "storeTable"
+  );
+
+const count =
+  document.getElementById(
+    "count"
+  );
+
+const messageBox =
+  document.getElementById(
+    "message"
+  );
 
 
 function session(){
@@ -544,26 +305,28 @@ function session(){
 }
 
 
-function message(
+function showMessage(
   text,
   error
 ){
 
-  const element =
-    $("#message");
-
-  element.textContent =
+  messageBox.textContent =
     text || "";
 
-  element.style.color =
-    error
-      ? "#dc2626"
-      : "#15803d";
+  messageBox.className =
+    "message " +
+    (
+      error
+        ? "error"
+        : "success"
+    );
 
 }
 
 
-function escapeHtml(value){
+function escapeHtml(
+  value
+){
 
   const div =
     document.createElement(
@@ -586,13 +349,17 @@ async function api(
 ){
 
   const body =
-    data || {};
+    Object.assign(
+      {},
+      data || {},
+      {
+        action:
+          action,
 
-  body.action =
-    action;
-
-  body.session_token =
-    session();
+        session_token:
+          session()
+      }
+    );
 
 
   const response =
@@ -615,16 +382,17 @@ async function api(
     );
 
 
-  const raw =
+  const text =
     await response.text();
 
   let result = {};
 
+
   try{
 
     result =
-      raw
-        ? JSON.parse(raw)
+      text
+        ? JSON.parse(text)
         : {};
 
   }catch(error){
@@ -662,17 +430,20 @@ async function loadStores(){
         {}
       );
 
+
     stores =
       result.stores || [];
 
+
     renderStores();
+
 
   }catch(error){
 
-    $("#count").textContent =
+    count.textContent =
       "목록을 불러오지 못했습니다.";
 
-    message(
+    showMessage(
       error.message,
       true
     );
@@ -682,66 +453,13 @@ async function loadStores(){
 }
 
 
-function statusInfo(
-  accountStatus
-){
-
-  if(
-    accountStatus ===
-    "pending"
-  ){
-
-    return {
-      text:
-        "승인대기",
-
-      className:
-        "status-pending"
-    };
-
-  }
-
-
-  if(
-    accountStatus ===
-    "suspended"
-  ){
-
-    return {
-      text:
-        "정지",
-
-      className:
-        "status-suspended"
-    };
-
-  }
-
-
-  return {
-    text:
-      "정상",
-
-    className:
-      "status-active"
-  };
-
-}
-
-
 function renderStores(){
 
-  const query =
-    $("#search")
+  const keyword =
+    searchInput
       .value
-      .toLowerCase()
-      .trim();
-
-  const tbody =
-    $("#storeTable");
-
-  tbody.innerHTML =
-    "";
+      .trim()
+      .toLowerCase();
 
 
   const list =
@@ -750,24 +468,26 @@ function renderStores(){
 
         return [
           store.store_id,
-          store.store_name,
-          store.admin_id,
-          store.owner_name,
-          store.phone,
-          store.region_name
+          store.store_name
         ]
         .join(" ")
         .toLowerCase()
-        .indexOf(query) > -1;
+        .includes(
+          keyword
+        );
 
       }
     );
 
 
-  $("#count").textContent =
+  count.textContent =
     "총 " +
     list.length +
-    "개 매장";
+    "개 가맹점";
+
+
+  storeTable.innerHTML =
+    "";
 
 
   list.forEach(
@@ -778,22 +498,22 @@ function renderStores(){
           "tr"
         );
 
-      const status =
-        statusInfo(
-          store.account_status
-        );
+
+      const pending =
+        store.account_status ===
+        "pending";
 
 
-      if(
-        selected &&
-        selected.store_id ===
-        store.store_id
-      ){
+      const statusText =
+        pending
+          ? "승인대기"
+          : "승인완료";
 
-        tr.className =
-          "selected";
 
-      }
+      const statusClass =
+        pending
+          ? "pending"
+          : "active";
 
 
       tr.innerHTML =
@@ -803,56 +523,119 @@ function renderStores(){
         ) +
         "</td>" +
 
-        "<td><b>" +
+        "<td>" +
         escapeHtml(
           store.store_name
         ) +
-        "</b></td>" +
-
-        "<td>" +
-        escapeHtml(
-          store.admin_id
-        ) +
         "</td>" +
 
-        "<td>" +
-        escapeHtml(
-          store.owner_name
-        ) +
-        "</td>" +
-
-        "<td>" +
-        escapeHtml(
-          store.phone
-        ) +
-        "</td>" +
-
-        "<td>" +
-        escapeHtml(
-          store.region_name
-        ) +
-        "</td>" +
-
-        '<td class="' +
-        status.className +
+        '<td class="status ' +
+        statusClass +
         '">' +
-        status.text +
-        "</td>";
+        statusText +
+        "</td>" +
+
+        "<td></td>";
 
 
-      tr.addEventListener(
-        "click",
-        function(){
+      const actionCell =
+        tr.children[3];
 
-          selectStore(
-            store
+
+      if(
+        pending
+      ){
+
+        const button =
+          document.createElement(
+            "button"
           );
 
-        }
-      );
+
+        button.type =
+          "button";
+
+        button.className =
+          "approve-button";
+
+        button.textContent =
+          "승인";
 
 
-      tbody.appendChild(
+        button.addEventListener(
+          "click",
+          async function(){
+
+            if(
+              !confirm(
+                (
+                  store.store_name ||
+                  store.store_id
+                ) +
+                " 가맹점을 승인하시겠습니까?"
+              )
+            ){
+
+              return;
+
+            }
+
+
+            try{
+
+              button.disabled =
+                true;
+
+
+              const result =
+                await api(
+                  "activate_store",
+                  {
+                    store_id:
+                      store.store_id
+                  }
+                );
+
+
+              showMessage(
+                result.message ||
+                "승인되었습니다.",
+                false
+              );
+
+
+              await loadStores();
+
+
+            }catch(error){
+
+              button.disabled =
+                false;
+
+              showMessage(
+                error.message,
+                true
+              );
+
+            }
+
+          }
+        );
+
+
+        actionCell.appendChild(
+          button
+        );
+
+      }else{
+
+        actionCell.textContent =
+          "승인완료";
+
+      }
+
+
+      storeTable.appendChild(
         tr
       );
 
@@ -862,509 +645,25 @@ function renderStores(){
 }
 
 
-function selectStore(
-  store
-){
-
-  selected =
-    store;
-
-
-  $("#storeId").value =
-    store.store_id || "";
-
-  $("#adminId").value =
-    store.admin_id || "";
-
-  $("#password").value =
-    "";
-
-  $("#storeName").value =
-    store.store_name || "";
-
-  $("#ownerName").value =
-    store.owner_name || "";
-
-  $("#phone").value =
-    store.phone || "";
-
-  $("#regionName").value =
-    store.region_name || "";
-
-  $("#address").value =
-    store.address || "";
-
-
-  $("#storeId").readOnly =
-    true;
-
-
-  $("#selectedStore").textContent =
-    (store.store_name || "") +
-    " (" +
-    (store.store_id || "") +
-    ")";
-
-
-  message(
-    "",
-    false
-  );
-
-  renderStores();
-
-}
-
-
-function clearForm(){
-
-  selected =
-    null;
-
-
-  [
-    "#storeId",
-    "#adminId",
-    "#password",
-    "#storeName",
-    "#ownerName",
-    "#phone",
-    "#regionName",
-    "#address"
-  ]
-  .forEach(
-    function(id){
-
-      $(id).value =
-        "";
-
-    }
-  );
-
-
-  $("#storeId").readOnly =
-    false;
-
-  $("#selectedStore").textContent =
-    "매장을 선택해 주세요.";
-
-  renderStores();
-
-}
-
-
-$("#createButton")
-.addEventListener(
-  "click",
-  async function(){
-
-    try{
-
-      const result =
-        await api(
-          "create_store",
-          {
-            store_id:
-              $("#storeId")
-                .value
-                .trim(),
-
-            admin_id:
-              $("#adminId")
-                .value
-                .trim(),
-
-            password:
-              $("#password")
-                .value,
-
-            store_name:
-              $("#storeName")
-                .value
-                .trim(),
-
-            owner_name:
-              $("#ownerName")
-                .value
-                .trim(),
-
-            phone:
-              $("#phone")
-                .value
-                .trim(),
-
-            region_name:
-              $("#regionName")
-                .value
-                .trim(),
-
-            address:
-              $("#address")
-                .value
-                .trim()
-          }
-        );
-
-
-      clearForm();
-
-      message(
-        result.message,
-        false
-      );
-
-      await loadStores();
-
-    }catch(error){
-
-      message(
-        error.message,
-        true
-      );
-
-    }
-
-  }
-);
-
-
-$("#updateButton")
-.addEventListener(
-  "click",
-  async function(){
-
-    if(!selected){
-
-      alert(
-        "매장을 먼저 선택하세요."
-      );
-
-      return;
-
-    }
-
-
-    try{
-
-      const result =
-        await api(
-          "update_store",
-          {
-            store_id:
-              selected.store_id,
-
-            admin_id:
-              $("#adminId")
-                .value
-                .trim(),
-
-            store_name:
-              $("#storeName")
-                .value
-                .trim(),
-
-            owner_name:
-              $("#ownerName")
-                .value
-                .trim(),
-
-            phone:
-              $("#phone")
-                .value
-                .trim(),
-
-            region_name:
-              $("#regionName")
-                .value
-                .trim(),
-
-            address:
-              $("#address")
-                .value
-                .trim()
-          }
-        );
-
-
-      clearForm();
-
-      message(
-        result.message,
-        false
-      );
-
-      await loadStores();
-
-    }catch(error){
-
-      message(
-        error.message,
-        true
-      );
-
-    }
-
-  }
-);
-
-
-$("#clearButton")
-.addEventListener(
-  "click",
-  clearForm
-);
-
-
-$("#activateButton")
-.addEventListener(
-  "click",
-  async function(){
-
-    if(!selected){
-
-      alert(
-        "매장을 먼저 선택하세요."
-      );
-
-      return;
-
-    }
-
-
-    try{
-
-      const result =
-        await api(
-          "activate_store",
-          {
-            store_id:
-              selected.store_id
-          }
-        );
-
-
-      clearForm();
-
-      message(
-        result.message,
-        false
-      );
-
-      await loadStores();
-
-    }catch(error){
-
-      message(
-        error.message,
-        true
-      );
-
-    }
-
-  }
-);
-
-
-$("#suspendButton")
-.addEventListener(
-  "click",
-  async function(){
-
-    if(!selected){
-
-      alert(
-        "매장을 먼저 선택하세요."
-      );
-
-      return;
-
-    }
-
-
-    if(
-      !confirm(
-        "이 매장의 사용을 정지하시겠습니까?"
-      )
-    ){
-
-      return;
-
-    }
-
-
-    try{
-
-      const result =
-        await api(
-          "suspend_store",
-          {
-            store_id:
-              selected.store_id
-          }
-        );
-
-
-      clearForm();
-
-      message(
-        result.message,
-        false
-      );
-
-      await loadStores();
-
-    }catch(error){
-
-      message(
-        error.message,
-        true
-      );
-
-    }
-
-  }
-);
-
-
-$("#resetButton")
-.addEventListener(
-  "click",
-  async function(){
-
-    if(!selected){
-
-      alert(
-        "매장을 먼저 선택하세요."
-      );
-
-      return;
-
-    }
-
-
-    const newPassword =
-      prompt(
-        "새 임시 비밀번호를 입력하세요.\n영문+숫자 8자 이상"
-      );
-
-
-    if(!newPassword){
-
-      return;
-
-    }
-
-
-    try{
-
-      const result =
-        await api(
-          "reset_store_password",
-          {
-            store_id:
-              selected.store_id,
-
-            new_password:
-              newPassword
-          }
-        );
-
-
-      alert(
-        result.message
-      );
-
-    }catch(error){
-
-      alert(
-        error.message
-      );
-
-    }
-
-  }
-);
-
-
-$("#deleteButton")
-.addEventListener(
-  "click",
-  async function(){
-
-    if(!selected){
-
-      alert(
-        "매장을 먼저 선택하세요."
-      );
-
-      return;
-
-    }
-
-
-    if(
-      !confirm(
-        (selected.store_name || "") +
-        " 매장 계정을 삭제하시겠습니까?"
-      )
-    ){
-
-      return;
-
-    }
-
-
-    try{
-
-      const result =
-        await api(
-          "delete_store",
-          {
-            store_id:
-              selected.store_id
-          }
-        );
-
-
-      clearForm();
-
-      message(
-        result.message,
-        false
-      );
-
-      await loadStores();
-
-    }catch(error){
-
-      message(
-        error.message,
-        true
-      );
-
-    }
-
-  }
-);
-
-
-$("#search")
-.addEventListener(
+searchInput.addEventListener(
   "input",
   renderStores
 );
 
 
-$("#backButton")
-.addEventListener(
-  "click",
-  function(){
+document
+  .getElementById(
+    "backButton"
+  )
+  .addEventListener(
+    "click",
+    function(){
 
-    location.href =
-      DASHBOARD_PAGE;
+      location.href =
+        DASHBOARD_PAGE;
 
-  }
-);
+    }
+  );
 
 
 if(
