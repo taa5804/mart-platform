@@ -35,6 +35,139 @@ function normalizeStatus(
     .toLowerCase();
 }
 
+
+/* =========================================
+   매장 ID 자동 생성
+
+   M000001
+   M000002
+   M000003
+   ...
+========================================= */
+
+async function createMartCode(
+  supabase: any,
+) {
+
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .from(
+        "mart_members",
+      )
+      .select(
+        "mart_code",
+      )
+      .not(
+        "mart_code",
+        "is",
+        null,
+      );
+
+  if (error) {
+    throw new Error(
+      "매장 ID 생성 정보를 확인하지 못했습니다.",
+    );
+  }
+
+  let maxNumber = 0;
+
+  for (
+    const row of data || []
+  ) {
+
+    const code =
+      String(
+        row.mart_code || "",
+      )
+        .trim()
+        .toUpperCase();
+
+    const match =
+      /^M(\d+)$/.exec(
+        code,
+      );
+
+    if (!match) {
+      continue;
+    }
+
+    const number =
+      Number(
+        match[1],
+      );
+
+    if (
+      Number.isFinite(number) &&
+      number > maxNumber
+    ) {
+      maxNumber =
+        number;
+    }
+  }
+
+  /*
+    혹시 동시에 여러 승인이 들어올 경우를 대비해
+    이미 사용 중인 번호인지 다시 확인한다.
+  */
+
+  let nextNumber =
+    maxNumber + 1;
+
+  for (
+    let attempt = 0;
+    attempt < 1000;
+    attempt += 1
+  ) {
+
+    const martCode =
+      "M" +
+      String(
+        nextNumber,
+      ).padStart(
+        6,
+        "0",
+      );
+
+    const {
+      data: existing,
+      error:
+        existingError,
+    } =
+      await supabase
+        .from(
+          "mart_members",
+        )
+        .select(
+          "id",
+        )
+        .eq(
+          "mart_code",
+          martCode,
+        )
+        .maybeSingle();
+
+    if (existingError) {
+      throw new Error(
+        "매장 ID 중복 여부를 확인하지 못했습니다.",
+      );
+    }
+
+    if (!existing) {
+      return martCode;
+    }
+
+    nextNumber += 1;
+  }
+
+  throw new Error(
+    "새 매장 ID를 생성하지 못했습니다.",
+  );
+}
+
+
 Deno.serve(
   async (req) => {
 
@@ -301,8 +434,13 @@ Deno.serve(
 
       /*
         가맹점 승인
-        승인과 동시에
-        마트 전용 문의방 1개 자동 생성
+
+        1. 승인대기 매장 확인
+        2. mart_code 없으면 자동 생성
+        3. mart_code DB 저장
+        4. 승인 처리
+        5. 서비스 활성화
+        6. 해당 매장 문의방 자동 생성
       */
 
       if (
@@ -361,7 +499,7 @@ Deno.serve(
         /*
           아직 mart_code가 없는
           승인대기 자료라면
-          내부 id로 한 번 더 확인
+          내부 id로 다시 확인
         */
 
         if (
@@ -434,14 +572,74 @@ Deno.serve(
 
 
         /*
-          마트번호 확인
+          매장 ID 확인
+
+          기존 mart_code가 있으면 그대로 사용
+
+          mart_code가 없으면
+          M000001 형식으로 자동 생성
         */
 
-        const martCode =
+        let martCode =
           String(
             store.mart_code ||
-            store.id,
-          );
+            "",
+          ).trim();
+
+        let martCodeCreated =
+          false;
+
+        if (
+          !martCode
+        ) {
+
+          martCode =
+            await createMartCode(
+              supabase,
+            );
+
+          const {
+            error:
+              martCodeError,
+          } =
+            await supabase
+              .from(
+                "mart_members",
+              )
+              .update(
+                {
+                  mart_code:
+                    martCode,
+                },
+              )
+              .eq(
+                "id",
+                store.id,
+              );
+
+          if (
+            martCodeError
+          ) {
+            console.error(
+              "매장 ID 저장 오류:",
+              martCodeError,
+            );
+
+            return json(
+              {
+                ok: false,
+                message:
+                  "매장 ID 저장 중 오류가 발생했습니다.",
+                error:
+                  martCodeError.message,
+              },
+              500,
+            );
+          }
+
+          martCodeCreated =
+            true;
+        }
 
 
         /*
@@ -481,6 +679,32 @@ Deno.serve(
             "가맹점 승인 오류:",
             approvalError,
           );
+
+
+          /*
+            이번 승인 과정에서
+            새로 생성한 mart_code라면
+            승인 실패 시 원상복구
+          */
+
+          if (
+            martCodeCreated
+          ) {
+            await supabase
+              .from(
+                "mart_members",
+              )
+              .update(
+                {
+                  mart_code:
+                    null,
+                },
+              )
+              .eq(
+                "id",
+                store.id,
+              );
+          }
 
           return json(
             {
@@ -545,18 +769,39 @@ Deno.serve(
 
           /*
             문의방 생성 실패 시
-            승인도 원래 상태로 되돌림
+            승인 상태 원상복구
           */
+
+          const restoreData:
+            Record<
+              string,
+              unknown
+            > = {
+              approval_status:
+                store.approval_status,
+              service_status:
+                "inactive",
+            };
+
+          /*
+            이번 승인에서
+            새로 만든 매장 ID라면
+            ID도 원상복구
+          */
+
+          if (
+            martCodeCreated
+          ) {
+            restoreData.mart_code =
+              null;
+          }
 
           await supabase
             .from(
               "mart_members",
             )
             .update(
-              {
-                approval_status:
-                  store.approval_status,
-              },
+              restoreData,
             )
             .eq(
               "id",
@@ -576,14 +821,21 @@ Deno.serve(
         }
 
 
+        /*
+          승인 완료
+        */
+
         return json(
           {
             ok: true,
 
             message:
-              "가맹점 승인 및 마트 문의방 생성이 완료되었습니다.",
+              "가맹점 승인, 매장 ID 발급 및 마트 문의방 생성이 완료되었습니다.",
 
             store_id:
+              martCode,
+
+            mart_code:
               martCode,
 
             room_id:
