@@ -501,6 +501,149 @@ if(!session()){
 
 
 
+
+
+<div id="hqRoomApproval" class="hq-room-shell">
+  <div class="hq-room-top">
+    <button type="button" class="hq-back-btn" onclick="backToHqDashboard()">← 본사 관리자</button>
+  </div>
+  <div id="wgApproval">
+<style>
+#wgApproval{max-width:1100px;margin:auto;padding:20px 12px;font-family:Arial,sans-serif;color:#222}
+#wgApproval *{box-sizing:border-box}
+#wgApproval h2{margin:0 0 6px;font-size:22px}
+#wgApproval .wa-sub{margin:0 0 16px;color:#64748b;font-size:14px;line-height:1.6}
+#wgApproval .wa-card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px}
+#wgApproval .wa-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+#wgApproval input{flex:1;min-width:220px;height:44px;padding:0 11px;border:1px solid #ccc;border-radius:7px;font-size:14px}
+#wgApproval button{border:0;border-radius:7px;padding:10px 15px;color:#fff;font-weight:700;cursor:pointer}
+#wgApproval .green{background:#15803d}
+#wgApproval .gray{background:#475569}
+#wgApproval .wa-table{overflow-x:auto}
+#wgApproval table{width:100%;min-width:720px;border-collapse:collapse}
+#wgApproval th,#wgApproval td{padding:11px 10px;border-bottom:1px solid #ddd;text-align:left;font-size:13px;vertical-align:middle}
+#wgApproval th{background:#f5f5f5}
+#wgApproval tbody tr:hover{background:#f0fdf4}
+#wgApproval .wa-badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:12px;font-weight:700}
+#wgApproval .wa-empty{padding:24px 10px;text-align:center;color:#64748b}
+#wgApproval #waMsg{margin-top:12px;font-weight:700}
+@media(max-width:700px){#wgApproval .wa-top{align-items:stretch}#wgApproval input{width:100%}}
+</style>
+
+<h2>가맹점 승인관리</h2>
+<p class="wa-sub">가맹점 신청 중 승인대기 상태의 매장을 확인하고 사용 승인합니다.</p>
+
+<div class="wa-card">
+  <div class="wa-top">
+    <input id="waSearch" placeholder="마트번호 · 매장명 · 대표자 · 전화번호 검색">
+    <button id="waRefresh" class="gray" type="button">새로고침</button>
+  </div>
+  <p id="waCount">불러오는 중...</p>
+  <div class="wa-table">
+    <table>
+      <thead>
+        <tr>
+          <th>마트번호</th>
+          <th>매장명</th>
+          <th>대표자</th>
+          <th>전화번호</th>
+          <th>권역</th>
+          <th>상태</th>
+          <th>승인</th>
+        </tr>
+      </thead>
+      <tbody id="waTable"></tbody>
+    </table>
+  </div>
+  <div id="waMsg"></div>
+</div>
+
+<script>
+(function(){
+var ROOT=document.getElementById("wgApproval");
+if(!ROOT)return;
+var $=function(s){return ROOT.querySelector(s);};
+var URL="https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-store-account";
+var KEY="wooriapt_hq_admin_session";
+var stores=[];
+
+function session(){return localStorage.getItem(KEY)||"";}
+function esc(v){var d=document.createElement("div");d.textContent=v||"";return d.innerHTML;}
+function msg(text,error){var e=$("#waMsg");e.textContent=text||"";e.style.color=error?"#dc2626":"#15803d";}
+async function api(action,data){
+ var body=data||{};
+ body.action=action;
+ body.session_token=session();
+ var r=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+ var x=await r.json();
+ if(!r.ok||!x.ok)throw new Error(x.message||"처리에 실패했습니다.");
+ return x;
+}
+function isPending(s){return !s.account_status||s.account_status==="pending"||s.account_status==="waiting"||s.account_status==="승인대기";}
+async function load(){
+ try{
+  msg("",false);
+  $("#waCount").textContent="불러오는 중...";
+  var x=await api("list_stores",{});
+  stores=(x.stores||[]).filter(isPending);
+  render();
+ }catch(e){
+  $("#waCount").textContent="승인대기 목록을 불러오지 못했습니다.";
+  msg(e.message,true);
+ }
+}
+function render(){
+ var q=$("#waSearch").value.toLowerCase().trim();
+ var list=stores.filter(function(s){
+  return [s.store_id,s.store_name,s.owner_name,s.phone,s.region_name].join(" ").toLowerCase().indexOf(q)>-1;
+ });
+ var tbody=$("#waTable");
+ tbody.innerHTML="";
+ $("#waCount").textContent="승인대기 총 "+list.length+"개 매장";
+ if(!list.length){
+  var tr=document.createElement("tr");
+  tr.innerHTML='<td colspan="7" class="wa-empty">승인대기 중인 가맹점이 없습니다.</td>';
+  tbody.appendChild(tr);
+  return;
+ }
+ list.forEach(function(s){
+  var tr=document.createElement("tr");
+  tr.innerHTML=
+   "<td>"+esc(s.store_id)+"</td>"+
+   "<td><b>"+esc(s.store_name)+"</b></td>"+
+   "<td>"+esc(s.owner_name)+"</td>"+
+   "<td>"+esc(s.phone)+"</td>"+
+   "<td>"+esc(s.region_name)+"</td>"+
+   '<td><span class="wa-badge">승인대기</span></td>'+
+   '<td><button type="button" class="green wa-approve">사용 승인</button></td>';
+  tr.querySelector(".wa-approve").onclick=async function(){
+   if(!confirm((s.store_name||s.store_id||"해당 매장")+"을 사용 승인하시겠습니까?"))return;
+   try{
+    this.disabled=true;
+    var x=await api("activate_store",{store_id:s.store_id});
+    msg(x.message||"사용 승인되었습니다.",false);
+    await load();
+   }catch(e){
+    this.disabled=false;
+    msg(e.message,true);
+   }
+  };
+  tbody.appendChild(tr);
+ });
+}
+$("#waSearch").oninput=render;
+$("#waRefresh").onclick=load;
+window.loadHqApproval=load;
+if(!session()){
+ msg("본사 관리자 로그인이 필요합니다.",true);
+}else{
+ load();
+}
+})();
+</script>
+  </div>
+</div>
+
 <div id="hqRoomInquiry" class="hq-room-shell">
   <div class="hq-room-top">
     <button type="button" class="hq-back-btn" onclick="backToHqDashboard()">← 본사 관리자</button>
@@ -2516,7 +2659,7 @@ if(!session()){
   }
 
   function hideRooms(){
-    ["hqRoomAccount","hqRoomInquiry","hqRoomPayment","hqRoomBanner","hqRoomCoupon","hqRoomQr"].forEach(function(id){
+    ["hqRoomAccount","hqRoomApproval","hqRoomInquiry","hqRoomPayment","hqRoomBanner","hqRoomCoupon","hqRoomQr"].forEach(function(id){
       const el=document.getElementById(id);
       if(el) el.style.display="none";
     });
@@ -2536,7 +2679,7 @@ if(!session()){
 
     const map={
       account:"hqRoomAccount",
-      approval:"hqRoomAccount",
+      approval:"hqRoomApproval",
       inquiry:"hqRoomInquiry",
       payment:"hqRoomPayment",
       banner:"hqRoomBanner",
@@ -2547,6 +2690,7 @@ if(!session()){
     const target=document.getElementById(map[room]);
     if(target) target.style.display="block";
     if(room==="qr" && typeof window.loadHqQrOrders==="function") window.loadHqQrOrders();
+    if(room==="approval" && typeof window.loadHqApproval==="function") window.loadHqApproval();
     if(room==="inquiry" && typeof window.loadHqInquiry==="function") window.loadHqInquiry();
 
     window.scrollTo(0,0);
