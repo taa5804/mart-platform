@@ -348,6 +348,21 @@
         readonly
       >
 
+      <div style="margin-top:16px;padding:14px;background:#f3f8f4;border:1px solid #d7e8dc;border-radius:8px;">
+        <b>본사 결제·계좌정보</b>
+        <div class="sa-help">본사에서 등록한 결제 및 정산정보가 자동으로 표시됩니다.</div>
+        <input id="settlementBank" readonly placeholder="은행명">
+        <input id="settlementAccount" readonly placeholder="계좌번호">
+        <input id="settlementHolder" readonly placeholder="예금주">
+        <input id="settlementMonthlyFee" readonly placeholder="결제금액">
+        <input id="settlementPaymentStatus" readonly placeholder="결제상태">
+        <input id="settlementLastPaymentDate" readonly placeholder="최근 결제일">
+        <input id="settlementNextPaymentDate" readonly placeholder="다음 결제예정일">
+        <input id="settlementPaymentMethod" readonly placeholder="결제방법">
+        <input id="settlementStatus" readonly placeholder="정산상태">
+        <button class="sa-btn" type="button" onclick="loadSettlementAccount()">결제·계좌정보 새로고침</button>
+      </div>
+
       <input
         id="oldPw"
         type="password"
@@ -412,6 +427,12 @@ const SUPABASE_URL =
 
 const SUPABASE_KEY =
   'sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2';
+
+const SETTLEMENT_SYNC_URL =
+  'https://wpshlmijsscmlasqtapa.supabase.co/functions/v1/settlement-account-sync';
+
+const SETTLEMENT_PUBLIC_KEY =
+  'sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K';
 
 const STORAGE_BUCKET =
   'product_images';
@@ -572,7 +593,8 @@ async function loginStore() {
 
     await Promise.all([
       loadDraftProducts(),
-      loadStoreInfo()
+      loadStoreInfo(),
+      loadSettlementAccount()
     ]);
 
   } catch (error) {
@@ -611,6 +633,10 @@ function showMenu(id, button) {
 
   if (id === 'inquiry') {
     loadInquiries();
+  }
+
+  if (id === 'account') {
+    loadSettlementAccount();
   }
 }
 
@@ -1836,6 +1862,72 @@ async function changePassword() {
       '비밀번호 변경 실패: ' +
       error.message
     );
+  }
+}
+
+function setSettlementValue(id, value) {
+  const element = document.getElementById(id);
+  if (element) element.value = value ?? '';
+}
+
+function paymentStatusText(value) {
+  if (value === 'paid') return '결제완료';
+  if (value === 'exempt') return '면제';
+  return '미납';
+}
+
+function settlementStatusText(value) {
+  if (value === 'suspended') return '정산중지';
+  return '정산사용';
+}
+
+async function loadSettlementAccount() {
+  if (!currentStoreId || !currentPw) return;
+
+  try {
+    const response = await fetch(SETTLEMENT_SYNC_URL, {
+      method: 'POST',
+      headers: {
+        apikey: SETTLEMENT_PUBLIC_KEY,
+        Authorization: 'Bearer ' + SETTLEMENT_PUBLIC_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'store_get',
+        store_id: currentStoreId,
+        password: currentPw
+      })
+    });
+
+    const raw = await response.text();
+    let data = {};
+    try { data = raw ? JSON.parse(raw) : {}; } catch (e) {}
+
+    if (!response.ok || data.ok === false) {
+      throw new Error(data.message || data.error || raw || '결제·계좌정보를 불러오지 못했습니다.');
+    }
+
+    const row = data.row || data.data || {};
+    setSettlementValue('settlementBank', row.bank_name || '');
+    setSettlementValue('settlementAccount', row.account_number || '');
+    setSettlementValue('settlementHolder', row.account_holder || '');
+    setSettlementValue('settlementMonthlyFee', row.monthly_fee ? Number(row.monthly_fee).toLocaleString('ko-KR') + '원' : '');
+    setSettlementValue('settlementPaymentStatus', paymentStatusText(row.payment_status));
+    setSettlementValue('settlementLastPaymentDate', row.last_payment_date || '');
+    setSettlementValue('settlementNextPaymentDate', row.next_payment_date || '');
+    setSettlementValue('settlementPaymentMethod', row.payment_method || '');
+    setSettlementValue('settlementStatus', settlementStatusText(row.settlement_status));
+  } catch (error) {
+    console.error('결제·계좌정보 불러오기 실패:', error);
+    setSettlementValue('settlementBank', '');
+    setSettlementValue('settlementAccount', '');
+    setSettlementValue('settlementHolder', '');
+    setSettlementValue('settlementMonthlyFee', '');
+    setSettlementValue('settlementPaymentStatus', '');
+    setSettlementValue('settlementLastPaymentDate', '');
+    setSettlementValue('settlementNextPaymentDate', '');
+    setSettlementValue('settlementPaymentMethod', '');
+    setSettlementValue('settlementStatus', '');
   }
 }
 
