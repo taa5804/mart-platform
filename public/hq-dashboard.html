@@ -140,7 +140,7 @@ body{
           <span>매장을 선택하고 배너 2개를 관리합니다.</span>
         </button>
 
-        <button type="button" class="menu-card" onclick="openHqRoom('approval')">
+        <button type="button" class="menu-card" onclick="location.href='/hq-store-account.html'">
           <div class="menu-icon">🏪</div>
           <strong>가맹점 승인관리</strong>
           <span>가맹점 신청과 승인 상태를 관리합니다.</span>
@@ -164,7 +164,7 @@ body{
           <span>매장 QR 주문 신청과 제작·발송 상태를 관리합니다.</span>
         </button>
 
-        <button type="button" class="menu-card" onclick="openHqRoom('inquiry')">
+        <button type="button" class="menu-card" onclick="location.href='/hq-store-inquiry.html'">
           <div class="menu-icon">💬</div>
           <strong>가맹점 소통</strong>
           <span>가맹점과 본사의 소통 내용을 관리합니다.</span>
@@ -498,140 +498,6 @@ if(!session()){
 </div>
 </div>
 
-
-
-
-<div id="hqRoomInquiry" class="hq-room-shell">
-  <div class="hq-room-top">
-    <button type="button" class="hq-back-btn" onclick="backToHqDashboard()">← 본사 관리자</button>
-  </div>
-  <div id="hqInquiryApp">
-    <style>
-      #hqInquiryApp{max-width:900px;margin:auto;padding:20px 12px;font-family:Arial,sans-serif;color:#1f2937}
-      #hqInquiryApp *{box-sizing:border-box}
-      #hqInquiryApp h2{margin:0 0 6px;font-size:25px}
-      #hqInquiryApp .hi-sub{margin:0 0 18px;color:#64748b;font-size:14px;line-height:1.6}
-      #hqInquiryApp .hi-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;margin-bottom:16px}
-      #hqInquiryApp label{display:block;margin-bottom:6px;font-size:13px;font-weight:700}
-      #hqInquiryApp input,#hqInquiryApp textarea{width:100%;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font-size:14px}
-      #hqInquiryApp input{height:44px;padding:0 11px}
-      #hqInquiryApp textarea{min-height:110px;padding:10px;resize:vertical}
-      #hqInquiryApp .hi-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-      #hqInquiryApp button{border:0;border-radius:8px;padding:10px 15px;color:#fff;font-weight:700;cursor:pointer}
-      #hqInquiryApp .green{background:#15803d}
-      #hqInquiryApp .blue{background:#2563eb}
-      #hqInquiryApp .gray{background:#475569}
-      #hqInquiryApp .hi-store{margin-top:12px;padding:12px;border-radius:8px;background:#f8fafc;font-size:14px}
-      #hqInquiryApp .hi-list{display:flex;flex-direction:column;gap:9px;max-height:460px;overflow:auto}
-      #hqInquiryApp .hi-msg{padding:11px 13px;border-radius:10px;background:#f1f5f9;line-height:1.55;font-size:14px}
-      #hqInquiryApp .hi-msg.hq{background:#dcfce7}
-      #hqInquiryApp .hi-meta{margin-bottom:4px;font-size:11px;color:#64748b}
-      #hqInquiryApp .hi-status{margin-top:10px;font-size:13px;font-weight:700}
-    </style>
-
-    <h2>가맹점 소통</h2>
-    <p class="hi-sub">매장 ID를 입력하면 해당 가맹점의 문의방을 바로 열어 본사와 소통할 수 있습니다.</p>
-
-    <div class="hi-card">
-      <label for="hiStoreId">매장 ID</label>
-      <input id="hiStoreId" placeholder="예: STORE0001">
-      <div class="hi-btns">
-        <button id="hiOpen" type="button" class="green">문의방 열기</button>
-        <button id="hiRefresh" type="button" class="gray">새로고침</button>
-      </div>
-      <div id="hiStore" class="hi-store">매장 ID를 입력해 주세요.</div>
-      <div id="hiStatus" class="hi-status"></div>
-    </div>
-
-    <div class="hi-card">
-      <div id="hiList" class="hi-list"><div class="hi-msg">문의방을 먼저 열어 주세요.</div></div>
-    </div>
-
-    <div class="hi-card">
-      <label for="hiMessage">본사 답변 / 문의</label>
-      <textarea id="hiMessage" maxlength="5000" placeholder="가맹점에 보낼 내용을 입력하세요."></textarea>
-      <div class="hi-btns">
-        <button id="hiSend" type="button" class="blue">전송</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-(function(){
-  var ROOT=document.getElementById("hqInquiryApp");
-  if(!ROOT)return;
-  var $=function(s){return ROOT.querySelector(s);};
-  var URL="https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-admin-account";
-  var KEY="wooriapt_hq_admin_session";
-  var currentStoreId="";
-
-  function esc(v){
-    var d=document.createElement("div");
-    d.textContent=v==null?"":String(v);
-    return d.innerHTML;
-  }
-  function status(t,e){
-    $("#hiStatus").textContent=t||"";
-    $("#hiStatus").style.color=e?"#dc2626":"#15803d";
-  }
-  async function api(action,data){
-    var body=data||{};
-    body.action=action;
-    body.session_token=localStorage.getItem(KEY)||"";
-    var r=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    var raw=await r.text();
-    var x={};
-    try{x=raw?JSON.parse(raw):{};}catch(e){}
-    if(!r.ok||x.ok===false)throw new Error(x.message||x.error||"처리에 실패했습니다.");
-    return x;
-  }
-  function render(messages){
-    var box=$("#hiList");
-    box.innerHTML="";
-    if(!messages||!messages.length){box.innerHTML='<div class="hi-msg">아직 문의 내용이 없습니다.</div>';return;}
-    messages.forEach(function(m){
-      var div=document.createElement("div");
-      div.className="hi-msg "+(String(m.sender_type||"").toUpperCase()==="HQ"?"hq":"");
-      div.innerHTML='<div class="hi-meta">'+esc(m.sender_type||"")+" · "+esc(m.created_at?new Date(m.created_at).toLocaleString("ko-KR"):"")+'</div><div>'+esc(m.message||"")+'</div>';
-      box.appendChild(div);
-    });
-    box.scrollTop=box.scrollHeight;
-  }
-  async function load(){
-    var id=$("#hiStoreId").value.trim();
-    if(!id){status("매장 ID를 입력해 주세요.",true);return;}
-    try{
-      status("문의방을 불러오는 중입니다.",false);
-      var check=await api("hq_store_check",{store_id:id});
-      currentStoreId=check.store.store_id||id;
-      $("#hiStoreId").value=currentStoreId;
-      $("#hiStore").textContent=(check.store.store_name||"")+" ("+currentStoreId+")";
-      var list=await api("hq_inquiry_list",{store_id:currentStoreId});
-      render(list.messages||[]);
-      status("문의방이 연결되었습니다.",false);
-    }catch(e){currentStoreId="";render([]);status(e.message,true);}
-  }
-  $("#hiOpen").onclick=load;
-  $("#hiRefresh").onclick=function(){if(currentStoreId)$("#hiStoreId").value=currentStoreId;load();};
-  $("#hiSend").onclick=async function(){
-    if(!currentStoreId){status("문의방을 먼저 열어 주세요.",true);return;}
-    var message=$("#hiMessage").value.trim();
-    if(!message){status("문의내용을 입력해 주세요.",true);return;}
-    try{
-      await api("hq_inquiry_send",{store_id:currentStoreId,message:message});
-      $("#hiMessage").value="";
-      await load();
-      status("가맹점에 문의가 전달되었습니다.",false);
-    }catch(e){status(e.message,true);}
-  };
-  $("#hiStoreId").addEventListener("keydown",function(e){if(e.key==="Enter")load();});
-  window.loadHqInquiry=function(){
-    status("",false);
-    if(currentStoreId){$("#hiStoreId").value=currentStoreId;load();}
-  };
-})();
-</script>
 
 <div id="hqRoomPayment" class="hq-room-shell">
   <div class="hq-room-top">
@@ -2516,7 +2382,7 @@ if(!session()){
   }
 
   function hideRooms(){
-    ["hqRoomAccount","hqRoomInquiry","hqRoomPayment","hqRoomBanner","hqRoomCoupon","hqRoomQr"].forEach(function(id){
+    ["hqRoomAccount","hqRoomPayment","hqRoomBanner","hqRoomCoupon","hqRoomQr"].forEach(function(id){
       const el=document.getElementById(id);
       if(el) el.style.display="none";
     });
@@ -2536,8 +2402,6 @@ if(!session()){
 
     const map={
       account:"hqRoomAccount",
-      approval:"hqRoomAccount",
-      inquiry:"hqRoomInquiry",
       payment:"hqRoomPayment",
       banner:"hqRoomBanner",
       coupon:"hqRoomCoupon",
@@ -2547,7 +2411,6 @@ if(!session()){
     const target=document.getElementById(map[room]);
     if(target) target.style.display="block";
     if(room==="qr" && typeof window.loadHqQrOrders==="function") window.loadHqQrOrders();
-    if(room==="inquiry" && typeof window.loadHqInquiry==="function") window.loadHqInquiry();
 
     window.scrollTo(0,0);
   };
