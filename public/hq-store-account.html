@@ -1,688 +1,649 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
->
-<meta name="theme-color" content="#15803d">
+import { createClient } from "npm:@supabase/supabase-js@2";
 
-<title>가맹점 승인 | 본사 관리자</title>
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods":
+    "POST, OPTIONS",
+};
 
-<style>
-*{
-  box-sizing:border-box;
-}
-
-html,
-body{
-  width:100%;
-  min-height:100%;
-  margin:0;
-}
-
-body{
-  min-height:100vh;
-  padding:22px 14px 40px;
-  background:#f4f7f5;
-  color:#111827;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Arial,
-    sans-serif;
-}
-
-.wrap{
-  width:100%;
-  max-width:850px;
-  margin:0 auto;
-}
-
-.back-button{
-  min-height:42px;
-  margin-bottom:14px;
-  padding:0 15px;
-  border:0;
-  border-radius:8px;
-  background:#374151;
-  color:#fff;
-  font-size:14px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.header{
-  margin-bottom:16px;
-  padding:22px 20px;
-  border-radius:16px;
-  background:linear-gradient(
-    135deg,
-    #166534,
-    #15803d
+function json(
+  data: unknown,
+  status = 200,
+) {
+  return new Response(
+    JSON.stringify(data),
+    {
+      status,
+      headers: {
+        ...corsHeaders,
+        "Content-Type":
+          "application/json; charset=utf-8",
+      },
+    },
   );
-  color:#fff;
 }
 
-.header h1{
-  margin:0;
-  font-size:24px;
+function normalizeStatus(
+  value: unknown,
+) {
+  return String(
+    value || "",
+  )
+    .trim()
+    .toLowerCase();
 }
 
-.header p{
-  margin:7px 0 0;
-  color:rgba(255,255,255,.86);
-  font-size:14px;
-}
-
-.card{
-  padding:18px;
-  border:1px solid #dde5df;
-  border-radius:14px;
-  background:#fff;
-}
-
-.search{
-  width:100%;
-  height:46px;
-  margin-bottom:14px;
-  padding:0 12px;
-  border:1px solid #cbd5e1;
-  border-radius:8px;
-  font-size:15px;
-  outline:none;
-}
-
-.search:focus{
-  border-color:#15803d;
-  box-shadow:0 0 0 3px rgba(21,128,61,.08);
-}
-
-.count{
-  margin:0 0 12px;
-  color:#64748b;
-  font-size:14px;
-}
-
-.table-wrap{
-  overflow-x:auto;
-}
-
-table{
-  width:100%;
-  min-width:650px;
-  border-collapse:collapse;
-}
-
-th,
-td{
-  padding:12px 10px;
-  border-bottom:1px solid #e5e7eb;
-  text-align:left;
-  font-size:14px;
-}
-
-th{
-  background:#f8fafc;
-  color:#475569;
-}
-
-.status{
-  font-weight:700;
-}
-
-.pending{
-  color:#d97706;
-}
-
-.active{
-  color:#15803d;
-}
-
-.approve-button{
-  min-width:72px;
-  min-height:38px;
-  border:0;
-  border-radius:7px;
-  background:#15803d;
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.approve-button:disabled{
-  opacity:.5;
-  cursor:default;
-}
-
-.message{
-  margin-top:14px;
-  font-size:14px;
-  font-weight:700;
-}
-
-.error{
-  color:#dc2626;
-}
-
-.success{
-  color:#15803d;
-}
-
-@media(max-width:600px){
-  body{
-    padding:14px 10px 30px;
-  }
-
-  .header{
-    padding:20px 17px;
-  }
-}
-</style>
-</head>
-
-<body>
-
-<main class="wrap">
-
-  <button
-    id="backButton"
-    class="back-button"
-    type="button"
-  >
-    ← 본사 관리자
-  </button>
-
-
-  <header class="header">
-    <h1>가맹점 승인</h1>
-    <p>
-      승인대기 가맹점을 확인하고 승인합니다.
-    </p>
-  </header>
-
-
-  <section class="card">
-
-    <input
-      id="search"
-      class="search"
-      placeholder="마트번호 · 마트명 검색"
-    >
-
-    <p
-      id="count"
-      class="count"
-    >
-      불러오는 중...
-    </p>
-
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>마트번호</th>
-            <th>마트명</th>
-            <th>상태</th>
-            <th>처리</th>
-          </tr>
-        </thead>
-
-        <tbody id="storeTable"></tbody>
-
-      </table>
-
-    </div>
-
-
-    <div
-      id="message"
-      class="message"
-    ></div>
-
-  </section>
-
-</main>
-
-
-<script>
-(function(){
-
-"use strict";
-
-
-const FUNCTION_URL =
-  "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-store-account";
-
-const SESSION_KEY =
-  "wooriapt_hq_admin_session";
-
-const LOGIN_PAGE =
-  "/hq-account.html";
-
-const DASHBOARD_PAGE =
-  "/hq-dashboard.html";
-
-
-let stores = [];
-
-
-const searchInput =
-  document.getElementById(
-    "search"
-  );
-
-const storeTable =
-  document.getElementById(
-    "storeTable"
-  );
-
-const count =
-  document.getElementById(
-    "count"
-  );
-
-const messageBox =
-  document.getElementById(
-    "message"
-  );
-
-
-function session(){
-
-  return (
-    localStorage.getItem(
-      SESSION_KEY
-    ) || ""
-  );
-
-}
-
-
-function showMessage(
-  text,
-  error
-){
-
-  messageBox.textContent =
-    text || "";
-
-  messageBox.className =
-    "message " +
-    (
-      error
-        ? "error"
-        : "success"
-    );
-
-}
-
-
-function escapeHtml(
-  value
-){
-
-  const div =
-    document.createElement(
-      "div"
-    );
-
-  div.textContent =
-    value == null
-      ? ""
-      : String(value);
-
-  return div.innerHTML;
-
-}
-
-
-async function api(
-  action,
-  data
-){
-
-  const body =
-    Object.assign(
-      {},
-      data || {},
-      {
-        action:
-          action,
-
-        session_token:
-          session()
-      }
-    );
-
-
-  const response =
-    await fetch(
-      FUNCTION_URL,
-      {
-        method:
-          "POST",
-
-        headers:{
-          "Content-Type":
-            "application/json"
+Deno.serve(
+  async (req) => {
+
+    if (
+      req.method ===
+      "OPTIONS"
+    ) {
+      return new Response(
+        "ok",
+        {
+          headers:
+            corsHeaders,
         },
-
-        body:
-          JSON.stringify(
-            body
-          )
-      }
-    );
-
-
-  const text =
-    await response.text();
-
-  let result = {};
-
-
-  try{
-
-    result =
-      text
-        ? JSON.parse(text)
-        : {};
-
-  }catch(error){
-
-    result = {};
-
-  }
-
-
-  if(
-    !response.ok ||
-    result.ok === false
-  ){
-
-    throw new Error(
-      result.message ||
-      "처리에 실패했습니다."
-    );
-
-  }
-
-
-  return result;
-
-}
-
-
-async function loadStores(){
-
-  try{
-
-    const result =
-      await api(
-        "list_stores",
-        {}
       );
+    }
 
+    if (
+      req.method !==
+      "POST"
+    ) {
+      return json(
+        {
+          ok: false,
+          message:
+            "POST 요청만 사용할 수 있습니다.",
+        },
+        405,
+      );
+    }
 
-    stores =
-      result.stores || [];
+    try {
 
-
-    renderStores();
-
-
-  }catch(error){
-
-    count.textContent =
-      "목록을 불러오지 못했습니다.";
-
-    showMessage(
-      error.message,
-      true
-    );
-
-  }
-
-}
-
-
-function renderStores(){
-
-  const keyword =
-    searchInput
-      .value
-      .trim()
-      .toLowerCase();
-
-
-  const list =
-    stores.filter(
-      function(store){
-
-        return [
-          store.store_id,
-          store.store_name
-        ]
-        .join(" ")
-        .toLowerCase()
-        .includes(
-          keyword
+      const supabaseUrl =
+        Deno.env.get(
+          "SUPABASE_URL",
         );
 
+      const serviceRoleKey =
+        Deno.env.get(
+          "SUPABASE_SERVICE_ROLE_KEY",
+        );
+
+      if (
+        !supabaseUrl ||
+        !serviceRoleKey
+      ) {
+        return json(
+          {
+            ok: false,
+            message:
+              "Supabase 서버 설정값이 없습니다.",
+          },
+          500,
+        );
       }
-    );
 
-
-  count.textContent =
-    "총 " +
-    list.length +
-    "개 가맹점";
-
-
-  storeTable.innerHTML =
-    "";
-
-
-  list.forEach(
-    function(store){
-
-      const tr =
-        document.createElement(
-          "tr"
+      const supabase =
+        createClient(
+          supabaseUrl,
+          serviceRoleKey,
+          {
+            auth: {
+              persistSession:
+                false,
+              autoRefreshToken:
+                false,
+            },
+          },
         );
 
+      const body =
+        await req.json();
 
-      const pending =
-        store.account_status ===
-        "pending";
+      const action =
+        String(
+          body?.action || "",
+        ).trim();
 
+      const sessionToken =
+        String(
+          body?.session_token ||
+          "",
+        ).trim();
 
-      const statusText =
-        pending
-          ? "승인대기"
-          : "승인완료";
-
-
-      const statusClass =
-        pending
-          ? "pending"
-          : "active";
-
-
-      tr.innerHTML =
-        "<td>" +
-        escapeHtml(
-          store.store_id
-        ) +
-        "</td>" +
-
-        "<td>" +
-        escapeHtml(
-          store.store_name
-        ) +
-        "</td>" +
-
-        '<td class="status ' +
-        statusClass +
-        '">' +
-        statusText +
-        "</td>" +
-
-        "<td></td>";
+      if (
+        !sessionToken
+      ) {
+        return json(
+          {
+            ok: false,
+            message:
+              "본사 관리자 로그인이 필요합니다.",
+          },
+          401,
+        );
+      }
 
 
-      const actionCell =
-        tr.children[3];
+      /*
+        본사 관리자 세션 확인
+      */
+
+      const adminResponse =
+        await fetch(
+          `${supabaseUrl}/functions/v1/hq-admin-account`,
+          {
+            method:
+              "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body:
+              JSON.stringify(
+                {
+                  action:
+                    "validate_session",
+
+                  session_token:
+                    sessionToken,
+                },
+              ),
+          },
+        );
+
+      const adminText =
+        await adminResponse.text();
+
+      let adminResult:
+        Record<
+          string,
+          unknown
+        > = {};
+
+      try {
+        adminResult =
+          adminText
+            ? JSON.parse(
+                adminText,
+              )
+            : {};
+      } catch {
+        adminResult = {};
+      }
+
+      if (
+        !adminResponse.ok ||
+        adminResult?.ok ===
+          false
+      ) {
+        return json(
+          {
+            ok: false,
+            message:
+              "본사 관리자 인증이 만료되었습니다.",
+          },
+          401,
+        );
+      }
 
 
-      if(
-        pending
-      ){
+      /*
+        가맹점 목록
+      */
 
-        const button =
-          document.createElement(
-            "button"
+      if (
+        action ===
+        "list_stores"
+      ) {
+
+        const {
+          data,
+          error,
+        } =
+          await supabase
+            .from(
+              "mart_members",
+            )
+            .select(
+              `
+              id,
+              mart_code,
+              mart_name,
+              approval_status,
+              service_status
+              `,
+            )
+            .order(
+              "created_at",
+              {
+                ascending:
+                  false,
+              },
+            );
+
+        if (error) {
+          console.error(
+            "가맹점 목록 오류:",
+            error,
+          );
+
+          return json(
+            {
+              ok: false,
+              message:
+                "가맹점 목록을 불러오지 못했습니다.",
+              error:
+                error.message,
+            },
+            500,
+          );
+        }
+
+        const stores =
+          (
+            data || []
+          ).map(
+            (
+              row: any,
+            ) => {
+
+              const status =
+                normalizeStatus(
+                  row.approval_status,
+                );
+
+              const pending =
+                !status ||
+                status ===
+                  "pending" ||
+                status ===
+                  "waiting" ||
+                status ===
+                  "승인대기";
+
+              return {
+                store_id:
+                  row.mart_code ||
+                  String(
+                    row.id,
+                  ),
+
+                store_name:
+                  row.mart_name ||
+                  "",
+
+                account_status:
+                  pending
+                    ? "pending"
+                    : "active",
+              };
+            },
+          );
+
+        return json(
+          {
+            ok: true,
+            stores,
+          },
+        );
+      }
+
+
+      /*
+        가맹점 승인
+        승인과 동시에
+        마트 전용 문의방 1개 자동 생성
+      */
+
+      if (
+        action ===
+        "activate_store"
+      ) {
+
+        const storeId =
+          String(
+            body?.store_id ||
+            "",
+          ).trim();
+
+        if (
+          !storeId
+        ) {
+          return json(
+            {
+              ok: false,
+              message:
+                "마트번호가 없습니다.",
+            },
+            400,
+          );
+        }
+
+
+        /*
+          mart_code로 먼저 검색
+        */
+
+        let {
+          data: store,
+          error:
+            storeError,
+        } =
+          await supabase
+            .from(
+              "mart_members",
+            )
+            .select(
+              `
+              id,
+              mart_code,
+              mart_name,
+              approval_status,
+              service_status
+              `,
+            )
+            .eq(
+              "mart_code",
+              storeId,
+            )
+            .maybeSingle();
+
+
+        /*
+          아직 mart_code가 없는
+          승인대기 자료라면
+          내부 id로 한 번 더 확인
+        */
+
+        if (
+          !store &&
+          /^\d+$/.test(
+            storeId,
+          )
+        ) {
+
+          const result =
+            await supabase
+              .from(
+                "mart_members",
+              )
+              .select(
+                `
+                id,
+                mart_code,
+                mart_name,
+                approval_status
+                `,
+              )
+              .eq(
+                "id",
+                Number(
+                  storeId,
+                ),
+              )
+              .maybeSingle();
+
+          store =
+            result.data;
+
+          storeError =
+            result.error;
+        }
+
+        if (
+          storeError
+        ) {
+          console.error(
+            "가맹점 조회 오류:",
+            storeError,
+          );
+
+          return json(
+            {
+              ok: false,
+              message:
+                "가맹점 정보를 확인하지 못했습니다.",
+              error:
+                storeError.message,
+            },
+            500,
+          );
+        }
+
+        if (
+          !store
+        ) {
+          return json(
+            {
+              ok: false,
+              message:
+                "해당 가맹점을 찾을 수 없습니다.",
+            },
+            404,
+          );
+        }
+
+
+        /*
+          매장 ID 자동 생성
+          기존 mart_code가 있으면 그대로 사용하고,
+          없으면 내부 id를 기준으로 STORE0001 형식으로 생성합니다.
+        */
+
+        const previousMartCode =
+          String(
+            store.mart_code ||
+            "",
+          ).trim();
+
+        const martCode =
+          previousMartCode ||
+          (
+            "STORE" +
+            String(store.id)
+              .padStart(4, "0")
           );
 
 
-        button.type =
-          "button";
+        /*
+          승인 처리
+          생성된 매장 ID를 mart_members.mart_code에 함께 저장합니다.
+        */
 
-        button.className =
-          "approve-button";
+        const now =
+          new Date()
+            .toISOString();
 
-        button.textContent =
-          "승인";
+        const {
+          error:
+            approvalError,
+        } =
+          await supabase
+            .from(
+              "mart_members",
+            )
+            .update(
+              {
+                mart_code:
+                  martCode,
 
+                approval_status:
+                  "approved",
 
-        button.addEventListener(
-          "click",
-          async function(){
+                service_status:
+                  "active",
+              },
+            )
+            .eq(
+              "id",
+              store.id,
+            );
 
-            if(
-              !confirm(
-                (
-                  store.store_name ||
-                  store.store_id
-                ) +
-                " 가맹점을 승인하시겠습니까?"
-              )
-            ){
+        if (
+          approvalError
+        ) {
+          console.error(
+            "가맹점 승인 오류:",
+            approvalError,
+          );
 
-              return;
-
-            }
-
-
-            try{
-
-              button.disabled =
-                true;
-
-
-              const result =
-                await api(
-                  "activate_store",
-                  {
-                    store_id:
-                      store.store_id
-                  }
-                );
-
-
-              showMessage(
-                result.message ||
-                "승인되었습니다.",
-                false
-              );
-
-
-              await loadStores();
+          return json(
+            {
+              ok: false,
+              message:
+                "가맹점 승인 처리 중 오류가 발생했습니다.",
+              error:
+                approvalError.message,
+            },
+            500,
+          );
+        }
 
 
-            }catch(error){
+        /*
+          승인과 동시에
+          해당 마트 문의방 자동 생성
 
-              button.disabled =
-                false;
+          이미 방이 있으면
+          새로 만들지 않고
+          기존 방을 활성화
+        */
 
-              showMessage(
-                error.message,
-                true
-              );
+        const {
+          data: room,
+          error:
+            roomError,
+        } =
+          await supabase
+            .from(
+              "store_inquiry_rooms",
+            )
+            .upsert(
+              {
+                store_id:
+                  martCode,
 
-            }
+                is_active:
+                  true,
 
-          }
+                updated_at:
+                  now,
+              },
+              {
+                onConflict:
+                  "store_id",
+              },
+            )
+            .select(
+              "id, store_id",
+            )
+            .single();
+
+        if (
+          roomError
+        ) {
+          console.error(
+            "문의방 생성 오류:",
+            roomError,
+          );
+
+
+          /*
+            문의방 생성 실패 시
+            승인도 원래 상태로 되돌림
+          */
+
+          await supabase
+            .from(
+              "mart_members",
+            )
+            .update(
+              {
+                mart_code:
+                  previousMartCode || null,
+
+                approval_status:
+                  store.approval_status,
+
+                service_status:
+                  store.service_status || null,
+              },
+            )
+            .eq(
+              "id",
+              store.id,
+            );
+
+          return json(
+            {
+              ok: false,
+              message:
+                "마트 문의방 생성 중 오류가 발생했습니다.",
+              error:
+                roomError.message,
+            },
+            500,
+          );
+        }
+
+
+        return json(
+          {
+            ok: true,
+
+            message:
+              "가맹점 승인, 매장 ID 생성 및 마트 문의방 생성이 완료되었습니다.",
+
+            store_id:
+              martCode,
+
+            room_id:
+              room.id,
+          },
         );
-
-
-        actionCell.appendChild(
-          button
-        );
-
-      }else{
-
-        actionCell.textContent =
-          "승인완료";
-
       }
 
 
-      storeTable.appendChild(
-        tr
+      return json(
+        {
+          ok: false,
+          message:
+            "지원하지 않는 요청입니다.",
+        },
+        400,
       );
 
+    } catch (
+      error
+    ) {
+
+      console.error(
+        error,
+      );
+
+      return json(
+        {
+          ok: false,
+
+          message:
+            error instanceof
+              Error
+              ? error.message
+              : "서버 오류가 발생했습니다.",
+        },
+        500,
+      );
     }
-  );
-
-}
-
-
-searchInput.addEventListener(
-  "input",
-  renderStores
+  },
 );
-
-
-document
-  .getElementById(
-    "backButton"
-  )
-  .addEventListener(
-    "click",
-    function(){
-
-      location.href =
-        DASHBOARD_PAGE;
-
-    }
-  );
-
-
-if(
-  !session()
-){
-
-  location.replace(
-    LOGIN_PAGE
-  );
-
-}else{
-
-  loadStores();
-
-}
-
-
-})();
-</script>
-
-</body>
-</html>
