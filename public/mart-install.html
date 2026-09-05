@@ -997,6 +997,39 @@ function loadSignboardPending(){
 }
 
 
+function hasCompletedSignboardRegistration(){
+
+  const pending =
+    loadSignboardPending();
+
+
+  const pushToken =
+    String(
+      localStorage.getItem(
+        PUSH_TOKEN_KEY
+      ) ||
+      ""
+    ).trim();
+
+
+  const permissionGranted =
+    "Notification" in window &&
+    Notification.permission ===
+      "granted";
+
+
+  return !!(
+    pending &&
+    pending.qr_code &&
+    String(
+      pending.qr_code
+    ).toUpperCase() === qrCode &&
+    pushToken &&
+    permissionGranted
+  );
+}
+
+
 function loadSavedPhone(){
 
   const pending =
@@ -1823,6 +1856,25 @@ document.addEventListener(
      */
     if(SIGNBOARD_MODE){
 
+      if(
+        hasCompletedSignboardRegistration()
+      ){
+
+        localStorage.setItem(
+          STORE_PATH_KEY,
+          storePath
+        );
+
+        localStorage.setItem(
+          STORE_URL_KEY,
+          storePath
+        );
+
+        openStore();
+
+        return;
+      }
+
       androidTitle.textContent =
         "우리가게 앱 설치";
 
@@ -1969,10 +2021,10 @@ document.addEventListener(
 
     /*
      * QR 없음
-     * 기존 마트 사장님 직접 설치
+     * 고객 직접 설치
      */
     androidTitle.textContent =
-      "마트 사장님 앱 설치";
+      "고객용 우리가게 앱 설치";
 
 
     androidGuide.innerHTML =
