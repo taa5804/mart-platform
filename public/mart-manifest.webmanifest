@@ -3,7 +3,7 @@
   "name": "우리가게",
   "short_name": "우리가게",
   "description": "우리가게 특가·행사 알림",
-  "start_url": "/mart-open.html",
+  "start_url": "/74",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
