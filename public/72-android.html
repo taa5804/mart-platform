@@ -761,6 +761,13 @@ window.addEventListener(
       "1"
     );
 
+    showCard(pushCard);
+
+    pushBtn.disabled = false;
+
+    pushBtn.textContent =
+      "푸시 알림 허용";
+
     finishRegistrationIfReady();
   }
 );
