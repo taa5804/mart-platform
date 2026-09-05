@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 const {
   sb,
   validCode
@@ -15,10 +17,7 @@ function validRegistrationKey(value) {
 module.exports = async (req, res) => {
 
   /*
-   * ==========================================
-   * iPhone 등록정보 조회
-   * 기존 iphone-registration.js 기능 통합
-   * ==========================================
+   * 아이폰 설치 후 등록정보 복원
    */
   if (req.method === "GET") {
 
@@ -43,7 +42,6 @@ module.exports = async (req, res) => {
         });
       }
 
-
       const rows =
         await sb(
           "pending_app_registrations" +
@@ -58,7 +56,6 @@ module.exports = async (req, res) => {
           }
         );
 
-
       if (
         !Array.isArray(rows) ||
         rows.length === 0
@@ -70,30 +67,22 @@ module.exports = async (req, res) => {
         });
       }
 
-
       const row =
         rows[0];
 
-
       return res.status(200).json({
         ok: true,
-
         registration_key:
           row.registration_key,
-
         qr_code:
           row.qr_code,
-
         phone:
           row.phone,
-
         store_code:
           row.store_code || "",
-
         store_url:
           row.store_url || ""
       });
-
 
     } catch (error) {
 
@@ -101,7 +90,6 @@ module.exports = async (req, res) => {
         "registration lookup error:",
         error
       );
-
 
       return res.status(500).json({
         ok: false,
@@ -113,19 +101,18 @@ module.exports = async (req, res) => {
 
 
   /*
-   * ==========================================
-   * 기존 자동차 QR 등록
-   * 기존 register.js 기능 그대로 유지
-   * ==========================================
+   * 자동차 QR 등록
    */
   if (req.method === "POST") {
 
     const {
       code,
       phone,
-      subscription
+      subscription,
+      iphone_install,
+      store_code,
+      store_url
     } = req.body || {};
-
 
     if (
       !validCode(code) ||
@@ -133,14 +120,17 @@ module.exports = async (req, res) => {
         .test(phone || "")
     ) {
       return res.status(400).json({
+        ok: false,
         error:
           "입력값이 올바르지 않습니다."
       });
     }
 
-
     try {
 
+      /*
+       * 기존 자동차 QR 등록은 그대로 유지
+       */
       await sb(
         "vehicle_qr?on_conflict=code",
         {
@@ -166,10 +156,58 @@ module.exports = async (req, res) => {
       );
 
 
-      return res.json({
+      /*
+       * 아이폰 설치 준비 요청일 때만
+       * 복원용 등록키를 생성합니다.
+       */
+      if (iphone_install === true) {
+
+        const registrationKey =
+          crypto.randomUUID()
+            .toLowerCase();
+
+        await sb(
+          "pending_app_registrations",
+          {
+            method: "POST",
+
+            headers: {
+              Prefer:
+                "return=minimal"
+            },
+
+            body:
+              JSON.stringify({
+                registration_key:
+                  registrationKey,
+                qr_code:
+                  code,
+                phone,
+                store_code:
+                  store_code || "",
+                store_url:
+                  store_url || "/74",
+                created_at:
+                  new Date()
+                    .toISOString()
+              })
+          }
+        );
+
+        return res.status(200).json({
+          ok: true,
+          registration_key:
+            registrationKey
+        });
+      }
+
+
+      /*
+       * 기존 안드로이드·일반 자동차 등록 응답
+       */
+      return res.status(200).json({
         ok: true
       });
-
 
     } catch (error) {
 
@@ -178,8 +216,8 @@ module.exports = async (req, res) => {
         error
       );
 
-
       return res.status(500).json({
+        ok: false,
         error:
           "등록 처리에 실패했습니다."
       });
