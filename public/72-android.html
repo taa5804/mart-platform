@@ -761,12 +761,12 @@ window.addEventListener(
       "1"
     );
 
-    showCard(pushCard);
+    showCard(
+      pushCard
+    );
 
-    pushBtn.disabled = false;
-
-    pushBtn.textContent =
-      "푸시 알림 허용";
+    pushBtn.disabled =
+      false;
 
     finishRegistrationIfReady();
   }
@@ -987,9 +987,6 @@ installBtn.addEventListener(
        * 사용자가 시스템 설치창에서 앱 추가를 승인하면
        * 앱 설치는 계속 진행되고, 푸시 알림 허용 화면으로 이동합니다.
        */
-      showCard(
-        pushCard
-      );
 
     }catch(error){
 
