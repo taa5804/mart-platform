@@ -12,10 +12,10 @@
 </head>
 <body>
   <section id="loadingCard" class="card active"><h1>자동차 QR 확인 중</h1><p>잠시만 기다려 주세요.</p></section>
-  <section id="registerCard" class="card"><h1>자동차 QR 등록</h1><p>차량이동 요청을 받을<br>휴대전화번호를 입력해 주세요.</p><input id="phoneInput" type="tel" inputmode="numeric" autocomplete="tel" maxlength="13" placeholder="010-0000-0000"><button id="registerButton" type="button">등록하기</button><div id="registerStatus" class="status"></div></section>
+  <section id="registerCard" class="card"><h1>자동차 QR 등록</h1><p>등록할 자동차 QR을 확인하고<br>휴대전화번호를 입력해 주세요.</p><input id="phoneInput" type="tel" inputmode="numeric" autocomplete="tel" maxlength="13" placeholder="010-0000-0000"><button id="registerButton" type="button">QR 등록하기</button><div id="registerStatus" class="status"></div></section>
   <section id="installCard" class="card"><h1>앱 설치가 필요합니다</h1><div class="guide">앱 설치와 푸시 알림은<br>차량이동 요청을 받기 위해<br>반드시 필요합니다.<br><br>계속하기를 누르면<br>앱 설치가 시작됩니다.</div><div id="browserGuide" class="browser-guide"></div><button id="continueButton" type="button">계속하기</button><div id="installStatus" class="status"></div></section>
   <section id="pushCard" class="card"><h1>푸시 알림 승인</h1><div class="guide">차량이동 요청을 받기 위해<br>푸시 알림을 허용해 주세요.</div><button id="pushButton" type="button" disabled>앱 설치 완료 대기 중...</button><div id="pushStatus" class="status"></div></section>
-  <section id="completeCard" class="card"><h1>등록 완료</h1><p>자동차 QR 등록과<br>푸시 알림 설정이 완료되었습니다.</p><div class="status success">차량이동 요청을 받을 수 있습니다.</div></section>
+  <section id="completeCard" class="card"><h1>QR 등록 완료</h1><p>자동차 QR 등록과<br>푸시 알림 설정이 완료되었습니다.</p><div class="status success">이제 이 QR로 차량이동 요청을 받을 수 있습니다.</div></section>
   <section id="requestCard" class="card"><h1>차량이동 요청</h1><p>차주에게 차량이동 요청<br>푸시 알림을 보냅니다.</p><button id="moveButton" type="button">차량이동요청</button><div id="countdownBox" class="countdown"></div><button id="emergencyButton" class="emergency" type="button" disabled>긴급통화</button><div id="requestStatus" class="status"></div><div class="small">차량이동요청은 3분 간격으로 최대 3회까지 전송됩니다.</div></section>
   <section id="errorCard" class="card"><h1>접속할 수 없습니다</h1><p id="errorMessage">QR 정보를 확인할 수 없습니다.</p></section>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
