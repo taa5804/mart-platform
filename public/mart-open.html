@@ -241,6 +241,10 @@ body{
     "wooriapt_store_url";
 
 
+  const PUSH_TOKEN_KEY =
+    "wooriapt_mart_push_token";
+
+
 
   /*
    * =====================================================
@@ -526,6 +530,78 @@ body{
   }
 
 
+  function loadPendingRegistration(){
+
+    try{
+
+      return JSON.parse(
+        localStorage.getItem(
+          PENDING_KEY
+        ) ||
+        "null"
+      );
+
+    }catch(error){
+
+      return null;
+    }
+  }
+
+
+  function hasCompletedSignboardRegistration(){
+
+    const pending =
+      loadPendingRegistration();
+
+
+    const pushToken =
+      String(
+        localStorage.getItem(
+          PUSH_TOKEN_KEY
+        ) ||
+        ""
+      ).trim();
+
+
+    const permissionGranted =
+      "Notification" in window &&
+      Notification.permission ===
+        "granted";
+
+
+    return !!(
+      pending &&
+      pending.qr_code &&
+      String(
+        pending.qr_code
+      ).toUpperCase() === qrCode &&
+      pushToken &&
+      permissionGranted
+    );
+  }
+
+
+  function openSignboardStore(){
+
+    localStorage.setItem(
+      STORE_PATH_KEY,
+      storePath
+    );
+
+
+    localStorage.setItem(
+      STORE_URL_KEY,
+      storePath
+    );
+
+
+    window.location.replace(
+      "https://wooriapt.ai.kr" +
+      storePath
+    );
+  }
+
+
 
   /*
    * =====================================================
@@ -617,6 +693,15 @@ body{
     SIGNBOARD_MODE &&
     qrCode
   ){
+
+    if(
+      hasCompletedSignboardRegistration()
+    ){
+
+      openSignboardStore();
+
+      return;
+    }
 
     openSignboardFlow();
 
