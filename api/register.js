@@ -1,4 +1,5 @@
-const crypto = require("crypto");
+const crypto =
+  require("crypto");
 
 const {
   sb,
@@ -6,172 +7,298 @@ const {
 } = require("./_lib");
 
 
-function validRegistrationKey(value) {
+function validRegistrationKey(
+  value
+){
+
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     .test(
-      String(value || "").trim()
+      String(
+        value || ""
+      ).trim()
     );
 }
 
 
-module.exports = async (req, res) => {
+function normalizePhone(
+  value
+){
 
-  /*
-   * 아이폰 설치 후 등록정보 복원
-   */
-  if (req.method === "GET") {
-
-    try {
-
-      const registrationKey =
-        String(
-          req.query.reg || ""
-        )
-          .trim()
-          .toLowerCase();
-
-      if (
-        !validRegistrationKey(
-          registrationKey
-        )
-      ) {
-        return res.status(400).json({
-          ok: false,
-          message:
-            "등록키가 올바르지 않습니다."
-        });
-      }
-
-      const rows =
-        await sb(
-          "pending_app_registrations" +
-          "?registration_key=eq." +
-          encodeURIComponent(
-            registrationKey
-          ) +
-          "&select=registration_key,qr_code,phone,store_code,store_url,created_at" +
-          "&limit=1",
-          {
-            method: "GET"
-          }
-        );
-
-      if (
-        !Array.isArray(rows) ||
-        rows.length === 0
-      ) {
-        return res.status(404).json({
-          ok: false,
-          message:
-            "등록정보를 찾을 수 없습니다."
-        });
-      }
-
-      const row =
-        rows[0];
-
-      return res.status(200).json({
-        ok: true,
-        registration_key:
-          row.registration_key,
-        qr_code:
-          row.qr_code,
-        phone:
-          row.phone,
-        store_code:
-          row.store_code || "",
-        store_url:
-          row.store_url || ""
-      });
-
-    } catch (error) {
-
-      console.error(
-        "registration lookup error:",
-        error
-      );
-
-      return res.status(500).json({
-        ok: false,
-        message:
-          "아이폰 등록정보 확인에 실패했습니다."
-      });
-    }
-  }
+  return String(
+    value || ""
+  ).replace(
+    /[^0-9]/g,
+    ""
+  );
+}
 
 
-  /*
-   * 자동차 QR 등록
-   */
-  if (req.method === "POST") {
+module.exports =
+  async function (
+    req,
+    res
+  ){
 
-    const {
-      code,
-      phone,
-      subscription,
-      iphone_install,
-      store_code,
-      store_url
-    } = req.body || {};
+    /*
+     * 설치된 아이폰 앱에서
+     * 등록정보 복원
+     */
 
-    if (
-      !validCode(code) ||
-      !/^01[016789]\d{7,8}$/
-        .test(phone || "")
-    ) {
-      return res.status(400).json({
-        ok: false,
-        error:
-          "입력값이 올바르지 않습니다."
-      });
-    }
+    if(
+      req.method === "GET"
+    ){
 
-    try {
-
-      /*
-       * 기존 자동차 QR 등록은 그대로 유지
-       */
-      await sb(
-        "vehicle_qr?on_conflict=code",
-        {
-          method: "POST",
-
-          headers: {
-            Prefer:
-              "resolution=merge-duplicates,return=minimal"
-          },
-
-          body:
-            JSON.stringify({
-              code,
-              phone,
-              push_subscription:
-                subscription || null,
-              active: true,
-              registered_at:
-                new Date()
-                  .toISOString()
-            })
-        }
-      );
-
-
-      /*
-       * 아이폰 설치 준비 요청일 때만
-       * 복원용 등록키를 생성합니다.
-       */
-      if (iphone_install === true) {
+      try{
 
         const registrationKey =
-          crypto.randomUUID()
+          String(
+            req.query.reg || ""
+          )
+            .trim()
             .toLowerCase();
+
+        if(
+          !validRegistrationKey(
+            registrationKey
+          )
+        ){
+
+          return res
+            .status(400)
+            .json({
+              ok:
+                false,
+
+              message:
+                "등록키가 올바르지 않습니다."
+            });
+        }
+
+        const rows =
+          await sb(
+            "pending_app_registrations" +
+            "?registration_key=eq." +
+            encodeURIComponent(
+              registrationKey
+            ) +
+            "&select=" +
+            [
+              "registration_key",
+              "qr_code",
+              "phone",
+              "store_id",
+              "created_at"
+            ].join(",") +
+            "&limit=1",
+            {
+              method:
+                "GET"
+            }
+          );
+
+        if(
+          !Array.isArray(
+            rows
+          ) ||
+          rows.length === 0
+        ){
+
+          return res
+            .status(404)
+            .json({
+              ok:
+                false,
+
+              message:
+                "등록정보를 찾을 수 없습니다."
+            });
+        }
+
+        const row =
+          rows[0];
+
+        return res
+          .status(200)
+          .json({
+            ok:
+              true,
+
+            registration_key:
+              row.registration_key,
+
+            qr_code:
+              row.qr_code,
+
+            phone:
+              row.phone,
+
+            store_id:
+              row.store_id || null
+          });
+
+      }catch(error){
+
+        console.error(
+          "registration lookup error:",
+          error
+        );
+
+        return res
+          .status(500)
+          .json({
+            ok:
+              false,
+
+            message:
+              "아이폰 등록정보 확인에 실패했습니다."
+          });
+      }
+    }
+
+
+    /*
+     * 아이폰 앱 설치 준비
+     *
+     * 이 단계에서는 자동차를 등록하지 않음
+     */
+
+    if(
+      req.method === "POST"
+    ){
+
+      const body =
+        req.body || {};
+
+      const qrCode =
+        String(
+          body.code ||
+          body.qr_code ||
+          ""
+        )
+          .trim()
+          .toUpperCase();
+
+      const phone =
+        normalizePhone(
+          body.phone ||
+          body.owner_phone
+        );
+
+      if(
+        !validCode(
+          qrCode
+        ) ||
+        !/^01[016789][0-9]{7,8}$/
+          .test(
+            phone
+          )
+      ){
+
+        return res
+          .status(400)
+          .json({
+            ok:
+              false,
+
+            message:
+              "입력값이 올바르지 않습니다."
+          });
+      }
+
+      if(
+        body.iphone_install !== true
+      ){
+
+        return res
+          .status(400)
+          .json({
+            ok:
+              false,
+
+            message:
+              "아이폰 설치 준비 요청이 아닙니다."
+          });
+      }
+
+      try{
+
+        /*
+         * QR에 배정된 마트번호 확인
+         */
+
+        const vehicleRows =
+          await sb(
+            "vehicle_qr" +
+            "?qr_code=eq." +
+            encodeURIComponent(
+              qrCode
+            ) +
+            "&select=" +
+            [
+              "qr_code",
+              "store_id",
+              "is_active"
+            ].join(",") +
+            "&limit=1",
+            {
+              method:
+                "GET"
+            }
+          );
+
+        if(
+          !Array.isArray(
+            vehicleRows
+          ) ||
+          vehicleRows.length === 0
+        ){
+
+          return res
+            .status(404)
+            .json({
+              ok:
+                false,
+
+              message:
+                "등록되지 않은 자동차 QR입니다."
+            });
+        }
+
+        const vehicle =
+          vehicleRows[0];
+
+        if(
+          vehicle.is_active === false
+        ){
+
+          return res
+            .status(400)
+            .json({
+              ok:
+                false,
+
+              message:
+                "사용이 중지된 자동차 QR입니다."
+            });
+        }
+
+        const registrationKey =
+          crypto
+            .randomUUID()
+            .toLowerCase();
+
+        /*
+         * 아이폰 설치 후 복원할
+         * 최소 정보만 저장
+         */
 
         await sb(
           "pending_app_registrations",
           {
-            method: "POST",
+            method:
+              "POST",
 
-            headers: {
+            headers:{
               Prefer:
                 "return=minimal"
             },
@@ -180,13 +307,17 @@ module.exports = async (req, res) => {
               JSON.stringify({
                 registration_key:
                   registrationKey,
+
                 qr_code:
-                  code,
-                phone,
-                store_code:
-                  store_code || "",
-                store_url:
-                  store_url || "/74",
+                  qrCode,
+
+                phone:
+                  phone,
+
+                store_id:
+                  vehicle.store_id ||
+                  null,
+
                 created_at:
                   new Date()
                     .toISOString()
@@ -194,40 +325,47 @@ module.exports = async (req, res) => {
           }
         );
 
-        return res.status(200).json({
-          ok: true,
-          registration_key:
-            registrationKey
-        });
+        return res
+          .status(200)
+          .json({
+            ok:
+              true,
+
+            registration_key:
+              registrationKey,
+
+            store_id:
+              vehicle.store_id ||
+              null
+          });
+
+      }catch(error){
+
+        console.error(
+          "iPhone preparation error:",
+          error
+        );
+
+        return res
+          .status(500)
+          .json({
+            ok:
+              false,
+
+            message:
+              "아이폰 설치 준비에 실패했습니다."
+          });
       }
-
-
-      /*
-       * 기존 안드로이드·일반 자동차 등록 응답
-       */
-      return res.status(200).json({
-        ok: true
-      });
-
-    } catch (error) {
-
-      console.error(
-        "vehicle register error:",
-        error
-      );
-
-      return res.status(500).json({
-        ok: false,
-        error:
-          "등록 처리에 실패했습니다."
-      });
     }
-  }
 
 
-  return res.status(405).json({
-    ok: false,
-    message:
-      "GET 또는 POST 요청만 사용할 수 있습니다."
-  });
-};
+    return res
+      .status(405)
+      .json({
+        ok:
+          false,
+
+        message:
+          "GET 또는 POST 요청만 사용할 수 있습니다."
+      });
+  };
