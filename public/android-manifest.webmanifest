@@ -1,13 +1,15 @@
 {
-  "id": "/mart-app-v1",
+  "id": "/mart-sign-app-v1",
   "name": "우리가게",
   "short_name": "우리가게",
-  "description": "에너젠마트 특가·행사 알림",
+  "description": "마트 행사와 할인 알림",
   "start_url": "/mart-open.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#16a34a",
+  "orientation": "portrait",
+  "lang": "ko-KR",
   "icons": [
     {
       "src": "/icon-192.png",
