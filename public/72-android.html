@@ -210,6 +210,9 @@ const SUPABASE_KEY =
 const VAPID_KEY =
   "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
 
+const STORE_ID_KEY =
+  "wooriapt_store_id";
+
 
 /*
  * Firebase 현재 설정
@@ -509,6 +512,8 @@ async function registerVehicle(
       "자동차 등록에 실패했습니다."
     );
   }
+
+  return data;
 }
 
 
@@ -814,9 +819,28 @@ pushBtn.addEventListener(
         );
       }
 
-      await registerVehicle(
-        token
-      );
+      const result =
+        await registerVehicle(
+          token
+        );
+
+      const storeId =
+        String(
+          result.store_id || ""
+        ).trim();
+
+      if(
+        storeId
+      ){
+        localStorage.setItem(
+          STORE_ID_KEY,
+          storeId
+        );
+      }else{
+        localStorage.removeItem(
+          STORE_ID_KEY
+        );
+      }
 
       processing =
         false;
