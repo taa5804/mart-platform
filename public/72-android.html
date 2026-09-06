@@ -144,15 +144,13 @@ button:disabled{
   <h1>Android 앱 설치</h1>
 
   <div class="guide">
-    아래 버튼을 눌러<br>
-    우리가게 앱을 설치해 주세요.
+    휴대전화에 표시되는 설치창에서<br>
+    설치를 눌러 주세요.
   </div>
 
-  <button id="installBtn" type="button" disabled>
-    앱 설치 준비 중
-  </button>
-
-  <div id="installStatus" class="status"></div>
+  <div id="installStatus" class="status waiting">
+    앱 설치를 진행해 주세요.
+  </div>
 </section>
 
 
@@ -287,17 +285,11 @@ const phoneInput =
 const registerBtn =
   document.getElementById("registerBtn");
 
-const installBtn =
-  document.getElementById("installBtn");
-
 const pushBtn =
   document.getElementById("pushBtn");
 
 const registerStatus =
   document.getElementById("registerStatus");
-
-const installStatus =
-  document.getElementById("installStatus");
 
 const pushStatus =
   document.getElementById("pushStatus");
@@ -449,7 +441,7 @@ async function prepareServiceWorker(){
 
 
 /*
- * 서버 등록
+ * 서버에 자동차 등록
  */
 
 async function registerVehicle(
@@ -521,7 +513,7 @@ async function registerVehicle(
 
 
 /*
- * 앱 설치 준비 완료
+ * 앱 설치창 준비
  */
 
 window.addEventListener(
@@ -532,18 +524,6 @@ window.addEventListener(
 
     installPrompt =
       event;
-
-    installBtn.disabled =
-      false;
-
-    installBtn.textContent =
-      "앱 설치";
-
-    setStatus(
-      installStatus,
-      "",
-      ""
-    );
   }
 );
 
@@ -551,9 +531,9 @@ window.addEventListener(
 /*
  * 실제 앱 설치 완료
  *
- * 설치 완료 문구는 표시하지 않음
+ * 설치 완료 웹 문구는 표시하지 않음
  * 휴대전화 설치 완료 표시 후
- * 푸시 화면을 보여줌
+ * 푸시 화면을 표시
  */
 
 window.addEventListener(
@@ -608,8 +588,8 @@ phoneInput.addEventListener(
 
 
 /*
- * 1단계
- * 전화번호 확인
+ * 전화번호 확인 후
+ * 휴대전화 앱 설치창 바로 표시
  */
 
 registerBtn.addEventListener(
@@ -651,54 +631,13 @@ registerBtn.addEventListener(
       return;
     }
 
-    try{
-
-      await prepareServiceWorker();
-
-      showCard(
-        installCard
-      );
-
-      if(
-        installPrompt
-      ){
-        installBtn.disabled =
-          false;
-
-        installBtn.textContent =
-          "앱 설치";
-      }
-
-    }catch(error){
-
-      setStatus(
-        registerStatus,
-        error instanceof Error
-          ? error.message
-          : "앱 설치 준비에 실패했습니다.",
-        "error"
-      );
-    }
-  }
-);
-
-
-/*
- * 2단계
- * 앱 설치
- */
-
-installBtn.addEventListener(
-  "click",
-  async () => {
-
     if(
       !installPrompt
     ){
 
       setStatus(
-        installStatus,
-        "앱 설치창을 준비하고 있습니다.",
+        registerStatus,
+        "앱 설치 준비 중입니다. 잠시 후 다시 눌러 주세요.",
         "waiting"
       );
 
@@ -708,16 +647,11 @@ installBtn.addEventListener(
     const currentPrompt =
       installPrompt;
 
-    installBtn.disabled =
+    registerBtn.disabled =
       true;
 
-    installBtn.textContent =
-      "앱 설치 중...";
-
-    setStatus(
-      installStatus,
-      "",
-      ""
+    showCard(
+      installCard
     );
 
     try{
@@ -727,23 +661,24 @@ installBtn.addEventListener(
       const choice =
         await currentPrompt.userChoice;
 
+      installPrompt =
+        null;
+
       if(
         choice.outcome !==
         "accepted"
       ){
 
-        installPrompt =
-          null;
-
-        installBtn.disabled =
+        registerBtn.disabled =
           false;
 
-        installBtn.textContent =
-          "앱 설치";
+        showCard(
+          registerCard
+        );
 
         setStatus(
-          installStatus,
-          "앱 설치를 완료해 주세요.",
+          registerStatus,
+          "앱을 설치해 주세요.",
           "error"
         );
 
@@ -751,20 +686,21 @@ installBtn.addEventListener(
       }
 
       /*
-       * 여기에서는 다음 화면으로 이동하지 않음
+       * 설치를 승인한 뒤에는
        * 실제 appinstalled 신호를 기다림
        */
 
     }catch(error){
 
-      installBtn.disabled =
+      registerBtn.disabled =
         false;
 
-      installBtn.textContent =
-        "앱 설치";
+      showCard(
+        registerCard
+      );
 
       setStatus(
-        installStatus,
+        registerStatus,
         error instanceof Error
           ? error.message
           : "앱 설치에 실패했습니다.",
@@ -776,8 +712,7 @@ installBtn.addEventListener(
 
 
 /*
- * 3단계
- * 푸시 허용 및 자동차 등록
+ * 푸시 허용 후 자동차 등록
  */
 
 pushBtn.addEventListener(
