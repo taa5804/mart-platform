@@ -15,7 +15,7 @@
   href="/mart-manifest.webmanifest"
 >
 
-<title>입간판 QR Android 등록</title>
+<title>우리가게 알림 등록</title>
 
 <style>
 *{
@@ -122,7 +122,7 @@ button:disabled{
 
 <body>
 
-<section id="registerCard" class="card active">
+<section id="registerCard" class="card">
   <h1>우리가게 알림 등록</h1>
 
   <p>
@@ -157,10 +157,7 @@ button:disabled{
     설치를 눌러 주세요.
   </div>
 
-  <div
-    id="installStatus"
-    class="status waiting"
-  >
+  <div class="status waiting">
     앱 설치를 진행해 주세요.
   </div>
 </section>
@@ -198,7 +195,7 @@ button:disabled{
   </p>
 
   <div class="status success">
-    이제 마트 행사와 할인 알림을 받을 수 있습니다.
+    해당 마트 플랫폼으로 이동합니다.
   </div>
 </section>
 
@@ -217,7 +214,7 @@ button:disabled{
 
 
 /*
- * 입간판 푸시 등록 서버
+ * 서버 설정
  */
 
 const API_URL =
@@ -231,6 +228,12 @@ const VAPID_KEY =
 
 const STORE_ID_KEY =
   "wooriapt_store_id";
+
+const SIGN_QR_KEY =
+  "wooriapt_sign_qr";
+
+const SIGN_PHONE_KEY =
+  "wooriapt_sign_phone";
 
 
 /*
@@ -270,16 +273,18 @@ const params =
     window.location.search
   );
 
-const qrCode =
-  String(
-    params.get("qr") || ""
-  )
-    .trim()
-    .toUpperCase()
-    .replace(
-      /[^A-Z0-9_-]/g,
-      ""
-    );
+const urlQrCode =
+  cleanQr(
+    params.get("qr")
+  );
+
+let qrCode =
+  urlQrCode ||
+  cleanQr(
+    localStorage.getItem(
+      SIGN_QR_KEY
+    )
+  );
 
 
 /*
@@ -351,10 +356,16 @@ const cards = [
 
 
 /*
- * 필요한 상태만 사용
+ * 필요한 상태
  */
 
-let customerPhone = "";
+let customerPhone =
+  normalizePhone(
+    localStorage.getItem(
+      SIGN_PHONE_KEY
+    )
+  );
+
 let installPrompt = null;
 let appInstalled = false;
 let processing = false;
@@ -397,6 +408,34 @@ function setStatus(
     type
       ? "status " + type
       : "status";
+}
+
+
+function showError(message) {
+  errorText.textContent =
+    message ||
+    "등록 처리에 실패했습니다.";
+
+  showCard(
+    errorCard
+  );
+}
+
+
+/*
+ * QR 번호
+ */
+
+function cleanQr(value) {
+  return String(
+    value || ""
+  )
+    .trim()
+    .toUpperCase()
+    .replace(
+      /[^A-Z0-9_-]/g,
+      ""
+    );
 }
 
 
@@ -515,7 +554,7 @@ async function registerSignCustomer(
             qr_code:
               qrCode,
 
-            customer_phone:
+            phone:
               customerPhone,
 
             push_token:
@@ -571,8 +610,8 @@ window.addEventListener(
 
 
 /*
- * 실제 앱 설치가 완료된 후에만
- * 푸시 버튼을 활성화
+ * 실제 설치가 끝난 후에만
+ * 푸시 화면 표시
  */
 
 window.addEventListener(
@@ -583,6 +622,31 @@ window.addEventListener(
 
     installPrompt =
       null;
+
+    qrCode =
+      cleanQr(
+        localStorage.getItem(
+          SIGN_QR_KEY
+        )
+      );
+
+    customerPhone =
+      normalizePhone(
+        localStorage.getItem(
+          SIGN_PHONE_KEY
+        )
+      );
+
+    if (
+      !qrCode ||
+      !validPhone(customerPhone)
+    ) {
+      showError(
+        "입간판 등록정보를 확인할 수 없습니다."
+      );
+
+      return;
+    }
 
     setTimeout(
       function () {
@@ -624,8 +688,7 @@ phoneInput.addEventListener(
 
 
 /*
- * 전화번호 확인 후
- * 앱 설치창을 바로 표시
+ * 전화번호 저장 후 앱 설치
  */
 
 registerBtn.addEventListener(
@@ -637,9 +700,7 @@ registerBtn.addEventListener(
       );
 
     if (
-      !validPhone(
-        customerPhone
-      )
+      !validPhone(customerPhone)
     ) {
       setStatus(
         registerStatus,
@@ -671,6 +732,16 @@ registerBtn.addEventListener(
 
       return;
     }
+
+    localStorage.setItem(
+      SIGN_QR_KEY,
+      qrCode
+    );
+
+    localStorage.setItem(
+      SIGN_PHONE_KEY,
+      customerPhone
+    );
 
     const currentPrompt =
       installPrompt;
@@ -707,14 +778,7 @@ registerBtn.addEventListener(
           "앱을 설치해 주세요.",
           "error"
         );
-
-        return;
       }
-
-      /*
-       * 설치를 승인한 뒤에는
-       * 실제 appinstalled 신호를 기다립니다.
-       */
 
     } catch (error) {
       registerBtn.disabled =
@@ -737,7 +801,7 @@ registerBtn.addEventListener(
 
 
 /*
- * 푸시 허용 후 입간판 고객 등록
+ * 푸시 허용 후 고객 등록
  */
 
 pushBtn.addEventListener(
@@ -748,6 +812,40 @@ pushBtn.addEventListener(
     }
 
     if (!appInstalled) {
+      return;
+    }
+
+    qrCode =
+      cleanQr(
+        localStorage.getItem(
+          SIGN_QR_KEY
+        )
+      );
+
+    customerPhone =
+      normalizePhone(
+        localStorage.getItem(
+          SIGN_PHONE_KEY
+        )
+      );
+
+    if (!qrCode) {
+      setStatus(
+        pushStatus,
+        "입간판 QR 정보를 확인할 수 없습니다.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (!validPhone(customerPhone)) {
+      setStatus(
+        pushStatus,
+        "휴대전화번호를 정확히 입력해 주세요.",
+        "error"
+      );
+
       return;
     }
 
@@ -851,6 +949,14 @@ pushBtn.addEventListener(
         );
       }
 
+      localStorage.removeItem(
+        SIGN_QR_KEY
+      );
+
+      localStorage.removeItem(
+        SIGN_PHONE_KEY
+      );
+
       processing =
         false;
 
@@ -894,15 +1000,27 @@ pushBtn.addEventListener(
  */
 
 (async function start() {
-  if (!qrCode) {
-    errorText.textContent =
-      "입간판 QR 정보를 확인할 수 없습니다.";
+  if (urlQrCode) {
+    qrCode =
+      urlQrCode;
 
-    showCard(
-      errorCard
+    localStorage.setItem(
+      SIGN_QR_KEY,
+      qrCode
+    );
+  }
+
+  if (!qrCode) {
+    showError(
+      "올바른 입간판 QR 주소가 아닙니다."
     );
 
     return;
+  }
+
+  if (validPhone(customerPhone)) {
+    phoneInput.value =
+      formatPhone(customerPhone);
   }
 
   showCard(
