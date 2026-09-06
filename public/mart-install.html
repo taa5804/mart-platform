@@ -10,12 +10,37 @@
 
 <meta name="theme-color" content="#16a34a">
 
+<title>우리가게 알림 등록</title>
+
+<script>
+(function () {
+  "use strict";
+
+  const userAgent =
+    navigator.userAgent || "";
+
+  const isIphone =
+    /iPhone|iPad|iPod/i.test(
+      userAgent
+    ) ||
+    (
+      navigator.platform === "MacIntel" &&
+      navigator.maxTouchPoints > 1
+    );
+
+  if (isIphone) {
+    window.location.replace(
+      "/mart-install-iphone.html" +
+      window.location.search
+    );
+  }
+})();
+</script>
+
 <link
   rel="manifest"
   href="/mart-manifest.webmanifest"
 >
-
-<title>우리가게 알림 등록</title>
 
 <style>
 *{
@@ -213,10 +238,6 @@ button:disabled{
 "use strict";
 
 
-/*
- * 서버 설정
- */
-
 const API_URL =
   "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/register-mart-push";
 
@@ -235,10 +256,6 @@ const SIGN_QR_KEY =
 const SIGN_PHONE_KEY =
   "wooriapt_sign_phone";
 
-
-/*
- * Firebase 설정
- */
 
 const FIREBASE_CONFIG = {
   apiKey:
@@ -264,10 +281,6 @@ const FIREBASE_CONFIG = {
 };
 
 
-/*
- * 입간판 QR 번호
- */
-
 const params =
   new URLSearchParams(
     window.location.search
@@ -286,10 +299,6 @@ let qrCode =
     )
   );
 
-
-/*
- * 화면
- */
 
 const registerCard =
   document.getElementById(
@@ -355,10 +364,6 @@ const cards = [
 ];
 
 
-/*
- * 필요한 상태
- */
-
 let customerPhone =
   normalizePhone(
     localStorage.getItem(
@@ -371,10 +376,6 @@ let appInstalled = false;
 let processing = false;
 let serviceWorkerRegistration = null;
 
-
-/*
- * 화면 표시
- */
 
 function showCard(card) {
   cards.forEach(
@@ -422,10 +423,6 @@ function showError(message) {
 }
 
 
-/*
- * QR 번호
- */
-
 function cleanQr(value) {
   return String(
     value || ""
@@ -438,10 +435,6 @@ function cleanQr(value) {
     );
 }
 
-
-/*
- * 전화번호
- */
 
 function normalizePhone(value) {
   return String(
@@ -486,10 +479,6 @@ function formatPhone(value) {
 }
 
 
-/*
- * 서비스워커
- */
-
 async function prepareServiceWorker() {
   if (serviceWorkerRegistration) {
     return serviceWorkerRegistration;
@@ -517,10 +506,6 @@ async function prepareServiceWorker() {
   return serviceWorkerRegistration;
 }
 
-
-/*
- * 입간판 고객 등록
- */
 
 async function registerSignCustomer(
   token
@@ -594,10 +579,6 @@ async function registerSignCustomer(
 }
 
 
-/*
- * 앱 설치창 준비
- */
-
 window.addEventListener(
   "beforeinstallprompt",
   function (event) {
@@ -608,11 +589,6 @@ window.addEventListener(
   }
 );
 
-
-/*
- * 실제 설치가 끝난 후에만
- * 푸시 화면 표시
- */
 
 window.addEventListener(
   "appinstalled",
@@ -672,10 +648,6 @@ window.addEventListener(
 );
 
 
-/*
- * 전화번호 자동 표시
- */
-
 phoneInput.addEventListener(
   "input",
   function (event) {
@@ -686,10 +658,6 @@ phoneInput.addEventListener(
   }
 );
 
-
-/*
- * 전화번호 저장 후 앱 설치
- */
 
 registerBtn.addEventListener(
   "click",
@@ -800,10 +768,6 @@ registerBtn.addEventListener(
 );
 
 
-/*
- * 푸시 허용 후 고객 등록
- */
-
 pushBtn.addEventListener(
   "click",
   async function () {
@@ -839,7 +803,11 @@ pushBtn.addEventListener(
       return;
     }
 
-    if (!validPhone(customerPhone)) {
+    if (
+      !validPhone(
+        customerPhone
+      )
+    ) {
       setStatus(
         pushStatus,
         "휴대전화번호를 정확히 입력해 주세요.",
@@ -995,10 +963,6 @@ pushBtn.addEventListener(
 );
 
 
-/*
- * 처음 시작
- */
-
 (async function start() {
   if (urlQrCode) {
     qrCode =
@@ -1018,9 +982,15 @@ pushBtn.addEventListener(
     return;
   }
 
-  if (validPhone(customerPhone)) {
+  if (
+    validPhone(
+      customerPhone
+    )
+  ) {
     phoneInput.value =
-      formatPhone(customerPhone);
+      formatPhone(
+        customerPhone
+      );
   }
 
   showCard(
