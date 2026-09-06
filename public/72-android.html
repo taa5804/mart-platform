@@ -147,8 +147,8 @@ button:disabled{
     우리가게 앱을 설치해 주세요.
   </div>
 
-  <button id="installBtn" type="button">
-    앱 설치
+  <button id="installBtn" type="button" disabled>
+    앱 설치 준비 중
   </button>
 
   <div id="installStatus" class="status"></div>
@@ -208,9 +208,6 @@ const SUPABASE_KEY =
 const VAPID_KEY =
   "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
 
-const PLATFORM_URL =
-  "/74.html";
-
 const FIREBASE_CONFIG = {
   apiKey:
     "AIzaSyB3nZdmUrj2wsKPQpOV8dLso7i17fZo0Hc",
@@ -232,15 +229,11 @@ const FIREBASE_CONFIG = {
 };
 
 const BUILD_VERSION =
-  "20260906-ANDROID-SIMPLE-01";
+  "20260906-ANDROID-SIMPLE-02";
 
 const PENDING_KEY =
   "wooriapt_vehicle_android_pending";
 
-
-/*
- * QR 번호
- */
 
 const params =
   new URLSearchParams(
@@ -258,10 +251,6 @@ const qrCode =
       ""
     );
 
-
-/*
- * 화면 요소
- */
 
 const registerCard =
   document.getElementById(
@@ -337,13 +326,10 @@ const cards = [
 ];
 
 
-/*
- * 필요한 상태값은 세 개만 사용
- */
-
 let deferredInstallPrompt = null;
 let appInstallCompleted = false;
 let registrationInProgress = false;
+let serviceWorkerPromise = null;
 
 
 /*
@@ -449,37 +435,7 @@ function formatPhone(value){
 
 
 /*
- * 설치된 앱으로 실행했는지 확인
- */
-
-function isInstalledApp(){
-
-  return (
-    window.matchMedia(
-      "(display-mode: standalone)"
-    ).matches ||
-    window.navigator.standalone === true
-  );
-}
-
-
-/*
- * 앱으로 실행하면 푸시 설치화면을 띄우지 않고
- * 바로 74번 플랫폼으로 이동
- */
-
-if(
-  isInstalledApp()
-){
-
-  window.location.replace(
-    PLATFORM_URL
-  );
-}
-
-
-/*
- * 서버 호출
+ * 서버
  */
 
 async function callApi(payload){
@@ -534,41 +490,53 @@ async function callApi(payload){
 
 
 /*
- * 서비스워커 등록
+ * 서비스워커
  */
 
-async function prepareServiceWorker(){
+function prepareServiceWorker(){
 
   if(
-    !(
-      "serviceWorker"
-      in navigator
-    )
+    serviceWorkerPromise
   ){
-
-    throw new Error(
-      "이 브라우저에서는 앱 설치를 지원하지 않습니다."
-    );
+    return serviceWorkerPromise;
   }
 
-  const registration =
-    await navigator
-      .serviceWorker
-      .register(
-        "/firebase-messaging-sw.js?v=" +
-        BUILD_VERSION,
-        {
-          scope:
-            "/",
+  serviceWorkerPromise =
+    (async () => {
 
-          updateViaCache:
-            "none"
-        }
-      );
+      if(
+        !(
+          "serviceWorker"
+          in navigator
+        )
+      ){
 
-  return await navigator
-    .serviceWorker
-    .ready;
+        throw new Error(
+          "이 브라우저에서는 앱 설치를 지원하지 않습니다."
+        );
+      }
+
+      const registration =
+        await navigator
+          .serviceWorker
+          .register(
+            "/firebase-messaging-sw.js?v=" +
+            BUILD_VERSION,
+            {
+              scope:
+                "/",
+
+              updateViaCache:
+                "none"
+            }
+          );
+
+      return await navigator
+        .serviceWorker
+        .ready;
+    })();
+
+  return serviceWorkerPromise;
 }
 
 
@@ -611,8 +579,11 @@ window.addEventListener(
   "appinstalled",
   () => {
 
-    deferredInstallPrompt = null;
-    appInstallCompleted = true;
+    deferredInstallPrompt =
+      null;
+
+    appInstallCompleted =
+      true;
 
     showCard(
       pushCard
@@ -652,8 +623,6 @@ phone.addEventListener(
 /*
  * 1단계
  * 전화번호 확인
- *
- * 여기에서는 자동차를 등록하지 않음
  */
 
 registerBtn.addEventListener(
@@ -750,6 +719,9 @@ installBtn.addEventListener(
       return;
     }
 
+    const promptEvent =
+      deferredInstallPrompt;
+
     installBtn.disabled =
       true;
 
@@ -764,20 +736,18 @@ installBtn.addEventListener(
 
     try{
 
-      await deferredInstallPrompt
-        .prompt();
+      await promptEvent.prompt();
 
       const result =
-        await deferredInstallPrompt
-          .userChoice;
+        await promptEvent.userChoice;
+
+      deferredInstallPrompt =
+        null;
 
       if(
         result.outcome !==
         "accepted"
       ){
-
-        deferredInstallPrompt =
-          null;
 
         throw new Error(
           "앱 설치를 완료해 주세요."
@@ -785,9 +755,7 @@ installBtn.addEventListener(
       }
 
       /*
-       * 설치를 승인했어도 여기에서는
-       * 푸시 화면으로 이동하지 않음
-       *
+       * 여기에서는 푸시 화면으로 이동하지 않음
        * 실제 appinstalled 이벤트를 기다림
        */
 
@@ -819,7 +787,7 @@ installBtn.addEventListener(
 
 /*
  * 3단계
- * 푸시 알림 허용 후 자동차 등록
+ * 푸시 허용 후 자동차 등록
  */
 
 pushBtn.addEventListener(
@@ -833,8 +801,8 @@ pushBtn.addEventListener(
     }
 
     /*
-     * 실제 앱 설치가 확인되지 않으면
-     * 절대 푸시 및 자동차 등록을 실행하지 않음
+     * 앱 설치가 끝나지 않았으면
+     * 푸시와 자동차등록을 실행하지 않음
      */
 
     if(
@@ -961,8 +929,8 @@ pushBtn.addEventListener(
       }
 
       /*
-       * 앱 설치와 푸시 토큰 발급이 모두 끝난 뒤
-       * 여기에서 한 번만 자동차 등록
+       * 앱 설치와 푸시 토큰 발급이 끝난 후
+       * 자동차를 한 번만 등록
        */
 
       await callApi({
@@ -1023,19 +991,10 @@ pushBtn.addEventListener(
 
 
 /*
- * 처음 화면
- *
- * 등록 도중 새로고침했어도 푸시 화면으로 보내지 않음
- * 다시 설치 단계에서 시작
+ * 시작
  */
 
 (function start(){
-
-  if(
-    isInstalledApp()
-  ){
-    return;
-  }
 
   if(
     !qrCode
@@ -1069,6 +1028,11 @@ pushBtn.addEventListener(
     );
   }
 
+  /*
+   * 등록 도중 다시 열려도
+   * 푸시 화면으로 바로 보내지 않음
+   */
+
   if(
     pending &&
     pending.qr_code === qrCode
@@ -1078,21 +1042,21 @@ pushBtn.addEventListener(
       installCard
     );
 
-    prepareServiceWorker()
-      .catch(
-        () => {}
-      );
+  }else{
 
-    return;
+    showCard(
+      registerCard
+    );
   }
-
-  showCard(
-    registerCard
-  );
 
   prepareServiceWorker()
     .catch(
-      () => {}
+      error => {
+        console.warn(
+          "서비스워커 준비:",
+          error
+        );
+      }
     );
 })();
 </script>
