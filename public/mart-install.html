@@ -202,7 +202,7 @@ button:disabled{
  */
 
 const API_URL =
-  "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/send-vehicle-push";
+  "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/register-mart-push";
 
 const SUPABASE_KEY =
   "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
@@ -447,7 +447,7 @@ async function prepareServiceWorker(){
  * 서버에 알림 등록
  */
 
-async function registerVehicle(
+async function registerMartPush(
   token
 ){
 
@@ -473,10 +473,6 @@ async function registerVehicle(
           JSON.stringify({
             action:
               "register",
-
-            registration_type:
-              "vehicle",
-
             qr_code:
               qrCode,
 
@@ -820,7 +816,7 @@ pushBtn.addEventListener(
       }
 
       const result =
-        await registerVehicle(
+        await registerMartPush(
           token
         );
 
