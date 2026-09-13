@@ -873,26 +873,41 @@ function ensureCategoryLoaded(type){
   loadCategoryProducts(type);
 }
 
+let productScrollHandlerBound=false;
+let productLastScrollY=window.scrollY;
+let productNextAllowedScrollY=0;
+
 function observeProductLoadMore(type){
   const state=productLoadState[type];
-  if(!state||state.done)return;
+  if(!state||state.done||productScrollHandlerBound)return;
 
-  if(!productLoadObserver){
-    productLoadObserver=new IntersectionObserver(entries=>{
-      entries.forEach(entry=>{
-        if(!entry.isIntersecting)return;
-        const category=entry.target.getAttribute('data-product-load-more');
-        const categoryState=productLoadState[category];
-        if(categoryState&&!categoryState.loading&&!categoryState.done){
-          productLoadObserver.unobserve(entry.target);
-          loadCategoryProducts(category);
-        }
-      });
-    },{root:null,rootMargin:'400px 0px',threshold:0});
-  }
+  productScrollHandlerBound=true;
+  productLastScrollY=window.scrollY;
 
-  const sentinel=document.querySelector('[data-product-load-more="'+type+'"]');
-  if(sentinel)productLoadObserver.observe(sentinel);
+  window.addEventListener('scroll',()=>{
+    const currentScrollY=window.scrollY;
+    const moved=Math.abs(currentScrollY-productLastScrollY);
+    productLastScrollY=currentScrollY;
+
+    if(moved<4)return;
+    if(currentScrollY<productNextAllowedScrollY)return;
+
+    const activeSection=document.querySelector('#eventMainApp .section.active');
+    if(!activeSection)return;
+
+    const sentinel=activeSection.querySelector('[data-product-load-more]');
+    if(!sentinel)return;
+
+    const category=sentinel.getAttribute('data-product-load-more');
+    const categoryState=productLoadState[category];
+    if(!categoryState||categoryState.loading||categoryState.done)return;
+
+    const rect=sentinel.getBoundingClientRect();
+    if(rect.top<=window.innerHeight+80&&rect.bottom>=-80){
+      productNextAllowedScrollY=currentScrollY+120;
+      loadCategoryProducts(category);
+    }
+  },{passive:true});
 }
 
 async function loadCategoryProducts(type){
