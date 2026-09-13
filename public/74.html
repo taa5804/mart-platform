@@ -642,6 +642,15 @@ let groupProducts=[];
 let generalProducts=[];
 let freeDeliveryAmount=0;
 
+const PRODUCT_PAGE_SIZE=6;
+const productLoadState={
+  today:{offset:0,loaded:false,loading:false,done:false},
+  sale:{offset:0,loaded:false,loading:false,done:false},
+  group:{offset:0,loaded:false,loading:false,done:false},
+  general:{offset:0,loaded:false,loading:false,done:false}
+};
+let productLoadObserver=null;
+
 function escapeHtml(value){
   return String(value??'')
     .replace(/&/g,'&amp;')
@@ -656,6 +665,7 @@ function showSection(id,btn){
   document.querySelectorAll('#eventMainApp .tab-btn').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
+  if(productLoadState[id])ensureCategoryLoaded(id);
 }
 
 function showSectionById(id){
@@ -693,7 +703,7 @@ function qtyBox(type,id){
 function productCard(p){
   return `
   <div class="card">
-    <img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}">
+    <img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async">
     <div class="card-body">
       <div class="name">${escapeHtml(p.name)}</div>
       <div class="price">${escapeHtml(p.price)}</div>
@@ -719,7 +729,7 @@ function generalRow(p){
 function groupCard(p){
   return `
   <div class="card">
-    <img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}">
+    <img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async">
     <div class="card-body">
       <div class="name">${escapeHtml(p.name)}</div>
       <div class="group-info">
@@ -753,27 +763,173 @@ function groupCard(p){
   </div>`;
 }
 
+function getCategoryConfig(type){
+  if(type==='today')return {
+    listId:'todayList',
+    emptyText:'등록된 오늘의 특가 상품이 없습니다.',
+    products:()=>todayProducts,
+    setProducts:value=>{todayProducts=value;},
+    card:productCard
+  };
+  if(type==='sale')return {
+    listId:'saleList',
+    emptyText:'등록된 행사상품이 없습니다.',
+    products:()=>saleProducts,
+    setProducts:value=>{saleProducts=value;},
+    card:productCard
+  };
+  if(type==='group')return {
+    listId:'groupList',
+    emptyText:'등록된 공동구매 상품이 없습니다.',
+    products:()=>groupProducts,
+    setProducts:value=>{groupProducts=value;},
+    card:groupCard
+  };
+  if(type==='general')return {
+    listId:'generalList',
+    emptyText:'등록된 일반상품이 없습니다.',
+    products:()=>generalProducts,
+    setProducts:value=>{generalProducts=value;},
+    card:generalRow
+  };
+  return null;
+}
+
+function renderProductSection(type){
+  const config=getCategoryConfig(type);
+  if(!config)return;
+
+  const list=document.getElementById(config.listId);
+  const products=config.products();
+  const state=productLoadState[type];
+
+  if(products.length===0){
+    list.innerHTML=state&&state.loading
+      ? '<div class="empty-box">상품을 불러오는 중입니다.</div>'
+      : '<div class="empty-box">'+config.emptyText+'</div>';
+    return;
+  }
+
+  list.innerHTML=products.map(config.card).join('')+
+    (state&&!state.done?'<div data-product-load-more="'+type+'" style="grid-column:1/-1;height:1px;"></div>':'');
+
+  observeProductLoadMore(type);
+}
+
 function renderProducts(){
-  const todayList=document.getElementById('todayList');
-  const saleList=document.getElementById('saleList');
-  const groupList=document.getElementById('groupList');
-  const generalList=document.getElementById('generalList');
+  renderProductSection('today');
+  renderProductSection('sale');
+  renderProductSection('group');
+  renderProductSection('general');
+}
 
-  todayList.innerHTML=todayProducts.length
-    ? todayProducts.map(productCard).join('')
-    : '<div class="empty-box">등록된 오늘의 특가 상품이 없습니다.</div>';
+function mapLiveProduct(type,r){
+  if(type==='today'||type==='sale'){
+    if(!(r.image_url||r.product_name||r.price||r.description))return null;
+    return {
+      type:type,
+      id:Number(r.product_no),
+      name:r.product_name||'상품명 없음',
+      price:r.price||'',
+      desc:r.description||'',
+      img:r.image_url||'',
+      qty:1
+    };
+  }
 
-  saleList.innerHTML=saleProducts.length
-    ? saleProducts.map(productCard).join('')
-    : '<div class="empty-box">등록된 행사상품이 없습니다.</div>';
+  if(type==='group'){
+    if(!(r.image_url||r.product_name||r.group_price||r.normal_price))return null;
+    return {
+      type:'group',
+      id:Number(r.product_no),
+      name:r.product_name||'상품명 없음',
+      normal:r.normal_price||'',
+      group:r.group_price||'',
+      join:Number(r.join_count)||0,
+      goal:Number(r.target_count)||0,
+      img:r.image_url||'',
+      qty:1
+    };
+  }
 
-  groupList.innerHTML=groupProducts.length
-    ? groupProducts.map(groupCard).join('')
-    : '<div class="empty-box">등록된 공동구매 상품이 없습니다.</div>';
+  if(type==='general'){
+    if(!(r.product_name||r.price))return null;
+    return {
+      type:'general',
+      id:Number(r.product_no),
+      name:r.product_name||'상품명 없음',
+      price:r.price||'',
+      desc:r.description||'',
+      qty:1
+    };
+  }
 
-  generalList.innerHTML=generalProducts.length
-    ? generalProducts.map(generalRow).join('')
-    : '<div class="empty-box">등록된 일반상품이 없습니다.</div>';
+  return null;
+}
+
+function ensureCategoryLoaded(type){
+  const state=productLoadState[type];
+  if(!state||state.loaded||state.loading)return;
+  loadCategoryProducts(type);
+}
+
+function observeProductLoadMore(type){
+  const state=productLoadState[type];
+  if(!state||state.done)return;
+
+  if(!productLoadObserver){
+    productLoadObserver=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting)return;
+        const category=entry.target.getAttribute('data-product-load-more');
+        const categoryState=productLoadState[category];
+        if(categoryState&&!categoryState.loading&&!categoryState.done){
+          productLoadObserver.unobserve(entry.target);
+          loadCategoryProducts(category);
+        }
+      });
+    },{root:null,rootMargin:'400px 0px',threshold:0});
+  }
+
+  const sentinel=document.querySelector('[data-product-load-more="'+type+'"]');
+  if(sentinel)productLoadObserver.observe(sentinel);
+}
+
+async function loadCategoryProducts(type){
+  const state=productLoadState[type];
+  const config=getCategoryConfig(type);
+  if(!state||!config||state.loading||state.done)return;
+
+  state.loading=true;
+  if(!state.loaded)renderProductSection(type);
+
+  try{
+    const selectFields='product_no,category,product_name,price,description,image_url,group_price,normal_price,join_count,target_count';
+    const response=await fetch(
+      `${SUPABASE_URL}/rest/v1/store_products_live?store_id=eq.${encodeURIComponent(CURRENT_STORE_ID)}&category=eq.${encodeURIComponent(type)}&select=${selectFields}&order=product_no.asc&limit=${PRODUCT_PAGE_SIZE}&offset=${state.offset}`,
+      {headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}}
+    );
+    if(!response.ok)throw new Error(await response.text());
+
+    const rows=await response.json();
+    const newProducts=rows.map(r=>mapLiveProduct(type,r)).filter(Boolean);
+    const existing=config.products();
+    config.setProducts(existing.concat(newProducts));
+
+    state.offset+=rows.length;
+    state.loaded=true;
+    if(rows.length<PRODUCT_PAGE_SIZE)state.done=true;
+
+    renderProductSection(type);
+  }catch(e){
+    console.error('상품 불러오기 실패:',e);
+    if(!state.loaded){
+      const list=document.getElementById(config.listId);
+      if(list)list.innerHTML='<div class="empty-box">상품을 불러오지 못했습니다.</div>';
+    }
+  }finally{
+    state.loading=false;
+  }
 }
 
 async function loadStoreInfo(){
@@ -810,65 +966,7 @@ async function loadStoreInfo(){
 }
 
 async function loadLiveProducts(){
-  try{
-    const response=await fetch(
-      `${SUPABASE_URL}/rest/v1/store_products_live?store_id=eq.${encodeURIComponent(CURRENT_STORE_ID)}&select=*&order=category.asc,product_no.asc`,
-      {headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}}
-    );
-    if(!response.ok)throw new Error(await response.text());
-
-    const rows=await response.json();
-
-    todayProducts=rows
-      .filter(r=>r.category==='today'&&(r.image_url||r.product_name||r.price||r.description))
-      .map(r=>({
-        type:'today',
-        id:Number(r.product_no),
-        name:r.product_name||'상품명 없음',
-        price:r.price||'',
-        desc:r.description||'',
-        img:r.image_url||'',
-        qty:1
-      }));
-
-    saleProducts=rows
-      .filter(r=>r.category==='sale'&&(r.image_url||r.product_name||r.price||r.description))
-      .map(r=>({
-        type:'sale',
-        id:Number(r.product_no),
-        name:r.product_name||'상품명 없음',
-        price:r.price||'',
-        desc:r.description||'',
-        img:r.image_url||'',
-        qty:1
-      }));
-
-    groupProducts=rows
-      .filter(r=>r.category==='group'&&(r.image_url||r.product_name||r.group_price||r.normal_price))
-      .map(r=>({
-        type:'group',
-        id:Number(r.product_no),
-        name:r.product_name||'상품명 없음',
-        normal:r.normal_price||'',
-        group:r.group_price||'',
-        join:Number(r.join_count)||0,
-        goal:Number(r.target_count)||0,
-        img:r.image_url||'',
-        qty:1
-      }));
-
-    generalProducts=rows
-      .filter(r=>r.category==='general'&&(r.product_name||r.price))
-      .map(r=>({type:'general',id:Number(r.product_no),name:r.product_name||'상품명 없음',price:r.price||'',desc:r.description||'',qty:1}));
-
-    renderProducts();
-  }catch(e){
-    console.error('상품 불러오기 실패:',e);
-    document.getElementById('todayList').innerHTML='<div class="empty-box">상품을 불러오지 못했습니다.</div>';
-    document.getElementById('saleList').innerHTML='<div class="empty-box">상품을 불러오지 못했습니다.</div>';
-    document.getElementById('groupList').innerHTML='<div class="empty-box">상품을 불러오지 못했습니다.</div>';
-    document.getElementById('generalList').innerHTML='<div class="empty-box">상품을 불러오지 못했습니다.</div>';
-  }
+  ensureCategoryLoaded('today');
 }
 
 function priceToNumber(value){
