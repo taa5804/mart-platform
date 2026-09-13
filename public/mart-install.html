@@ -878,12 +878,21 @@ pushBtn.addEventListener(
     !qrCode
   ){
 
-    errorText.textContent =
-      "입간판 QR 정보를 확인할 수 없습니다.";
-
     showCard(
-      errorCard
+      installCard
     );
+
+    try{
+
+      await prepareServiceWorker();
+
+    }catch(error){
+
+      console.warn(
+        "서비스워커 준비 실패:",
+        error
+      );
+    }
 
     return;
   }
