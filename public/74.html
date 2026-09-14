@@ -660,24 +660,41 @@ function escapeHtml(value){
     .replace(/'/g,'&#039;');
 }
 
-function getFastImageUrl(url){
-  const value=String(url||'').trim();
-  if(!value)return '';
-  if(value.includes('/storage/v1/object/public/')){
-    const transformed=value.replace('/storage/v1/object/public/','/storage/v1/render/image/public/');
-    const separator=transformed.includes('?')?'&':'?';
-    return transformed+separator+'width=480&quality=60&resize=contain';
+/* 상품 이미지 속도개선: 800px / 약 200KB 이하 목표
+   Supabase Storage 공개 이미지는 Image Transformation URL로 요청하고,
+   변환이 지원되지 않는 URL은 기존 원본 URL을 그대로 사용합니다. */
+const PRODUCT_IMAGE_WIDTH=800;
+const PRODUCT_IMAGE_QUALITY=45;
+
+function optimizeProductImageUrl(value){
+  const raw=String(value||'').trim();
+  if(!raw)return '';
+
+  try{
+    const u=new URL(raw,location.href);
+    const marker='/storage/v1/object/public/';
+    if(u.hostname.endsWith('.supabase.co')&&u.pathname.includes(marker)){
+      u.pathname=u.pathname.replace(marker,'/storage/v1/render/image/public/');
+      u.searchParams.set('width',String(PRODUCT_IMAGE_WIDTH));
+      u.searchParams.set('resize','contain');
+      u.searchParams.set('quality',String(PRODUCT_IMAGE_QUALITY));
+      return u.toString();
+    }
+  }catch(error){
+    console.warn('이미지 최적화 URL 변환 실패:',error);
   }
-  return value;
+
+  return raw;
 }
 
-function fallbackOriginalImage(img){
-  if(!img)return;
-  const original=img.getAttribute('data-original-src')||'';
-  if(original&&img.src!==original){
-    img.onerror=null;
-    img.src=original;
-  }
+function productImageTag(url,name,className=''){
+  const original=String(url||'').trim();
+  const optimized=optimizeProductImageUrl(original);
+  if(!optimized)return '';
+  const fallback=original&&original!==optimized
+    ? ` data-original="${escapeHtml(original)}" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src=this.dataset.original;}"`
+    : '';
+  return `<img${className?` class="${escapeHtml(className)}"`:''} src="${escapeHtml(optimized)}" alt="${escapeHtml(name)}" loading="lazy" decoding="async"${fallback}>`;
 }
 
 function showSection(id,btn){
@@ -723,7 +740,7 @@ function qtyBox(type,id){
 function productCard(p){
   return `
   <div class="card">
-    <img src="${escapeHtml(getFastImageUrl(p.img))}" data-original-src="${escapeHtml(p.img)}" onerror="fallbackOriginalImage(this)" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async">
+    ${productImageTag(p.img,p.name)}
     <div class="card-body">
       <div class="name">${escapeHtml(p.name)}</div>
       <div class="price">${escapeHtml(p.price)}</div>
@@ -749,7 +766,7 @@ function generalRow(p){
 function groupCard(p){
   return `
   <div class="card">
-    <img src="${escapeHtml(getFastImageUrl(p.img))}" data-original-src="${escapeHtml(p.img)}" onerror="fallbackOriginalImage(this)" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async">
+    ${productImageTag(p.img,p.name)}
     <div class="card-body">
       <div class="name">${escapeHtml(p.name)}</div>
       <div class="group-info">
@@ -1146,7 +1163,7 @@ function renderCart(){
       : '가격 미입력 · 수량 '+item.qty+'개';
 
     const imageHtml=item.img
-      ? '<img class="order-cart-thumb" src="'+escapeHtml(getFastImageUrl(item.img))+'" data-original-src="'+escapeHtml(item.img)+'" onerror="fallbackOriginalImage(this)" alt="'+escapeHtml(item.name)+'">'
+      ? productImageTag(item.img,item.name,'order-cart-thumb')
       : '';
 
     return '<div class="order-cart-row '+(item.img?'':'no-image')+'">'
@@ -1397,7 +1414,7 @@ async function loadMainBanners(){
       if(row.image_url){
         banner.style.setProperty(
           '--banner-image',
-          'url("'+String(getFastImageUrl(row.image_url)).replace(/"/g,'%22')+'")'
+          'url("'+String(row.image_url).replace(/"/g,'%22')+'")'
         );
       }else{
         banner.style.setProperty('--banner-image','none');
