@@ -67,6 +67,12 @@
       "source": "/mart-open",
 
       "destination": "/mart-open.html"
+    },
+
+    {
+      "source": "/74",
+
+      "destination": "/74.html"
     }
 
   ]
