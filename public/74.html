@@ -660,41 +660,10 @@ function escapeHtml(value){
     .replace(/'/g,'&#039;');
 }
 
-/* 상품 이미지 속도개선: 800px / 약 200KB 이하 목표
-   Supabase Storage 공개 이미지는 Image Transformation URL로 요청하고,
-   변환이 지원되지 않는 URL은 기존 원본 URL을 그대로 사용합니다. */
-const PRODUCT_IMAGE_WIDTH=800;
-const PRODUCT_IMAGE_QUALITY=45;
-
-function optimizeProductImageUrl(value){
-  const raw=String(value||'').trim();
-  if(!raw)return '';
-
-  try{
-    const u=new URL(raw,location.href);
-    const marker='/storage/v1/object/public/';
-    if(u.hostname.endsWith('.supabase.co')&&u.pathname.includes(marker)){
-      u.pathname=u.pathname.replace(marker,'/storage/v1/render/image/public/');
-      u.searchParams.set('width',String(PRODUCT_IMAGE_WIDTH));
-      u.searchParams.set('resize','contain');
-      u.searchParams.set('quality',String(PRODUCT_IMAGE_QUALITY));
-      return u.toString();
-    }
-  }catch(error){
-    console.warn('이미지 최적화 URL 변환 실패:',error);
-  }
-
-  return raw;
-}
-
 function productImageTag(url,name,className=''){
-  const original=String(url||'').trim();
-  const optimized=optimizeProductImageUrl(original);
-  if(!optimized)return '';
-  const fallback=original&&original!==optimized
-    ? ` data-original="${escapeHtml(original)}" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src=this.dataset.original;}"`
-    : '';
-  return `<img${className?` class="${escapeHtml(className)}"`:''} src="${escapeHtml(optimized)}" alt="${escapeHtml(name)}" loading="lazy" decoding="async"${fallback}>`;
+  const imageUrl=String(url||'').trim();
+  if(!imageUrl)return '';
+  return `<img${className?` class="${escapeHtml(className)}"`:''} src="${escapeHtml(imageUrl)}" alt="${escapeHtml(name)}" loading="lazy" decoding="async">`;
 }
 
 function showSection(id,btn){
