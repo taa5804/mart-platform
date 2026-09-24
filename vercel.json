@@ -73,6 +73,12 @@
       "source": "/74",
 
       "destination": "/74.html"
+    },
+
+    {
+      "source": "/broker-sitemap.xml",
+
+      "destination": "/api/broker-sitemap"
     }
 
   ]
