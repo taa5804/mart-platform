@@ -5,8 +5,8 @@
   --------------------------------
   - 기존 apt-page.js 수정 없음
   - 기존 마트 API 수정 없음
-  - agent_directory에서 전국 동 단위 조회
-  - 도로명주소 / 지번주소에서 동 단위 생성
+  - agent_directory에서 전국 중개사 조회
+  - 지번주소 / 도로명주소에서 동 단위 생성
   - 1000개씩 끝까지 조회
   - 중복 동 제거
   - 최종 URL:
@@ -16,8 +16,8 @@
 const SUPABASE_URL =
   "https://wpshlmijsscmlasqtapa.supabase.co";
 
-const SUPABASE_KEY =
-  "sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K";
+const SUPABASE_SECRET_KEY =
+  process.env.SUPABASE_SECRET_KEY;
 
 const SITE_ORIGIN =
   "https://www.wooriapt.app";
@@ -64,6 +64,11 @@ function getLocationFromAddress(row) {
   const jibunAddress =
     clean(row["지번주소"]);
 
+  /*
+    동 단위 추출은 지번주소 우선.
+    지번주소가 없으면 도로명주소 사용.
+  */
+
   const address =
     jibunAddress ||
     roadAddress;
@@ -91,12 +96,11 @@ function getLocationFromAddress(row) {
   const city =
     clean(parts[1]);
 
-
   let place = "";
 
 
   /*
-    지번주소에서 동 / 읍 / 면을 우선 탐색
+    주소에서 동 / 읍 / 면 탐색
   */
 
   for (
@@ -120,8 +124,8 @@ function getLocationFromAddress(row) {
 
 
   /*
-    지번주소에 동 정보가 없으면
-    도로명주소에서도 확인
+    지번주소에서 찾지 못했을 경우
+    도로명주소에서도 한 번 확인
   */
 
   if (
@@ -173,10 +177,17 @@ function getLocationFromAddress(row) {
 
 
 /* =========================================
-   중개사 전국 데이터 조회
+   전국 중개사 동 단위 조회
 ========================================= */
 
 async function getAllBrokerLocations() {
+  if (!SUPABASE_SECRET_KEY) {
+    throw new Error(
+      "SUPABASE_SECRET_KEY environment variable is missing."
+    );
+  }
+
+
   const locationSet =
     new Set();
 
@@ -216,11 +227,11 @@ async function getAllBrokerLocations() {
 
           headers: {
             apikey:
-              SUPABASE_KEY,
+              SUPABASE_SECRET_KEY,
 
             Authorization:
               "Bearer " +
-              SUPABASE_KEY,
+              SUPABASE_SECRET_KEY,
 
             Accept:
               "application/json"
