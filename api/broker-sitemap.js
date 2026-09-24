@@ -14,10 +14,10 @@
 */
 
 const SUPABASE_URL =
-  "https://dcysjuxyjqtvkihdsjvv.supabase.co";
+  "https://wpshlmjjsscmlasqtapa.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
+  "sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K";
 
 const SITE_ORIGIN =
   "https://www.wooriapt.app";
