@@ -14,7 +14,7 @@
 */
 
 const SUPABASE_URL =
-  "https://wpshlmjjsscmlasqtapa.supabase.co";
+  "https://wpshlmijsscmlasqtapa.supabase.co";
 
 const SUPABASE_KEY =
   "sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K";
