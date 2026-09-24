@@ -6,7 +6,7 @@
   - 기존 apt-page.js 수정 없음
   - 기존 마트 API 수정 없음
   - agent_directory에서 전국 동 단위 조회
-  - 시도 / 시군구 / 읍면동 기준
+  - 도로명주소 / 지번주소에서 동 단위 생성
   - 1000개씩 끝까지 조회
   - 중복 동 제거
   - 최종 URL:
@@ -14,10 +14,10 @@
 */
 
 const SUPABASE_URL =
-  "https://dcysjuxyjqtvkihdsjvv.supabase.co";
+  "https://wpshlmjjsscmlasqtapa.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
+  "sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K";
 
 const SITE_ORIGIN =
   "https://www.wooriapt.app";
@@ -54,7 +54,126 @@ function xmlEscape(value) {
 
 
 /* =========================================
-   중개사 동 단위 전체 조회
+   주소에서 시도 / 시군구 / 읍면동 추출
+========================================= */
+
+function getLocationFromAddress(row) {
+  const roadAddress =
+    clean(row["도로명주소"]);
+
+  const jibunAddress =
+    clean(row["지번주소"]);
+
+  const address =
+    jibunAddress ||
+    roadAddress;
+
+
+  if (!address) {
+    return null;
+  }
+
+
+  const parts =
+    address
+      .split(/\s+/)
+      .filter(Boolean);
+
+
+  if (parts.length < 3) {
+    return null;
+  }
+
+
+  const region =
+    clean(parts[0]);
+
+  const city =
+    clean(parts[1]);
+
+
+  let place = "";
+
+
+  /*
+    지번주소에서 동 / 읍 / 면을 우선 탐색
+  */
+
+  for (
+    let i = 2;
+    i < parts.length;
+    i++
+  ) {
+    const value =
+      clean(parts[i]);
+
+
+    if (
+      value.endsWith("동") ||
+      value.endsWith("읍") ||
+      value.endsWith("면")
+    ) {
+      place = value;
+      break;
+    }
+  }
+
+
+  /*
+    지번주소에 동 정보가 없으면
+    도로명주소에서도 확인
+  */
+
+  if (
+    !place &&
+    roadAddress
+  ) {
+    const roadParts =
+      roadAddress
+        .split(/\s+/)
+        .filter(Boolean);
+
+
+    for (
+      let i = 2;
+      i < roadParts.length;
+      i++
+    ) {
+      const value =
+        clean(roadParts[i]);
+
+
+      if (
+        value.endsWith("동") ||
+        value.endsWith("읍") ||
+        value.endsWith("면")
+      ) {
+        place = value;
+        break;
+      }
+    }
+  }
+
+
+  if (
+    !region ||
+    !city ||
+    !place
+  ) {
+    return null;
+  }
+
+
+  return {
+    region,
+    city,
+    place
+  };
+}
+
+
+/* =========================================
+   중개사 전국 데이터 조회
 ========================================= */
 
 async function getAllBrokerLocations() {
@@ -71,13 +190,7 @@ async function getAllBrokerLocations() {
 
     query.set(
       "select",
-      "시도,시군구,읍면동"
-    );
-
-
-    query.set(
-      "order",
-      "시도.asc,시군구.asc,읍면동.asc"
+      "도로명주소,지번주소"
     );
 
 
@@ -144,38 +257,20 @@ async function getAllBrokerLocations() {
     for (
       const row of rows
     ) {
-      const region =
-        clean(
-          row["시도"]
-        );
+      const location =
+        getLocationFromAddress(row);
 
 
-      const city =
-        clean(
-          row["시군구"]
-        );
-
-
-      const place =
-        clean(
-          row["읍면동"]
-        );
-
-
-      if (
-        !region ||
-        !city ||
-        !place
-      ) {
+      if (!location) {
         continue;
       }
 
 
       locationSet.add(
         [
-          region,
-          city,
-          place
+          location.region,
+          location.city,
+          location.place
         ].join("|")
       );
     }
