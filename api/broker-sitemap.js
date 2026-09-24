@@ -1,14 +1,12 @@
 "use strict";
 
 /*
-  공인중개사 전용 동 단위 사이트맵
+  공인중개사 동 단위 사이트맵
   --------------------------------
-  - 기존 apt-page.js 수정 없음
-  - 기존 마트 API 수정 없음
-  - agent_directory에서 전국 중개사 조회
-  - 지번주소 / 도로명주소에서 동 단위 생성
-  - 1000개씩 끝까지 조회
-  - 중복 동 제거
+  - agent_directory 사용
+  - 전국 중개사 데이터를 읽음
+  - 주소에서 시도 / 시군구 / 읍면동 추출
+  - 같은 동은 1개 URL만 생성
   - 최종 URL:
     https://www.wooriapt.app/broker-search/시도/시군구/읍면동
 */
@@ -25,9 +23,9 @@ const SITE_ORIGIN =
 const BATCH_SIZE = 1000;
 
 
-/* =========================================
-   공통 함수
-========================================= */
+/* =========================
+   기본 함수
+========================= */
 
 function clean(value) {
   return String(value || "")
@@ -53,26 +51,26 @@ function xmlEscape(value) {
 }
 
 
-/* =========================================
-   주소에서 시도 / 시군구 / 읍면동 추출
-========================================= */
+/* =========================
+   주소 → 동 단위 추출
+========================= */
 
 function getLocationFromAddress(row) {
-  const roadAddress =
-    clean(row["도로명주소"]);
 
   const jibunAddress =
     clean(row["지번주소"]);
 
+  const roadAddress =
+    clean(row["도로명주소"]);
+
   /*
-    동 단위 추출은 지번주소 우선.
-    지번주소가 없으면 도로명주소 사용.
+    동 단위 판별은 지번주소 우선.
+    지번주소가 없을 경우 도로명주소 사용.
   */
 
   const address =
     jibunAddress ||
     roadAddress;
-
 
   if (!address) {
     return null;
@@ -93,24 +91,32 @@ function getLocationFromAddress(row) {
   const region =
     clean(parts[0]);
 
-  const city =
-    clean(parts[1]);
 
+  /*
+    서울특별시 강남구 역삼동
+    경기도 성남시 분당구 정자동
+    세종특별자치시 조치원읍 ...
+    등의 형태를 처리
+  */
+
+  let city = "";
   let place = "";
 
 
   /*
-    주소에서 동 / 읍 / 면 탐색
+    읍 / 면 / 동 위치 검색
   */
 
+  let placeIndex = -1;
+
   for (
-    let i = 2;
+    let i = 1;
     i < parts.length;
     i++
   ) {
+
     const value =
       clean(parts[i]);
-
 
     if (
       value.endsWith("동") ||
@@ -118,44 +124,39 @@ function getLocationFromAddress(row) {
       value.endsWith("면")
     ) {
       place = value;
+      placeIndex = i;
       break;
     }
   }
 
 
+  if (!place) {
+    return null;
+  }
+
+
   /*
-    지번주소에서 찾지 못했을 경우
-    도로명주소에서도 한 번 확인
+    읍면동 앞까지를 시군구로 사용
+
+    서울특별시 강남구 역삼동
+    → 강남구
+
+    경기도 성남시 분당구 정자동
+    → 성남시 분당구
   */
 
-  if (
-    !place &&
-    roadAddress
-  ) {
-    const roadParts =
-      roadAddress
-        .split(/\s+/)
-        .filter(Boolean);
+  if (placeIndex > 1) {
 
+    city =
+      parts
+        .slice(1, placeIndex)
+        .join(" ");
 
-    for (
-      let i = 2;
-      i < roadParts.length;
-      i++
-    ) {
-      const value =
-        clean(roadParts[i]);
+  } else {
 
+    city =
+      clean(parts[1]);
 
-      if (
-        value.endsWith("동") ||
-        value.endsWith("읍") ||
-        value.endsWith("면")
-      ) {
-        place = value;
-        break;
-      }
-    }
   }
 
 
@@ -176,11 +177,12 @@ function getLocationFromAddress(row) {
 }
 
 
-/* =========================================
-   전국 중개사 동 단위 조회
-========================================= */
+/* =========================
+   Supabase 데이터 조회
+========================= */
 
 async function getAllBrokerLocations() {
+
   if (!SUPABASE_SECRET_KEY) {
     throw new Error(
       "SUPABASE_SECRET_KEY environment variable is missing."
@@ -191,10 +193,12 @@ async function getAllBrokerLocations() {
   const locationSet =
     new Set();
 
+
   let offset = 0;
 
 
   while (true) {
+
     const query =
       new URLSearchParams();
 
@@ -226,6 +230,7 @@ async function getAllBrokerLocations() {
           method: "GET",
 
           headers: {
+
             apikey:
               SUPABASE_SECRET_KEY,
 
@@ -241,6 +246,7 @@ async function getAllBrokerLocations() {
 
 
     if (!response.ok) {
+
       const errorText =
         await response.text();
 
@@ -268,6 +274,7 @@ async function getAllBrokerLocations() {
     for (
       const row of rows
     ) {
+
       const location =
         getLocationFromAddress(row);
 
@@ -276,6 +283,10 @@ async function getAllBrokerLocations() {
         continue;
       }
 
+
+      /*
+        같은 동은 하나만 저장
+      */
 
       locationSet.add(
         [
@@ -286,6 +297,10 @@ async function getAllBrokerLocations() {
       );
     }
 
+
+    /*
+      마지막 페이지
+    */
 
     if (
       rows.length < BATCH_SIZE
@@ -305,15 +320,16 @@ async function getAllBrokerLocations() {
 }
 
 
-/* =========================================
-   사이트맵 API
-========================================= */
+/* =========================
+   사이트맵 생성
+========================= */
 
 module.exports =
 async function handler(
   req,
   res
 ) {
+
   res.setHeader(
     "Content-Type",
     "application/xml; charset=utf-8"
@@ -327,6 +343,7 @@ async function handler(
 
 
   try {
+
     const locations =
       await getAllBrokerLocations();
 
@@ -341,41 +358,14 @@ async function handler(
 
 
     /*
-      중개사 안내 페이지
-    */
-
-    urls.push(
-      [
-        "  <url>",
-
-        "    <loc>" +
-          xmlEscape(
-            SITE_ORIGIN +
-            "/broker-guide.html"
-          ) +
-        "</loc>",
-
-        "    <lastmod>" +
-          lastmod +
-        "</lastmod>",
-
-        "    <changefreq>weekly</changefreq>",
-
-        "    <priority>0.9</priority>",
-
-        "  </url>"
-      ].join("\n")
-    );
-
-
-    /*
-      전국 동 단위 중개사 검색 페이지
+      동 단위 URL 생성
     */
 
     for (
       const locationKey
       of locations
     ) {
+
       const parts =
         locationKey.split("|");
 
@@ -433,7 +423,9 @@ async function handler(
       .status(200)
       .send(xml);
 
+
   } catch (error) {
+
     console.error(
       "BROKER SITEMAP ERROR:",
       error
