@@ -15,26 +15,24 @@
 
 <title>자동차 QR iPhone 등록</title>
 
+<link rel="manifest" id="appManifest" href="/api/iphone-manifest">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png">
+
 <script>
 (function () {
-  const params =
-    new URLSearchParams(window.location.search);
-
-  const registrationKey =
-    String(params.get("reg") || "").trim();
-
-  const manifest =
-    document.createElement("link");
-
-  manifest.rel = "manifest";
-
-  manifest.href =
-    registrationKey
-      ? "/api/iphone-manifest?reg=" +
-        encodeURIComponent(registrationKey)
-      : "/api/iphone-manifest";
-
-  document.head.appendChild(manifest);
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const reg = String(params.get("reg") || "").trim();
+    if (reg) {
+      const manifest = document.getElementById("appManifest");
+      if (manifest) {
+        manifest.href = "/api/iphone-manifest?reg=" + encodeURIComponent(reg);
+      }
+    }
+  } catch (e) {}
 })();
 </script>
 
@@ -232,7 +230,7 @@ button:disabled{
 
 
 <section id="errorCard" class="card">
-  <h1>등록할 수 없습니다</h1>
+  <h1>등록할 수 없습���다</h1>
   <p id="errorText"></p>
 </section>
 
@@ -704,6 +702,15 @@ registerBtn.addEventListener(
         );
       }
 
+      try {
+        localStorage.setItem("wooriapt_ios_reg_key", newRegistrationKey);
+        localStorage.setItem("wooriapt_ios_qr_code", qrCode);
+        localStorage.setItem("wooriapt_ios_phone", ownerPhone);
+        if (data.store_id) {
+          localStorage.setItem("wooriapt_store_id", String(data.store_id));
+        }
+      } catch (e) {}
+
       const nextUrl =
         "/72-iphone.html" +
         "?qr=" +
@@ -849,7 +856,7 @@ pushBtn.addEventListener(
         pushStatus,
         error instanceof Error
           ? error.message
-          : "자동차 등록에 실패했습니다.",
+          : "자동차 등록에 실패했습���다.",
         "error"
       );
     }
@@ -861,12 +868,27 @@ pushBtn.addEventListener(
 
 (async function start() {
   /*
-   * 홈 화면에 설치된 앱
+   * 홈 화면에 설치된 앱 (Standalone PWA)
    */
   if (isStandalone()) {
-    if (!registrationKey) {
+    let activeKey =
+      registrationKey ||
+      localStorage.getItem("wooriapt_ios_reg_key") ||
+      "";
+
+    if (!activeKey) {
+      const cachedQr = localStorage.getItem("wooriapt_ios_qr_code");
+      const cachedPhone = localStorage.getItem("wooriapt_ios_phone");
+      if (cachedQr && cachedPhone) {
+        qrCode = cleanQr(cachedQr);
+        ownerPhone = normalizePhone(cachedPhone);
+        showCard(pushCard);
+        prepareServiceWorker().catch(() => {});
+        return;
+      }
+
       showError(
-        "아이폰 등록정보를 확인할 수 없습니다."
+        "아이폰 등록정보를 확인할 수 없습니다. QR 코드를 다시 스캔해 주세요."
       );
 
       return;
@@ -877,9 +899,8 @@ pushBtn.addEventListener(
      * 다시 묻지 않고 바로 마트 플랫폼으로 이동
      */
     if (
-      localStorage.getItem(
-        completedStorageKey()
-      ) === "1"
+      localStorage.getItem(completedStorageKey()) === "1" ||
+      localStorage.getItem("wooriapt_ios_vehicle_completed_" + activeKey) === "1"
     ) {
       openMartPlatform();
       return;
@@ -888,7 +909,7 @@ pushBtn.addEventListener(
     try {
       const data =
         await restoreRegistration(
-          registrationKey
+          activeKey
         );
 
       qrCode =
@@ -909,8 +930,19 @@ pushBtn.addEventListener(
       }
 
       showCard(pushCard);
+      prepareServiceWorker().catch(() => {});
 
     } catch (error) {
+      const cachedQr = localStorage.getItem("wooriapt_ios_qr_code");
+      const cachedPhone = localStorage.getItem("wooriapt_ios_phone");
+      if (cachedQr && cachedPhone) {
+        qrCode = cleanQr(cachedQr);
+        ownerPhone = normalizePhone(cachedPhone);
+        showCard(pushCard);
+        prepareServiceWorker().catch(() => {});
+        return;
+      }
+
       showError(
         error instanceof Error
           ? error.message
@@ -921,7 +953,6 @@ pushBtn.addEventListener(
     return;
   }
 
-
   /*
    * 전화번호 등록이 끝난 Safari 화면
    */
@@ -929,7 +960,6 @@ pushBtn.addEventListener(
     showCard(installCard);
     return;
   }
-
 
   /*
    * 처음 QR을 스캔한 화면
