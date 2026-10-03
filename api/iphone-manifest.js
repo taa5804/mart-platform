@@ -6,22 +6,30 @@ module.exports = async (req, res) => {
     });
   }
 
-  const registrationKey = String(
-    req.query.reg || ""
-  )
+  let registrationKey = String(req.query.reg || "")
     .trim()
     .toLowerCase();
 
+  if (!registrationKey && req.headers && req.headers.referer) {
+    try {
+      const refUrl = new URL(req.headers.referer);
+      registrationKey = String(refUrl.searchParams.get("reg") || "")
+        .trim()
+        .toLowerCase();
+    } catch (e) {}
+  }
+
   const validRegistrationKey =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-      .test(registrationKey);
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      registrationKey
+    );
 
   const startUrl = validRegistrationKey
-    ? `/mart-open.html?reg=${encodeURIComponent(registrationKey)}`
-    : "/mart-open.html";
+    ? `/72-iphone.html?reg=${encodeURIComponent(registrationKey)}`
+    : "/72-iphone.html";
 
   const manifest = {
-    id: "/woorigage-app",
+    id: "/woorigage-vehicle-app",
     name: "우리가게",
     short_name: "우리가게",
     description: "마트 행사와 차량이동 알림 앱",
@@ -52,16 +60,12 @@ module.exports = async (req, res) => {
     "Content-Type",
     "application/manifest+json; charset=utf-8"
   );
-
   res.setHeader(
     "Cache-Control",
     "no-store, no-cache, must-revalidate, max-age=0"
   );
-
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
 
-  return res.status(200).send(
-    JSON.stringify(manifest)
-  );
+  return res.status(200).send(JSON.stringify(manifest));
 };
