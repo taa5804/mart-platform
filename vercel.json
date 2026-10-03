@@ -1,86 +1,79 @@
 {
   "cleanUrls": false,
-
   "trailingSlash": false,
-
   "headers": [
-
     {
       "source": "/firebase-messaging-sw.js",
-
       "headers": [
-
         {
           "key": "Service-Worker-Allowed",
-
           "value": "/"
         },
-
         {
           "key": "Cache-Control",
-
           "value": "no-cache, no-store, must-revalidate"
         }
-
       ]
-
     },
-
     {
       "source": "/mart-manifest.webmanifest",
-
       "headers": [
-
         {
           "key": "Content-Type",
-
           "value": "application/manifest+json"
         },
-
         {
           "key": "Cache-Control",
-
           "value": "no-cache, no-store, must-revalidate"
         }
-
       ]
-
+    },
+    {
+      "source": "/android-manifest.webmanifest",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
     }
-
   ],
-
   "rewrites": [
-
     {
       "source": "/",
-
       "destination": "/index.html"
     },
-
     {
       "source": "/mart",
-
       "destination": "/mart.html"
     },
-
     {
       "source": "/mart-open",
-
       "destination": "/mart-open.html"
     },
-
+    {
+      "source": "/72",
+      "destination": "/72.html"
+    },
+    {
+      "source": "/72-android",
+      "destination": "/72-android.html"
+    },
+    {
+      "source": "/72-iphone",
+      "destination": "/72-iphone.html"
+    },
     {
       "source": "/74",
-
       "destination": "/74.html"
     },
-
     {
       "source": "/broker-sitemap.xml",
-
       "destination": "/api/broker-sitemap"
     }
-
   ]
-
 }
