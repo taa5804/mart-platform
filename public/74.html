@@ -142,9 +142,14 @@
 
     #store74App .photo-wrap{
       position:relative;
-      aspect-ratio:1/1;
+      aspect-ratio:4/3;
       background:#f3f4f6;
       overflow:hidden;
+    }
+    @media (max-width:640px){
+      #store74App .photo-wrap{
+        aspect-ratio:1/1;
+      }
     }
 
     #store74App .photo-wrap img{
