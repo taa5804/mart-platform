@@ -3,659 +3,2849 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>[마트 사장님 전용] 마트 고객유치 · 마트 매출올리기 · 마트 고객DB 확보 계산기 | 우리아파트</title>
-  <meta name="description" content="포스(POS) 교체 0원! 우리아파트 입주민 직통 연계로 마트 고객유치, 마트 매출올리기, 단골 고객DB 자동 확보! 연간 문자비 1,440만 원 절감 실시간 계산기.">
-  <meta name="keywords" content="마트 고객유치, 마트 매출올리기, 마트 DB확보, 마트 고객DB, 마트 단골확보, 마트 문자비용 절약, 포스 고객관리, 우리아파트 마트">
-  <link rel="canonical" href="https://www.wooriapt.app/mart">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="[마트 사장님 필수] 우리가게 마트 팩트 경영 계산기">
-  <meta property="og:description" content="기존 포스 고객 5,000명 기준 연간 1,440만 원 순이익 절감 확정! 지금 바로 우리 마트 비용을 실시간 비교해보세요.">
-  <meta property="og:url" content="https://www.wooriapt.app/mart">
-  <meta property="og:image" content="https://www.wooriapt.app/mart-landing-bg.png">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-    body {
-      background-color: #f1f5f9;
-      color: #1e293b;
-      display: flex;
-      justify-content: center;
-      padding: 16px 12px 60px;
-    }
-    .container {
-      width: 100%;
-      max-width: 480px;
-      background: #ffffff;
-      border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      padding: 22px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      border: 1px solid #e2e8f0;
-    }
-    .top-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .top-nav-btn {
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 800;
-      font-size: 13px;
-      padding: 7px 13px;
-      border-radius: 12px;
-      transition: all 0.2s ease;
-    }
-    .top-nav-home {
-      color: #0f172a;
-      background: #f8fafc;
-      border: 1.5px solid #cbd5e1;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    }
-    .top-nav-price {
-      color: #059669;
-      background: #ecfdf5;
-      border: 1px solid #a7f3d0;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    }
-    .badge-bar {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      background: #edfdf2;
-      border: 1px solid #bbf7d0;
-      color: #166534;
-      border-radius: 20px;
-      padding: 5px 12px;
-      font-size: 11.5px;
-      font-weight: 800;
-      margin: 0 auto;
-      width: fit-content;
-    }
-    .header {
-      text-align: center;
-    }
-    .header h1 {
-      font-size: 22px;
-      font-weight: 900;
-      color: #0f172a;
-      letter-spacing: -0.5px;
-      margin-bottom: 5px;
-      line-height: 1.3;
-    }
-    .header p {
-      font-size: 13px;
-      color: #64748b;
-      font-weight: 600;
-      line-height: 1.4;
-    }
-    .pos-bypass-box {
-      background: #eff6ff;
-      border: 1.5px solid #bfdbfe;
-      border-radius: 14px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    .pos-bypass-icon {
-      font-size: 20px;
-      line-height: 1;
-      margin-top: 2px;
-    }
-    .pos-bypass-text {
-      font-size: 12.5px;
-      color: #1e40af;
-      line-height: 1.45;
-    }
-    .pos-bypass-text strong {
-      color: #1d4ed8;
-      font-weight: 800;
-    }
-    .compare-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .card {
-      border-radius: 16px;
-      padding: 14px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 11px;
-    }
-    .card-agency {
-      background: #f8fafc;
-      border: 1.5px solid #cbd5e1;
-    }
-    .card-platform {
-      background: #f0fdf4;
-      border: 1.5px solid #86efac;
-    }
-    .card-title {
-      font-size: 13.5px;
-      font-weight: 800;
-      text-align: center;
-      padding-bottom: 7px;
-      border-bottom: 2px solid;
-    }
-    .card-agency .card-title {
-      color: #475569;
-      border-color: #f87171;
-    }
-    .card-platform .card-title {
-      color: #15803d;
-      border-color: #22c55e;
-    }
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .input-group label {
-      font-size: 11.5px;
-      font-weight: 700;
-      color: #475569;
-      text-align: center;
-    }
-    .input-box {
-      background: #ffffff;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 10px;
-      padding: 7px 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-    .card-platform .input-box {
-      border-color: #86efac;
-    }
-    .input-box:focus-within {
-      border-color: #10b981;
-      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-    }
-    .input-box input {
-      width: 100%;
-      border: none;
-      outline: none;
-      font-size: 14px;
-      font-weight: 800;
-      text-align: center;
-      color: #0f172a;
-      background: transparent;
-    }
-    .card-subtotal {
-      margin-top: auto;
-      padding-top: 8px;
-      border-top: 1px dashed #cbd5e1;
-      text-align: center;
-      font-size: 11.5px;
-      font-weight: 700;
-      color: #334155;
-    }
-    .card-subtotal span {
-      display: block;
-      font-size: 15px;
-      font-weight: 900;
-      color: #e11d48;
-      margin-top: 2px;
-    }
-    .card-platform .card-subtotal span {
-      color: #16a34a;
-    }
-    .result-banner {
-      background: linear-gradient(135deg, #059669 0%, #047857 100%);
-      border-radius: 16px;
-      padding: 16px 14px;
-      text-align: center;
-      color: #ffffff;
-      box-shadow: 0 8px 20px rgba(5, 150, 105, 0.25);
-    }
-    .result-banner-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.9);
-      margin-bottom: 2px;
-    }
-    .result-banner-value {
-      font-size: 23px;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-      color: #ffffff;
-      margin-bottom: 4px;
-    }
-    .result-banner-sub {
-      font-size: 11.5px;
-      font-weight: 600;
-      color: #d1fae5;
-    }
-    .engine-section {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 14px 12px;
-    }
-    .engine-title {
-      font-size: 12.5px;
-      font-weight: 800;
-      color: #334155;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    .engine-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 7px;
-    }
-    .engine-card {
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 12px;
-      padding: 10px 6px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      text-decoration: none;
-      transition: all 0.2s ease;
-    }
-    .engine-card:active {
-      transform: scale(0.97);
-    }
-    .engine-num {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #cbd5e1;
-      color: #1e293b;
-      font-size: 11px;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .engine-main {
-      font-size: 11.5px;
-      font-weight: 800;
-      color: #0f172a;
-      line-height: 1.3;
-    }
-    .engine-desc {
-      font-size: 10px;
-      font-weight: 700;
-      color: #059669;
-      margin-top: 1px;
-    }
-    .sales-boost-banner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 13px 15px;
-      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-      border: 1.5px solid #93c5fd;
-      border-radius: 14px;
-      text-decoration: none;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
-      transition: all 0.2s ease;
-    }
-    .sales-boost-banner:active {
-      transform: scale(0.98);
-      background: #bfdbfe;
-    }
-    .btn-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .cta-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      background: linear-gradient(135deg, #00aa4b 0%, #008f3f 100%);
-      color: #ffffff;
-      text-decoration: none;
-      text-align: center;
-      font-size: 16.5px;
-      font-weight: 900;
-      padding: 15px 12px;
-      border-radius: 30px;
-      box-shadow: 0 8px 20px rgba(0, 170, 75, 0.3);
-      transition: all 0.2s ease;
-      letter-spacing: -0.3px;
-    }
-    .cta-btn:active {
-      transform: scale(0.98);
-      background: #007a36;
-    }
-    .share-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      width: 100%;
-      background: #fee500;
-      color: #191919;
-      border: none;
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 14px;
-      font-weight: 800;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .share-btn:active {
-      transform: scale(0.98);
-      background: #ebd200;
-    }
-    .footer-note {
-      text-align: center;
-      font-size: 11px;
-      color: #94a3b8;
-      line-height: 1.45;
-    }
-    .bottom-home-bar {
-      text-align: center;
-      padding-top: 10px;
-      border-top: 1px dashed #cbd5e1;
-    }
-    .bottom-home-btn {
-      color: #475569;
-      font-size: 12.5px;
-      font-weight: 800;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 7px 15px;
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      border-radius: 20px;
-      transition: all 0.2s ease;
-    }
-  </style>
-<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"[마트 사장님 전용] 마트 고객유치 · 마트 매출올리기 · 마트 고객DB 확보 계산기 | 우리아파트","description":"포스(POS) 교체 0원! 우리아파트 입주민 직통 연계로 마트 고객유치, 마트 매출올리기, 단골 고객DB 자동 확보! 연간 문자비 1,440만 원 절감 실시간 계산기.","url":"https://www.wooriapt.app/mart","isPartOf":{"@type":"WebSite","name":"우리아파트","url":"https://www.wooriapt.app/"}}</script>
+  <title>우리아파트 마트 플랫폼 | 마트 사장님 전용 메인</title>
+  <meta name="description" content="마트 사장님이 스스로 운영하고 성장하는 우리아파트 마트 플랫폼. 샘플보기, 오늘의 시세 매칭기, 가맹비 계산기.">
+  <link rel="icon" href="/icon-512.png">
 </head>
-<body>
+<body style="margin:0; padding:0; background:#f4f7fb;">
+<style>
+/* =========================================================
+   우리아파트 마트 플랫폼
+   아임웹 코드위젯 - 이미지 시안형 완성본
+========================================================= */
 
-  <div class="container">
+#wooriMartVisual,
+#wooriMartVisual *{
+  box-sizing:border-box;
+}
 
-  <!-- [농·축·수산 오늘의 시세 매칭페이지 바로가기 버튼] -->
-  <div style="margin: 0 auto 16px; max-width: 600px; padding: 0 4px; box-sizing: border-box;">
-    <a href="https://www.wooriapt.app/price" target="_blank" style="display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ffffff; padding: 15px 18px; border-radius: 18px; text-decoration: none; box-shadow: 0 6px 18px rgba(5, 150, 105, 0.28); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 26px; line-height: 1;">🍏</span>
+#wooriMartVisual{
+  --blue:#0c4fd7;
+  --blue2:#216ce9;
+  --blue3:#eaf4ff;
+  --deep:#092d78;
+  --green:#139451;
+  --text:#16243a;
+  --gray:#617086;
+  --line:#d9e5f5;
+
+  width:100%;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+
+  color:var(--text);
+  background:#fff;
+
+  font-family:
+  -apple-system,
+  BlinkMacSystemFont,
+  "Segoe UI",
+  "Noto Sans KR",
+  Arial,
+  sans-serif;
+}
+
+#wooriMartVisual button{
+  font-family:inherit;
+}
+
+#wooriMartVisual .wmv-inner{
+  width:min(1180px,calc(100% - 34px));
+  margin:0 auto;
+}
+
+
+/* =========================================================
+   상단
+========================================================= */
+
+#wooriMartVisual .wmv-header{
+  background:#fff;
+  border-bottom:1px solid #e4edf8;
+}
+
+#wooriMartVisual .wmv-header-inner{
+  min-height:66px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+#wooriMartVisual .wmv-logo{
+  display:flex;
+  align-items:center;
+  gap:9px;
+
+  font-size:22px;
+  font-weight:950;
+
+  color:var(--blue);
+  letter-spacing:-.7px;
+}
+
+#wooriMartVisual .wmv-logo-icon{
+  width:32px;
+  height:32px;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:10px;
+
+  color:white;
+  background:
+  linear-gradient(135deg,#0d4fd7,#3c88ff);
+
+  box-shadow:
+  0 7px 18px rgba(11,79,215,.22);
+}
+
+#wooriMartVisual .wmv-top-right{
+  display:flex;
+  gap:9px;
+  align-items:center;
+}
+
+
+#wooriMartVisual .wmv-app-install{
+  border:1px solid #9fbfed;
+  padding:11px 15px;
+  border-radius:8px;
+  background:#fff;
+  color:var(--blue);
+  font-size:14px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+#wooriMartVisual .wmv-join{
+  border:0;
+
+  padding:11px 19px;
+
+  border-radius:8px;
+
+  background:var(--blue);
+  color:white;
+
+  font-size:14px;
+  font-weight:900;
+
+  cursor:pointer;
+
+  box-shadow:
+  0 7px 16px rgba(11,79,215,.18);
+}
+
+#wooriMartVisual .wmv-menu{
+  width:39px;
+  height:39px;
+
+  border:0;
+  border-radius:9px;
+
+  background:#f1f6fc;
+
+  font-size:22px;
+
+  cursor:pointer;
+}
+
+
+/* =========================================================
+   HERO 배경
+========================================================= */
+
+#wooriMartVisual .wmv-hero{
+  position:relative;
+
+  background:
+  radial-gradient(
+    circle at 82% 18%,
+    rgba(87,161,255,.24),
+    transparent 30%
+  ),
+  radial-gradient(
+    circle at 13% 19%,
+    rgba(40,105,230,.10),
+    transparent 26%
+  ),
+  linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #f8fbff 45%,
+    #e9f5ff 100%
+  );
+
+  border-bottom:1px solid #e8f0fa;
+}
+
+#wooriMartVisual .wmv-hero:before{
+  content:"";
+
+  position:absolute;
+  inset:0;
+
+  pointer-events:none;
+
+  opacity:.45;
+
+  background-image:
+  linear-gradient(
+    rgba(17,90,200,.026) 1px,
+    transparent 1px
+  ),
+  linear-gradient(
+    90deg,
+    rgba(17,90,200,.026) 1px,
+    transparent 1px
+  );
+
+  background-size:28px 28px;
+}
+
+#wooriMartVisual .wmv-hero-inner{
+  position:relative;
+
+  padding:
+  48px 0
+  34px;
+}
+
+
+/* =========================================================
+   HERO 상단
+========================================================= */
+
+#wooriMartVisual .wmv-hero-main{
+  display:grid;
+
+  grid-template-columns:
+  .9fr
+  1.4fr;
+
+  gap:40px;
+
+  align-items:center;
+}
+
+#wooriMartVisual .wmv-small-title{
+  margin-bottom:10px;
+
+  color:var(--blue);
+
+  font-size:17px;
+  font-weight:900;
+}
+
+#wooriMartVisual .wmv-title{
+  margin:0;
+
+  font-size:42px;
+  line-height:1.18;
+
+  font-weight:950;
+
+  letter-spacing:-2px;
+}
+
+#wooriMartVisual .wmv-title span{
+  color:var(--blue);
+}
+
+#wooriMartVisual .wmv-description{
+  margin-top:17px;
+
+  color:#46566e;
+
+  font-size:15px;
+  line-height:1.75;
+}
+
+#wooriMartVisual .wmv-buttons{
+  margin-top:21px;
+
+  display:flex;
+  gap:9px;
+
+  flex-wrap:wrap;
+}
+
+#wooriMartVisual .wmv-main-btn,
+#wooriMartVisual .wmv-outline-btn{
+  min-height:47px;
+
+  padding:0 20px;
+
+  border-radius:8px;
+
+  font-size:14px;
+  font-weight:900;
+
+  cursor:pointer;
+}
+
+#wooriMartVisual .wmv-main-btn{
+  border:1px solid var(--blue);
+
+  color:#fff;
+
+  background:
+  linear-gradient(
+    135deg,
+    #0c4fd7,
+    #1767ed
+  );
+
+  box-shadow:
+  0 8px 18px rgba(11,79,215,.18);
+}
+
+#wooriMartVisual .wmv-outline-btn{
+  background:#fff;
+
+  border:1px solid #a9c6f1;
+
+  color:var(--blue);
+}
+
+
+/* =========================================================
+   사진형 4카드
+========================================================= */
+
+#wooriMartVisual .wmv-photo-grid{
+  display:grid;
+
+  grid-template-columns:repeat(4,1fr);
+
+  gap:9px;
+}
+
+#wooriMartVisual .wmv-photo-card{
+  min-width:0;
+
+  text-align:center;
+}
+
+#wooriMartVisual .wmv-photo{
+  height:205px;
+
+  position:relative;
+
+  overflow:hidden;
+
+  border-radius:15px;
+
+  box-shadow:
+  0 15px 30px rgba(23,66,120,.17);
+
+  border:1px solid rgba(255,255,255,.85);
+}
+
+
+/* =========================================================
+   자동차 사진형
+========================================================= */
+
+#wooriMartVisual .wmv-car{
+  background:
+  linear-gradient(
+    180deg,
+    #9ed2ef 0%,
+    #c8e5f5 50%,
+    #757f86 51%,
+    #555c61 100%
+  );
+}
+
+#wooriMartVisual .wmv-car:before{
+  content:"";
+
+  position:absolute;
+
+  width:150px;
+  height:61px;
+
+  left:50%;
+  top:88px;
+
+  transform:translateX(-50%);
+
+  border-radius:
+  45px 45px
+  18px 18px;
+
+  background:
+  linear-gradient(
+    180deg,
+    #e9eef2,
+    #a6afb5
+  );
+
+  box-shadow:
+  inset 0 -8px 12px rgba(20,30,40,.16);
+}
+
+#wooriMartVisual .wmv-car:after{
+  content:"QR";
+
+  position:absolute;
+
+  width:40px;
+  height:31px;
+
+  display:grid;
+  place-items:center;
+
+  left:50%;
+  top:111px;
+
+  transform:translateX(-50%);
+
+  background:#fff;
+
+  color:var(--blue);
+
+  font-size:12px;
+  font-weight:950;
+
+  border:3px dotted var(--blue);
+}
+
+#wooriMartVisual .wmv-car-window{
+  position:absolute;
+
+  width:83px;
+  height:37px;
+
+  left:50%;
+  top:64px;
+
+  transform:translateX(-50%);
+
+  border-radius:
+  29px 29px
+  7px 7px;
+
+  background:
+  linear-gradient(
+    180deg,
+    #6ca6ca,
+    #365d75
+  );
+}
+
+#wooriMartVisual .wmv-wheel1,
+#wooriMartVisual .wmv-wheel2{
+  position:absolute;
+
+  width:31px;
+  height:31px;
+
+  border-radius:50%;
+
+  background:#24313a;
+
+  top:134px;
+}
+
+#wooriMartVisual .wmv-wheel1{
+  left:27px;
+}
+
+#wooriMartVisual .wmv-wheel2{
+  right:27px;
+}
+
+
+/* =========================================================
+   디지털 화면 사진형
+========================================================= */
+
+#wooriMartVisual .wmv-digital{
+  background:
+  linear-gradient(
+    180deg,
+    #dcecf4,
+    #81919c
+  );
+}
+
+#wooriMartVisual .wmv-digital-screen{
+  position:absolute;
+
+  left:16px;
+  right:16px;
+  top:40px;
+
+  height:91px;
+
+  border:7px solid #283944;
+
+  border-radius:7px;
+
+  background:
+  radial-gradient(
+    circle at 83% 17%,
+    #6ca5ff,
+    transparent 30%
+  ),
+  linear-gradient(
+    135deg,
+    #1766dd,
+    #092966
+  );
+
+  color:white;
+
+  display:flex;
+  flex-direction:column;
+
+  justify-content:center;
+  align-items:center;
+
+  box-shadow:
+  0 9px 17px rgba(20,41,60,.25);
+}
+
+#wooriMartVisual .wmv-sale-small{
+  font-size:10px;
+  font-weight:800;
+}
+
+#wooriMartVisual .wmv-sale-big{
+  margin-top:3px;
+
+  color:#ffe85b;
+
+  font-size:17px;
+  font-weight:950;
+}
+
+#wooriMartVisual .wmv-sale-bar{
+  margin-top:6px;
+
+  padding:4px 10px;
+
+  border-radius:20px;
+
+  background:white;
+
+  color:var(--blue);
+
+  font-size:7px;
+  font-weight:900;
+}
+
+#wooriMartVisual .wmv-products{
+  position:absolute;
+
+  left:9px;
+  right:9px;
+  bottom:10px;
+
+  height:45px;
+
+  display:flex;
+  gap:5px;
+}
+
+#wooriMartVisual .wmv-products i{
+  flex:1;
+
+  border-radius:4px;
+}
+
+#wooriMartVisual .wmv-products i:nth-child(1){
+  background:#e9d94c;
+}
+
+#wooriMartVisual .wmv-products i:nth-child(2){
+  background:#f59262;
+}
+
+#wooriMartVisual .wmv-products i:nth-child(3){
+  background:#70c169;
+}
+
+#wooriMartVisual .wmv-products i:nth-child(4){
+  background:#e9c563;
+}
+
+#wooriMartVisual .wmv-products i:nth-child(5){
+  background:#73a8e9;
+}
+
+
+/* =========================================================
+   휴대폰 주문 사진형
+========================================================= */
+
+#wooriMartVisual .wmv-order{
+  background:
+  radial-gradient(
+    circle at 17% 18%,
+    rgba(255,255,255,.75),
+    transparent 24%
+  ),
+  linear-gradient(
+    135deg,
+    #ddecfb,
+    #84b8e9
+  );
+}
+
+#wooriMartVisual .wmv-phone{
+  width:104px;
+  height:186px;
+
+  position:absolute;
+
+  left:50%;
+  top:10px;
+
+  transform:translateX(-50%);
+
+  border-radius:19px;
+
+  padding:8px;
+
+  background:#17232c;
+
+  box-shadow:
+  0 12px 24px rgba(18,45,67,.35);
+}
+
+#wooriMartVisual .wmv-phone-screen{
+  width:100%;
+  height:100%;
+
+  overflow:hidden;
+
+  border-radius:12px;
+
+  background:#f8fbff;
+}
+
+#wooriMartVisual .wmv-phone-head{
+  padding:11px 4px 5px;
+
+  text-align:center;
+
+  color:var(--blue);
+
+  font-size:7px;
+  font-weight:950;
+}
+
+#wooriMartVisual .wmv-phone-banner{
+  margin:2px 7px 7px;
+
+  height:34px;
+
+  border-radius:7px;
+
+  background:#e9f4ff;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:#23579b;
+
+  font-size:7px;
+  font-weight:900;
+}
+
+#wooriMartVisual .wmv-phone-products{
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:5px;
+
+  padding:0 7px;
+}
+
+#wooriMartVisual .wmv-phone-product{
+  height:44px;
+
+  border:1px solid #d6e3f2;
+
+  border-radius:7px;
+
+  background:white;
+
+  position:relative;
+}
+
+#wooriMartVisual .wmv-phone-product:before{
+  content:"";
+
+  width:18px;
+  height:18px;
+
+  border-radius:50%;
+
+  position:absolute;
+
+  top:7px;
+  left:50%;
+
+  transform:translateX(-50%);
+
+  background:#75c669;
+}
+
+#wooriMartVisual .wmv-phone-product:nth-child(2):before{
+  background:#f3b34a;
+}
+
+#wooriMartVisual .wmv-cart{
+  margin:7px;
+
+  height:32px;
+
+  border-radius:8px;
+
+  background:
+  linear-gradient(
+    135deg,
+    #0b4fd7,
+    #1d6ef2
+  );
+
+  color:white;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:7px;
+  font-weight:900;
+}
+
+
+/* =========================================================
+   배달 사진형
+========================================================= */
+
+#wooriMartVisual .wmv-delivery{
+  background:
+  linear-gradient(
+    180deg,
+    #a5cee8 0%,
+    #dbe8ef 54%,
+    #7f8589 55%,
+    #555b5f 100%
+  );
+}
+
+#wooriMartVisual .wmv-building{
+  position:absolute;
+
+  left:10px;
+  right:10px;
+  top:30px;
+
+  height:75px;
+
+  background:
+  repeating-linear-gradient(
+    90deg,
+    #c9d4dc 0,
+    #c9d4dc 19px,
+    #9fb0bc 20px,
+    #9fb0bc 27px
+  );
+
+  opacity:.65;
+}
+
+#wooriMartVisual .wmv-rider-head{
+  position:absolute;
+
+  width:27px;
+  height:27px;
+
+  border-radius:50%;
+
+  background:#edbb95;
+
+  left:85px;
+  top:82px;
+
+  z-index:3;
+}
+
+#wooriMartVisual .wmv-rider-body{
+  position:absolute;
+
+  width:43px;
+  height:58px;
+
+  border-radius:16px 16px 7px 7px;
+
+  background:#147ad8;
+
+  left:77px;
+  top:103px;
+
+  transform:rotate(-8deg);
+
+  z-index:2;
+}
+
+#wooriMartVisual .wmv-bike{
+  position:absolute;
+
+  left:37px;
+  bottom:18px;
+
+  width:127px;
+  height:43px;
+
+  border-bottom:8px solid var(--blue);
+
+  transform:skewX(-18deg);
+}
+
+#wooriMartVisual .wmv-bike:before,
+#wooriMartVisual .wmv-bike:after{
+  content:"";
+
+  position:absolute;
+
+  width:31px;
+  height:31px;
+
+  border-radius:50%;
+
+  background:#27343d;
+
+  bottom:-19px;
+}
+
+#wooriMartVisual .wmv-bike:before{
+  left:0;
+}
+
+#wooriMartVisual .wmv-bike:after{
+  right:0;
+}
+
+#wooriMartVisual .wmv-box{
+  position:absolute;
+
+  width:45px;
+  height:39px;
+
+  right:25px;
+  bottom:62px;
+
+  border-radius:7px;
+
+  background:var(--blue);
+
+  color:white;
+
+  display:grid;
+  place-items:center;
+
+  font-size:8px;
+  font-weight:900;
+
+  box-shadow:
+  0 6px 13px rgba(10,60,120,.22);
+}
+
+
+/* =========================================================
+   번호 / 카드문구
+========================================================= */
+
+#wooriMartVisual .wmv-number{
+  width:31px;
+  height:31px;
+
+  margin:-15px auto 8px;
+
+  position:relative;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:50%;
+
+  background:var(--green);
+
+  color:#fff;
+
+  font-size:14px;
+  font-weight:950;
+
+  box-shadow:
+  0 4px 10px rgba(19,148,81,.25);
+}
+
+#wooriMartVisual .wmv-photo-title{
+  color:#0e914d;
+
+  font-size:16px;
+  font-weight:950;
+}
+
+#wooriMartVisual .wmv-photo-desc{
+  margin-top:6px;
+
+  color:#4c5c72;
+
+  font-size:11px;
+  line-height:1.55;
+}
+
+
+/* =========================================================
+   장점
+========================================================= */
+
+#wooriMartVisual .wmv-benefits{
+  margin-top:25px;
+
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+
+  overflow:hidden;
+
+  border:1px solid var(--line);
+  border-radius:12px;
+
+  background:white;
+
+  box-shadow:
+  0 9px 26px rgba(31,65,110,.06);
+}
+
+#wooriMartVisual .wmv-benefit{
+  min-height:77px;
+
+  padding:13px 10px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  gap:10px;
+
+  border-right:1px solid #e3ebf6;
+}
+
+#wooriMartVisual .wmv-benefit:last-child{
+  border-right:0;
+}
+
+#wooriMartVisual .wmv-benefit-icon{
+  width:38px;
+  height:38px;
+
+  flex:0 0 38px;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:11px;
+
+  background:#edf5ff;
+
+  color:var(--blue);
+
+  font-size:20px;
+}
+
+#wooriMartVisual .wmv-benefit strong{
+  display:block;
+
+  color:var(--blue);
+
+  font-size:13px;
+}
+
+#wooriMartVisual .wmv-benefit small{
+  display:block;
+
+  margin-top:3px;
+
+  color:#738095;
+
+  font-size:10px;
+}
+
+
+/* =========================================================
+   아래 공통
+========================================================= */
+
+#wooriMartVisual .wmv-section{
+  padding-top:34px;
+}
+
+#wooriMartVisual .wmv-section-title{
+  margin:0 0 17px;
+
+  text-align:center;
+
+  color:#0b45bd;
+
+  font-size:19px;
+  font-weight:950;
+
+  letter-spacing:-.6px;
+}
+
+
+/* =========================================================
+   기능 카드
+========================================================= */
+
+#wooriMartVisual .wmv-feature-grid{
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:12px;
+}
+
+#wooriMartVisual .wmv-feature-card{
+  min-height:180px;
+
+  padding:19px;
+
+  border:1px solid #d5e3f5;
+  border-radius:13px;
+
+  background:
+  linear-gradient(
+    145deg,
+    #ffffff,
+    #fbfdff
+  );
+
+  box-shadow:
+  0 7px 20px rgba(24,60,110,.04);
+}
+
+#wooriMartVisual .wmv-feature-top{
+  display:grid;
+
+  grid-template-columns:54px 1fr;
+
+  gap:13px;
+}
+
+#wooriMartVisual .wmv-feature-icon{
+  width:54px;
+  height:54px;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:15px;
+
+  background:
+  linear-gradient(
+    135deg,
+    #edf5ff,
+    #daeaff
+  );
+
+  font-size:29px;
+}
+
+#wooriMartVisual .wmv-feature-name{
+  color:#0b4bc9;
+
+  font-size:18px;
+  font-weight:950;
+}
+
+#wooriMartVisual .wmv-feature-green{
+  margin-top:3px;
+
+  color:#11914d;
+
+  font-size:12px;
+  font-weight:900;
+}
+
+#wooriMartVisual .wmv-feature-card ul{
+  margin:10px 0 0;
+
+  padding-left:18px;
+
+  color:#3d4d64;
+
+  font-size:12px;
+  line-height:1.7;
+}
+
+#wooriMartVisual .wmv-detail{
+  margin-top:9px;
+
+  height:31px;
+
+  padding:0 11px;
+
+  border:1px solid #b3cdf3;
+  border-radius:6px;
+
+  background:white;
+
+  color:var(--blue);
+
+  font-size:11px;
+  font-weight:900;
+}
+
+
+/* =========================================================
+   매출
+========================================================= */
+
+#wooriMartVisual .wmv-growth{
+  padding:21px 15px;
+
+  border:1px solid var(--line);
+  border-radius:13px;
+
+  background:
+  linear-gradient(
+    180deg,
+    #fff,
+    #fbfdff
+  );
+}
+
+#wooriMartVisual .wmv-growth-row{
+  display:grid;
+
+  grid-template-columns:
+  1fr 26px
+  1fr 26px
+  1fr 26px
+  1fr 26px
+  1fr;
+
+  align-items:center;
+}
+
+#wooriMartVisual .wmv-growth-item{
+  text-align:center;
+}
+
+#wooriMartVisual .wmv-growth-icon{
+  width:45px;
+  height:45px;
+
+  margin:auto;
+
+  border-radius:13px;
+
+  background:#edf5ff;
+
+  display:grid;
+  place-items:center;
+
+  font-size:23px;
+}
+
+#wooriMartVisual .wmv-growth-name{
+  margin-top:7px;
+
+  color:#0b4bc9;
+
+  font-size:12px;
+  font-weight:950;
+}
+
+#wooriMartVisual .wmv-growth-text{
+  margin-top:5px;
+
+  color:#718096;
+
+  font-size:9px;
+  line-height:1.5;
+}
+
+#wooriMartVisual .wmv-arrow{
+  color:var(--blue);
+
+  text-align:center;
+
+  font-size:22px;
+  font-weight:950;
+}
+
+
+/* =========================================================
+   가맹점 등록비 계산기
+========================================================= */
+
+#wooriMartVisual .wmv-fee-box{
+  padding:22px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:#fff;
+  box-shadow:0 7px 20px rgba(24,60,110,.04);
+}
+
+#wooriMartVisual .wmv-fee-desc{
+  margin:-7px 0 18px;
+  text-align:center;
+  color:#617086;
+  font-size:12px;
+  line-height:1.6;
+}
+
+#wooriMartVisual .wmv-fee-rule{
+  margin-bottom:16px;
+  padding:13px 15px;
+  border-radius:9px;
+  background:#f5f9ff;
+  color:#40536c;
+  font-size:12px;
+  line-height:1.7;
+}
+
+#wooriMartVisual .wmv-fee-inputs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+#wooriMartVisual .wmv-fee-field label{
+  display:block;
+  margin-bottom:6px;
+  color:#26364e;
+  font-size:12px;
+  font-weight:900;
+}
+
+#wooriMartVisual .wmv-fee-input-wrap{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+#wooriMartVisual .wmv-fee-input{
+  width:100%;
+  height:42px;
+  padding:0 12px;
+  border:1px solid #cddbed;
+  border-radius:8px;
+  background:#fff;
+  color:#16243a;
+  font-size:14px;
+  outline:none;
+}
+
+#wooriMartVisual .wmv-fee-unit{
+  flex:0 0 auto;
+  color:#617086;
+  font-size:12px;
+  font-weight:800;
+}
+
+#wooriMartVisual .wmv-fee-results{
+  margin-top:16px;
+  border:1px solid #dce7f5;
+  border-radius:9px;
+  overflow:hidden;
+}
+
+#wooriMartVisual .wmv-fee-result-row{
+  min-height:42px;
+  padding:0 13px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  border-bottom:1px solid #e5edf7;
+  font-size:12px;
+}
+
+#wooriMartVisual .wmv-fee-result-row:last-child{
+  border-bottom:0;
+}
+
+#wooriMartVisual .wmv-fee-result-row strong{
+  color:#16243a;
+}
+
+#wooriMartVisual .wmv-fee-total{
+  background:#edf5ff;
+  color:var(--blue);
+  font-size:15px;
+  font-weight:950;
+}
+
+#wooriMartVisual .wmv-fee-register{
+  width:100%;
+  height:43px;
+  margin-top:13px;
+  border:0;
+  border-radius:8px;
+  background:var(--blue);
+  color:#fff;
+  font-size:13px;
+  font-weight:950;
+  cursor:pointer;
+}
+
+
+/* =========================================================
+   모바일 반응형
+========================================================= */
+
+@media(max-width:768px){
+
+  #wooriMartVisual .wmv-inner{
+    width:calc(100% - 22px);
+  }
+
+  #wooriMartVisual .wmv-header-inner{
+    min-height:57px;
+  }
+
+  #wooriMartVisual .wmv-logo{
+    font-size:17px;
+  }
+
+  #wooriMartVisual .wmv-logo-icon{
+    width:27px;
+    height:27px;
+  }
+
+  #wooriMartVisual .wmv-app-install{
+    padding:8px 10px;
+    font-size:11px;
+  }
+
+  #wooriMartVisual .wmv-join{
+    padding:8px 12px;
+    font-size:11px;
+  }
+
+  #wooriMartVisual .wmv-menu{
+    width:34px;
+    height:34px;
+    font-size:19px;
+  }
+
+  #wooriMartVisual .wmv-hero-inner{
+    padding:24px 0 23px;
+  }
+
+  #wooriMartVisual .wmv-hero-main{
+    display:block;
+  }
+
+  #wooriMartVisual .wmv-small-title{
+    font-size:12px;
+  }
+
+  #wooriMartVisual .wmv-title{
+    font-size:28px;
+    letter-spacing:-1.2px;
+  }
+
+  #wooriMartVisual .wmv-description{
+    font-size:12px;
+    margin-top:12px;
+  }
+
+  #wooriMartVisual .wmv-buttons{
+    margin-top:14px;
+  }
+
+  #wooriMartVisual .wmv-main-btn,
+  #wooriMartVisual .wmv-outline-btn{
+    height:41px;
+    min-width:0;
+    padding:0 11px;
+    font-size:11px;
+  }
+
+  #wooriMartVisual .wmv-photo-grid{
+    margin-top:21px;
+    gap:4px;
+  }
+
+  #wooriMartVisual .wmv-photo{
+    height:104px;
+    border-radius:8px;
+  }
+
+  #wooriMartVisual .wmv-car:before{
+    width:75px;
+    height:33px;
+    top:44px;
+  }
+
+  #wooriMartVisual .wmv-car-window{
+    width:42px;
+    height:20px;
+    top:32px;
+  }
+
+  #wooriMartVisual .wmv-car:after{
+    width:23px;
+    height:17px;
+    top:57px;
+    font-size:6px;
+    border-width:1px;
+  }
+
+  #wooriMartVisual .wmv-wheel1,
+  #wooriMartVisual .wmv-wheel2{
+    width:16px;
+    height:16px;
+    top:68px;
+  }
+
+  #wooriMartVisual .wmv-wheel1{
+    left:12px;
+  }
+
+  #wooriMartVisual .wmv-wheel2{
+    right:12px;
+  }
+
+  #wooriMartVisual .wmv-digital-screen{
+    left:5px;
+    right:5px;
+    top:19px;
+    height:49px;
+    border-width:3px;
+  }
+
+  #wooriMartVisual .wmv-sale-small{
+    font-size:5px;
+  }
+
+  #wooriMartVisual .wmv-sale-big{
+    font-size:8px;
+  }
+
+  #wooriMartVisual .wmv-sale-bar{
+    padding:2px 4px;
+    font-size:4px;
+  }
+
+  #wooriMartVisual .wmv-products{
+    height:23px;
+    bottom:5px;
+    left:4px;
+    right:4px;
+  }
+
+  #wooriMartVisual .wmv-phone{
+    width:52px;
+    height:93px;
+    top:5px;
+    border-radius:9px;
+    padding:4px;
+  }
+
+  #wooriMartVisual .wmv-phone-screen{
+    border-radius:6px;
+  }
+
+  #wooriMartVisual .wmv-phone-head{
+    padding:4px 1px 2px;
+    font-size:3.5px;
+  }
+
+  #wooriMartVisual .wmv-phone-banner{
+    height:17px;
+    margin:1px 3px 3px;
+    font-size:3px;
+  }
+
+  #wooriMartVisual .wmv-phone-products{
+    gap:2px;
+    padding:0 3px;
+  }
+
+  #wooriMartVisual .wmv-phone-product{
+    height:21px;
+  }
+
+  #wooriMartVisual .wmv-phone-product:before{
+    width:8px;
+    height:8px;
+    top:3px;
+  }
+
+  #wooriMartVisual .wmv-cart{
+    height:16px;
+    margin:3px;
+    font-size:3.5px;
+  }
+
+  #wooriMartVisual .wmv-building{
+    top:15px;
+    height:38px;
+  }
+
+  #wooriMartVisual .wmv-rider-head{
+    width:14px;
+    height:14px;
+    left:43px;
+    top:41px;
+  }
+
+  #wooriMartVisual .wmv-rider-body{
+    width:22px;
+    height:29px;
+    left:39px;
+    top:52px;
+  }
+
+  #wooriMartVisual .wmv-bike{
+    left:18px;
+    bottom:10px;
+    width:63px;
+    height:21px;
+    border-bottom-width:4px;
+  }
+
+  #wooriMartVisual .wmv-bike:before,
+  #wooriMartVisual .wmv-bike:after{
+    width:16px;
+    height:16px;
+    bottom:-10px;
+  }
+
+  #wooriMartVisual .wmv-box{
+    width:23px;
+    height:20px;
+    right:11px;
+    bottom:31px;
+    font-size:4px;
+  }
+
+  #wooriMartVisual .wmv-number{
+    width:23px;
+    height:23px;
+    margin-top:-11px;
+    font-size:9px;
+  }
+
+  #wooriMartVisual .wmv-photo-title{
+    font-size:9px;
+  }
+
+  #wooriMartVisual .wmv-photo-desc{
+    font-size:7px;
+    line-height:1.4;
+  }
+
+  #wooriMartVisual .wmv-benefits{
+    margin-top:17px;
+  }
+
+  #wooriMartVisual .wmv-benefit{
+    display:block;
+    min-height:67px;
+    padding:9px 3px;
+    text-align:center;
+  }
+
+  #wooriMartVisual .wmv-benefit-icon{
+    width:28px;
+    height:28px;
+    margin:0 auto 4px;
+    font-size:14px;
+  }
+
+  #wooriMartVisual .wmv-benefit strong{
+    font-size:8px;
+  }
+
+  #wooriMartVisual .wmv-benefit small{
+    font-size:6.7px;
+  }
+
+  #wooriMartVisual .wmv-section{
+    padding-top:22px;
+  }
+
+  #wooriMartVisual .wmv-section-title{
+    margin-bottom:11px;
+    font-size:13px;
+  }
+
+  #wooriMartVisual .wmv-feature-grid{
+    gap:6px;
+  }
+
+  #wooriMartVisual .wmv-feature-card{
+    min-height:0;
+    padding:10px 8px;
+  }
+
+  #wooriMartVisual .wmv-feature-top{
+    grid-template-columns:32px 1fr;
+    gap:7px;
+  }
+
+  #wooriMartVisual .wmv-feature-icon{
+    width:32px;
+    height:32px;
+    font-size:17px;
+  }
+
+  #wooriMartVisual .wmv-feature-name{
+    font-size:10px;
+  }
+
+  #wooriMartVisual .wmv-feature-green{
+    font-size:7px;
+  }
+
+  #wooriMartVisual .wmv-feature-card ul{
+    padding-left:12px;
+    font-size:7px;
+    line-height:1.5;
+  }
+
+  #wooriMartVisual .wmv-detail{
+    height:24px;
+    font-size:7px;
+  }
+
+  #wooriMartVisual .wmv-growth{
+    padding:13px 4px;
+  }
+
+  #wooriMartVisual .wmv-growth-row{
+    grid-template-columns:
+    1fr 10px
+    1fr 10px
+    1fr 10px
+    1fr 10px
+    1fr;
+  }
+
+  #wooriMartVisual .wmv-growth-icon{
+    width:27px;
+    height:27px;
+    font-size:14px;
+  }
+
+  #wooriMartVisual .wmv-growth-name{
+    font-size:7px;
+  }
+
+  #wooriMartVisual .wmv-growth-text{
+    font-size:5.5px;
+  }
+
+  #wooriMartVisual .wmv-arrow{
+    font-size:10px;
+  }
+
+  #wooriMartVisual .wmv-signup{
+    grid-template-columns:1fr;
+    padding-bottom:25px;
+  }
+
+  #wooriMartVisual .wmv-sign-box,
+  #wooriMartVisual .wmv-guide{
+    padding:11px 8px;
+  }
+
+  #wooriMartVisual .wmv-steps{
+    grid-template-columns:
+    1fr 11px
+    1fr 11px
+    1fr 11px
+    1fr;
+  }
+
+  #wooriMartVisual .wmv-step-num{
+    width:24px;
+    height:24px;
+    font-size:7px;
+  }
+
+  #wooriMartVisual .wmv-step-title{
+    font-size:8px;
+  }
+
+  #wooriMartVisual .wmv-step-text{
+    font-size:6px;
+  }
+
+  #wooriMartVisual .wmv-guide-title{
+    font-size:13px;
+  }
+
+  #wooriMartVisual .wmv-guide-desc,
+  #wooriMartVisual .wmv-guide li{
+    font-size:8px;
+  }
+
+  #wooriMartVisual .wmv-fee-box{
+    padding:14px 10px;
+  }
+
+  #wooriMartVisual .wmv-fee-desc,
+  #wooriMartVisual .wmv-fee-rule{
+    font-size:9px;
+  }
+
+  #wooriMartVisual .wmv-fee-inputs{
+    grid-template-columns:1fr;
+    gap:9px;
+  }
+
+  #wooriMartVisual .wmv-fee-field label,
+  #wooriMartVisual .wmv-fee-unit,
+  #wooriMartVisual .wmv-fee-result-row{
+    font-size:9px;
+  }
+
+  #wooriMartVisual .wmv-fee-input{
+    height:38px;
+    font-size:12px;
+  }
+
+  #wooriMartVisual .wmv-fee-total{
+    font-size:12px;
+  }
+
+}
+
+</style>
+
+
+<div id="wooriMartVisual">
+
+
+  <!-- =========================
+       상단
+  ========================== -->
+  <header class="wmv-header">
+
+    <div class="wmv-inner wmv-header-inner">
+
+      <div class="wmv-logo">
+
+        <div class="wmv-logo-icon">
+          ⌂
+        </div>
+
         <div>
-          <div style="font-size: 13px; opacity: 0.9; font-weight: 500; margin-bottom: 2px;">동네마트 물가잡기 솔루션</div>
-          <div style="font-size: 16px; font-weight: 800; letter-spacing: -0.3px;">농·축·수산 오늘의 시세 1초 매칭 보기 →</div>
-        </div>
-      </div>
-      <div style="background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap;">
-        시세 확인
-      </div>
-    </a>
-  </div>
-
-    <div class="top-nav">
-      <a href="https://www.wooriapt.app" class="top-nav-btn top-nav-home">
-        <span style="font-size:16px;">🏠</span>
-        <span>우리아파트 안심거래 홈</span>
-      </a>
-      <a href="https://www.wooriapt.app/mart-price" class="top-nav-btn top-nav-price">
-        <span style="font-size:14px;">📊</span>
-        <span>오늘의 시세</span>
-      </a>
-    </div>
-
-    <div class="badge-bar">🔥 마트 사장님 3대 핵심 과제: 고객유치 · 매출올리기 · 고객DB 확보</div>
-
-    <div class="header">
-      <h1>마트 고객유치 &amp; 매출올리기 계산기</h1>
-      <p>단골 고객DB 확보 + 연간 문자비 1,440만 원 절감 (실시간 비교)</p>
-    </div>
-
-    <div class="pos-bypass-box">
-      <div class="pos-bypass-icon">💡</div>
-      <div class="pos-bypass-text">
-        <strong>포스(POS) 기계는 그대로 쓰시면 됩니다!</strong><br>
-        포스 고객 DB(5,000명)를 1초 만에 디지털 단골로 전환하고, 자동차 QR과 분양사 쿠폰으로 신규 고객을 매장으로 끌어옵니다.
-      </div>
-    </div>
-
-    <div class="compare-grid">
-      <div class="card card-agency">
-        <div class="card-title">대행사 문자 방식</div>
-
-        <div class="input-group">
-          <label for="agency-customers">문자 고객수</label>
-          <div class="input-box">
-            <input type="number" id="agency-customers" value="5000" step="500" min="0">
-            <span style="font-size:12px; font-weight:800; color:#64748b; margin-left:3px;">명</span>
-          </div>
+          wooriapt.ai.kr
         </div>
 
-        <div class="input-group">
-          <label for="agency-unit-cost">건당 문자 단가</label>
-          <div class="input-box">
-            <input type="number" id="agency-unit-cost" value="35" step="1" min="0">
-            <span style="font-size:12px; font-weight:800; color:#64748b; margin-left:3px;">원</span>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label for="agency-manage-fee">대행사 월 관리비</label>
-          <div class="input-box">
-            <input type="number" id="agency-manage-fee" value="400000" step="50000" min="0">
-            <span style="font-size:12px; font-weight:800; color:#64748b; margin-left:3px;">원</span>
-          </div>
-        </div>
-
-        <div class="card-subtotal">
-          기존 연간 총지출
-          <span id="agency-annual-total">1,800만 원</span>
-        </div>
       </div>
 
-      <div class="card card-platform">
-        <div class="card-title">우리가게 플랫폼 전환</div>
 
-        <div class="input-group">
-          <label for="platform-customers">문자 고객수</label>
-          <div class="input-box">
-            <input type="number" id="platform-customers" value="5000" step="500" min="0">
-            <span style="font-size:12px; font-weight:800; color:#64748b; margin-left:3px;">명</span>
-          </div>
-        </div>
+      <div class="wmv-top-right">
 
-        <div class="input-group">
-          <label for="platform-monthly-sales">마트 월 매출</label>
-          <div class="input-box">
-            <input type="number" id="platform-monthly-sales" value="150000000" step="10000000" min="0">
-            <span style="font-size:12px; font-weight:800; color:#64748b; margin-left:3px;">원</span>
-          </div>
-        </div>
+        <button
+          class="wmv-join"
+          type="button"
+          onclick="location.href='https://mart-platform.vercel.app/signup.html'">
+          가맹점 등록
+        </button>
 
-        <div class="input-group">
-          <label for="platform-fee">플랫폼 월 가맹비</label>
-          <div class="input-box">
-            <input type="number" id="platform-fee" value="300000" step="50000" min="0">
-            <span style="font-size:12px; font-weight:800; color:#64748b; margin-left:3px;">원</span>
-          </div>
-        </div>
+        <button
+          class="wmv-app-install"
+          type="button"
+          onclick="location.href='https://mart-platform.vercel.app/mart-install.html'">
+          앱설치
+        </button>
 
-        <div class="card-subtotal">
-          플랫폼 연간 비용
-          <span id="platform-annual-total">360만 원</span>
-        </div>
+        <button
+          class="wmv-menu"
+          type="button">
+          ☰
+        </button>
+
       </div>
+
     </div>
 
-    <div class="result-banner">
-      <div class="result-banner-label">연간 확정 비용 절감액</div>
-      <div class="result-banner-value" id="saving-total">+1,440만 원 순이익 확정!</div>
-      <div class="result-banner-sub" id="saving-sub">문자비 낭비를 막고 고스란히 마트 마진으로 전환됩니다</div>
-    </div>
+  </header>
 
-    <div class="engine-section">
-      <div class="engine-title">마트 사장님 필수 3대 성장 솔루션</div>
-      <div class="engine-grid">
-        <a href="https://wooriapt.ai.kr" target="_blank" class="engine-card" title="문자 고객 디지털 전환 공식 안내">
-          <div class="engine-num">1</div>
-          <div class="engine-main">고객DB 확보 ➔<br>디지털 단골</div>
-          <div class="engine-desc">(문자비 0원)</div>
-        </a>
-        <a href="https://wooriapt.ai.kr" target="_blank" class="engine-card" title="자동차 QR 신규 고객 확보 공식 안내">
-          <div class="engine-num">2</div>
-          <div class="engine-main">마트 고객유치 ➔<br>아파트 주민</div>
-          <div class="engine-desc">(주민 유입)</div>
-        </a>
-        <a href="https://www.wooriapt.app/mart-sales.html" class="engine-card" style="background:#eff6ff; border:1.5px solid #93c5fd;" title="분양사 연동 마트 매출 올리기 안내">
-          <div class="engine-num" style="background:#2563eb; color:#fff;">3</div>
-          <div class="engine-main" style="color:#1d4ed8;">마트 매출올리기 ➔<br>3천원 장보기</div>
-          <div class="engine-desc" style="color:#2563eb;">(3천원 쿠폰 ➔)</div>
-        </a>
-      </div>
-    </div>
 
-    <a href="https://www.wooriapt.app/mart-sales.html" class="sales-boost-banner">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <span style="font-size:22px;">🚀</span>
+  <!-- =========================
+       HERO
+  ========================== -->
+  <section class="wmv-hero">
+
+    <div class="wmv-inner wmv-hero-inner">
+
+
+      <div class="wmv-hero-main">
+
+
+        <!-- LEFT -->
         <div>
-          <div style="font-size:13.5px; font-weight:900; color:#1e40af;">마트 매출 올리기 (분양사 3천원 쿠폰 연동)</div>
-          <div style="font-size:11.5px; font-weight:600; color:#2563eb;">인근 아파트 주민 장보기 유치 안내 보기 ➔</div>
+
+          <div class="wmv-small-title">
+            마트 사장님이 스스로 운영하고 성장하는
+          </div>
+
+          <h1 class="wmv-title">
+
+            우리아파트 마트 플랫폼<br>
+
+            <span>
+              DB 확보와 고객 유입으로<br>
+              매출이 올라갑니다!
+            </span>
+
+          </h1>
+
+
+          <div class="wmv-description">
+
+            자동차 QR, 디지털 화면, 주문,<br>
+            방문·배달 서비스를 하나의 플랫폼에서<br>
+
+            마트 사장님이 직접 보고,<br>
+            직접 관리하고,<br>
+            직접 성장하세요.
+
+          </div>
+
+
+          <div class="wmv-buttons">
+
+            <button
+              class="wmv-main-btn"
+              type="button"
+              onclick="location.href='https://mart-platform.vercel.app/platform-guide-detail.html'">
+
+              플랫폼 사용 방법 보기 ▶
+
+            </button>
+
+
+            <button
+              class="wmv-outline-btn"
+              type="button"
+              onclick="location.href='https://mart-platform.vercel.app/about-detail.html'">
+
+              자세히 알아보기 〉
+
+            </button>
+
+            <button
+              class="wmv-outline-btn"
+              type="button"
+              onclick="location.href='https://wooriapt.ai.kr/74'">
+
+              샘플보기 〉
+
+            </button>
+
+          </div>
+
         </div>
+
+
+
+        <!-- RIGHT -->
+        <div class="wmv-photo-grid">
+
+
+          <!-- 1 -->
+          <div class="wmv-photo-card">
+
+            <div class="wmv-photo wmv-car">
+
+              <div class="wmv-car-window"></div>
+              <div class="wmv-wheel1"></div>
+              <div class="wmv-wheel2"></div>
+
+            </div>
+
+            <div class="wmv-number">
+              1
+            </div>
+
+            <div class="wmv-photo-title">
+              자동차 QR
+            </div>
+
+            <div class="wmv-photo-desc">
+
+              마트 전용 QR 스티커로<br>
+              지역 고객 DB를 확보하고<br>
+              고객을 마트로 유입합니다.
+
+            </div>
+
+          </div>
+
+
+
+          <!-- 2 -->
+          <div class="wmv-photo-card">
+
+            <div class="wmv-photo wmv-digital">
+
+              <div class="wmv-digital-screen">
+
+                <div class="wmv-sale-small">
+                  오늘만 특가!
+                </div>
+
+                <div class="wmv-sale-big">
+                  최대 30% 할인
+                </div>
+
+                <div class="wmv-sale-bar">
+                  이벤트 · 행사 · 신상품
+                </div>
+
+              </div>
+
+
+              <div class="wmv-products">
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+              </div>
+
+            </div>
+
+            <div class="wmv-number">
+              2
+            </div>
+
+            <div class="wmv-photo-title">
+              디지털 화면
+            </div>
+
+            <div class="wmv-photo-desc">
+
+              문자 내용을 디지털 화면으로<br>
+              전달하여 이벤트, 할인, 행사,<br>
+              신상품 정보를 전달합니다.
+
+            </div>
+
+          </div>
+
+
+
+          <!-- 3 -->
+          <div class="wmv-photo-card">
+
+            <div class="wmv-photo wmv-order">
+
+              <div class="wmv-phone">
+
+                <div class="wmv-phone-screen">
+
+                  <div class="wmv-phone-head">
+                    우리아파트 마트
+                  </div>
+
+                  <div class="wmv-phone-banner">
+                    오늘의 특가
+                  </div>
+
+                  <div class="wmv-phone-products">
+
+                    <div class="wmv-phone-product">
+                    </div>
+
+                    <div class="wmv-phone-product">
+                    </div>
+
+                  </div>
+
+                  <div class="wmv-cart">
+                    장바구니 · 주문하기
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="wmv-number">
+              3
+            </div>
+
+            <div class="wmv-photo-title">
+              주문 시스템
+            </div>
+
+            <div class="wmv-photo-desc">
+
+              앱·웹으로 간편하게 주문하고<br>
+              결제까지 한번에!<br>
+              24시간 주문 가능합니다.
+
+            </div>
+
+          </div>
+
+
+
+          <!-- 4 -->
+          <div class="wmv-photo-card">
+
+            <div class="wmv-photo wmv-delivery">
+
+              <div class="wmv-building">
+              </div>
+
+              <div class="wmv-rider-head">
+              </div>
+
+              <div class="wmv-rider-body">
+              </div>
+
+              <div class="wmv-bike">
+              </div>
+
+              <div class="wmv-box">
+                배달
+              </div>
+
+            </div>
+
+            <div class="wmv-number">
+              4
+            </div>
+
+            <div class="wmv-photo-title">
+              방문 · 배달 서비스
+            </div>
+
+            <div class="wmv-photo-desc">
+
+              방문 픽업과 빠른 배달로<br>
+              고객 편의를 높이고<br>
+              재구매로 이어지게 합니다.
+
+            </div>
+
+          </div>
+
+
+        </div>
+
       </div>
-      <span style="font-size:12px; font-weight:900; color:#1d4ed8; padding:5px 10px; background:#ffffff; border:1px solid #bfdbfe; border-radius:8px; white-space:nowrap;">확인 ›</span>
-    </a>
 
-    <div class="btn-group">
-      <a href="https://wooriapt.ai.kr" target="_blank" class="cta-btn">
-        [ 우리가게 가맹점 신청 알아보기 &gt; ]
-      </a>
-      <button type="button" class="share-btn" onclick="shareCalculator()">
-        <span>💬</span> <span>동료 마트 사장님 / 밴드에 1초 공유하기</span>
-      </button>
-    </div>
 
-    <div class="footer-note">
-      * 가맹 신청 버튼을 누르시면 마트 전용 공식 홈페이지(wooriapt.ai.kr)로 이동합니다.<br>
-      * 중소형 식자재마트 실무 기준 (5,000명 DB / 월 6회 발송) 반영
-    </div>
 
-    <div class="bottom-home-bar">
-      <a href="https://www.wooriapt.app" class="bottom-home-btn">
-        <span>🏠</span>
-        <span>우리아파트 안심거래 메인화면 (www.wooriapt.app)</span>
-      </a>
-    </div>
+      <!-- =========================
+           장점
+      ========================== -->
+      <div class="wmv-benefits">
 
-    <!-- 특허(BM) 및 저작권 법적 보호 경고문 -->
-    <div style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:12px; padding:10px 12px; text-align:left;">
-      <div style="font-size:11px; font-weight:900; color:#334155; display:flex; align-items:center; gap:4px; margin-bottom:2px;">
-        <span>⚖️</span>
-        <span>특허(BM) 출원 및 저작권 법적 보호 안내</span>
+
+        <div class="wmv-benefit">
+
+          <div class="wmv-benefit-icon">
+            ▣
+          </div>
+
+          <div>
+
+            <strong>
+              간편한 사용
+            </strong>
+
+            <small>
+              누구나 쉽게 관리
+            </small>
+
+          </div>
+
+        </div>
+
+
+        <div class="wmv-benefit">
+
+          <div class="wmv-benefit-icon">
+            ◷
+          </div>
+
+          <div>
+
+            <strong>
+              실시간 매출 확인
+            </strong>
+
+            <small>
+              데이터로 매출 확인
+            </small>
+
+          </div>
+
+        </div>
+
+
+        <div class="wmv-benefit">
+
+          <div class="wmv-benefit-icon">
+            ♙
+          </div>
+
+          <div>
+
+            <strong>
+              고객 DB 확보
+            </strong>
+
+            <small>
+              단골 고객 만들기
+            </small>
+
+          </div>
+
+        </div>
+
+
+        <div class="wmv-benefit">
+
+          <div class="wmv-benefit-icon">
+            ○
+          </div>
+
+          <div>
+
+            <strong>
+              수수료 ZERO
+            </strong>
+
+            <small>
+              부담 없이 성장
+            </small>
+
+          </div>
+
+        </div>
+
+
       </div>
-      <p style="margin:0; font-size:10px; color:#64748b; line-height:1.45; font-weight:600; word-break:keep-all;">
-        본 마트 고객DB 확보·연간 문자비 절감 계산기 및 분양사 쿠폰 연동 시스템은 독자적인 비즈니스 모델(BM) 특허 및 저작권법의 보호를 받습니다. 타 업체 및 제3자의 무단 모방·복제·도용 시 부정경쟁방지법 및 관련 법령에 의거 민·형사상 법적 책임을 물을 수 있습니다.
-      </p>
+
     </div>
-  </div>
 
-  <script>
-    const agencyCust = document.getElementById('agency-customers');
-    const agencyUnit = document.getElementById('agency-unit-cost');
-    const agencyFee = document.getElementById('agency-manage-fee');
-    const platformCust = document.getElementById('platform-customers');
-    const platformFee = document.getElementById('platform-fee');
+  </section>
 
-    const agencyTotalEl = document.getElementById('agency-annual-total');
-    const platformTotalEl = document.getElementById('platform-annual-total');
-    const savingTotalEl = document.getElementById('saving-total');
-    const savingSubEl = document.getElementById('saving-sub');
 
-    agencyCust.addEventListener('input', () => {
-      platformCust.value = agencyCust.value;
-      recalculate();
-    });
-    platformCust.addEventListener('input', () => {
-      agencyCust.value = platformCust.value;
-      recalculate();
-    });
 
-    [agencyUnit, agencyFee, platformFee].forEach(input => {
-      input.addEventListener('input', recalculate);
-    });
+  <!-- =========================
+       기능
+  ========================== -->
+  <section
+    class="wmv-section"
+    id="wmvFeatures">
 
-    function formatKoreanMoney(amount) {
-      if (amount <= 0) return '0원';
-      const man = Math.round(amount / 10000);
-      if (man >= 10000) {
-        const eok = Math.floor(man / 10000);
-        const restMan = man % 10000;
-        return restMan > 0 ? (eok + '억 ' + restMan.toLocaleString() + '만 원') : (eok + '억 원');
-      }
-      return man.toLocaleString() + '만 원';
-    }
+    <div class="wmv-inner">
 
-    function recalculate() {
-      const customers = parseFloat(agencyCust.value) || 0;
-      const unitCost = parseFloat(agencyUnit.value) || 0;
-      const mgtFee = parseFloat(agencyFee.value) || 0;
-      const platFee = parseFloat(platformFee.value) || 0;
+      <h2 class="wmv-section-title">
 
-      const monthlySmsTimes = 6;
-      const agencyAnnual = (customers * unitCost * monthlySmsTimes + mgtFee) * 12;
-      const platformAnnual = platFee * 12;
-      const annualSaving = agencyAnnual - platformAnnual;
+        플랫폼이 제공하는 기능
+        (사장님이 직접 사용하는 도구)
 
-      agencyTotalEl.textContent = formatKoreanMoney(agencyAnnual);
-      platformTotalEl.textContent = formatKoreanMoney(platformAnnual);
+      </h2>
 
-      if (annualSaving > 0) {
-        savingTotalEl.textContent = '+' + formatKoreanMoney(annualSaving) + ' 순이익 확정!';
-        savingSubEl.textContent = '문자비 낭비를 막고 고스란히 마트 마진으로 전환됩니다';
-      } else if (annualSaving === 0) {
-        savingTotalEl.textContent = '비용 변동 없음 (동일)';
-        savingSubEl.textContent = '기존 대행사 비용과 플랫폼 가맹비가 동일합니다';
-      } else {
-        savingTotalEl.textContent = '-' + formatKoreanMoney(Math.abs(annualSaving)) + ' 차이';
-        savingSubEl.textContent = '가맹비 금액을 조정해보세요';
-      }
-    }
 
-    function shareCalculator() {
-      const u = location.href;
-      const t = '우리가게 마트 팩트 경영 계산기';
-      const txt = '대행사 문자비 1,440만 원 아끼고 신규 고객 늘리는 마트 팩트 경영 계산기입니다. 우리 마트 비용도 지금 확인해보세요!';
-      if (navigator.share) {
-        navigator.share({ title: t, text: txt, url: u }).catch(() => {});
-      } else {
-        navigator.clipboard.writeText(u).then(() => {
-          alert('계산기 주소가 복사되었습니다! 마트 사장님 단톡방이나 밴드에 붙여넣어 보세요: ' + u);
-        }).catch(() => {
-          prompt('주소를 복사하세요:', u);
-        });
-      }
-    }
+      <div class="wmv-feature-grid">
 
-    recalculate();
+
+        <div class="wmv-feature-card">
+
+          <div class="wmv-feature-top">
+
+            <div class="wmv-feature-icon">
+              🚙
+            </div>
+
+            <div>
+
+              <div class="wmv-feature-name">
+                자동차 QR
+              </div>
+
+              <div class="wmv-feature-green">
+                DB 확보 · 고객 유입 수단
+              </div>
+
+              <ul>
+
+                <li>
+                  차량에 QR 스티커 부착
+                </li>
+
+                <li>
+                  QR을 통해 마트 이벤트·쿠폰 제공
+                </li>
+
+                <li>
+                  고객 연락처 수집 (동의 고객)
+                </li>
+
+                <li>
+                  DB가 쌓여 단골 고객으로 전환
+                </li>
+
+              </ul>
+
+              <button
+                class="wmv-detail"
+                type="button"
+                onclick="location.href='https://mart-platform.vercel.app/car-qr-detail.html'">
+                상세보기 〉
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="wmv-feature-card">
+
+          <div class="wmv-feature-top">
+
+            <div class="wmv-feature-icon">
+              🖥️
+            </div>
+
+            <div>
+
+              <div class="wmv-feature-name">
+                디지털 화면
+              </div>
+
+              <div class="wmv-feature-green">
+                문자를 디지털화한 홍보 수단
+              </div>
+
+              <ul>
+
+                <li>
+                  기존 문자 내용을 화면으로 송출
+                </li>
+
+                <li>
+                  할인·이벤트·신상품 실시간 안내
+                </li>
+
+                <li>
+                  시각적 효과로 고객 관심 확대
+                </li>
+
+                <li>
+                  홍보 전달력을 높이는 운영 도구
+                </li>
+
+              </ul>
+
+              <button
+                class="wmv-detail"
+                type="button"
+                onclick="location.href='https://mart-platform.vercel.app/digital-detail.html'">
+                상세보기 〉
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="wmv-feature-card">
+
+          <div class="wmv-feature-top">
+
+            <div class="wmv-feature-icon">
+              🛒
+            </div>
+
+            <div>
+
+              <div class="wmv-feature-name">
+                주문 시스템
+              </div>
+
+              <div class="wmv-feature-green">
+                간편 주문으로 매출 확대
+              </div>
+
+              <ul>
+
+                <li>
+                  앱·웹에서 상품 선택 후 주문
+                </li>
+
+                <li>
+                  간편한 주문 및 결제
+                </li>
+
+                <li>
+                  24시간 주문 접수 가능
+                </li>
+
+                <li>
+                  장바구니·재주문 기능 제공
+                </li>
+
+              </ul>
+
+              <button
+                class="wmv-detail"
+                type="button"
+                onclick="location.href='https://mart-platform.vercel.app/order-detail.html'">
+                상세보기 〉
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="wmv-feature-card">
+
+          <div class="wmv-feature-top">
+
+            <div class="wmv-feature-icon">
+              🛵
+            </div>
+
+            <div>
+
+              <div class="wmv-feature-name">
+                방문 · 배달 서비스
+              </div>
+
+              <div class="wmv-feature-green">
+                편리한 수령으로 재구매 유도
+              </div>
+
+              <ul>
+
+                <li>
+                  방문 픽업 기능 제공
+                </li>
+
+                <li>
+                  빠른 배달 서비스 연계
+                </li>
+
+                <li>
+                  배달 가능 지역 설정
+                </li>
+
+                <li>
+                  재구매 고객 비율 증가
+                </li>
+
+              </ul>
+
+              <button
+                class="wmv-detail"
+                type="button"
+                onclick="location.href='https://mart-platform.vercel.app/delivery-detail.html'">
+                상세보기 〉
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================
+       매출 상승
+  ========================== -->
+  <section
+    class="wmv-section"
+    id="wmvGrowth">
+
+    <div class="wmv-inner">
+
+      <div class="wmv-growth">
+
+        <h2 class="wmv-section-title">
+          왜 매출이 상승하는가?
+        </h2>
+
+
+        <div class="wmv-growth-row">
+
+
+          <div class="wmv-growth-item">
+
+            <div class="wmv-growth-icon">
+              👥
+            </div>
+
+            <div class="wmv-growth-name">
+              더 많은 고객 유입
+            </div>
+
+            <div class="wmv-growth-text">
+              자동차 QR와 디지털 화면으로<br>
+              주변 고객 유입 증가
+            </div>
+
+          </div>
+
+
+          <div class="wmv-arrow">
+            →
+          </div>
+
+
+          <div class="wmv-growth-item">
+
+            <div class="wmv-growth-icon">
+              ▤
+            </div>
+
+            <div class="wmv-growth-name">
+              고객과의 연결
+            </div>
+
+            <div class="wmv-growth-text">
+              DB 확보로 고객과 지속적인<br>
+              소통이 가능
+            </div>
+
+          </div>
+
+
+          <div class="wmv-arrow">
+            →
+          </div>
+
+
+          <div class="wmv-growth-item">
+
+            <div class="wmv-growth-icon">
+              🛒
+            </div>
+
+            <div class="wmv-growth-name">
+              주문 편의 제공
+            </div>
+
+            <div class="wmv-growth-text">
+              간편 주문과 다양한 수령 방식으로<br>
+              구매 장벽 감소
+            </div>
+
+          </div>
+
+
+          <div class="wmv-arrow">
+            →
+          </div>
+
+
+          <div class="wmv-growth-item">
+
+            <div class="wmv-growth-icon">
+              ☺
+            </div>
+
+            <div class="wmv-growth-name">
+              재구매 증가
+            </div>
+
+            <div class="wmv-growth-text">
+              맞춤 혜택과 빠른 서비스로<br>
+              재구매율 상승
+            </div>
+
+          </div>
+
+
+          <div class="wmv-arrow">
+            →
+          </div>
+
+
+          <div class="wmv-growth-item">
+
+            <div class="wmv-growth-icon">
+              📈
+            </div>
+
+            <div class="wmv-growth-name">
+              매출 지속 성장
+            </div>
+
+            <div class="wmv-growth-text">
+              신규 + 재구매 고객 증가로<br>
+              매출 지속 성장
+            </div>
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+
+  <!-- =========================
+       가맹점 등록비 계산기
+  ========================== -->
+  <section class="wmv-section" id="wmvFeeCalculator">
+
+    <div class="wmv-inner">
+
+      <div class="wmv-fee-box">
+
+        <h2 class="wmv-section-title">
+          가맹점 등록비 계산기
+        </h2>
+
+        <div class="wmv-fee-desc">
+          최근 1년 고객 DB 수와 월매출을 입력한 뒤 계산 합계 버튼을 누르면 예상 월 가맹비가 표시됩니다.
+        </div>
+
+        <div class="wmv-fee-rule">
+          계산방식: 최근 1년 고객 DB 1명당 30원 + 월매출 1억 원당 60,000원 (VAT 별도)
+        </div>
+
+        <div class="wmv-fee-inputs">
+
+          <div class="wmv-fee-field">
+            <label for="wmvFeeDb">최근 1년 고객 DB 수</label>
+            <div class="wmv-fee-input-wrap">
+              <input
+                id="wmvFeeDb"
+                class="wmv-fee-input"
+                type="number"
+                min="0"
+                step="1"
+                inputmode="numeric"
+                placeholder="예: 10000">
+              <span class="wmv-fee-unit">명</span>
+            </div>
+          </div>
+
+          <div class="wmv-fee-field">
+            <label for="wmvFeeSales">월매출</label>
+            <div class="wmv-fee-input-wrap">
+              <input
+                id="wmvFeeSales"
+                class="wmv-fee-input"
+                type="number"
+                min="0"
+                step="0.1"
+                inputmode="decimal"
+                placeholder="예: 5">
+              <span class="wmv-fee-unit">억 원</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="wmv-fee-results">
+
+          <div class="wmv-fee-result-row">
+            <span>DB 기준 금액</span>
+            <strong id="wmvFeeDbResult">0원</strong>
+          </div>
+
+          <div class="wmv-fee-result-row">
+            <span>매출 기준 금액</span>
+            <strong id="wmvFeeSalesResult">0원</strong>
+          </div>
+
+          <div class="wmv-fee-result-row wmv-fee-total">
+            <span>예상 월 가맹비</span>
+            <strong id="wmvFeeTotal">0원</strong>
+          </div>
+
+        </div>
+
+        <button
+          class="wmv-fee-register"
+          id="wmvFeeCalcBtn"
+          type="button">
+          계산 합계
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       가입
+  ========================== -->
+  <section class="wmv-section">
+
+    <div class="wmv-inner">
+
+
+      <div class="wmv-signup">
+
+
+        <div class="wmv-sign-box">
+
+          <h2 class="wmv-section-title">
+            간단한 4단계 가입 절차
+          </h2>
+
+
+          <div class="wmv-steps">
+
+
+            <div>
+
+              <div class="wmv-step-num">
+                01
+              </div>
+
+              <div class="wmv-step-title">
+                약관 동의
+              </div>
+
+              <div class="wmv-step-text">
+                서비스 이용약관 및<br>
+                개인정보 처리방침에 동의
+              </div>
+
+            </div>
+
+
+            <div class="wmv-arrow">
+              →
+            </div>
+
+
+            <div>
+
+              <div class="wmv-step-num">
+                02
+              </div>
+
+              <div class="wmv-step-title">
+                정보 입력
+              </div>
+
+              <div class="wmv-step-text">
+                마트 정보와 담당자 정보를<br>
+                정확하게 입력
+              </div>
+
+            </div>
+
+
+            <div class="wmv-arrow">
+              →
+            </div>
+
+
+            <div>
+
+              <div class="wmv-step-num">
+                03
+              </div>
+
+              <div class="wmv-step-title">
+                서류 제출
+              </div>
+
+              <div class="wmv-step-text">
+                사업자등록증을 업로드하여<br>
+                자격 확인
+              </div>
+
+            </div>
+
+
+            <div class="wmv-arrow">
+              →
+            </div>
+
+
+            <div>
+
+              <div class="wmv-step-num">
+                04
+              </div>
+
+              <div class="wmv-step-title">
+                가입 완료
+              </div>
+
+              <div class="wmv-step-text">
+                승인되면 바로<br>
+                플랫폼 이용
+              </div>
+
+            </div>
+
+
+          </div>
+
+        </div>
+
+
+
+        <div class="wmv-guide">
+
+          <div class="wmv-guide-title">
+            가입 및 이용 안내
+          </div>
+
+          <div class="wmv-guide-desc">
+
+            마트 사장님이 직접 보고<br>
+            직접 운영하는 플랫폼입니다.
+
+          </div>
+
+          <ul>
+
+            <li>
+              교육/컨설팅 없음
+            </li>
+
+            <li>
+              마케팅 지원 없음
+            </li>
+
+            <li>
+              플랫폼 사용법 제공
+            </li>
+
+            <li>
+              사장님이 직접 운영
+            </li>
+
+          </ul>
+
+          <button
+            class="wmv-sign-btn"
+            type="button"
+            onclick="wmvSignup();">
+
+            가입 절차 보기 〉
+
+          </button>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+</div>
+
+
+<script>
+(function(){
+  var dbInput=document.getElementById("wmvFeeDb");
+  var salesInput=document.getElementById("wmvFeeSales");
+  var dbResult=document.getElementById("wmvFeeDbResult");
+  var salesResult=document.getElementById("wmvFeeSalesResult");
+  var totalResult=document.getElementById("wmvFeeTotal");
+  var calcButton=document.getElementById("wmvFeeCalcBtn");
+
+  function wmvFormatWon(value){
+    return Math.round(value).toLocaleString("ko-KR")+"원";
+  }
+
+  function wmvUpdateFee(){
+    var dbCount=Math.max(0,Number(dbInput && dbInput.value) || 0);
+    var salesEok=Math.max(0,Number(salesInput && salesInput.value) || 0);
+
+    var dbFee=dbCount*30;
+    var salesFee=salesEok*60000;
+    var total=dbFee+salesFee;
+
+    if(dbResult) dbResult.textContent=wmvFormatWon(dbFee);
+    if(salesResult) salesResult.textContent=wmvFormatWon(salesFee);
+    if(totalResult) totalResult.textContent=wmvFormatWon(total);
+  }
+
+  if(calcButton) calcButton.addEventListener("click",wmvUpdateFee);
+})();
 </script>
+
+
+<script>
+(function(){
+
+  window.wmvSignup=function() {
+    location.href="https://mart-platform.vercel.app/signup-process-detail.html";
+  };
+
+  var join=document.querySelector("#wooriMartVisual .wmv-join");
+  if(join){
+    join.addEventListener("click",function(){
+      location.href="https://mart-platform.vercel.app/signup.html";
+    });
+  }
+
+  var menu=document.querySelector("#wooriMartVisual .wmv-menu");
+  if(menu){
+    menu.addEventListener("click",function(){
+      var target=document.getElementById("wmvFeatures");
+      if(target){
+        target.scrollIntoView({behavior:"smooth"});
+      }
+    });
+  }
+
+})();
+</script>
+
 </body>
 </html>
