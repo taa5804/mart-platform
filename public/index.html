@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>우리아파트 마트 플랫폼 | 마트 사장님 전용 메인</title>
-  <meta name="description" content="마트 사장님이 스스로 운영하고 성장하는 우리아파트 마트 플랫폼. 샘플보기, 오늘의 시세 매칭기, 가맹비 계산기.">
+  <title>우리아파트 마트 플랫폼</title>
   <link rel="icon" href="/icon-512.png">
 </head>
 <body style="margin:0; padding:0; background:#f4f7fb;">
@@ -2844,6 +2843,118 @@
     });
   }
 
+})();
+</script>
+
+<!-- ========================================================
+   [우리아파트 메인] 4개 버튼 2×2 완벽 균형 격자 정렬 코드
+   (아임웹 코드 위젯 맨 아래에 붙여넣기)
+======================================================== -->
+<style>
+/* 4개 버튼을 가로 2열 × 세로 2행 완벽한 직사각형 격자(Grid)로 정렬 */
+#wooriMartVisual .wmv-buttons {
+  margin-top: 22px !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  max-width: 480px !important;
+  width: 100% !important;
+}
+
+/* 4개 버튼 공통 규격: 높이, 폰트, 여백 일체화 */
+#wooriMartVisual .wmv-buttons > * {
+  width: 100% !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+/* 1. [초록색] 농·축·수산 오늘의 시세 매칭기 */
+#wooriMartVisual #wmvPriceMatchBtn,
+#wooriMartVisual .wmv-price-match-btn {
+  border: 1px solid #059669 !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #059669, #10b981) !important;
+  box-shadow: 0 6px 16px rgba(5, 150, 105, 0.28) !important;
+  gap: 6px !important;
+}
+
+/* 2. [파란색] 플랫폼 사용 방법 보기 */
+#wooriMartVisual .wmv-main-btn {
+  border: 1px solid #0c4fd7 !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0c4fd7, #1767ed) !important;
+  box-shadow: 0 6px 16px rgba(11, 79, 215, 0.22) !important;
+}
+
+/* 3 & 4. [흰색/블루] 자세히 알아보기 & 샘플보기 */
+#wooriMartVisual .wmv-outline-btn {
+  background: #ffffff !important;
+  border: 1.5px solid #a9c6f1 !important;
+  color: #0c4fd7 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* 마우스 올렸을 때 살짝 뜨는 효과 */
+#wooriMartVisual .wmv-buttons > *:hover {
+  transform: translateY(-2px) !important;
+}
+
+/* 스마트폰 모바일 화면 (768px 이하) 반응형 */
+@media (max-width: 768px) {
+  #wooriMartVisual .wmv-buttons {
+    margin-top: 14px !important;
+    gap: 6px !important;
+    max-width: 100% !important;
+  }
+  #wooriMartVisual .wmv-buttons > * {
+    min-height: 42px !important;
+    height: 42px !important;
+    font-size: 11px !important;
+    padding: 0 4px !important;
+    letter-spacing: -0.7px !important;
+  }
+}
+</style>
+
+<script>
+(function(){
+  function injectPriceBtn() {
+    var container = document.querySelector("#wooriMartVisual .wmv-buttons");
+    if (!container || document.getElementById("wmvPriceMatchBtn")) return;
+
+    var btn = document.createElement("button");
+    btn.id = "wmvPriceMatchBtn";
+    btn.className = "wmv-price-match-btn";
+    btn.type = "button";
+    btn.innerHTML = "<span>🍏</span> <span>농·축·수산 오늘의 시세 매칭기 〉</span>";
+    
+    btn.onclick = function() {
+      window.open("https://www.wooriapt.app/price", "_blank");
+    };
+
+    container.insertBefore(btn, container.firstChild);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", injectPriceBtn);
+  } else {
+    injectPriceBtn();
+  }
+  setTimeout(injectPriceBtn, 300);
 })();
 </script>
 
