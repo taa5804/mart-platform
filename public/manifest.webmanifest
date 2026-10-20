@@ -1,7 +1,7 @@
 {
   "id": "/wooriauto-app",
-  "name": "우리자동차 QR",
-  "short_name": "우리자동차",
+  "name": "우리상점 - 단골마트 오늘의 특가",
+  "short_name": "우리상점",
   "description": "차량이동 요청 알림 앱",
   "start_url": "/72.html",
   "scope": "/",
