@@ -1,7 +1,7 @@
 {
   "id": "/mart-sign-app-v1",
-  "name": "우리가게",
-  "short_name": "우리가게",
+  "name": "우리상점 - 단골마트 오늘의 특가",
+  "short_name": "우리상점",
   "description": "마트 행사와 할인 알림",
   "start_url": "/mart-open.html",
   "scope": "/",
