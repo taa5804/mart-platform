@@ -1123,7 +1123,7 @@
     async function s74LoadProducts(){
       try{
         const res=await fetch(
-          `${S74_SUPABASE_URL}/rest/v1/store_products_live?store_id=eq.${encodeURIComponent(S74_STORE_ID)}&select=product_no,category,product_name,price,normal_price,group_price,image_url,description,join_count,target_count,discount_rate&order=category.asc,product_no.asc`,
+          `${S74_SUPABASE_URL}/rest/v1/store_products_live?store_id=eq.${encodeURIComponent(S74_STORE_ID)}&select=product_no,category,product_name,price,normal_price,group_price,image_url,description,join_count,target_count&order=category.asc,product_no.asc`,
           {headers:{apikey:S74_SUPABASE_KEY,Authorization:'Bearer '+S74_SUPABASE_KEY}}
         );
         if(!res.ok)throw new Error(await res.text());
