@@ -85,7 +85,7 @@ module.exports = async function handler(req, res) {
         `▶ 로그인 ID: ${cleanPhone}`,
         ``,
         `지금 바로 아래 링크를 눌러 특가상품 등록, 디지털 전단지 운영을 시작하세요:`,
-        `https://mart-platform.vercel.app/admin.html`,
+        `https://mart-platform.vercel.app/admin.html?store=${encodeURIComponent(mart_code || "M000002")}&name=${encodeURIComponent(mart_name || "에너젠마트")}`,
         ``,
         `문의: 우리아파트 본사 062-952-4150`
       ].join("\n");
