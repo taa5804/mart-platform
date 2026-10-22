@@ -531,6 +531,41 @@ async function patchRows(
   return await response.json();
 }
 
+
+// Auto login if opened from SMS link with store code
+async function initStoreFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const storeId = params.get('store') || params.get('id');
+  const storeName = params.get('name') || params.get('mart');
+
+  if (storeId) {
+    currentStoreId = storeId;
+    const titleEl = document.querySelector('.sa-title');
+    if (titleEl) {
+      titleEl.textContent = (storeName ? '[' + storeName + '] ' : '') + '매장관리자';
+    }
+    const lb = document.getElementById('loginBox');
+    const ab = document.getElementById('adminBox');
+    if (lb) lb.classList.add('sa-hidden');
+    if (ab) ab.classList.remove('sa-hidden');
+
+    const accId = document.getElementById('accountStoreId');
+    if (accId) accId.value = storeId;
+
+    renderInputs();
+    try {
+      await Promise.all([
+        loadDraftProducts(),
+        loadLiveProducts(),
+        loadStoreProfile()
+      ]);
+    } catch(e) {
+      console.warn('Initial load error:', e);
+    }
+  }
+}
+window.addEventListener('DOMContentLoaded', initStoreFromUrl);
+
 async function loginStore() {
   const id =
     document
