@@ -191,6 +191,79 @@ button:disabled{
     padding:17px 14px;
   }
 }
+
+.contract-box{
+  background:#fff;
+  border:1px solid #c9d8e2;
+  border-radius:12px;
+  padding:16px;
+  height:190px;
+  overflow-y:auto;
+  font-size:13px;
+  line-height:1.75;
+  color:#334155;
+  margin-bottom:14px;
+}
+.contract-box h4{margin:10px 0 4px;color:#0f172a;font-size:14px}
+.contract-highlight{background:#fef3c7;padding:2px 4px;border-radius:4px;font-weight:700;color:#92400e}
+.sig-wrap{
+  background:#f8fafc;
+  border:2px dashed #94a3b8;
+  border-radius:12px;
+  padding:12px;
+  text-align:center;
+  margin-bottom:14px;
+}
+.sig-canvas{
+  background:#fff;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  width:100%;
+  max-width:380px;
+  height:120px;
+  touch-action:none;
+  cursor:crosshair;
+  display:block;
+  margin:0 auto;
+}
+.sig-btn{
+  margin-top:8px;
+  padding:6px 14px;
+  font-size:12px;
+  border-radius:6px;
+  border:1px solid #cbd5e1;
+  background:#fff;
+  color:#475569;
+  cursor:pointer;
+}
+.sig-btn:hover{background:#f1f5f9}
+.bank-copy-card{
+  background:#f0fdf4;
+  border:2px solid #86efac;
+  border-radius:14px;
+  padding:20px;
+  text-align:center;
+  margin-top:20px;
+}
+.bank-copy-btn{
+  background:#16a34a;
+  color:#fff;
+  font-size:16px;
+  font-weight:700;
+  padding:12px 24px;
+  border-radius:10px;
+  border:none;
+  cursor:pointer;
+  margin-top:12px;
+  display:inline-block;
+}
+.bank-copy-btn:hover{background:#15803d}
+.step-bar{display:flex;justify-content:space-between;margin:20px 0;position:relative}
+.step-item{flex:1;text-align:center;position:relative;font-size:13px;font-weight:700;color:#64748b}
+.step-item.active{color:#15803d}
+.step-item .circle{width:28px;height:28px;line-height:28px;border-radius:50%;background:#e2e8f0;margin:0 auto 6px;color:#64748b}
+.step-item.active .circle{background:#16a34a;color:#fff}
+
 </style>
 </head>
 
@@ -337,9 +410,51 @@ button:disabled{
   </div>
 
 
+  
+  <div class="card">
+    <h2>3. 공식 가맹점 이용계약서 및 전자서명</h2>
+    <p class="guide" style="margin-bottom:10px;">
+      아래 표준 가맹계약서를 확인하신 후 손가락 또는 마우스로 전자 서명해 주세요.
+    </p>
+
+    <div class="contract-box">
+      <h4>제1조 (목적)</h4>
+      본 계약은 주식회사 우리아파트(이하 "본사")와 가맹점(이하 "마트") 간의 '우리아파트 마트 플랫폼' 가맹점 서비스 이용 및 디지털 전단 운영에 관한 제반 사항을 규정함을 목적으로 합니다.
+
+      <h4>제2조 (가맹비 및 월 이용료)</h4>
+      1. 마트는 본사가 정한 월 이용료를 납부함으로써 플랫폼의 특가상품 등록, 디지털 전단지 운영, 입주민 알림 전송 기능을 제공받습니다.<br>
+      2. 이용료는 본사 지정 계좌로 무통장 입금하거나 별도 협의된 방식으로 납부합니다.
+
+      <h4>제3조 (계약의 효력 발생 및 정지조건 - 필독)</h4>
+      <span class="contract-highlight">
+      본 계약은 마트가 서명하고 "본사 지정 계좌로 이용료(가맹비)를 완납하여 본사가 최종 사용승인(개통)한 시점"부터 정식 효력이 발생합니다. 가맹비가 입금되지 아니한 경우 본 계약은 효력이 발생하지 아니하며 관리자 방은 개통되지 않습니다.
+      </span>
+
+      <h4>제4조 (본사의 의무 및 서비스 개통)</h4>
+      본사는 마트의 서류 검토 및 가맹비 입금이 확인되는 즉시 고유 마트코드를 발급하고 매장 관리자 방을 정식 개통합니다.
+
+      <h4>제5조 (해지 및 개인정보 보호)</h4>
+      본 계약은 일방의 중대한 위반 또는 상호 협의로 해지할 수 있으며, 제출된 사업자등록증 및 고객정보는 관련 법령에 따라 엄격히 보호됩니다.
+    </div>
+
+    <div class="sig-wrap">
+      <div style="font-weight:700;font-size:14px;color:#1e293b;margin-bottom:8px;">
+        가맹점 대표자 전자서명 (아래 네모칸에 서명해 주세요)
+      </div>
+      <canvas id="sigCanvas" class="sig-canvas" width="380" height="120"></canvas>
+      <button type="button" class="sig-btn" onclick="clearSignature()">서명 다시 쓰기</button>
+      <input type="hidden" id="signatureData">
+    </div>
+
+    <div class="field" style="margin-top:10px;">
+      <label>대표자 자필 확인 <span class="req">*</span></label>
+      <input id="signerName" type="text" placeholder="대표자 성함을 입력해 주세요 (예: 장수용)">
+    </div>
+  </div>
+
   <div class="card">
 
-    <h2>3. 가입 신청</h2>
+    <h2>4. 최종 가입 신청 및 계좌 안내</h2>
 
     <label class="agree">
       <input
@@ -384,6 +499,74 @@ const sb =
     SUPABASE_KEY
   );
 
+
+
+// Signature Canvas Setup
+let sigCanvas, sigCtx, isDrawing = false;
+window.addEventListener("DOMContentLoaded", () => {
+  sigCanvas = document.getElementById("sigCanvas");
+  if (!sigCanvas) return;
+  sigCtx = sigCanvas.getContext("2d");
+  sigCtx.strokeStyle = "#0f172a";
+  sigCtx.lineWidth = 2.5;
+  sigCtx.lineCap = "round";
+
+  function getPos(e) {
+    const rect = sigCanvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * (sigCanvas.width / rect.width),
+      y: (clientY - rect.top) * (sigCanvas.height / rect.height)
+    };
+  }
+
+  function start(e) {
+    isDrawing = true;
+    const p = getPos(e);
+    sigCtx.beginPath();
+    sigCtx.moveTo(p.x, p.y);
+    if (e.cancelable && e.type.startsWith("touch")) e.preventDefault();
+  }
+  function move(e) {
+    if (!isDrawing) return;
+    const p = getPos(e);
+    sigCtx.lineTo(p.x, p.y);
+    sigCtx.stroke();
+    if (e.cancelable && e.type.startsWith("touch")) e.preventDefault();
+  }
+  function end() {
+    if (isDrawing) {
+      isDrawing = false;
+      document.getElementById("signatureData").value = sigCanvas.toDataURL("image/png");
+      if (typeof checkForm === "function") checkForm();
+    }
+  }
+
+  sigCanvas.addEventListener("mousedown", start);
+  sigCanvas.addEventListener("mousemove", move);
+  window.addEventListener("mouseup", end);
+
+  sigCanvas.addEventListener("touchstart", start, { passive: false });
+  sigCanvas.addEventListener("touchmove", move, { passive: false });
+  sigCanvas.addEventListener("touchend", end);
+});
+
+function clearSignature() {
+  if (!sigCtx || !sigCanvas) return;
+  sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+  document.getElementById("signatureData").value = "";
+  if (typeof checkForm === "function") checkForm();
+}
+
+function copyBankAccount() {
+  const acc = "농협 301-0123-4567-81";
+  navigator.clipboard.writeText(acc).then(() => {
+    alert("본사 입금계좌번호(" + acc + ")가 복사되었습니다! 폰뱅킹에 붙여넣어 입금해 주세요.");
+  }).catch(() => {
+    prompt("아래 계좌번호를 복사해 주세요:", acc);
+  });
+}
 
 const requiredTextFields = [
   "martName",
@@ -720,16 +903,73 @@ async function submitSignup(){
     }
 
 
-    msg.style.color =
-      "#0b7a45";
+    // Send Deposit Guide LMS via mart-notify
+    try {
+      fetch("/api/mart-notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "DEPOSIT_GUIDE",
+          mart_name: martName,
+          owner_name: ownerName,
+          phone: phone
+        })
+      });
+    } catch(notifyErr) {
+      console.warn("Notify error:", notifyErr);
+    }
 
-    msg.textContent =
-      "가입 신청이 완료되었습니다. 본사 승인 대기 중입니다.";
+    const card = document.querySelector(".wrap");
+    card.innerHTML = `
+      <div style="background:#fff;border-radius:20px;padding:36px 24px;box-shadow:0 10px 30px rgba(0,0,0,0.08);text-align:center;">
+        <div style="width:64px;height:64px;line-height:64px;background:#dcfce7;color:#15803d;border-radius:50%;font-size:32px;margin:0 auto 16px;">✓</div>
+        <h1 style="color:#0f172a;font-size:24px;margin-bottom:8px;">가맹계약 체결 및 가입 완료</h1>
+        <p style="color:#475569;font-size:15px;line-height:1.6;margin-bottom:24px;">
+          [${martName}] 대표님의 가맹계약 전자서명과 필수서류가 본사에 정상 접수되었습니다.
+        </p>
 
-    submitBtn.textContent =
-      "가입 신청 완료";
+        <div class="step-bar">
+          <div class="step-item active">
+            <div class="circle">✓</div>
+            계약서 서명
+          </div>
+          <div class="step-item active">
+            <div class="circle">2</div>
+            가맹비 입금대기
+          </div>
+          <div class="step-item">
+            <div class="circle">3</div>
+            방 개통 완료
+          </div>
+        </div>
 
-    submitBtn.disabled = true;
+        <div class="bank-copy-card">
+          <div style="font-size:14px;color:#166534;font-weight:700;">본사 입금 전용 계좌</div>
+          <div style="font-size:22px;color:#0f172a;font-weight:900;margin:10px 0;">
+            농협 301-0123-4567-81
+          </div>
+          <div style="font-size:14px;color:#475569;">
+            예금주: <b>(주)에너젠51</b> (입금자명: ${martName})
+          </div>
+          <button type="button" class="bank-copy-btn" onclick="copyBankAccount()">
+            📋 계좌번호 복사하기
+          </button>
+        </div>
+
+        <p style="color:#64748b;font-size:13px;line-height:1.7;margin-top:20px;">
+          * 계좌번호 및 가맹 안내가 대표님 휴대폰(<b>${phone}</b>)으로 문자로 발송되었습니다.<br>
+          * 본사에서 입금 확인 즉시 매장 관리자 방이 개통되며, 접속 링크와 마트코드가 문자로 날아갑니다.
+        </p>
+
+        <div style="margin-top:28px;">
+          <a href="/index.html" style="display:inline-block;padding:12px 28px;background:#f1f5f9;color:#334155;border-radius:10px;text-decoration:none;font-weight:700;">
+            홈으로 돌아가기
+          </a>
+        </div>
+      </div>
+    `;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
 
 
   }catch(error){
