@@ -152,7 +152,7 @@
 </style>
 
 <div class="sa-title" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;">
-  <a href="/index.html" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:rgba(255,255,255,0.22);color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:800;border:1px solid rgba(255,255,255,0.4);">🏠 마트 메인</a>
+  <a href="/74.html" id="btnCustomerView" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:7px 14px;background:#15803d;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:900;border:1px solid rgba(255,255,255,0.5);box-shadow:0 3px 8px rgba(0,0,0,0.2);">🛒 내 마트(손님 화면) 보기</a>
   <span class="sa-title-text" style="font-size:18px;font-weight:900;">매장관리자 V1</span>
   <span style="width:75px;"></span>
 </div>
@@ -547,6 +547,8 @@ async function initStoreFromUrl() {
     const titleEl = document.querySelector('.sa-title');
     if (titleEl) {
       titleEl.textContent = (storeName ? '[' + storeName + '] ' : '') + '매장관리자';
+    const btnView = document.getElementById('btnCustomerView');
+    if (btnView) btnView.href = '/74.html?store=' + encodeURIComponent(storeId);
     }
     const lb = document.getElementById('loginBox');
     const ab = document.getElementById('adminBox');
