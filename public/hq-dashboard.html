@@ -164,10 +164,10 @@ body{
           <span>매장 QR 주문 신청과 제작·발송 상태를 관리합니다.</span>
         </button>
 
-        <button type="button" class="menu-card" onclick="openHqRoom('inquiry')">
+        <button type="button" class="menu-card" onclick="openHqRoom('inquiry')" style="position:relative;">
           <div class="menu-icon">💬</div>
-          <strong>가맹점 소통</strong>
-          <span>가맹점과 본사의 소통 내용을 관리합니다.</span>
+          <strong>가맹점 소통 <span id="hqInquiryBadge" style="display:none;background:#dc2626;color:#fff;font-size:12px;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle;">신규</span></strong>
+          <span>가맹점과 본사의 실시간 1:1 문의 및 답변을 관리합니다.</span>
         </button>
       </div>
 
@@ -813,37 +813,45 @@ if(!session()){
       #hqInquiryApp .green{background:#15803d}
       #hqInquiryApp .blue{background:#2563eb}
       #hqInquiryApp .gray{background:#475569}
-      #hqInquiryApp .hi-store{margin-top:12px;padding:12px;border-radius:8px;background:#f8fafc;font-size:14px}
-      #hqInquiryApp .hi-list{display:flex;flex-direction:column;gap:9px;max-height:460px;overflow:auto}
-      #hqInquiryApp .hi-msg{padding:11px 13px;border-radius:10px;background:#f1f5f9;line-height:1.55;font-size:14px}
-      #hqInquiryApp .hi-msg.hq{background:#dcfce7}
-      #hqInquiryApp .hi-meta{margin-bottom:4px;font-size:11px;color:#64748b}
+      #hqInquiryApp .hi-store{margin-top:12px;padding:12px;border-radius:8px;background:#f0fdf4;border:1px solid #bbf7d0;font-size:14px;font-weight:700;color:#166534}
+      #hqInquiryApp .hi-list{display:flex;flex-direction:column;gap:10px;max-height:460px;overflow:auto;padding:4px}
+      #hqInquiryApp .hi-msg{padding:13px 15px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;line-height:1.55;font-size:15px;cursor:pointer}
+      #hqInquiryApp .hi-msg.hq{background:#dcfce7;border:1px solid #86efac;margin-left:24px}
+      #hqInquiryApp .hi-meta{margin-bottom:5px;font-size:12px;font-weight:700;color:#1e40af;display:flex;justify-content:space-between;align-items:center}
+      #hqInquiryApp .hi-msg.hq .hi-meta{color:#15803d}
       #hqInquiryApp .hi-status{margin-top:10px;font-size:13px;font-weight:700}
+      #hqInquiryApp .hi-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+      #hqInquiryApp .hi-tab{background:#e2e8f0;color:#1e293b;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;border:0}
+      #hqInquiryApp .hi-tab.active{background:#15803d;color:#fff}
     </style>
 
-    <h2>가맹점 소통</h2>
-    <p class="hi-sub">매장 ID를 입력하면 해당 가맹점의 문의방을 바로 열어 본사와 소통할 수 있습니다.</p>
+    <h2>💬 가맹점 실시간 소통방</h2>
+    <p class="hi-sub">가맹점(매장관리자)에서 보낸 문의가 실시간으로 자동 도착합니다. 매장을 선택하거나 바로 답변을 전송하세요.</p>
 
     <div class="hi-card">
-      <label for="hiStoreId">매장 ID</label>
-      <input id="hiStoreId" placeholder="예: STORE0001">
+      <label>가맹점 빠른 선택 (클릭 시 해당 매장 대화방 연결)</label>
+      <div id="hiStoreTabs" class="hi-tabs"></div>
+      <label for="hiStoreId" style="margin-top:8px;">선택된 매장 코드 (답변 받을 가맹점)</label>
+      <input id="hiStoreId" value="M000002" placeholder="예: M000002">
       <div class="hi-btns">
-        <button id="hiOpen" type="button" class="green">문의방 열기</button>
-        <button id="hiRefresh" type="button" class="gray">새로고침</button>
+        <button id="hiOpen" type="button" class="green">해당 매장만 보기</button>
+        <button id="hiShowAll" type="button" class="blue">전체 매장 문의 보기</button>
+        <button id="hiRefresh" type="button" class="gray">🔄 새로고침</button>
       </div>
-      <div id="hiStore" class="hi-store">매장 ID를 입력해 주세요.</div>
+      <div id="hiStore" class="hi-store">현재 답변 대상 매장: 에너젠마트 (M000002)</div>
       <div id="hiStatus" class="hi-status"></div>
     </div>
 
     <div class="hi-card">
-      <div id="hiList" class="hi-list"><div class="hi-msg">문의방을 먼저 열어 주세요.</div></div>
+      <label style="margin-bottom:10px;">📩 도착한 문의 및 대화 내역</label>
+      <div id="hiList" class="hi-list"><div class="hi-msg">문의 내역을 불러오는 중입니다...</div></div>
     </div>
 
     <div class="hi-card">
-      <label for="hiMessage">본사 답변 / 문의</label>
-      <textarea id="hiMessage" maxlength="5000" placeholder="가맹점에 보낼 내용을 입력하세요."></textarea>
+      <label for="hiMessage">✍️ 본사 답변 보내기</label>
+      <textarea id="hiMessage" maxlength="5000" placeholder="가맹점 사장님께 보낼 답변을 입력하고 [본사 답변 전송]을 누르세요."></textarea>
       <div class="hi-btns">
-        <button id="hiSend" type="button" class="blue">전송</button>
+        <button id="hiSend" type="button" class="blue" style="padding:12px 24px;font-size:15px;">📤 본사 답변 전송</button>
       </div>
     </div>
   </div>
@@ -854,9 +862,15 @@ if(!session()){
   var ROOT=document.getElementById("hqInquiryApp");
   if(!ROOT)return;
   var $=function(s){return ROOT.querySelector(s);};
-  var URL="https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-admin-account";
-  var KEY="wooriapt_hq_admin_session";
-  var currentStoreId="";
+  var SB_URL="https://wpshlmijsscmlasqtapa.supabase.co";
+  var SB_KEY="sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K";
+  var currentStoreId="M000002";
+  var filterMode="ALL";
+  var storeNames={
+    "M000002":"에너젠마트",
+    "M000001":"우리마트 본점",
+    "STORE0001":"기본 가맹점"
+  };
 
   function esc(v){
     var d=document.createElement("div");
@@ -867,61 +881,180 @@ if(!session()){
     $("#hiStatus").textContent=t||"";
     $("#hiStatus").style.color=e?"#dc2626":"#15803d";
   }
-  async function api(action,data){
-    var body=data||{};
-    body.action=action;
-    body.session_token=localStorage.getItem(KEY)||"";
-    var r=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    var raw=await r.text();
-    var x={};
-    try{x=raw?JSON.parse(raw):{};}catch(e){}
-    if(!r.ok||x.ok===false)throw new Error(x.message||x.error||"처리에 실패했습니다.");
-    return x;
+  function getStoreLabel(code){
+    var c=String(code||"M000002").trim();
+    return storeNames[c] ? (storeNames[c]+" ("+c+")") : c;
   }
+
+  async function fetchStoreNames(){
+    try{
+      var r=await fetch(SB_URL+"/rest/v1/mart_members?select=mart_code,mart_name",{
+        headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY}
+      });
+      if(r.ok){
+        var rows=await r.json();
+        (rows||[]).forEach(function(m){
+          if(m.mart_code && m.mart_name) storeNames[m.mart_code]=m.mart_name;
+        });
+      }
+    }catch(e){}
+  }
+
+  function renderTabs(allMessages){
+    var tabsBox=$("#hiStoreTabs");
+    if(!tabsBox)return;
+    var stores=["M000002"];
+    (allMessages||[]).forEach(function(m){
+      if(m.store_id && stores.indexOf(m.store_id)===-1) stores.push(m.store_id);
+    });
+    tabsBox.innerHTML="";
+
+    var allBtn=document.createElement("button");
+    allBtn.type="button";
+    allBtn.className="hi-tab"+(filterMode==="ALL"?" active":"");
+    allBtn.textContent="📋 전체 문의 ("+(allMessages?allMessages.length:0)+"건)";
+    allBtn.onclick=function(){
+      filterMode="ALL";
+      load();
+    };
+    tabsBox.appendChild(allBtn);
+
+    stores.forEach(function(st){
+      var count=(allMessages||[]).filter(function(m){return m.store_id===st;}).length;
+      var btn=document.createElement("button");
+      btn.type="button";
+      btn.className="hi-tab"+(filterMode==="STORE"&&currentStoreId===st?" active":"");
+      btn.textContent="🏪 "+getStoreLabel(st)+" ("+count+"건)";
+      btn.onclick=function(){
+        currentStoreId=st;
+        filterMode="STORE";
+        $("#hiStoreId").value=st;
+        $("#hiStore").textContent="현재 답변 대상 매장: "+getStoreLabel(st);
+        load();
+      };
+      tabsBox.appendChild(btn);
+    });
+  }
+
   function render(messages){
     var box=$("#hiList");
     box.innerHTML="";
-    if(!messages||!messages.length){box.innerHTML='<div class="hi-msg">아직 문의 내용이 없습니다.</div>';return;}
+    if(!messages||!messages.length){
+      box.innerHTML='<div class="hi-msg">아직 도착한 문의 내용이 없습니다.</div>';
+      return;
+    }
     messages.forEach(function(m){
+      var isHq=String(m.sender_type||"").toUpperCase()==="HQ";
       var div=document.createElement("div");
-      div.className="hi-msg "+(String(m.sender_type||"").toUpperCase()==="HQ"?"hq":"");
-      div.innerHTML='<div class="hi-meta">'+esc(m.sender_type||"")+" · "+esc(m.created_at?new Date(m.created_at).toLocaleString("ko-KR"):"")+'</div><div>'+esc(m.message||"")+'</div>';
+      div.className="hi-msg "+(isHq?"hq":"");
+      var senderLabel=isHq ? "🏢 본사 답변 ("+getStoreLabel(m.store_id)+")" : "🏪 가맹점 문의 · "+getStoreLabel(m.store_id);
+      var timeStr=m.created_at ? new Date(m.created_at).toLocaleString("ko-KR") : "";
+      div.innerHTML='<div class="hi-meta"><span>'+esc(senderLabel)+'</span><span>'+esc(timeStr)+'</span></div><div style="font-weight:600;color:#0f172a;">'+esc(m.message||"")+'</div>';
+      div.onclick=function(){
+        if(m.store_id){
+          currentStoreId=m.store_id;
+          $("#hiStoreId").value=m.store_id;
+          $("#hiStore").textContent="현재 답변 대상 매장: "+getStoreLabel(m.store_id);
+        }
+      };
       box.appendChild(div);
     });
     box.scrollTop=box.scrollHeight;
   }
-  async function load(){
-    var id=$("#hiStoreId").value.trim();
-    if(!id){status("매장 ID를 입력해 주세요.",true);return;}
+
+  async function load(silent){
     try{
-      status("문의방을 불러오는 중입니다.",false);
-      var check=await api("hq_store_check",{store_id:id});
-      currentStoreId=check.store.store_id||id;
-      $("#hiStoreId").value=currentStoreId;
-      $("#hiStore").textContent=(check.store.store_name||"")+" ("+currentStoreId+")";
-      var list=await api("hq_inquiry_list",{store_id:currentStoreId});
-      render(list.messages||[]);
-      status("문의방이 연결되었습니다.",false);
-    }catch(e){currentStoreId="";render([]);status(e.message,true);}
+      if(!silent) status("실시간 문의 내역을 불러오는 중입니다...",false);
+      await fetchStoreNames();
+      var r=await fetch(SB_URL+"/rest/v1/store_inquiry_messages?select=*&order=created_at.asc",{
+        headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY}
+      });
+      if(!r.ok) throw new Error("문의 내역 조회 실패 ("+r.status+")");
+      var allMessages=await r.json();
+
+      var badge=document.getElementById("hqInquiryBadge");
+      if(badge){
+        var storeMsgs=(allMessages||[]).filter(function(m){return String(m.sender_type||"").toUpperCase()!=="HQ";});
+        if(storeMsgs.length>0){
+          badge.style.display="inline-block";
+          badge.textContent="문의 "+storeMsgs.length+"건";
+        }
+      }
+
+      renderTabs(allMessages);
+
+      var id=$("#hiStoreId").value.trim()||"M000002";
+      currentStoreId=id;
+      $("#hiStore").textContent="현재 답변 대상 매장: "+getStoreLabel(currentStoreId);
+
+      var filtered = filterMode==="ALL"
+        ? allMessages
+        : (allMessages||[]).filter(function(m){return m.store_id===currentStoreId;});
+
+      render(filtered);
+      if(!silent) status("✅ 가맹점 문의방이 실시간 연결되었습니다. (표시된 대화: "+(filtered?filtered.length:0)+"건)",false);
+    }catch(e){
+      if(!silent) status(e.message,true);
+    }
   }
-  $("#hiOpen").onclick=load;
-  $("#hiRefresh").onclick=function(){if(currentStoreId)$("#hiStoreId").value=currentStoreId;load();};
+
+  $("#hiOpen").onclick=function(){
+    var id=$("#hiStoreId").value.trim()||"M000002";
+    currentStoreId=id;
+    filterMode="STORE";
+    load();
+  };
+  $("#hiShowAll").onclick=function(){
+    filterMode="ALL";
+    load();
+  };
+  $("#hiRefresh").onclick=function(){load();};
+
   $("#hiSend").onclick=async function(){
-    if(!currentStoreId){status("문의방을 먼저 열어 주세요.",true);return;}
+    var targetStore=$("#hiStoreId").value.trim()||currentStoreId||"M000002";
     var message=$("#hiMessage").value.trim();
-    if(!message){status("문의내용을 입력해 주세요.",true);return;}
+    if(!message){status("답변할 내용을 입력해 주세요.",true);return;}
     try{
-      await api("hq_inquiry_send",{store_id:currentStoreId,message:message});
+      status("가맹점으로 답변을 전송하는 중...",false);
+      var r=await fetch(SB_URL+"/rest/v1/store_inquiry_messages",{
+        method:"POST",
+        headers:{
+          "apikey":SB_KEY,
+          "Authorization":"Bearer "+SB_KEY,
+          "Content-Type":"application/json",
+          "Prefer":"return=representation"
+        },
+        body:JSON.stringify({
+          store_id:targetStore,
+          sender_type:"HQ",
+          message:message
+        })
+      });
+      if(!r.ok){
+        var errTxt=await r.text();
+        throw new Error("전송 실패: "+errTxt);
+      }
       $("#hiMessage").value="";
-      await load();
-      status("가맹점에 문의가 전달되었습니다.",false);
+      await load(true);
+      status("✅ ["+getStoreLabel(targetStore)+"] 매장으로 본사 답변이 즉시 전송되었습니다!",false);
     }catch(e){status(e.message,true);}
   };
-  $("#hiStoreId").addEventListener("keydown",function(e){if(e.key==="Enter")load();});
+
+  $("#hiStoreId").addEventListener("keydown",function(e){
+    if(e.key==="Enter"){filterMode="STORE";load();}
+  });
+
   window.loadHqInquiry=function(){
-    status("",false);
-    if(currentStoreId){$("#hiStoreId").value=currentStoreId;load();}
+    load();
   };
+
+  setTimeout(function(){ load(true); }, 500);
+  setInterval(function(){
+    var room=document.getElementById("hqRoomInquiry");
+    if(room && room.classList.contains("active")){
+      load(true);
+    }
+  }, 5000);
 })();
 </script>
 
