@@ -102,6 +102,10 @@
     {
       "source": "/mart-sitemap.xml",
       "destination": "/api/mart-page?mode=mart-sitemap-index"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/mart-page?mode=mart-sitemap-index"
     }
   ]
 }

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wooriapt.ai.kr/sitemap.xml
+Sitemap: https://wooriapt.ai.kr/mart-sitemap.xml
