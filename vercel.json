@@ -74,6 +74,34 @@
     {
       "source": "/broker-sitemap.xml",
       "destination": "/api/broker-sitemap"
+    },
+    {
+      "source": "/mart-landing",
+      "destination": "/mart-landing.html"
+    },
+    {
+      "source": "/mart-price",
+      "destination": "/mart-price.html"
+    },
+    {
+      "source": "/price",
+      "destination": "/price.html"
+    },
+    {
+      "source": "/mart-search/:region/:city/:place/:mart",
+      "destination": "/api/mart-page?mode=mart-page&region=:region&city=:city&place=:place&mart=:mart"
+    },
+    {
+      "source": "/mart-search/:region/:city/:place",
+      "destination": "/api/mart-page?mode=mart-page&region=:region&city=:city&place=:place"
+    },
+    {
+      "source": "/sitemaps/marts-:page.xml",
+      "destination": "/api/mart-page?mode=mart-sitemap&page=:page"
+    },
+    {
+      "source": "/mart-sitemap.xml",
+      "destination": "/api/mart-page?mode=mart-sitemap-index"
     }
   ]
 }
