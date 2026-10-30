@@ -126,6 +126,17 @@ module.exports = async function handler(req, res) {
 
       const lmsResult = await sendLms(cleanPhone, "[우리아파트] 가맹계약 접수 및 계좌안내", content);
 
+      // 대표님(010-2286-4150) 휴대폰으로 마트 가맹신청 즉시 알림 발송
+      const adminContent = [
+        "[우리아파트 마트플랫폼 신규 가맹신청]",
+        "새로운 마트 가맹계약 신청이 접수되었습니다!",
+        "",
+        "• 마트명: " + (mart_name || "-"),
+        "• 대표자명: " + (owner_name || "-"),
+        "• 연락처: " + cleanPhone
+      ].join("\n");
+      await sendLms("01022864150", "[마트플랫폼 신규 가맹신청]", adminContent);
+
       return res.status(200).json({
         ok: true,
         message: "가맹계약 접수 및 입금안내 문자가 발송되었습니다.",
