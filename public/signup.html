@@ -412,7 +412,7 @@ button:disabled{
         <b>[을 - 플랫폼 본사]</b> (고정 기재)<br>
         • 상호명: 에너젠51 (우리아파트)<br>
         • 사업자등록번호: 410-27-88141<br>
-        • <b>정산관리 예금주: 송해석 (국민은행 733701-01-383748)</b><br>
+        • <b>정산관리 예금주: 송해석 (농협은행 199-02-289684)</b><br>
         • 본사 주소: 광주광역시 광산구 하남산단8번로 176
       </div></div>
 
@@ -819,12 +819,12 @@ async function submitSignup(){
         <div class="bank-copy-card">
           <div style="font-size:14px;color:#166534;font-weight:700;">본사 입금 전용 계좌</div>
           <div style="font-size:22px;color:#0f172a;font-weight:900;margin:10px 0;">
-            농협 301-0123-4567-81
+            농협은행 199-02-289684
           </div>
           <div style="font-size:14px;color:#475569;">
-            예금주: <b>(주)에너젠51</b> (입금자명: ${martName})
+            예금주: <b>송해석</b> (입금자명: ${martName})
           </div>
-          <button type="button" class="bank-copy-btn" onclick="copyBankAccount()">
+          <button type="button" class="bank-copy-btn" onclick="navigator.clipboard.writeText('199-02-289684').then(function(){alert('계좌번호가 복사되었습니다: 농협은행 199-02-289684');}).catch(function(){alert('농협은행 199-02-289684 (예금주 송해석)');})">
             📋 계좌번호 복사하기
           </button>
         </div>
