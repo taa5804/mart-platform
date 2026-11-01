@@ -362,9 +362,9 @@ button:disabled{
 </div>
 
   <div class="card">
-    <h2>3. 공식 가맹점 이용계약서 및 전자서명</h2>
+    <h2>3. 마트 제휴 계약서 확인 및 온라인 동의</h2>
     <p class="guide" style="margin-bottom:10px;">
-      아래 표준 가맹계약서를 확인하신 후 손가락 또는 마우스로 전자 서명해 주세요.
+      아래 제휴 계약서 내용을 확인하신 후 하단에서 동의 여부를 선택해 주세요.
     </p>
 
     <div class="contract-box" style="line-height:1.8; font-size:13.5px; color:#334155; max-height:340px; overflow-y:auto; padding:18px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px;">
@@ -416,24 +416,39 @@ button:disabled{
         • 본사 주소: 광주광역시 광산구 하남산단8번로 176
       </div></div>
 
-    <div class="sig-wrap">
-      <div style="font-weight:700;font-size:14px;color:#1e293b;margin-bottom:8px;">
-        가맹점 대표자 전자서명 (아래 네모칸에 서명해 주세요)
+    <div style="margin-top:20px; padding:18px 20px; background:#f0fdf4; border:2px solid #86efac; border-radius:12px;">
+      <div style="font-weight:800; font-size:15px; color:#166534; margin-bottom:12px;">
+        위 제휴 계약서(제1조~제6조) 내용에 동의하십니까? <span class="req">*</span>
       </div>
-      <canvas id="sigCanvas" class="sig-canvas" width="380" height="120"></canvas>
-      <button type="button" class="sig-btn" onclick="clearSignature()">서명 다시 쓰기</button>
-      <input type="hidden" id="signatureData">
-    </div>
-
-    <div class="field" style="margin-top:10px;">
-      <label>대표자 자필 확인 <span class="req">*</span></label>
-      <input id="signerName" type="text" placeholder="대표자 성함을 입력해 주세요 (예: 장수용)">
+      <div style="display:flex; gap:28px; align-items:center; flex-wrap:wrap;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:16px; font-weight:800; color:#15803d;">
+          <input type="radio" name="contractAgree" id="agreeYes" value="yes" onchange="checkForm()" style="width:20px; height:20px; accent-color:#15803d; cursor:pointer;">
+          <span>동의함 (온라인 계약 체결)</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:16px; font-weight:700; color:#64748b;">
+          <input type="radio" name="contractAgree" id="agreeNo" value="no" onchange="checkForm()" style="width:20px; height:20px; accent-color:#64748b; cursor:pointer;">
+          <span>동의 안함</span>
+        </label>
+      </div>
+      <div style="font-size:13px; color:#166534; margin-top:10px; line-height:1.5;">
+        ※ 전자문서 및 전자거래 기본법 제4조에 따라 온라인 '동의함' 선택 시 정식 서면 계약 날인과 동일한 법적 효력이 발생합니다.
+      </div>
     </div>
   </div>
 
   <div class="card">
-
-    <h2>4. 최종 가입 신청 및 계좌 안내</h2>
+    <h2>4. 최종 가입 신청</h2>
+    <button
+      id="submitBtn"
+      type="button"
+      disabled
+      onclick="submitSignup()"
+      style="height:52px; font-size:17px; font-weight:800;"
+    >
+      온라인 제휴 계약 체결 및 무료 가입 신청
+    </button>
+    <div id="msg" class="msg"></div>
+  </div> 및 계좌 안내</h2>
 
     <label class="agree">
       <input
@@ -584,8 +599,8 @@ function checkForm(){
   const businessFile =
     document.getElementById("businessFile").files.length > 0;
 
-  const agree =
-    document.getElementById("agree").checked;
+  const agreeEl = document.getElementById("agreeYes");
+  const agree = agreeEl ? agreeEl.checked : false;
 
   const allOK =
     textOK &&
@@ -673,6 +688,13 @@ async function submitSignup(){
   if(!businessFile){
     msg.style.color = "#d93025";
     msg.textContent = "사업자등록증 사본을 업로드해 주세요.";
+    return;
+  }
+
+  const agreeEl = document.getElementById("agreeYes");
+  if(!agreeEl || !agreeEl.checked){
+    msg.style.color = "#d93025";
+    msg.textContent = "제휴 계약서 내용에 '동의함'을 선택해 주셔야 가입이 진행됩니다.";
     return;
   }
 
