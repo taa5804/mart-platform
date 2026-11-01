@@ -249,7 +249,7 @@ async function handleMartPage(req, res) {
       : `${locationText} 마트·슈퍼마켓 총정리 | 오늘의 장보기 시세·할인쿠폰 | 우리아파트`;
 
     const description = dbMart
-      ? `${locationText} 소재 ${dbMart}(${dbAddress}) 매장 정보와 오늘의 장보기 시세 비교, 반값 할인쿠폰, 신규고객 유치·QR 단골등록·문자비용 0원 우리아파트 마트 플랫폼을 확인하세요.`
+      ? `${locationText} 소재 ${dbMart}(${dbAddress}) 매장 정보와 오늘의 장보기 시세 비교, 반값 할인쿠폰, 신규고객 유치·차량 주차 QR 단골등록·1명 발송 시 15원 초저가 전단 우리아파트 마트 플랫폼을 확인하세요.`
       : `${locationText} 지역 동네마트·식자재마트·슈퍼마켓 주소 및 연락처 디렉토리입니다. 우리동네 마트 특가 정보와 60개 생필품 오늘의 시세를 한눈에 비교하세요.`;
 
     const breadcrumbSchema = {
@@ -416,7 +416,7 @@ h1{margin:0 0 12px;font-size:28px;line-height:1.35;color:#0f172a;letter-spacing:
         </tr>
         <tr>
           <th>플랫폼 지원 서비스</th>
-          <td>오늘의 장보기 시세 비교 · QR 반값 쿠폰북 · 온라인/배달 주문 · 문자비용 0원 단골 알림</td>
+          <td>오늘의 장보기 시세 비교 · 주차 QR 단골 등록 · 디지털 전단지 1명 발송 시 15원 (월 고정비 0원)</td>
         </tr>
       </tbody>
     </table>
@@ -437,15 +437,15 @@ h1{margin:0 0 12px;font-size:28px;line-height:1.35;color:#0f172a;letter-spacing:
       <div class="feature">🎟️ 우리동네 반값 쿠폰북</div>
       <div class="feature">🛵 마트 온라인·배달주문</div>
       <div class="feature">📱 QR 스캔 1초 단골등록</div>
-      <div class="feature">💬 문자발송비 0원 푸시알림</div>
+      <div class="feature">💬 1명 발송 시 15원 디지털 전단</div>
       <div class="feature">🥕 아파트 단지 타겟 홍보</div>
     </div>
 
     <div class="owner-box">
       <h2>💡 ${esc(dbMart || `${locationText} 마트`)} 사장님이신가요? (매출·신규고객 유치 솔루션)</h2>
       <p>
-        매월 수십만~수백만 원씩 나가는 문자 발송비와 종이 전단지 비용을 <strong>0원</strong>으로 절감하세요!
-        우리아파트 마트 플랫폼은 매장 반경 내 아파트 입주민(30~50대 주부 핵심 타겟)에게 오늘의 특가와 반값 쿠폰을 실시간으로 전달합니다.
+        매월 수십만~수백만 원씩 나가는 비싼 LMS 사진문자(건당 38~50원) 대신 <strong>1명 발송 시 단 15원</strong>으로 디지털 전단지를 발송하세요! (월 고정관리비 0원)
+        손님에게 번호 노출 없는 주차 안심번호 QR카드를 사은품으로 제공하여 단골로 자동 등록하고, 본사가 100% 지원하는 마트 할인쿠폰으로 재방문 매출을 극대화합니다.
       </p>
       <p>
         도입 및 제휴 문의: <strong>010-9850-3388</strong> (우리아파트 마트 디지털전환 지원센터)
@@ -453,7 +453,7 @@ h1{margin:0 0 12px;font-size:28px;line-height:1.35;color:#0f172a;letter-spacing:
     </div>
 
     <div class="cta-grid">
-      <a class="cta" href="/mart-landing">🏪 마트 사장님 고객유치·도입 안내</a>
+      <a class="cta" href="/signup.html" style="background:#16a34a;color:#ffffff;font-weight:700;">📝 15원 마트 온라인 가입신청</a>
       <a class="cta secondary" href="/price">🥦 오늘의 장보기 60대 생필품 시세표</a>
     </div>
   </section>
@@ -479,7 +479,7 @@ h1{margin:0 0 12px;font-size:28px;line-height:1.35;color:#0f172a;letter-spacing:
       <a class="cross-pill" href="${esc(aptJeonseUrl)}">🏠 ${esc(dbPlace)} 아파트 전세 안심매칭</a>
       <a class="cross-pill" href="${esc(brokerHubUrl)}">🤝 ${esc(dbPlace)} 등록 공인중개사 찾기</a>
       <a class="cross-pill" href="/price">📈 오늘의 장보기 물가 시세</a>
-      <a class="cross-pill" href="/mart">🧮 마트 문자비용 절감 계산기</a>
+      <a class="cross-pill" href="/">🧮 마트 문자비용 절감 계산기</a>
       <a class="cross-pill" href="/check">🛡️ 부동산 등기·전세사기 팩트체크</a>
       <a class="cross-pill" href="/aura">🌊 신안 임자도 아우라펜션</a>
     </div>
