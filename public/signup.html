@@ -335,82 +335,32 @@ button:disabled{
 
 
   <div class="card">
+  <h2>
+    2. 필수서류 첨부 (사업자등록증)
+  </h2>
 
-    <h2>2. 필수서류 첨부</h2>
-
-    <div class="notice">
-      필수서류 3개를 모두 업로드해야 가입신청이 가능합니다.
-    </div>
-
-    <br>
-
-    <div class="upload-box">
-
-      <div class="upload-title">
-        ① 사업자등록증 <span class="req">*</span>
-      </div>
-
-      <div class="upload-guide">
-        현재 운영 중인 마트의 사업자등록증을 업로드해 주세요.
-      </div>
-
-      <input
-        id="businessFile"
-        type="file"
-        accept=".pdf,.jpg,.jpeg,.png"
-        onchange="checkForm()"
-      >
-
-    </div>
-
-
-    <div class="upload-box">
-
-      <div class="upload-title">
-        ② 고객 DB 자료 <span class="req">*</span>
-      </div>
-
-      <div class="upload-guide">
-        최근 1년간 확보한 고객 DB 자료를 업로드해 주세요.<br>
-        운영기간이 1년 미만인 신생마트는
-        개업일부터 현재까지 확보한 고객 DB 자료를 업로드해 주세요.
-      </div>
-
-      <input
-        id="dbFile"
-        type="file"
-        accept=".pdf,.jpg,.jpeg,.png,.xls,.xlsx,.csv"
-        onchange="checkForm()"
-      >
-
-    </div>
-
-
-    <div class="upload-box">
-
-      <div class="upload-title">
-        ③ 매출자료 <span class="req">*</span>
-      </div>
-
-      <div class="upload-guide">
-        최근 1년간의 매출자료를 업로드해 주세요.<br>
-        운영기간이 1년 미만인 신생마트는
-        개업일부터 현재까지의 매출자료를 업로드해 주세요.
-      </div>
-
-      <input
-        id="salesFile"
-        type="file"
-        accept=".pdf,.jpg,.jpeg,.png,.xls,.xlsx,.csv"
-        onchange="checkForm()"
-      >
-
-    </div>
-
+  <div class="notice">
+    원활한 가맹점 승인 및 매장 확인을 위해 사업자등록증 사본 1부를 업로드해 주세요.
   </div>
 
+  <br>
 
-  
+  <div class="upload-box">
+    <div class="upload-title">
+      사업자등록증 사본 <span class="req">*</span>
+    </div>
+    <div class="upload-guide">
+      현재 운영 중인 마트의 사업자등록증(사진 또는 PDF)을 업로드해 주세요.
+    </div>
+    <input
+      id="businessFile"
+      type="file"
+      accept=".pdf,.jpg,.jpeg,.png"
+      onchange="checkForm()"
+    >
+  </div>
+</div>
+
   <div class="card">
     <h2>3. 공식 가맹점 이용계약서 및 전자서명</h2>
     <p class="guide" style="margin-bottom:10px;">
@@ -634,21 +584,12 @@ function checkForm(){
   const businessFile =
     document.getElementById("businessFile").files.length > 0;
 
-  const dbFile =
-    document.getElementById("dbFile").files.length > 0;
-
-  const salesFile =
-    document.getElementById("salesFile").files.length > 0;
-
   const agree =
     document.getElementById("agree").checked;
-
 
   const allOK =
     textOK &&
     businessFile &&
-    dbFile &&
-    salesFile &&
     agree;
 
 
@@ -729,27 +670,10 @@ async function submitSignup(){
   const businessFile =
     document.getElementById("businessFile").files[0];
 
-  const dbFile =
-    document.getElementById("dbFile").files[0];
-
-  const salesFile =
-    document.getElementById("salesFile").files[0];
-
-
-  if(
-    !businessFile ||
-    !dbFile ||
-    !salesFile
-  ){
-
-    msg.style.color =
-      "#d93025";
-
-    msg.textContent =
-      "필수서류 3개를 모두 업로드해 주세요.";
-
+  if(!businessFile){
+    msg.style.color = "#d93025";
+    msg.textContent = "사업자등록증 사본을 업로드해 주세요.";
     return;
-
   }
 
 
@@ -864,8 +788,7 @@ async function submitSignup(){
 
 
     msg.textContent =
-      "필수서류 3개를 업로드하고 있습니다.";
-
+      "사업자등록증 서류를 업로드하고 있습니다.";
 
     const businessPath =
       await uploadDocument(
@@ -874,21 +797,8 @@ async function submitSignup(){
         businessFile
       );
 
-
-    const dbPath =
-      await uploadDocument(
-        userId,
-        "db",
-        dbFile
-      );
-
-
-    const salesPath =
-      await uploadDocument(
-        userId,
-        "sales",
-        salesFile
-      );
+    const dbPath = null;
+    const salesPath = null;
 
 
     msg.textContent =
