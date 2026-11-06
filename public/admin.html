@@ -185,6 +185,31 @@
 
 <div id="adminBox" class="sa-hidden">
 
+  <!-- [핵심] 기존 고객 DB 문자 발송 & 단골 전환 안내 상단 박스 -->
+  <div class="sa-box" style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border: 2px solid #16a34a; border-radius: 12px; padding: 16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <b style="color:#15803d;font-size:16px;">📩 기존 고객 DB 문자 발송 & 단골 전환 링크</b>
+      <span style="background:#16a34a;color:#fff;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:900;">0원 푸시 전환</span>
+    </div>
+    <div class="sa-help" style="color:#166534;font-size:13px;line-height:1.5;">
+      마트 사장님이 보유한 기존 고객 전화번호로 아래 안내 문구를 1회 전송하세요.<br>
+      고객이 링크를 눌러 <b>[🔔 특가 알림 허용]</b>을 누르면 <b>발송비 0원의 디지털 단골 고객</b>으로 자동 등록됩니다!
+    </div>
+    <div style="margin-top:10px;">
+      <label style="font-size:11px;font-weight:bold;color:#475569;">내 마트 직통 디지털 전단지 링크:</label>
+      <div style="display:flex;gap:6px;margin-top:4px;">
+        <input id="myStoreDirectUrl" readonly style="margin-top:0;background:#fff;font-size:13px;font-weight:bold;color:#0f172a;" value="">
+        <button type="button" class="sa-btn" onclick="copyStoreUrl()" style="width:90px;margin-top:0;padding:8px 4px;font-size:12px;background:#15803d;white-space:nowrap;">링크 복사</button>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <label style="font-size:11px;font-weight:bold;color:#475569;">기존 고객 DB 전송용 완성 문구 (LMS):</label>
+      <textarea id="myStoreSmsText" readonly style="height:120px;font-size:12px;line-height:1.5;background:#fff;margin-top:4px;color:#1e293b;"></textarea>
+      <button type="button" class="sa-btn" onclick="copyStoreSmsText()" style="background:#0284c7;font-size:14px;padding:12px;margin-top:8px;">📋 전체 문자 문구 1초 복사하기</button>
+    </div>
+  </div>
+
+
   <div class="sa-menu">
     <button
       class="menuBtn active"
@@ -233,6 +258,14 @@
       onclick="showMenu('account',this)"
     >
       계정
+    </button>
+
+    <button
+      class="menuBtn"
+      onclick="showMenu('sms',this)"
+      style="background:#f0fdf4;color:#15803d;border:1px solid #86efac;"
+    >
+      📩 단골문자
     </button>
 
     <button
@@ -401,6 +434,37 @@
     </div>
   </div>
 
+  <div id="sms" class="sa-section">
+    <div class="sa-box">
+      <b style="font-size:17px;color:#15803d;">📩 기존 고객 DB 문자 발송 & 단골 전환 가이드</b>
+      <div class="sa-help" style="margin-top:8px;line-height:1.6;">
+        기존에 포스(POS)에 쌓아둔 고객 전화번호 목록으로 안내 문자를 발송하여,
+        매달 수십만 원씩 나가던 문자 비용을 <b>0원 푸시 알림</b>으로 전환하는 방법입니다.
+      </div>
+
+      <div style="margin-top:14px;padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
+        <b style="color:#0f172a;">💡 왜 이렇게 보내야 하나요?</b>
+        <ul style="margin:8px 0 0 18px;padding:0;font-size:13px;color:#334155;line-height:1.7;">
+          <li><b>문자비 파격 절감</b>: 대행사에 건당 38원(LMS)씩 내던 문자를, 등록된 단골 고객에게는 <b>평생 0원 푸시</b>로 발송할 수 있습니다.</li>
+          <li><b>구매 전환율 급상승</b>: 글자만 빽빽한 스팸 문자 대신, <b>고화질 사진과 가격·할인율이 한눈에 보이는 디지털 전단지</b>가 1초 만에 펼쳐집니다.</li>
+          <li><b>자동차 QR이 없는 고객도 100% 흡수</b>: 도보 고객, 대중교통 이용 고객도 문자 링크를 통해 즉시 단골로 등록됩니다.</li>
+        </ul>
+      </div>
+
+      <div style="margin-top:14px;">
+        <label style="font-weight:bold;font-size:13px;color:#1e293b;">템플릿 1. 디지털 전단지 전환 기본 안내</label>
+        <textarea id="smsTpl1" readonly style="height:140px;font-size:12px;margin-top:6px;background:#fff;"></textarea>
+        <button type="button" class="sa-btn" onclick="copyTemplate('smsTpl1')" style="background:#15803d;margin-top:6px;">📋 템플릿 1 복사하기</button>
+      </div>
+
+      <div style="margin-top:18px;">
+        <label style="font-weight:bold;font-size:13px;color:#1e293b;">템플릿 2. 주말 특가 세일 행사 안내</label>
+        <textarea id="smsTpl2" readonly style="height:140px;font-size:12px;margin-top:6px;background:#fff;"></textarea>
+        <button type="button" class="sa-btn" onclick="copyTemplate('smsTpl2')" style="background:#0284c7;margin-top:6px;">📋 템플릿 2 복사하기</button>
+      </div>
+    </div>
+  </div>
+
   <div id="inquiry" class="sa-section">
     <div class="sa-box">
       <b>본사 문의</b>
@@ -563,7 +627,8 @@ async function initStoreFromUrl() {
       await Promise.all([
         loadDraftProducts(),
         loadLiveProducts(),
-        loadStoreProfile()
+        loadStoreProfile();
+      updateStoreSmsTexts()
       ]);
     } catch(e) {
       console.warn('Initial load error:', e);
@@ -571,6 +636,75 @@ async function initStoreFromUrl() {
   }
 }
 window.addEventListener('DOMContentLoaded', initStoreFromUrl);
+
+function updateStoreSmsTexts() {
+  const storeId = currentStoreId || 'store01';
+  const nameInput = document.getElementById('storeName');
+  const martName = (nameInput && nameInput.value.trim()) || '우리아파트마트';
+  const directUrl = 'https://wooriapt.ai.kr/74.html?store=' + encodeURIComponent(storeId);
+
+  const urlEl = document.getElementById('myStoreDirectUrl');
+  if (urlEl) urlEl.value = directUrl;
+
+  const defaultText = '[' + martName + ' 행사 안내가 선명한 디지털 전단지로 바뀝니다!]\n\n'
+    + '고객님 안녕하십니까, ' + martName + '입니다.\n'
+    + '그동안 작은 글씨 문자로 행사 상품 보시느라 불편하셨죠?\n\n'
+    + '앞으로 우리 마트의 신선식품·오늘특가·파격세일 소식은 선명한 사진과 할인율이 한눈에 보이는 \'디지털 사진전단지\'로 발송됩니다.\n\n'
+    + '아래 링크를 누르시면 이번 주 특가 상품을 바로 확인하실 수 있으며, 상단의 [🔔 특가 알림 허용]을 1초 만에 켜두시면 매주 파격 할인 소식을 무료로 받아보실 수 있습니다!\n\n'
+    + '▶ ' + martName + ' 디지털 전단지 보기:\n'
+    + directUrl + '\n\n'
+    + '※ 언제나 신선하고 정직한 상품으로 보답하겠습니다. 감사합니다!';
+
+  const textEl = document.getElementById('myStoreSmsText');
+  if (textEl) textEl.value = defaultText;
+
+  const tpl1 = document.getElementById('smsTpl1');
+  if (tpl1) tpl1.value = defaultText;
+
+  const tpl2 = document.getElementById('smsTpl2');
+  if (tpl2) {
+    tpl2.value = '[' + martName + ' 이번 주말 파격 특가 세일 안내]\n\n'
+      + '고객님, 이번 주말 장보기는 ' + martName + '에서 준비하세요!\n'
+      + '산지 직송 신선 과일, 야채, 정육을 파격 할인가로 모십니다.\n\n'
+      + '▶ 이번 주말 특가 사진전단지 바로보기:\n'
+      + directUrl + '\n\n'
+      + '※ 전단지 화면 상단의 [🔔 특가 알림 받기]를 켜두시면 매주 세일 소식을 놓치지 않고 무료로 받아보실 수 있습니다.';
+  }
+}
+
+function copyStoreUrl() {
+  const urlEl = document.getElementById('myStoreDirectUrl');
+  if (!urlEl) return;
+  urlEl.select();
+  navigator.clipboard.writeText(urlEl.value).then(() => {
+    alert('내 마트 직통 디지털 전단지 링크가 복사되었습니다!\n' + urlEl.value);
+  }).catch(() => {
+    alert('링크를 복사해주세요: ' + urlEl.value);
+  });
+}
+
+function copyStoreSmsText() {
+  const textEl = document.getElementById('myStoreSmsText');
+  if (!textEl) return;
+  textEl.select();
+  navigator.clipboard.writeText(textEl.value).then(() => {
+    alert('기존 고객 DB 전송용 문자 문구가 복사되었습니다!\n문자 발송 프로그램이나 휴대폰에 바로 붙여넣기 하세요.');
+  }).catch(() => {
+    alert('문구를 복사해주세요:\n' + textEl.value);
+  });
+}
+
+function copyTemplate(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.select();
+  navigator.clipboard.writeText(el.value).then(() => {
+    alert('템플릿 문구가 복사되었습니다! 문자 발송 사이트에서 바로 전송하세요.');
+  }).catch(() => {
+    alert('문구를 복사해주세요:\n' + el.value);
+  });
+}
+
 
 async function loginStore() {
   const id =
