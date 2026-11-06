@@ -261,7 +261,19 @@ const params =
     window.location.search
   );
 
-const qrCode =
+const storeCode =
+  String(
+    params.get("store") ||
+    params.get("store_id") ||
+    params.get("store_code") ||
+    params.get("id") ||
+    "store01"
+  )
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9_-]/g, "");
+
+let qrCode =
   String(
     params.get("qr") || ""
   )
@@ -271,6 +283,12 @@ const qrCode =
       /[^A-Z0-9_-]/g,
       ""
     );
+
+if (!qrCode && storeCode) {
+  qrCode = "SMS-" + storeCode;
+}
+
+const isSmsMode = !params.get("qr") || params.get("mode") === "sms";
 
 
 /*
@@ -884,27 +902,15 @@ pushBtn.addEventListener(
 
 (async function start(){
 
-  if(
-    !qrCode
-  ){
+  if (!qrCode && storeCode) {
+    qrCode = "SMS-" + storeCode;
+  }
 
-    showCard(
-      installCard
-    );
-
-    try{
-
-      await prepareServiceWorker();
-
-    }catch(error){
-
-      console.warn(
-        "서비스워커 준비 실패:",
-        error
-      );
-    }
-
-    return;
+  if (isSmsMode) {
+    const h1 = document.querySelector("#registerCard h1");
+    const p = document.querySelector("#registerCard p");
+    if (h1) h1.textContent = "디지털 전단지 특가 알림 등록";
+    if (p) p.textContent = "작은 글씨 문자 대신 선명한 사진 전단지로 받아보세요. 전화번호 입력 후 [알림 허용]을 누르시면 무료로 등록됩니다.";
   }
 
   showCard(
