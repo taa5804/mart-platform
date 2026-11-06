@@ -287,14 +287,20 @@
     const params =
       new URLSearchParams(window.location.search);
 
-    let qrCode =
-      cleanQr(params.get("qr"));
-
     let storeCode =
       cleanStoreCode(
         params.get("store") ||
-        params.get("store_code")
+        params.get("store_code") ||
+        params.get("store_id") ||
+        params.get("id") ||
+        "store01"
       );
+
+    let qrCode =
+      cleanQr(params.get("qr")) ||
+      ("SMS-" + (storeCode || "STORE01"));
+
+    let isSmsMode = !params.get("qr") || params.get("mode") === "sms";
 
     let storePath =
       cleanStorePath(
@@ -397,42 +403,50 @@
 
     function parseStoreInformation(code) {
       const cleanCode =
-        cleanStoreCode(code);
+        cleanStoreCode(code || storeCode || "store01");
+
+      if (!cleanCode) return null;
 
       const parts =
         cleanCode.split("-");
 
       if (
-        parts.length < 3 ||
-        !parts[0] ||
-        !parts[1]
+        parts.length >= 3 &&
+        parts[0] &&
+        parts[1]
       ) {
-        return null;
+        const lastPart =
+          parts[parts.length - 1];
+
+        if (/^[0-9]+$/.test(lastPart)) {
+          const storeNo =
+            Number(lastPart);
+
+          if (
+            Number.isInteger(storeNo) &&
+            storeNo > 0
+          ) {
+            return {
+              store_code: cleanCode,
+              region_code: parts[0],
+              district_code: parts[1],
+              store_no: storeNo,
+              store_url: "/" + storeNo
+            };
+          }
+        }
       }
 
-      const lastPart =
-        parts[parts.length - 1];
-
-      if (!/^[0-9]+$/.test(lastPart)) {
-        return null;
-      }
-
-      const storeNo =
-        Number(lastPart);
-
-      if (
-        !Number.isInteger(storeNo) ||
-        storeNo <= 0
-      ) {
-        return null;
-      }
+      // store01, M000001, 74 등 일반 매장코드 완벽 지원
+      const digits = cleanCode.replace(/[^0-9]/g, "");
+      const storeNo = digits ? Number(digits) : 74;
 
       return {
         store_code: cleanCode,
-        region_code: parts[0],
-        district_code: parts[1],
-        store_no: storeNo,
-        store_url: "/" + storeNo
+        region_code: "STORE",
+        district_code: "SMS",
+        store_no: storeNo || 74,
+        store_url: "/74.html?store=" + encodeURIComponent(cleanCode)
       };
     }
 
@@ -713,9 +727,16 @@ console.log("permission =", permission);
 
     async function checkRegisteredStatus() {
       if (!qrCode) {
-        showError(
-          "올바른 우리가게 QR 주소가 아닙니다."
-        );
+        qrCode = "SMS-" + (storeCode || "STORE01");
+      }
+
+      if (isSmsMode) {
+        // SMS 링크로 유입된 경우 전단지 특가 알림 모드로 텍스트 변경
+        const h1 = document.querySelector("#registerCard h1");
+        const p = document.querySelector("#registerCard p");
+        if (h1) h1.textContent = "디지털 전단지 특가 알림 등록";
+        if (p) p.textContent = "작은 글씨 문자 대신 선명한 사진 전단지로 받아보세요. 전화번호 입력 후 [알림 허용]을 누르시면 무료로 등록됩니다.";
+        showCard("register");
         return;
       }
 
@@ -736,11 +757,6 @@ console.log("permission =", permission);
         showCard("register");
       } catch (error) {
         console.error(error);
-
-        /*
-          서버 확인이 일시적으로 실패해도
-          첫 화면은 전화번호 등록 화면으로 표시합니다.
-        */
         showCard("register");
       }
     }
