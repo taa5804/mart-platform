@@ -3202,6 +3202,25 @@
 
       <div class="wmv-top-right">
 
+        <!-- 영업사원 메인화면 코드 입력 및 본인 방 입장 -->
+        <div class="wmv-partner-quick" style="display:inline-flex; align-items:center; gap:5px; background:#f0fdf4; padding:3px 8px; border-radius:8px; border:1.5px solid #0e6556; margin-right:6px;">
+          <span style="font-size:12px; font-weight:800; color:#0e6556; white-space:nowrap;">🔑 영업코드:</span>
+          <input type="text" id="quickPartnerCode" placeholder="코드(4자리)" style="width:80px; padding:5px 6px; border:1px solid #cbd5e1; border-radius:5px; font-size:12px; font-weight:700; outline:none;" onkeypress="if(event.key==='Enter') enterPartnerRoom()">
+          <button type="button" onclick="enterPartnerRoom()" style="background:#0e6556; color:#fff; border:none; padding:5px 10px; border-radius:5px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap;">내 방 입장</button>
+        </div>
+
+        <script>
+        function enterPartnerRoom() {
+          var code = document.getElementById('quickPartnerCode').value.trim();
+          if (!code) {
+            alert('영업사원 코드(휴대폰 뒷 4자리 등)를 입력해 주세요!');
+            document.getElementById('quickPartnerCode').focus();
+            return;
+          }
+          location.href = '/partner.html?code=' + encodeURIComponent(code);
+        }
+        </script>
+
         <button class="wmv-join" type="button" onclick="location.href='https://wooriapt.ai.kr/signup.html'">가맹점 등록</button>
 
         <button class="wmv-app-install" type="button" onclick="location.href='https://wooriapt.ai.kr/mart-install.html'">앱설치</button>
