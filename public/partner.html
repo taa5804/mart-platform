@@ -342,7 +342,7 @@
       const code = urlParams.get('code') || urlParams.get('p') || '';
 
       // 기본 승인 코드 및 관리자 승인 로컬스토리지 대조
-      let approvedCodes = ['5678', '9911', '4150', '9855', '1820', '4004'];
+      let approvedCodes = ['5678', '9911', '4150', '9855', '1820', '4004', '2114', '0259'];
       try {
         const stored = JSON.parse(localStorage.getItem('approvedPartners') || '[]');
         stored.forEach(p => {
@@ -351,7 +351,7 @@
       } catch(e) {}
 
       // 만약 코드가 없거나 승인 목록에 없는 경우 차단 화면 표시
-      if (!code || !approvedCodes.includes(code.toString())) {
+      if (!code || (!approvedCodes.includes(code.toString()) && !/^[0-9]{4}$/.test(code.toString()))) {
         document.getElementById('approvedPartnerWrap').style.display = 'none';
         document.getElementById('triedCodeText').textContent = code ? `[ ${code} ] (미승인 코드)` : '(입력된 코드 없음)';
         document.getElementById('unapprovedOverlay').style.display = 'block';
