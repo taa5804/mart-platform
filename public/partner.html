@@ -342,7 +342,7 @@
       const code = urlParams.get('code') || urlParams.get('p') || '';
 
       // 기본 승인 코드 및 관리자 승인 로컬스토리지 대조
-      let approvedCodes = ['5678', '9911', '4150'];
+      let approvedCodes = ['5678', '9911', '4150', '9855', '1820', '4004'];
       try {
         const stored = JSON.parse(localStorage.getItem('approvedPartners') || '[]');
         stored.forEach(p => {
