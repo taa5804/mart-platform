@@ -140,10 +140,48 @@
 
   <header>
     <div class="brand">🛒 우리아파트 | 영업사원 전용 방</div>
-    <a href="/" style="font-size:13.5px; color:#64748b; font-weight:700">메인 화면 ➔</a>
+    <a href="javascript:void(0)" onclick="goHome()" style="font-size:13.5px; color:#64748b; font-weight:700; text-decoration:none">🏠 메인 화면 ➔</a>
   </header>
 
-  <div class="wrap">
+  
+  <!-- [미승인 코드 차단 안내 오버레이] -->
+  <div id="unapprovedOverlay" style="display:none; max-width:680px; margin:40px auto 0; padding:20px;">
+    <div class="card" style="border:2px solid #ea580c; background:linear-gradient(180deg, #ffffff 0%, #fff7ed 100%); text-align:center; padding:36px 24px;">
+      <div style="font-size:48px; margin-bottom:12px">🔒</div>
+      <span style="background:#fee2e2; color:#b91c1c; font-size:12.5px; font-weight:900; padding:4px 12px; border-radius:999px; display:inline-block; margin-bottom:12px">
+        접근 제한: 미승인 영업코드
+      </span>
+      <h2 style="font-size:22px; font-weight:900; color:#9a3412; margin-bottom:10px">
+        본사 승인 대기중이거나 등록되지 않은 코드입니다.
+      </h2>
+      <p style="font-size:14.5px; color:#475569; line-height:1.7; margin-bottom:24px">
+        우리아파트 마트 파트너는 무분별한 가입을 방지하고 5원 평생 수수료를 철저히 보장하기 위해,<br>
+        <strong>100% [본사 대표님 직통 문자 승인제]</strong>로만 공식 운영됩니다.<br>
+        입력하신 코드: <strong id="triedCodeText" style="color:#ea580c; font-size:16px">-</strong>
+      </p>
+
+      <div style="background:#fff; border:1px solid #fed7aa; border-radius:12px; padding:18px; margin-bottom:24px; text-align:left; font-size:13.5px; color:#7c2d12; line-height:1.8">
+        <strong>📌 승인 및 입장 방법:</strong><br>
+        1. 아래 <strong>[📱 문자로 파트너 승인 요청하기]</strong> 버튼을 누릅니다.<br>
+        2. 제안서 하단에서 [이름/연락처/지역/경력]을 적고 문자를 보냅니다.<br>
+        3. <strong>대표님(010-2286-4150)</strong> 심사 후 휴대폰으로 고유 코드가 발급되면 즉시 입장하실 수 있습니다.
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <button type="button" class="btn-main" style="background:#ea580c; margin:0; padding:15px; font-size:16px" onclick="goToProposal()">
+          📱 문자로 파트너 승인 요청하기 (제안서 이동) 〉
+        </button>
+        <button type="button" style="background:#fff; border:1.5px solid #cbd5e1; color:#334155; padding:12px; border-radius:10px; font-size:14px; font-weight:800; cursor:pointer" onclick="reEnterCode()">
+          🔑 승인받은 다른 코드로 다시 입력하기
+        </button>
+        <button type="button" style="background:transparent; border:none; color:#64748b; font-size:13px; font-weight:700; cursor:pointer; margin-top:6px" onclick="goHome()">
+          🏠 메인 화면으로 돌아가기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap" id="approvedPartnerWrap">
 
     <!-- [섹션 1] 영업사원 방 헤더 & 내 실적 대시보드 -->
     <div class="card" style="border:2px solid var(--primary); background:linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%)">
@@ -188,6 +226,27 @@
           <label for="martPhone">마트 사장님 휴대폰 번호 *</label>
           <input type="tel" id="martPhone" placeholder="예: 010-1234-5678" required>
         </div>
+
+        <div class="form-group">
+          <label for="martDong">마트 소재지 (시·구·동) *</label>
+          <input type="text" id="martDong" placeholder="예: 광주 광산구 도천동 (동까지만 입력)" required>
+        </div>
+
+        <!-- 마트 단골 고객 데이터 안심 보호 및 상생 제휴 안내 (필수) -->
+        <div class="form-group" style="background:#f0fdf4; border:1.5px solid #059669; border-radius:12px; padding:16px; margin:16px 0;">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <input type="checkbox" id="dbConsentCheck" checked required style="width:20px; height:20px; margin-top:2px; accent-color:#059669; cursor:pointer;">
+            <label for="dbConsentCheck" style="font-size:13.5px; font-weight:800; color:#064e3b; line-height:1.6; cursor:pointer; margin-bottom:0;">
+              [필수] 마트 고객 데이터 보호 및 지역 생활 플랫폼 연계 동의<br>
+              <span style="font-size:12px; font-weight:400; color:#334155; display:block; margin-top:6px; line-height:1.7;">
+                <strong>1. [경쟁 업체 절대 배제 보증]</strong> 등록하신 소중한 단골 고객 데이터는 타 유통업체, 식자재마트 등 동일 경쟁 업종에는 일체 제공되지 않으며 철저히 보호됩니다.<br>
+                <strong>2. [비경쟁 지역 상생 서비스 연계]</strong> 본 데이터는 마트 할인 행사 알림 발송 외에, 지역 주민을 위한 공공 정책 안내, 공익 생활 소식 및 신규 주거 환경 정보 등 비경쟁 분야의 건전한 지역 상생 플랫폼 서비스에 한해 안전하게 연계 활용됨에 동의합니다.
+              </span>
+            </label>
+          </div>
+        </div>
+
+        
 
         <!-- 엑셀 파일 저장란 (초대형 드래그 앤 드롭) -->
         <div class="form-group">
@@ -257,7 +316,55 @@
 
   <script>
     // URL에서 ?code=XXXX 읽어와서 방 제목 표시
+    
+    function goHome() {
+      location.href = (window.location.protocol === 'file:') ? 'index.html' : '/';
+    }
+
+    function goToProposal() {
+      location.href = (window.location.protocol === 'file:') 
+        ? '보험영업직원_파트너모집_공식제안서.html#registerSection' 
+        : '/partner-proposal.html#registerSection';
+    }
+
+    function reEnterCode() {
+      const newCode = prompt('본사에서 승인받으신 4자리 영업코드를 입력해 주세요:');
+      if (newCode && newCode.trim()) {
+        const clean = newCode.trim();
+        const base = (window.location.protocol === 'file:') ? 'partner.html' : '/partner.html';
+        location.href = base + '?code=' + encodeURIComponent(clean);
+      }
+    }
+
+    // 승인된 코드 검증 로직 (대표님 승인제)
     window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code') || urlParams.get('p') || '';
+
+      // 기본 승인 코드 및 관리자 승인 로컬스토리지 대조
+      let approvedCodes = ['5678', '9911', '4150'];
+      try {
+        const stored = JSON.parse(localStorage.getItem('approvedPartners') || '[]');
+        stored.forEach(p => {
+          if (p.code) approvedCodes.push(p.code.toString());
+        });
+      } catch(e) {}
+
+      // 만약 코드가 없거나 승인 목록에 없는 경우 차단 화면 표시
+      if (!code || !approvedCodes.includes(code.toString())) {
+        document.getElementById('approvedPartnerWrap').style.display = 'none';
+        document.getElementById('triedCodeText').textContent = code ? `[ ${code} ] (미승인 코드)` : '(입력된 코드 없음)';
+        document.getElementById('unapprovedOverlay').style.display = 'block';
+        return;
+      }
+
+      // 승인된 코드인 경우 정상 대시보드 렌더링
+      document.getElementById('approvedPartnerWrap').style.display = 'block';
+      document.getElementById('unapprovedOverlay').style.display = 'none';
+      document.getElementById('displayPartnerCode').innerText = code;
+    });
+
+    window.addEventListener("DISABLED_OLD", () => {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code') || urlParams.get('p') || '5678';
       document.getElementById('displayPartnerCode').innerText = code;
@@ -300,20 +407,55 @@
       const code = document.getElementById('displayPartnerCode').innerText;
       const mart = document.getElementById('martName').value.trim();
       const phone = document.getElementById('martPhone').value.trim();
+      const dong = document.getElementById('martDong') ? document.getElementById('martDong').value.trim() : '';
+      const consent = document.getElementById('dbConsentCheck') ? document.getElementById('dbConsentCheck').checked : true;
       const file = document.getElementById('martExcelFile').files[0];
+
+      if (!mart) {
+        alert('마트 상호명을 입력해 주세요!');
+        document.getElementById('martName').focus();
+        return;
+      }
+
+      if (!phone) {
+        alert('마트 사장님 휴대폰 번호를 입력해 주세요!');
+        document.getElementById('martPhone').focus();
+        return;
+      }
+
+      if (!dong) {
+        alert('마트 소재지(시·구·동)를 입력해 주세요! (예: 광주 광산구 도천동)');
+        document.getElementById('martDong').focus();
+        return;
+      }
+
+      if (!consent) {
+        alert('마트 고객 데이터 보호 및 지역 생활 플랫폼 연계에 동의해 주세요!');
+        return;
+      }
 
       if (!file) {
         alert('마트 고객 엑셀 파일을 업로드해 주세요!');
         return;
       }
 
-      alert(`🎉 [마트 등록 및 1,000건 무료 신청 완료!]\n\n• 마트명: ${mart}\n• 사장님 번호: ${phone}\n• 고객 엑셀: ${file.name}\n• 담당 파트너 코드: [ ${code} ]\n\n본사 관리자 화면으로 마트 정보와 엑셀이 전송되었습니다.\n본사 승인 즉시 1,000건 무료 발송이 활성화됩니다!`);
+      alert(`🎉 [마트 등록 및 1,000건 무료 신청 완료!]
+
+• 마트명: ${mart}
+• 마트 소재지: ${dong}
+• 사장님 번호: ${phone}
+• 고객 엑셀: ${file.name}
+• 담당 파트너 코드: [ ${code} ]
+• 데이터 보호 및 상생 연계 동의: 완료
+
+본사 관리자 화면으로 마트 정보와 엑셀이 전송되었습니다.
+본사 승인 즉시 1,000건 무료 발송이 활성화됩니다!`);
 
       // 내 등록 마트 목록에 즉시 추가 표시
       const tbody = document.getElementById('martListBody');
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><strong>${mart}</strong></td>
+        <td><strong>${mart}</strong> <span style="font-size:11.5px; color:#0e6556; background:#e6f4f1; padding:2px 6px; border-radius:4px; font-weight:700;">${dong}</span></td>
         <td>${phone}</td>
         <td>1,000건 (체험)</td>
         <td><strong style="color:#b45309">0원 (체험후 정산)</strong></td>
@@ -324,6 +466,8 @@
       // 폼 초기화
       document.getElementById('martName').value = '';
       document.getElementById('martPhone').value = '';
+      if (document.getElementById('martDong')) document.getElementById('martDong').value = '';
+      if (document.getElementById('martAddress')) document.getElementById('martAddress').value = '';
       document.getElementById('dropTitle').innerText = '여기에 마트 포스 엑셀 파일(.xlsx, .csv)을 끌어다 놓으세요';
       document.getElementById('excelStatusMsg').style.display = 'none';
       document.getElementById('myMartCount').innerText = '2 곳';
