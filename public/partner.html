@@ -298,21 +298,138 @@
       </div>
     </div>
 
-    <!-- [섹션 4] 정산 계좌 등록/확인 -->
-    <div class="card">
-      <h2 style="font-size:17px; font-weight:900; color:var(--slate-900); margin-bottom:6px">
-        💳 수수료 정산 입금 계좌
-      </h2>
-      <div style="font-size:13.5px; color:#64748b; margin-bottom:12px">
-        매월 15일 / 말일 칼정산 입금될 본인 명의 계좌입니다.
+    <!-- [섹션 4] 수수료 정산 계좌 및 세무 증빙 등록 (칼정산 시스템) -->
+    <div class="card" id="partnerTaxCard" style="border:2px solid #0e6556; background:#ffffff;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+        <h2 style="font-size:18px; font-weight:900; color:#0e6556; margin:0; display:flex; align-items:center; gap:8px;">
+          <span>💰 수수료 칼정산 계좌 & 세무 증빙 등록</span>
+        </h2>
+        <span style="background:#e6f4f1; color:#0e6556; font-size:12px; font-weight:800; padding:3px 10px; border-radius:999px;">
+          정산일: 매월 15일 / 말일
+        </span>
+      </div>
+      <p style="font-size:13.5px; color:#64748b; margin-bottom:16px;">
+        유치 마트의 문자 발송 수수료(건당 5원)를 입금받으실 <strong>본인 명의 계좌</strong>와 <strong>세무 정산 유형</strong>을 선택해 주세요.
+      </p>
+
+      <!-- 세무 유형 선택 (라디오 토글) -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+        <label style="border:2px solid #0e6556; border-radius:12px; padding:14px; cursor:pointer; background:#f0fdf4; display:block;" id="labelTypeIndividual">
+          <input type="radio" name="taxType" value="individual" checked onchange="toggleTaxType('individual')" style="accent-color:#0e6556; transform:scale(1.2); margin-right:6px;">
+          <strong style="color:#064e3b; font-size:14px;">개인 프리랜서</strong>
+          <div style="font-size:12px; color:#475569; margin-top:4px;">사업자등록증 없음 (3.3% 원천징수 공제 후 입금)</div>
+        </label>
+        <label style="border:1.5px solid #cbd5e1; border-radius:12px; padding:14px; cursor:pointer; background:#ffffff; display:block;" id="labelTypeBiz">
+          <input type="radio" name="taxType" value="business" onchange="toggleTaxType('business')" style="accent-color:#0e6556; transform:scale(1.2); margin-right:6px;">
+          <strong style="color:#0f172a; font-size:14px;">사업자 파트너</strong>
+          <div style="font-size:12px; color:#475569; margin-top:4px;">개인/법인 사업자 (전자세금계산서 발행)</div>
+        </label>
       </div>
 
-      <div style="display:flex; gap:10px">
-        <input type="text" id="myBankInfo" placeholder="예: 국민은행 123-456-789012 (예금주: 홍길동)" value="국민은행 123-456-789012 (예금주: 홍길동)">
-        <button type="button" class="btn-main" style="width:auto; margin:0; padding:12px 16px; font-size:14px" onclick="alert('계좌 정보가 안전하게 저장되었습니다.')">저장</button>
+      <!-- [유형 1: 개인 프리랜서 입력 폼] -->
+      <div id="formIndividualTax" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:16px;">
+        <div style="font-weight:800; color:#0e6556; font-size:14px; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+          <span>👤</span> 개인 프리랜서 정보 (소득세법 3.3% 원천징수 신고용)
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1.5fr; gap:10px; margin-bottom:10px;">
+          <div>
+            <label style="font-size:12.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">성명 *</label>
+            <input type="text" id="partnerIndivName" placeholder="예: 홍길동" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px;">
+          </div>
+          <div>
+            <label style="font-size:12.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">주민등록번호 * (국세청 신고용)</label>
+            <input type="text" id="partnerIndivJumin" placeholder="예: 800101-1234567" maxlength="14" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px;">
+          </div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:12.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">📷 신분증 사본 첨부 (주민번호 뒷자리 마스킹 가능)</label>
+          <input type="file" id="partnerIndivIdFile" accept="image/*,.pdf" style="font-size:13px; width:100%; padding:8px; background:#fff; border:1px solid #cbd5e1; border-radius:8px;" onchange="handlePartnerFilePreview(this, 'indivFileStatus')">
+          <div id="indivFileStatus" style="font-size:12px; color:#0e6556; font-weight:700; margin-top:4px; display:none;"></div>
+        </div>
+        
+        <!-- 실시간 정산 시뮬레이션 박스 -->
+        <div style="background:#ffffff; border:1.5px solid #bbf7d0; border-radius:10px; padding:12px; margin-top:12px;">
+          <div style="font-size:12.5px; font-weight:800; color:#166534; margin-bottom:4px;">💡 실시간 정산 금액 자동 계산</div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; color:#475569; margin-bottom:2px;">
+            <span>당월 누적 수수료(5원):</span>
+            <strong id="dispRawFee1">250,000 원</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; color:#dc2626; margin-bottom:4px;">
+            <span>원천징수 사업소득세 (3.3%):</span>
+            <strong id="dispTaxFee1">- 8,250 원</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:900; color:#0e6556; border-top:1px dashed #cbd5e1; padding-top:6px; margin-top:4px;">
+            <span>통장 실입금 예상액:</span>
+            <strong id="dispNetFee1" style="font-size:17px; color:#0e6556;">241,750 원</strong>
+          </div>
+        </div>
       </div>
+
+      <!-- [유형 2: 사업자 파트너 입력 폼] -->
+      <div id="formBizTax" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:16px;">
+        <div style="font-weight:800; color:#0f172a; font-size:14px; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+          <span>🏢</span> 사업자 파트너 정보 (전자세금계산서 수취용)
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+          <div>
+            <label style="font-size:12.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">사업자등록번호 *</label>
+            <input type="text" id="partnerBizNo" placeholder="예: 000-00-00000" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px;">
+          </div>
+          <div>
+            <label style="font-size:12.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">상호(법인명) *</label>
+            <input type="text" id="partnerBizName" placeholder="예: (주)한국마케팅" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px;">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+          <div>
+            <label style="font-size:12.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">대표자 성명 *</label>
+            <input type="text" id="partnerBizOwner" placeholder="예: 홍길동" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px;">
+          </div>
+          <div>
+            <label style="font-size:12.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">계산서 발행 이메일 *</label>
+            <input type="email" id="partnerBizEmail" placeholder="partner@naver.com" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px;">
+          </div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:12.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">📷 사업자등록증 사본 첨부</label>
+          <input type="file" id="partnerBizFile" accept="image/*,.pdf" style="font-size:13px; width:100%; padding:8px; background:#fff; border:1px solid #cbd5e1; border-radius:8px;" onchange="handlePartnerFilePreview(this, 'bizFileStatus')">
+          <div id="bizFileStatus" style="font-size:12px; color:#0e6556; font-weight:700; margin-top:4px; display:none;"></div>
+        </div>
+
+        <!-- 실시간 정산 시뮬레이션 박스 -->
+        <div style="background:#ffffff; border:1.5px solid #bfdbfe; border-radius:10px; padding:12px; margin-top:12px;">
+          <div style="font-size:12.5px; font-weight:800; color:#1d4ed8; margin-bottom:4px;">💡 세금계산서 청구 금액 자동 계산</div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; color:#475569; margin-bottom:2px;">
+            <span>공급가액 (누적 수수료):</span>
+            <strong id="dispRawFee2">250,000 원</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; color:#2563eb; margin-bottom:4px;">
+            <span>부가가치세 (VAT 10%):</span>
+            <strong id="dispTaxFee2">+ 25,000 원</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:900; color:#1d4ed8; border-top:1px dashed #cbd5e1; padding-top:6px; margin-top:4px;">
+            <span>계산서 발행 & 총 입금액:</span>
+            <strong id="dispNetFee2" style="font-size:17px; color:#1d4ed8;">275,000 원</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- 공통 입금 계좌 입력 -->
+      <div style="margin-bottom:16px;">
+        <label style="font-size:13px; font-weight:800; color:#0f172a; display:block; margin-bottom:6px;">
+          🏦 수수료 입금 받으실 본인(사업자) 계좌 정보 *
+        </label>
+        <div style="display:grid; grid-template-columns:1fr 1.8fr 1fr; gap:8px;">
+          <input type="text" id="partnerBankName" placeholder="은행명 (예: 농협)" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px;">
+          <input type="text" id="partnerBankAccount" placeholder="계좌번호 (숫자만)" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px;">
+          <input type="text" id="partnerBankHolder" placeholder="예금주 성명" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px;">
+        </div>
+      </div>
+
+      <button type="button" class="btn-main" onclick="savePartnerTaxInfo()" style="width:100%; height:50px; font-size:16px; font-weight:900; background:#0e6556; border-radius:12px; cursor:pointer;">
+        💾 정산 계좌 & 세무 증빙 정보 안전하게 저장
+      </button>
     </div>
-
   </div>
 
   <script>
@@ -528,6 +645,161 @@
     }
 
     renderMyMarts(code);
-  </script>
+  
+
+// ==============================================
+// 영업 파트너 세무 정산 스크립트 (3.3% vs 사업자)
+// ==============================================
+var currentPartnerTaxType = 'individual';
+var currentPartnerFileBase64 = '';
+
+function toggleTaxType(type) {
+  currentPartnerTaxType = type;
+  var formIndiv = document.getElementById('formIndividualTax');
+  var formBiz = document.getElementById('formBizTax');
+  var lblIndiv = document.getElementById('labelTypeIndividual');
+  var lblBiz = document.getElementById('labelTypeBiz');
+
+  if (type === 'individual') {
+    if (formIndiv) formIndiv.style.display = 'block';
+    if (formBiz) formBiz.style.display = 'none';
+    if (lblIndiv) { lblIndiv.style.border = '2px solid #0e6556'; lblIndiv.style.background = '#f0fdf4'; }
+    if (lblBiz) { lblBiz.style.border = '1.5px solid #cbd5e1'; lblBiz.style.background = '#ffffff'; }
+  } else {
+    if (formIndiv) formIndiv.style.display = 'none';
+    if (formBiz) formBiz.style.display = 'block';
+    if (lblIndiv) { lblIndiv.style.border = '1.5px solid #cbd5e1'; lblIndiv.style.background = '#ffffff'; }
+    if (lblBiz) { lblBiz.style.border = '2px solid #0e6556'; lblBiz.style.background = '#eff6ff'; }
+  }
+}
+
+function handlePartnerFilePreview(input, statusElId) {
+  if (input.files && input.files[0]) {
+    var file = input.files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      currentPartnerFileBase64 = e.target.result;
+      var st = document.getElementById(statusElId);
+      if (st) {
+        st.style.display = 'block';
+        st.innerHTML = '✅ 파일 첨부 완료: ' + file.name;
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function updatePartnerCalculations(rawFee) {
+  var fee = Number(rawFee) || 250000;
+  var indivTax = Math.floor(fee * 0.033);
+  var indivNet = fee - indivTax;
+
+  var bizVat = Math.floor(fee * 0.1);
+  var bizNet = fee + bizVat;
+
+  if (document.getElementById('dispRawFee1')) document.getElementById('dispRawFee1').textContent = fee.toLocaleString() + ' 원';
+  if (document.getElementById('dispTaxFee1')) document.getElementById('dispTaxFee1').textContent = '- ' + indivTax.toLocaleString() + ' 원';
+  if (document.getElementById('dispNetFee1')) document.getElementById('dispNetFee1').textContent = indivNet.toLocaleString() + ' 원';
+
+  if (document.getElementById('dispRawFee2')) document.getElementById('dispRawFee2').textContent = fee.toLocaleString() + ' 원';
+  if (document.getElementById('dispTaxFee2')) document.getElementById('dispTaxFee2').textContent = '+ ' + bizVat.toLocaleString() + ' 원';
+  if (document.getElementById('dispNetFee2')) document.getElementById('dispNetFee2').textContent = bizNet.toLocaleString() + ' 원';
+}
+
+function savePartnerTaxInfo() {
+  var code = (document.getElementById('displayPartnerCode') ? document.getElementById('displayPartnerCode').textContent.trim() : '5678');
+  var bankName = document.getElementById('partnerBankName') ? document.getElementById('partnerBankName').value.trim() : '';
+  var bankAccount = document.getElementById('partnerBankAccount') ? document.getElementById('partnerBankAccount').value.trim() : '';
+  var bankHolder = document.getElementById('partnerBankHolder') ? document.getElementById('partnerBankHolder').value.trim() : '';
+
+  if (!bankName || !bankAccount || !bankHolder) {
+    alert('수수료를 입금받으실 은행명, 계좌번호, 예금주를 모두 입력해 주세요.');
+    return;
+  }
+
+  var payload = {
+    partnerCode: code,
+    taxType: currentPartnerTaxType,
+    bank: bankName + ' ' + bankAccount + ' (' + bankHolder + ')',
+    bankName: bankName,
+    bankAccount: bankAccount,
+    bankHolder: bankHolder,
+    fileBase64: currentPartnerFileBase64,
+    updatedAt: new Date().toISOString()
+  };
+
+  if (currentPartnerTaxType === 'individual') {
+    payload.name = document.getElementById('partnerIndivName') ? document.getElementById('partnerIndivName').value.trim() : '';
+    payload.jumin = document.getElementById('partnerIndivJumin') ? document.getElementById('partnerIndivJumin').value.trim() : '';
+    if (!payload.name) {
+      alert('성명을 입력해 주세요.');
+      return;
+    }
+  } else {
+    payload.bizNo = document.getElementById('partnerBizNo') ? document.getElementById('partnerBizNo').value.trim() : '';
+    payload.bizName = document.getElementById('partnerBizName') ? document.getElementById('partnerBizName').value.trim() : '';
+    payload.bizOwner = document.getElementById('partnerBizOwner') ? document.getElementById('partnerBizOwner').value.trim() : '';
+    payload.bizEmail = document.getElementById('partnerBizEmail') ? document.getElementById('partnerBizEmail').value.trim() : '';
+    if (!payload.bizNo || !payload.bizName) {
+      alert('사업자등록번호와 상호명을 입력해 주세요.');
+      return;
+    }
+  }
+
+  localStorage.setItem('partnerTaxInfo_' + code, JSON.stringify(payload));
+
+  // 본사 관리자 승인목록에도 자동 반영
+  try {
+    var appr = JSON.parse(localStorage.getItem('approvedPartners') || '[]');
+    var found = appr.find(function(x){ return x.code === code; });
+    if (found) {
+      found.taxType = currentPartnerTaxType;
+      found.bank = payload.bank;
+      if (payload.jumin) found.jumin = payload.jumin;
+      if (payload.bizNo) found.bizNo = payload.bizNo;
+      localStorage.setItem('approvedPartners', JSON.stringify(appr));
+    }
+  } catch(e){}
+
+  alert('✅ 정산 계좌와 세무 정보가 안전하게 저장되었습니다!\n매월 15일 / 말일 칼정산 시 등록하신 계좌로 신속하게 입금됩니다.');
+}
+
+function loadPartnerTaxInfo() {
+  var code = (document.getElementById('displayPartnerCode') ? document.getElementById('displayPartnerCode').textContent.trim() : '5678');
+  var saved = localStorage.getItem('partnerTaxInfo_' + code);
+  if (saved) {
+    try {
+      var d = JSON.parse(saved);
+      if (d.taxType) toggleTaxType(d.taxType);
+      if (d.bankName && document.getElementById('partnerBankName')) document.getElementById('partnerBankName').value = d.bankName;
+      if (d.bankAccount && document.getElementById('partnerBankAccount')) document.getElementById('partnerBankAccount').value = d.bankAccount;
+      if (d.bankHolder && document.getElementById('partnerBankHolder')) document.getElementById('partnerBankHolder').value = d.bankHolder;
+
+      if (d.taxType === 'individual') {
+        if (d.name && document.getElementById('partnerIndivName')) document.getElementById('partnerIndivName').value = d.name;
+        if (d.jumin && document.getElementById('partnerIndivJumin')) document.getElementById('partnerIndivJumin').value = d.jumin;
+      } else {
+        if (d.bizNo && document.getElementById('partnerBizNo')) document.getElementById('partnerBizNo').value = d.bizNo;
+        if (d.bizName && document.getElementById('partnerBizName')) document.getElementById('partnerBizName').value = d.bizName;
+        if (d.bizOwner && document.getElementById('partnerBizOwner')) document.getElementById('partnerBizOwner').value = d.bizOwner;
+        if (d.bizEmail && document.getElementById('partnerBizEmail')) document.getElementById('partnerBizEmail').value = d.bizEmail;
+      }
+    } catch(e){}
+  } else {
+    // 기본 프리셋
+    if (document.getElementById('partnerBankName')) document.getElementById('partnerBankName').value = '국민은행';
+    if (document.getElementById('partnerBankAccount')) document.getElementById('partnerBankAccount').value = '123-456-789012';
+    if (document.getElementById('partnerBankHolder')) document.getElementById('partnerBankHolder').value = '홍길동';
+    if (document.getElementById('partnerIndivName')) document.getElementById('partnerIndivName').value = '홍길동';
+    if (document.getElementById('partnerIndivJumin')) document.getElementById('partnerIndivJumin').value = '800101-1******';
+  }
+  updatePartnerCalculations(250000);
+}
+
+window.addEventListener('load', () => {
+  setTimeout(loadPartnerTaxInfo, 200);
+});
+
+</script>
 </body>
 </html>
