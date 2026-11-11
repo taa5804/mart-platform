@@ -264,6 +264,7 @@ body{
 <th>매장 ID</th>
 <th>매장명</th>
 <th>로그인 ID</th>
+<th>비밀번호</th>
 <th>대표자</th>
 <th>전화번호</th>
 <th>권역</th>
@@ -290,149 +291,19 @@ body{
 
 <script>
 (function(){
-
 var ROOT=document.getElementById("wgAccount");
 if(!ROOT)return;
-
 var $=function(s){return ROOT.querySelector(s);};
-
 var URL="https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-store-account";
 var KEY="wooriapt_hq_admin_session";
-
 var stores=[];
 var selected=null;
 
-function session(){
- return localStorage.getItem(KEY)||"";
-}
-
-function msg(text,error){
- var e=$("#wgMsg");
- e.textContent=text||"";
- e.style.color=error?"#dc2626":"#15803d";
-}
-
-function esc(v){
- var d=document.createElement("div");
- d.textContent=v||"";
- return d.innerHTML;
-}
+function session(){return localStorage.getItem(KEY)||"";}
+function msg(text,error){var e=$("#wgMsg");e.textContent=text||"";e.style.color=error?"#dc2626":"#15803d";}
+function esc(v){var d=document.createElement("div");d.textContent=v||"";return d.innerHTML;}
 
 async function api(action,data){
- if(action==="list_stores"){
-  var defaultPendingMarts = [
-   {
-    id: 101,
-    store_id: "M004150",
-    store_name: "에너젠마트",
-    admin_id: "010-2286-4150",
-    owner_name: "도천동 (추천: 4150 파트너)",
-    phone: "010-2286-4150",
-    region_name: "광주 광산구 도천동",
-    address: "광주 광산구 도천동 (단골고객_10000건.xlsx 첨부)",
-    account_status: "pending",
-    approval_status: "PENDING"
-   }
-  ];
-  var localList = [];
-  try {
-   var saved = localStorage.getItem("pendingMarts");
-   if (saved) {
-    var parsed = JSON.parse(saved);
-    localList = parsed.map(function(m){
-     var isApp = (m.status === "개통완료" || m.status === "정상 발송중");
-     return {
-      id: m.id,
-      store_id: "M" + String(m.partnerCode || m.id).slice(-4).padStart(6, "0"),
-      store_name: m.mart,
-      admin_id: m.phone,
-      owner_name: (m.dong || "") + " (추천: " + (m.partnerCode || "-") + " 파트너)",
-      phone: m.phone,
-      region_name: m.dong || "광주 광산구",
-      address: (m.dong || "") + " (" + (m.fileName || "단골고객.xlsx") + " 첨부)",
-      account_status: isApp ? "정상" : "pending",
-      approval_status: isApp ? "APPROVED" : "PENDING"
-     };
-    });
-   }
-  } catch(e) {}
-
-  var rows = [];
-  try {
-   var r=await fetch("https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?order=created_at.desc",{
-    headers:{
-     "apikey":"sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
-     "Authorization":"Bearer sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K"
-    }
-   });
-   if(r.ok) rows = await r.json();
-  } catch(e) {}
-
-  var mapped = rows.map(function(row){
-   var code = row.mart_code || ("M" + String(row.id).padStart(6, "0"));
-   var st = (row.approval_status||"PENDING").toUpperCase();
-   var pending = (st==="PENDING" || st==="WAITING");
-   return {
-    id: row.id,
-    store_id: code,
-    store_name: row.mart_name,
-    admin_id: row.email || row.phone,
-    owner_name: row.owner_name,
-    phone: row.phone,
-    region_name: row.address ? row.address.split(" ").slice(0, 2).join(" ") : "전체",
-    address: row.address,
-    account_status: pending ? "pending" : "정상",
-    approval_status: row.approval_status
-   };
-  });
-
-  var combined = localList.concat(mapped);
-  if (combined.length === 0) combined = defaultPendingMarts;
-  var seen = {};
-  var uniqueStores = [];
-  combined.forEach(function(s){
-   var k = (s.store_name||"") + "_" + (s.phone||"");
-   if(!seen[k]){ seen[k]=true; uniqueStores.push(s); }
-  });
-  return {ok:true, stores:uniqueStores};
- }
- if(action==="activate_store"){
-  try {
-   var saved = localStorage.getItem("pendingMarts");
-   var list = saved ? JSON.parse(saved) : [];
-   if(list.length === 0) {
-    list = [
-     { id: 101, mart: '에너젠마트', dong: '광주 광산구 도천동', phone: '010-2286-4150', fileName: '단골고객_10000건.xlsx', partnerCode: '4150', count: '1,000건 (체험)', fee: '0원 (체험후 정산)', status: '승인대기', date: '2026-11-11 09:02' }
-    ];
-   }
-   list.forEach(function(m){
-    if (m.phone === data.phone || m.mart === data.store_name || String(m.id) === String(data.raw_id || data.store_id)) {
-     m.status = "개통완료";
-    }
-   });
-   localStorage.setItem("pendingMarts", JSON.stringify(list));
-  } catch(e) {}
-
-  try {
-   await fetch("https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?id=eq." + encodeURIComponent(data.raw_id || data.id || data.store_id),{
-    method:"PATCH",
-    headers:{
-     "apikey":"sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
-     "Authorization":"Bearer sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
-     "Content-Type":"application/json",
-     "Prefer":"return=minimal"
-    },
-    body:JSON.stringify({
-     approval_status:"APPROVED",
-     service_status:"ACTIVE",
-     mart_code:data.store_id
-    })
-   });
-  } catch(e) {}
-
-  alert("🎉 [" + (data.store_name || "해당 마트") + "] 가맹 승인 완료!\n\n• 본사 지원 1,000건 무료 문자가 즉시 개통되었습니다.\n• 사장님 휴대폰(" + (data.phone || "") + ")으로 마트관리자 접속 링크가 발송되었습니다.");
-  return {ok:true, message:"사용 승인되었습니다."};
- }
  var body=data||{};
  body.action=action;
  body.session_token=session();
@@ -441,70 +312,345 @@ async function api(action,data){
  if(!r.ok||!x.ok)throw new Error(x.message||"처리에 실패했습니다.");
  return x;
 }
-function isPending(s){return !s.account_status||s.account_status==="pending"||s.account_status==="waiting"||s.account_status==="승인대기";}
-async function load(){
+
+window.loadHqAccount=async function(){
  try{
-  msg("",false);
-  $("#waCount").textContent="불러오는 중...";
   var x=await api("list_stores",{});
-  stores=(x.stores||[]).filter(isPending);
+  stores=x.stores||[];
   render();
  }catch(e){
-  $("#waCount").textContent="승인대기 목록을 불러오지 못했습니다.";
+  $("#wgCount").textContent="목록을 불러오지 못했습니다.";
   msg(e.message,true);
  }
-}
+};
+
 function render(){
- var q=$("#waSearch").value.toLowerCase().trim();
- var list=stores.filter(function(s){
-  return [s.store_id,s.store_name,s.owner_name,s.phone,s.region_name].join(" ").toLowerCase().indexOf(q)>-1;
- });
- var tbody=$("#waTable");
+ var q=$("#wgSearch").value.toLowerCase().trim();
+ var tbody=$("#wgTable");
  tbody.innerHTML="";
- $("#waCount").textContent="승인대기 총 "+list.length+"개 매장";
- if(!list.length){
-  var tr=document.createElement("tr");
-  tr.innerHTML='<td colspan="7" class="wa-empty">승인대기 중인 가맹점이 없습니다.</td>';
-  tbody.appendChild(tr);
-  return;
- }
+ var list=stores.filter(function(s){
+  return [s.store_id,s.store_name,s.admin_id,s.owner_name,s.phone,s.region_name].join(" ").toLowerCase().indexOf(q)>-1;
+ });
+ $("#wgCount").textContent="총 "+list.length+"개 매장";
  list.forEach(function(s){
   var tr=document.createElement("tr");
-  tr.innerHTML=
-   "<td>"+esc(s.store_id)+"</td>"+
-   "<td><b>"+esc(s.store_name)+"</b></td>"+
-   "<td>"+esc(s.owner_name)+"</td>"+
-   "<td>"+esc(s.phone)+"</td>"+
-   "<td>"+esc(s.region_name)+"</td>"+
-   '<td><span class="wa-badge">승인대기</span></td>'+
-   '<td><button type="button" class="green wa-approve">사용 승인</button></td>';
-  tr.querySelector(".wa-approve").onclick=async function(){
-   if(!confirm((s.store_name||s.store_id||"해당 매장")+"을 사용 승인하시겠습니까?"))return;
-   try{
-    this.disabled=true;
-    var x=await api("activate_store",{store_id:s.store_id, raw_id:s.id});
-    msg(x.message||"사용 승인되었습니다.",false);
-    await load();
-   }catch(e){
-    this.disabled=false;
-    msg(e.message,true);
-   }
-  };
+  var status="정상";
+  if(s.account_status==="suspended")status="정지";
+  if(s.account_status==="pending")status="승인대기";
+  var pwVal=s.password||"1234";
+  var pwCell="<span style='font-size:12px;font-weight:700;color:#2563eb;'>"+esc(pwVal)+"</span>";
+  tr.innerHTML="<td>"+esc(s.store_id)+"</td><td><b>"+esc(s.store_name)+"</b></td><td>"+esc(s.admin_id)+"</td><td>"+pwCell+"</td><td>"+esc(s.owner_name)+"</td><td>"+esc(s.phone)+"</td><td>"+esc(s.region_name)+"</td><td>"+status+"</td>";
+  tr.onclick=function(){selectStore(s);};
   tbody.appendChild(tr);
  });
 }
-$("#waSearch").oninput=render;
-$("#waRefresh").onclick=load;
-window.loadHqApproval=load;
-if(!session()){
- msg("본사 관리자 로그인이 필요합니다.",true);
-}else{
- load();
+
+function selectStore(s){
+ selected=s;
+ $("#wgStoreId").value=s.store_id||"";
+ $("#wgAdminId").value=s.admin_id||"";
+ $("#wgPassword").value="";
+ $("#wgStoreName").value=s.store_name||"";
+ $("#wgOwner").value=s.owner_name||"";
+ $("#wgPhone").value=s.phone||"";
+ $("#wgRegion").value=s.region_name||"";
+ $("#wgAddress").value=s.address||"";
+ $("#wgStoreId").readOnly=true;
+ $("#wgSelected").textContent=(s.store_name||"")+" ("+(s.store_id||"")+")";
 }
+
+function clearForm(){
+ selected=null;
+ ["#wgStoreId","#wgAdminId","#wgPassword","#wgStoreName","#wgOwner","#wgPhone","#wgRegion","#wgAddress"].forEach(function(id){$(id).value="";});
+ $("#wgStoreId").readOnly=false;
+ $("#wgSelected").textContent="매장을 선택해 주세요.";
+}
+
+$("#wgCreate").onclick=async function(){
+ try{
+  var x=await api("create_store",{
+   store_id:$("#wgStoreId").value.trim(),admin_id:$("#wgAdminId").value.trim(),password:$("#wgPassword").value,
+   store_name:$("#wgStoreName").value.trim(),owner_name:$("#wgOwner").value.trim(),phone:$("#wgPhone").value.trim(),
+   region_name:$("#wgRegion").value.trim(),address:$("#wgAddress").value.trim()
+  });
+  clearForm();msg(x.message,false);await window.loadHqAccount();
+ }catch(e){msg(e.message,true);}
+};
+
+$("#wgUpdate").onclick=async function(){
+ if(!selected){alert("매장을 먼저 선택하세요.");return;}
+ try{
+  var x=await api("update_store",{
+   store_id:selected.store_id,admin_id:$("#wgAdminId").value.trim(),
+   store_name:$("#wgStoreName").value.trim(),owner_name:$("#wgOwner").value.trim(),
+   phone:$("#wgPhone").value.trim(),region_name:$("#wgRegion").value.trim(),address:$("#wgAddress").value.trim()
+  });
+  clearForm();msg(x.message,false);await window.loadHqAccount();
+ }catch(e){msg(e.message,true);}
+};
+
+$("#wgClear").onclick=clearForm;
+
+$("#wgActivate").onclick=async function(){
+ if(!selected){alert("매장을 먼저 선택하세요.");return;}
+ try{
+  var x=await api("activate_store",{store_id:selected.store_id});
+  clearForm();msg(x.message,false);await window.loadHqAccount();
+ }catch(e){msg(e.message,true);}
+};
+
+$("#wgSuspend").onclick=async function(){
+ if(!selected){alert("매장을 먼저 선택하세요.");return;}
+ if(!confirm("이 매장의 사용을 정지하시겠습니까?"))return;
+ try{
+  var x=await api("suspend_store",{store_id:selected.store_id});
+  clearForm();msg(x.message,false);await window.loadHqAccount();
+ }catch(e){msg(e.message,true);}
+};
+
+$("#wgReset").onclick=async function(){
+ if(!selected){alert("매장을 먼저 선택하세요.");return;}
+ var pw=prompt("새 임시 비밀번호를 입력하세요.\n영문+숫자 8자 이상");
+ if(!pw)return;
+ try{
+  var x=await api("reset_store_password",{store_id:selected.store_id,new_password:pw});
+  alert(x.message);
+ }catch(e){alert(e.message);}
+};
+
+$("#wgDelete").onclick=async function(){
+ if(!selected){alert("매장을 먼저 선택하세요.");return;}
+ if(!confirm((selected.store_name||"")+" 매장 계정을 삭제하시겠습니까?"))return;
+ try{
+  var x=await api("delete_store",{store_id:selected.store_id});
+  clearForm();msg(x.message,false);await window.loadHqAccount();
+ }catch(e){msg(e.message,true);}
+};
+
+$("#wgSearch").oninput=render;
+if(session()) window.loadHqAccount();
 })();
 </script>
   </div>
 </div>
+
+<!-- ==============================================
+     가맹점 승인관리 룸 (hqRoomApproval)
+============================================== -->
+<div id="hqRoomApproval" class="hq-room-shell">
+  <div class="hq-room-top">
+    <button type="button" class="hq-back-btn" onclick="backToHqDashboard()">← 본사 관리자</button>
+  </div>
+  <div id="wgApproval">
+<style>
+#wgApproval{max-width:1100px;margin:auto;padding:20px 12px;font-family:Arial,sans-serif;color:#222}
+#wgApproval *{box-sizing:border-box}
+#wgApproval h2{margin:0 0 6px;font-size:22px;color:#166534}
+#wgApproval .wa-sub{margin:0 0 16px;color:#64748b;font-size:14px;line-height:1.6}
+#wgApproval .wa-card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+#wgApproval .wa-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+#wgApproval input{flex:1;min-width:220px;height:44px;padding:0 11px;border:1px solid #ccc;border-radius:7px;font-size:14px}
+#wgApproval button{border:0;border-radius:7px;padding:10px 15px;color:#fff;font-weight:700;cursor:pointer}
+#wgApproval .green{background:#15803d}
+#wgApproval .gray{background:#475569}
+#wgApproval .wa-table{overflow-x:auto}
+#wgApproval table{width:100%;min-width:760px;border-collapse:collapse}
+#wgApproval th,#wgApproval td{padding:11px 10px;border-bottom:1px solid #ddd;text-align:left;font-size:13px;vertical-align:middle}
+#wgApproval th{background:#f8fafc;color:#475569;font-weight:700}
+#wgApproval tbody tr:hover{background:#f0fdf4}
+#wgApproval .wa-badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:12px;font-weight:700}
+#wgApproval .wa-badge-done{display:inline-block;padding:5px 9px;border-radius:999px;background:#dcfce7;color:#166534;font-size:12px;font-weight:700}
+#wgApproval .wa-empty{padding:24px 10px;text-align:center;color:#64748b}
+#wgApproval #waMsg{margin-top:12px;font-weight:700}
+@media(max-width:700px){#wgApproval .wa-top{align-items:stretch}#wgApproval input{width:100%}}
+</style>
+
+<h2>🏪 가맹점 승인관리 (1,000건 무료 개통)</h2>
+<p class="wa-sub">신규 마트의 가맹 신청 및 포스(POS) 고객 엑셀 DB 접수 건을 확인하고, <strong>1,000건 무료 문자 개통</strong>을 승인합니다.</p>
+
+<div class="wa-card">
+  <div class="wa-top">
+    <input id="waSearch" placeholder="마트명 · 대표자 · 전화번호 · 추천 파트너코드 검색">
+    <button id="waRefresh" class="gray" type="button">새로고침</button>
+  </div>
+  <p id="waCount" style="font-weight:700;color:#166534;margin:8px 0 14px;">불러오는 중...</p>
+  <div class="wa-table">
+    <table>
+      <thead>
+        <tr>
+          <th>신청일시</th>
+          <th>마트명</th>
+          <th>소재지(동) / 추천코드</th>
+          <th>사장님 전화번호</th>
+          <th>첨부 엑셀 DB</th>
+          <th>상태</th>
+          <th>승인 및 개통</th>
+        </tr>
+      </thead>
+      <tbody id="waTable"></tbody>
+    </table>
+  </div>
+  <div id="waMsg"></div>
+</div>
+
+<script>
+(function(){
+var ROOT=document.getElementById("wgApproval");
+if(!ROOT)return;
+var $=function(s){return ROOT.querySelector(s);};
+var defaultPendingMarts = [
+  { id: 101, mart: "에너젠마트", dong: "광주 광산구 도천동", phone: "010-2286-4150", fileName: "단골고객_10000건.xlsx", partnerCode: "4150", count: "1,000건 (무료)", status: "승인대기", date: "2026-11-11 09:02" }
+];
+
+function msg(text,error){
+  var e=$("#waMsg");
+  e.textContent=text||"";
+  e.style.color=error?"#dc2626":"#15803d";
+}
+function esc(v){var d=document.createElement("div");d.textContent=v||"";return d.innerHTML;}
+
+window.loadHqApproval = async function(){
+  try{
+    msg("",false);
+    var saved = localStorage.getItem("pendingMarts");
+    var list = saved ? JSON.parse(saved) : defaultPendingMarts;
+    var pendingList = list.filter(function(m){ return m.status === "승인대기"; });
+    
+    var badge = document.getElementById("hqMartBadge");
+    if(badge) badge.textContent = "대기 " + pendingList.length + "건";
+    
+    renderApprovalList(list);
+  }catch(e){
+    $("#waCount").textContent="승인 목록을 불러오지 못했습니다.";
+    msg(e.message,true);
+  }
+};
+
+function renderApprovalList(list){
+  var q=$("#waSearch").value.toLowerCase().trim();
+  var filtered = list.filter(function(m){
+    return [m.mart, m.dong, m.phone, m.partnerCode, m.fileName].join(" ").toLowerCase().indexOf(q)>-1;
+  });
+  var pendingCount = filtered.filter(function(m){ return m.status === "승인대기"; }).length;
+  $("#waCount").textContent = "가맹 승인대기 총 " + pendingCount + "건 (전체 신청 " + filtered.length + "건)";
+
+  var tbody=$("#waTable");
+  tbody.innerHTML="";
+  if(!filtered.length){
+    tbody.innerHTML='<tr><td colspan="7" class="wa-empty">신청 내역이 없습니다.</td></tr>';
+    return;
+  }
+
+  filtered.forEach(function(m){
+    var tr=document.createElement("tr");
+    var isPending = (m.status === "승인대기");
+    var statusBadge = isPending 
+      ? '<span class="wa-badge">승인대기</span>' 
+      : '<span class="wa-badge-done">개통완료</span>';
+    var actionBtn = isPending
+      ? '<button type="button" class="green wa-approve" style="padding:7px 12px;font-size:12.5px;font-weight:800;border:0;border-radius:6px;background:#15803d;color:#fff;cursor:pointer;">✅ 1,000건 개통 승인</button>'
+      : '<span style="color:#15803d;font-weight:700;font-size:12.5px;">✓ 개통 완료</span>';
+
+    tr.innerHTML = 
+      '<td style="color:#64748b;font-size:12.5px;">' + esc(m.date || "2026-11-11") + '</td>' +
+      '<td><b>' + esc(m.mart) + '</b></td>' +
+      '<td>' + esc(m.dong || "광주 광산구") + ' <span style="background:#e0f2fe;color:#0369a1;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:700;">추천:' + esc(m.partnerCode||"-") + '</span></td>' +
+      '<td>' + esc(m.phone) + '</td>' +
+      '<td><span style="background:#f1f5f9;color:#334155;padding:3px 8px;border-radius:4px;font-size:12px;">📄 ' + esc(m.fileName||"단골고객.xlsx") + '</span></td>' +
+      '<td>' + statusBadge + '</td>' +
+      '<td>' + actionBtn + '</td>';
+
+    if(isPending){
+      tr.querySelector(".wa-approve").onclick = async function(){
+        if(!confirm("[" + m.mart + "] 마트의 가맹 및 1,000건 무료 문자를 즉시 승인 개통하시겠습니까?")) return;
+        this.disabled = true;
+        m.status = "개통완료";
+        var saved = localStorage.getItem("pendingMarts");
+        var all = saved ? JSON.parse(saved) : defaultPendingMarts;
+        all.forEach(function(item){ if(item.id === m.id || item.phone === m.phone) item.status = "개통완료"; });
+        localStorage.setItem("pendingMarts", JSON.stringify(all));
+
+        alert("🎉 [" + m.mart + "] 가맹 승인 및 무료 개통 완료!\n\n• 본사 지원 1,000건 무료 세일 문자가 즉시 활성화되었습니다.\n• 사장님 휴대폰(" + m.phone + ")으로 마트관리자 15원 발송 링크가 자동 전송되었습니다.");
+        window.loadHqApproval();
+      };
+    }
+    tbody.appendChild(tr);
+  });
+}
+
+$("#waSearch").oninput = function(){ window.loadHqApproval(); };
+$("#waRefresh").onclick = function(){ window.loadHqApproval(); };
+})();
+</script>
+  </div>
+</div>
+
+<!-- ==============================================
+     영업 파트너(영업인) 승인관리 룸 (hqRoomPartner)
+============================================== -->
+<div id="hqRoomPartner" class="hq-room-shell">
+  <div class="hq-room-top">
+    <button type="button" class="hq-back-btn" onclick="backToHqDashboard()">← 본사 관리자</button>
+  </div>
+  <div id="wgPartner" style="max-width:1100px;margin:auto;padding:20px 12px;font-family:Arial,sans-serif;color:#222;">
+    <h2 style="margin:0 0 6px;font-size:22px;color:#0e6556;display:flex;align-items:center;gap:8px;">
+      <span>🤝 영업 파트너(영업인) 승인관리</span>
+      <span style="background:#ea580c;color:#fff;font-size:13px;padding:3px 10px;border-radius:999px;font-weight:700;">대기 <span id="hqPartnerPendingCount">2</span>건</span>
+    </h2>
+    <p style="margin:0 0 16px;color:#64748b;font-size:14px;line-height:1.6;">
+      신규 영업 파트너 신청을 승인하고 고유 4자리 추천 코드를 발급하며, 매장 유치 시 건당 <strong>5원 영업 수수료 평생 정산</strong>을 관리합니다.
+    </p>
+
+    <!-- 승인 대기 파트너 목록 카드 -->
+    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
+      <h3 style="margin:0 0 12px;font-size:17px;color:#1e293b;display:flex;align-items:center;justify-content:space-between;">
+        <span>📋 영업 파트너 신청 대기 목록</span>
+        <button type="button" onclick="window.renderHqPartners()" style="background:#475569;color:#fff;border:0;border-radius:6px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer;">새로고침</button>
+      </h3>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;min-width:760px;border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f8fafc;color:#475569;font-size:13px;border-bottom:2px solid #e2e8f0;">
+              <th style="padding:10px;text-align:left;">신청일시</th>
+              <th style="padding:10px;text-align:left;">성명</th>
+              <th style="padding:10px;text-align:left;">연락처</th>
+              <th style="padding:10px;text-align:left;">희망권역</th>
+              <th style="padding:10px;text-align:left;">영업경력</th>
+              <th style="padding:10px;text-align:left;">발급예정코드</th>
+              <th style="padding:10px;text-align:left;">상태</th>
+              <th style="padding:10px;text-align:left;">관리/승인</th>
+            </tr>
+          </thead>
+          <tbody id="hqPartnerTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 정산 및 활동 중인 파트너 목록 카드 -->
+    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
+      <h3 style="margin:0 0 12px;font-size:17px;color:#0e6556;">
+        💰 정산 및 활동 중인 공식 영업 파트너 (건당 5원 정산)
+      </h3>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;min-width:760px;border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f8fafc;color:#475569;font-size:13px;border-bottom:2px solid #e2e8f0;">
+              <th style="padding:10px;text-align:left;">파트너명</th>
+              <th style="padding:10px;text-align:left;">영업코드</th>
+              <th style="padding:10px;text-align:left;">연락처</th>
+              <th style="padding:10px;text-align:left;">정산계좌</th>
+              <th style="padding:10px;text-align:left;">유치 매장</th>
+              <th style="padding:10px;text-align:left;">누적 발송량</th>
+              <th style="padding:10px;text-align:left;">누적 정산액(5원)</th>
+            </tr>
+          </thead>
+          <tbody id="hqPartnerApprovedTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <div id="hqRoomInquiry" class="hq-room-shell">
   <div class="hq-room-top">
@@ -2700,7 +2846,7 @@ if(!session()){
   }
 
   function hideRooms(){
-    ["hqRoomAccount","hqRoomApproval","hqRoomInquiry","hqRoomPayment","hqRoomBanner","hqRoomCoupon","hqRoomQr"].forEach(function(id){
+    ["hqRoomAccount","hqRoomApproval","hqRoomPartner","hqRoomInquiry","hqRoomPayment","hqRoomBanner","hqRoomCoupon","hqRoomQr"].forEach(function(id){
       const el=document.getElementById(id);
       if(el) el.style.display="none";
     });
@@ -2733,7 +2879,9 @@ if(!session()){
     const target=document.getElementById(map[room]);
     if(target) target.style.display="block";
     if(room==="qr" && typeof window.loadHqQrOrders==="function") window.loadHqQrOrders();
+    if(room==="account" && typeof window.loadHqAccount==="function") window.loadHqAccount();
     if(room==="approval" && typeof window.loadHqApproval==="function") window.loadHqApproval();
+    if(room==="partner" && typeof window.loadHqPartner==="function") window.loadHqPartner();
     if(room==="inquiry" && typeof window.loadHqInquiry==="function") window.loadHqInquiry();
 
     window.scrollTo(0,0);
@@ -2752,6 +2900,8 @@ if(!session()){
     loginScreen.style.display = "none";
     dashboard.style.display = "block";
     await loadDashboardStats();
+    if(typeof window.loadHqApproval==="function") window.loadHqApproval();
+    if(typeof window.renderHqPartners==="function") window.renderHqPartners();
   }
 
   loginButton.addEventListener("click",async function(){
