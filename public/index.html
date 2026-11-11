@@ -2712,6 +2712,159 @@
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
+
+<style id="mart-benefits-2col-style">
+/* 마트 플랫폼 2대 파격 혜택 바 (시안 1: 문자 15원 강조 & 디지털 플랫폼 제공) */
+#wooriMartVisual .wmv-benefits.wmv-benefits-2col {
+  margin-top: 25px !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  overflow: hidden !important;
+  border: 2px solid #2563eb !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.12) !important;
+}
+
+#wooriMartVisual .wmv-benefit.wmv-benefit-sms,
+#wooriMartVisual .wmv-benefit.wmv-benefit-platform {
+  min-height: 88px !important;
+  padding: 16px 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 16px !important;
+  box-sizing: border-box !important;
+}
+
+#wooriMartVisual .wmv-benefit.wmv-benefit-sms {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffffff 70%) !important;
+  border-right: 1.5px solid #fed7aa !important;
+}
+
+#wooriMartVisual .wmv-benefit.wmv-benefit-platform {
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 70%) !important;
+  border-right: 0 !important;
+}
+
+#wooriMartVisual .wmv-benefit-icon {
+  width: 48px !important;
+  height: 48px !important;
+  flex: 0 0 48px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 14px !important;
+  font-size: 24px !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06) !important;
+}
+
+#wooriMartVisual .wmv-benefit-sms .wmv-benefit-icon {
+  border: 1.5px solid #fecdd3 !important;
+}
+
+#wooriMartVisual .wmv-benefit-platform .wmv-benefit-icon {
+  border: 1.5px solid #bfdbfe !important;
+}
+
+#wooriMartVisual .wmv-benefit-info {
+  flex: 1 !important;
+  min-width: 0 !important;
+  text-align: left !important;
+}
+
+#wooriMartVisual .wmv-benefit-badge {
+  display: inline-block !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+  margin-bottom: 4px !important;
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fca5a5 !important;
+}
+
+#wooriMartVisual .wmv-benefit-badge.free-badge {
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+  border: 1px solid #93c5fd !important;
+}
+
+#wooriMartVisual .wmv-benefit-main {
+  display: block !important;
+  color: #0f172a !important;
+  font-size: 16.5px !important;
+  font-weight: 900 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.4px !important;
+}
+
+/* 15원 강력 강조 (선명한 레드 볼드 & 언더라인) */
+#wooriMartVisual .highlight-price {
+  color: #e11d48 !important;
+  font-size: 22px !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.5px !important;
+  text-decoration: underline !important;
+  text-underline-offset: 4px !important;
+  margin-left: 2px !important;
+}
+
+#wooriMartVisual .highlight-free {
+  color: #2563eb !important;
+  font-size: 20px !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.4px !important;
+  margin-left: 2px !important;
+}
+
+#wooriMartVisual .wmv-benefit-sub {
+  display: block !important;
+  margin-top: 4px !important;
+  color: #475569 !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.3px !important;
+}
+
+@media (max-width: 768px) {
+  #wooriMartVisual .wmv-benefits.wmv-benefits-2col {
+    grid-template-columns: 1fr !important;
+    border-radius: 14px !important;
+  }
+  #wooriMartVisual .wmv-benefit.wmv-benefit-sms {
+    border-right: 0 !important;
+    border-bottom: 1.5px solid #fed7aa !important;
+  }
+  #wooriMartVisual .wmv-benefit.wmv-benefit-sms,
+  #wooriMartVisual .wmv-benefit.wmv-benefit-platform {
+    padding: 14px 16px !important;
+    min-height: 76px !important;
+    gap: 12px !important;
+  }
+  #wooriMartVisual .wmv-benefit-icon {
+    width: 40px !important;
+    height: 40px !important;
+    flex: 0 0 40px !important;
+    font-size: 20px !important;
+  }
+  #wooriMartVisual .wmv-benefit-main {
+    font-size: 15px !important;
+  }
+  #wooriMartVisual .highlight-price {
+    font-size: 19px !important;
+  }
+  #wooriMartVisual .highlight-free {
+    font-size: 18px !important;
+  }
+  #wooriMartVisual .wmv-benefit-sub {
+    font-size: 11.5px !important;
+  }
+}
+</style>
+
 </head>
 <body class="page_ready  doz_sys  _body_menu_m20260904c80e1a667a5f2  mobile-nav-on  mobile_nav_dep1  page  new_header_site  " 	style=";"  id="doz_body">
 <div id="site_alarm_slidemenu_container" class="notification-canvas-container">
@@ -3285,7 +3438,7 @@
 
             <button class="wmv-main-btn" type="button" onclick="location.href='https://wooriapt.ai.kr/platform-guide-detail.html'">플랫폼 사용 방법 보기 ▶</button>
 
-            <button class="wmv-outline-btn" type="button" onclick="location.href='https://wooriapt.ai.kr/about-detail.html'">자세히 알아보기 〉</button>
+            <button class="wmv-outline-btn" type="button" onclick="location.href='/about-detail.html'">영업 등록 가이드 〉</button>
 
             <button class="wmv-outline-btn" type="button" onclick="location.href='/74.html'">샘플보기 〉</button>
 
@@ -3361,40 +3514,26 @@
 
       
 
-      <div class="wmv-benefits">
-
-        <div class="wmv-benefit">
-
-          <div class="wmv-benefit-icon">▣</div>
-
-          <div><strong>간편한 사용</strong><small>누구나 쉽게 관리</small></div>
-
+      <div class="wmv-benefits wmv-benefits-2col">
+        <!-- 혜택 1: 문자비용 15원 (강력 강조) -->
+        <div class="wmv-benefit wmv-benefit-sms">
+          <div class="wmv-benefit-icon">💬</div>
+          <div class="wmv-benefit-info">
+            <div class="wmv-benefit-badge">비용 절감 혁신</div>
+            <strong class="wmv-benefit-main">문자 발송 비용 <span class="highlight-price">건당 15원</span></strong>
+            <small class="wmv-benefit-sub">종이 전단지·일반 문자 대비 홍보비 최대 70% 대폭 절감</small>
+          </div>
         </div>
 
-        <div class="wmv-benefit">
-
-          <div class="wmv-benefit-icon">◷</div>
-
-          <div><strong>실시간 매출 확인</strong><small>데이터로 매출 확인</small></div>
-
+        <!-- 혜택 2: 디지털 플랫폼 제공 -->
+        <div class="wmv-benefit wmv-benefit-platform">
+          <div class="wmv-benefit-icon">🖥️</div>
+          <div class="wmv-benefit-info">
+            <div class="wmv-benefit-badge free-badge">100% 무상 지원</div>
+            <strong class="wmv-benefit-main">디지털 스마트 플랫폼 <span class="highlight-free">무료 제공</span></strong>
+            <small class="wmv-benefit-sub">자동차 QR · 디지털 화면 · 모바일 주문배달 시스템 일체 탑재</small>
+          </div>
         </div>
-
-        <div class="wmv-benefit">
-
-          <div class="wmv-benefit-icon">♙</div>
-
-          <div><strong>고객 DB 확보</strong><small>단골 고객 만들기</small></div>
-
-        </div>
-
-        <div class="wmv-benefit">
-
-          <div class="wmv-benefit-icon">○</div>
-
-          <div><strong>수수료 ZERO</strong><small>부담 없이 성장</small></div>
-
-        </div>
-
       </div>
 
     </div>
