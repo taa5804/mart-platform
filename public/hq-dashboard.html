@@ -2514,6 +2514,7 @@ if(!session()){
               <th>매장ID</th>
               <th>매장명</th>
               <th>신청수량</th>
+              <th>공급대금</th>
               <th>신청일시</th>
               <th>처리상태</th>
             </tr>
@@ -2585,25 +2586,41 @@ if(!session()){
       const tbody=document.getElementById("hqQrTable");
       tbody.innerHTML="";
 
+      function getBadgeColor(st){
+        if(st==='접수대기') return 'background:#fef3c7;color:#b45309;border:1px solid #fde68a;';
+        if(st==='접수완료') return 'background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe;';
+        if(st==='제작중') return 'background:#f3e8ff;color:#6b21a8;border:1px solid #e9d5ff;';
+        if(st==='제작완료') return 'background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;';
+        if(st==='발송완료') return 'background:#dcfce7;color:#15803d;border:1px solid #86efac;';
+        if(st==='취소') return 'background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;';
+        return 'background:#f1f5f9;color:#475569;';
+      }
+
       qrRows.filter(function(r){
         return [r.id,r.store_id,r.store_name,r.status].join(" ").toLowerCase().indexOf(q)>-1;
       }).forEach(function(r){
         const tr=document.createElement("tr");
         if(qrSelected && String(qrSelected.id)===String(r.id))tr.className="selected";
+        const cost = (Number(r.quantity||0) * 200).toLocaleString('ko-KR') + '원';
         tr.innerHTML=
-          "<td>"+qrEsc(r.id)+"</td>"+
+          "<td><b>#"+qrEsc(r.id)+"</b></td>"+
           "<td>"+qrEsc(r.store_id)+"</td>"+
           "<td><b>"+qrEsc(r.store_name)+"</b></td>"+
-          "<td>"+Number(r.quantity||0).toLocaleString("ko-KR")+"개</td>"+
+          "<td>"+Number(r.quantity||0).toLocaleString("ko-KR")+"장</td>"+
+          "<td><span style='color:#b45309;font-weight:bold;'>"+cost+"</span></td>"+
           "<td>"+qrEsc(qrDate(r.created_at))+"</td>"+
-          "<td><b>"+qrEsc(r.status)+"</b></td>";
+          "<td><span style='padding:3px 8px;border-radius:12px;font-size:12px;font-weight:bold;"+getBadgeColor(r.status)+"'>"+qrEsc(r.status)+"</span></td>";
         tr.onclick=function(){
           qrSelected=r;
           document.getElementById("hqQrSelected").innerHTML=
-            "<b>주문번호 "+qrEsc(r.id)+"</b><br>"+
-            qrEsc(r.store_name)+" ("+qrEsc(r.store_id)+") · "+
-            Number(r.quantity||0).toLocaleString("ko-KR")+"개 · 현재상태: "+qrEsc(r.status);
-          qrMsg("",false);
+            "<div style='font-size:16px;font-weight:800;color:#1e3a8a;margin-bottom:6px;'>📦 주문번호 #"+qrEsc(r.id)+" ("+qrEsc(r.status)+")</div>"+
+            "<div style='font-size:14px;color:#334155;line-height:1.7;'>"+
+            "• <strong>신청 매장 및 배송정보:</strong> "+qrEsc(r.store_name)+" ("+qrEsc(r.store_id)+")<br>"+
+            "• <strong>신청 수량:</strong> "+Number(r.quantity||0).toLocaleString("ko-KR")+" 장 &nbsp;|&nbsp; "+
+            "• <strong>공급 금액:</strong> <span style='color:#dc2626;font-weight:bold;'>"+(Number(r.quantity||0)*200).toLocaleString("ko-KR")+"원</span> (농협 199-02-289684 입금)<br>"+
+            "• <strong>주문 일시:</strong> "+qrEsc(qrDate(r.created_at))+
+            "</div>";
+          qrMsg("[" + r.id + "번 주문]이 선택되었습니다. 아래 버튼을 눌러 처리상태를 변경하세요.",false);
           qrRender();
         };
         tbody.appendChild(tr);
