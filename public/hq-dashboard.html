@@ -612,7 +612,7 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
         <h3 style="margin:0;font-size:18px;color:#0e6556;display:flex;align-items:center;gap:8px;">
           <span>👑 발급 완료된 공식 영업 파트너 목록 (건당 5원 정산)</span>
-          <span id="hqPartnerApprovedCount" style="background:#e6f4f1;color:#0e6556;font-size:13px;padding:2px 10px;border-radius:999px;font-weight:800;">총 10명</span>
+          <span id="hqPartnerApprovedCount" style="background:#e6f4f1;color:#0e6556;font-size:13px;padding:2px 10px;border-radius:999px;font-weight:800;">총 8명</span>
         </h3>
         <button type="button" onclick="document.getElementById('addPartnerModal').style.display='block'" style="background:#15803d;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:800;cursor:pointer;">
           ➕ 새 영업코드 직접 등록
@@ -3044,9 +3044,7 @@ if(!session()){
     { name: '공식파트너(0259)', code: '0259', phone: '010-****-0259', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
     { name: '공식파트너(9855)', code: '9855', phone: '010-****-9855', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
     { name: '공식파트너(1820)', code: '1820', phone: '010-****-1820', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
-    { name: '공식파트너(4004)', code: '4004', phone: '010-****-4004', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
-    { name: '김철수 파트너', code: '5678', phone: '010-1234-5678', bank: '국민 123-456-*** (김철수)', mart: '대박식자재마트', count: 50000, fee: 250000 },
-    { name: '이영희 파트너', code: '9911', phone: '010-9876-9911', bank: '농협 302-091-*** (이영희)', mart: '에이스식자재마트 광주', count: 30000, fee: 150000 }
+    { name: '공식파트너(4004)', code: '4004', phone: '010-****-4004', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 }
   ];
 
   window.renderHqPartners = function() {
