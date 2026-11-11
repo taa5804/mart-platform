@@ -3045,14 +3045,36 @@ if(!session()){
           : '<span style="background:#e6f4f1;color:#0e6556;font-weight:900;padding:3px 8px;border-radius:4px;font-size:13px;">' + p.code + '</span>';
 
         tr.style = rowBg;
+        var fee = Number(p.fee) || 0;
+        var isBiz = (p.taxType === 'business');
+        var taxBadge = isBiz 
+          ? '<span style="background:#dbeafe;color:#1e40af;padding:3px 8px;border-radius:4px;font-weight:800;font-size:11.5px;">🏢 사업자</span>'
+          : '<span style="background:#dcfce7;color:#166534;padding:3px 8px;border-radius:4px;font-weight:800;font-size:11.5px;">👤 개인 3.3%</span>';
+        
+        var taxDiff = isBiz ? Math.floor(fee * 0.1) : -Math.floor(fee * 0.033);
+        var netPayout = isBiz ? (fee + Math.floor(fee * 0.1)) : (fee - Math.floor(fee * 0.033));
+        var taxDiffStr = (fee === 0) ? '-' : (isBiz ? ('+ ' + taxDiff.toLocaleString() + '원(VAT)') : ('- ' + Math.abs(taxDiff).toLocaleString() + '원(3.3%)'));
+        var taxDiffColor = isBiz ? '#2563eb' : '#dc2626';
+
+        var docBtn = '<button type="button" onclick="window.viewPartnerTaxDoc(\'' + p.code + '\')" style="background:#f8fafc;color:#334155;border:1px solid #cbd5e1;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;cursor:pointer;">📄 증빙보기</button>';
+        
+        var isPaid = p.payoutStatus === '입금완료';
+        var payBtn = isPaid
+          ? '<span style="background:#15803d;color:#fff;padding:4px 9px;border-radius:6px;font-size:12px;font-weight:800;">✅ 입금완료</span>'
+          : '<button type="button" onclick="window.markPartnerPaid(\'' + p.code + '\', this)" style="background:#0e6556;color:#fff;border:0;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:800;cursor:pointer;">💸 입금처리</button>';
+
         tr.innerHTML = `
           <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;"><b>${p.name}</b></td>
           <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${codeBadge}</td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${p.phone}</td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;font-size:12.5px;color:#475569;">${p.bank}</td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;font-size:12.5px;">${p.phone}</td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${taxBadge}</td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;font-size:12px;color:#475569;">${p.bank || '미등록'}</td>
           <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;font-weight:700;">${p.mart}</td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${(p.count || 0).toLocaleString()}건</td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;"><strong style="color:#b45309;font-size:14px;">${(p.fee || 0).toLocaleString()}원</strong></td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;"><strong style="color:#b45309;font-size:13.5px;">${fee.toLocaleString()}원</strong></td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;font-size:12px;color:${taxDiffColor};font-weight:700;">${taxDiffStr}</td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;"><strong style="color:#0e6556;font-size:14px;">${netPayout.toLocaleString()}원</strong></td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${docBtn}</td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${payBtn}</td>
         `;
         appTbody.appendChild(tr);
       });
