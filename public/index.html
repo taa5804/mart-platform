@@ -2865,6 +2865,14 @@
 }
 </style>
 
+
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0c4fd7">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="우리아파트 마트">
+
 </head>
 <body class="page_ready  doz_sys  _body_menu_m20260904c80e1a667a5f2  mobile-nav-on  mobile_nav_dep1  page  new_header_site  " 	style=";"  id="doz_body">
 <div id="site_alarm_slidemenu_container" class="notification-canvas-container">
@@ -3394,7 +3402,7 @@
 
         <button class="wmv-join" type="button" onclick="location.href='https://wooriapt.ai.kr/signup.html'">가맹점 등록</button>
 
-        <button class="wmv-app-install" type="button" onclick="location.href='https://wooriapt.ai.kr/mart-install.html'">앱설치</button>
+        <button class="wmv-app-install" type="button" onclick="openPwaInstallGuide()">앱설치</button>
 
         <button class="wmv-menu" type="button">☰</button>
 
@@ -4231,6 +4239,118 @@
     }
 </script>
 
+
+
+<!-- ============================================== -->
+<!-- PWA 원터치 앱 설치 스크립트 & 전용 안내 모달 -->
+<!-- ============================================== -->
+<div id="pwaInstallModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:999999; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
+  <div style="background:#ffffff; border-radius:22px; max-width:440px; width:100%; padding:26px 22px; box-shadow:0 25px 60px rgba(0,0,0,0.3); text-align:center; position:relative; animation:pwaPop .25s ease-out;">
+    <button type="button" onclick="closePwaInstallModal()" style="position:absolute; top:16px; right:16px; border:0; background:#f1f5f9; width:34px; height:34px; border-radius:50%; font-size:18px; cursor:pointer; color:#64748b; display:grid; place-items:center;">✕</button>
+    
+    <div style="width:72px; height:72px; margin:0 auto 14px auto; border-radius:18px; overflow:hidden; box-shadow:0 8px 20px rgba(12,79,215,0.22); border:2px solid #e0e7ff; background:#ffffff; display:grid; place-items:center;">
+      <img src="/mart-logo.png" alt="우리아파트 마트" style="width:100%; height:100%; object-fit:contain;">
+    </div>
+
+    <h3 style="font-size:20px; font-weight:900; color:#0f172a; margin:0 0 6px 0; letter-spacing:-0.5px;">우리아파트 마트 플랫폼</h3>
+    <p style="font-size:13.5px; color:#475569; margin:0 0 20px 0; font-weight:600;">휴대폰 / PC 바탕화면에 바로가기 앱을 설치합니다</p>
+
+    <div id="pwaAutoInstallBox" style="display:none; margin-bottom:18px;">
+      <button type="button" onclick="triggerPwaInstallPrompt()" style="width:100%; height:52px; background:linear-gradient(135deg, #0c4fd7, #2563eb); color:#ffffff; border:0; border-radius:14px; font-size:16px; font-weight:900; cursor:pointer; box-shadow:0 8px 20px rgba(37,99,235,0.35);">
+        📲 지금 바로 바탕화면에 앱 설치
+      </button>
+    </div>
+
+    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:16px; text-align:left; font-size:13px; line-height:1.65; color:#334155;">
+      <div style="font-weight:800; color:#0c4fd7; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+        <span>💡</span> 기기별 1초 간편 설치 안내
+      </div>
+      <div style="margin-bottom:8px;">
+        <strong style="color:#0f172a;">• 안드로이드(삼성 인터넷 / 크롬):</strong><br>
+        상단 메뉴(<strong>⋮</strong>) 클릭 ➔ <strong>[홈 화면에 추가]</strong> 또는 <strong>[앱 설치]</strong> 선택
+      </div>
+      <div style="margin-bottom:8px;">
+        <strong style="color:#0f172a;">• 아이폰(Safari):</strong><br>
+        하단 <strong>공유 아이콘(⎋)</strong> 클릭 ➔ <strong>[홈 화면에 추가]</strong> 선택
+      </div>
+      <div>
+        <strong style="color:#0f172a;">• PC(크롬 / 엣지):</strong><br>
+        주소창 우측의 <strong>설치 아이콘(⊕)</strong>을 누르시면 PC 바탕화면에 즉시 설치됩니다.
+      </div>
+    </div>
+
+    <button type="button" onclick="closePwaInstallModal()" style="margin-top:16px; width:100%; height:44px; background:#f1f5f9; color:#475569; border:0; border-radius:12px; font-size:14px; font-weight:800; cursor:pointer;">
+      닫기
+    </button>
+  </div>
+</div>
+
+<style>
+@keyframes pwaPop {
+  from { opacity:0; transform:scale(0.92); }
+  to { opacity:1; transform:scale(1); }
+}
+</style>
+
+<script>
+let deferredInstallPrompt = null;
+
+// Service worker 등록
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
+// 브라우저 PWA 설치 프롬프트 감지
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const autoBox = document.getElementById('pwaAutoInstallBox');
+  if (autoBox) autoBox.style.display = 'block';
+});
+
+function openPwaInstallGuide() {
+  const modal = document.getElementById('pwaInstallModal');
+  const autoBox = document.getElementById('pwaAutoInstallBox');
+  
+  if (deferredInstallPrompt) {
+    if (autoBox) autoBox.style.display = 'block';
+    // 즉시 네이티브 설치 프롬프트 시도
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        deferredInstallPrompt = null;
+        if (modal) modal.style.display = 'none';
+      }
+    }).catch(() => {
+      if (modal) modal.style.display = 'flex';
+    });
+    return;
+  }
+  
+  if (modal) modal.style.display = 'flex';
+}
+
+function triggerPwaInstallPrompt() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        deferredInstallPrompt = null;
+        closePwaInstallModal();
+      }
+    });
+  } else {
+    alert('브라우저 메뉴에서 [홈 화면에 추가] 또는 [앱 설치]를 선택해 주세요.');
+  }
+}
+
+function closePwaInstallModal() {
+  const modal = document.getElementById('pwaInstallModal');
+  if (modal) modal.style.display = 'none';
+}
+</script>
 
 </body>
 </html>
