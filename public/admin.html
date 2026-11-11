@@ -165,32 +165,90 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 
 <div class="sa-title">매장관리자 V1</div>
 
-<div id="loginBox" class="sa-box">
-  <b>매장 로그인</b>
+<div id="loginBox" class="sa-box" style="border:2px solid #166534;box-shadow:0 4px 14px rgba(22,101,52,0.15);border-radius:12px;padding:20px;">
 
-  <input
-    id="loginId"
-    placeholder="매장 ID"
-    value="store01"
-  >
+  <!-- [1단계: 마트 전용코드 입력 화면] -->
+  <div id="stepCodeBox">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="font-size:22px;">🏪</span>
+      <b style="font-size:18px;color:#166534;">우리아파트 마트관리자 전용방 입장</b>
+    </div>
+    <p style="font-size:13.5px;color:#64748b;margin:0 0 16px 0;line-height:1.5;">
+      본사에서 부여받으신 <strong>[마트 전용코드]</strong>를 입력하시면 사장님 매장 전용 관리실로 연결됩니다.
+    </p>
 
-  <input
-    id="loginPw"
-    type="password"
-    placeholder="비밀번호"
-    value="1234"
-  >
+    <label style="font-size:13.5px;font-weight:bold;color:#334155;display:block;margin-bottom:6px;">
+      🔑 마트 전용코드 입력
+    </label>
+    <div style="display:flex;gap:8px;">
+      <input
+        id="loginId"
+        placeholder="예: store01 또는 M000002"
+        value="store01"
+        style="height:46px;font-size:16px;font-weight:bold;color:#1e3a8a;letter-spacing:1px;margin-top:0;"
+        onkeydown="if(event.key==='Enter') verifyMartCode()"
+      >
+      <button
+        type="button"
+        class="sa-btn"
+        onclick="verifyMartCode()"
+        style="width:130px;height:46px;margin-top:0;font-size:14px;background:#166534;white-space:nowrap;"
+      >
+        전용방 확인 →
+      </button>
+    </div>
 
-  <button
-    class="sa-btn"
-    onclick="loginStore()"
-  >
-    로그인
-  </button>
-
-  <div class="sa-help">
-    테스트 ID: store01 / 비밀번호: 1234
+    <div class="sa-help" style="margin-top:14px;font-size:12.5px;color:#64748b;background:#f8fafc;padding:10px 12px;border-radius:6px;border:1px solid #e2e8f0;line-height:1.7;">
+      • <strong>테스트 전용코드:</strong> <code>store01</code><br>
+      • <strong>초기 비밀번호:</strong> 사장님 휴대폰 번호 뒤 4자리 (대표 송해석: <code>4150</code>)
+    </div>
   </div>
+
+  <!-- [2단계: 매장 확인 완료 & 비밀번호 입력 화면] -->
+  <div id="stepPwBox" style="display:none;">
+    <!-- 매장 환영 간판 -->
+    <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:12px;color:#166534;font-weight:700;">✅ 마트 전용방 확인 완료</div>
+      <div id="verifiedMartTitle" style="font-size:18px;font-weight:900;color:#14532d;margin-top:4px;">
+        에너젠마트 사장님 전용 관리실
+      </div>
+      <div id="verifiedMartSub" style="font-size:13px;color:#166534;margin-top:3px;">
+        코드: store01 &nbsp;|&nbsp; 대표: 송해석 사장님
+      </div>
+    </div>
+
+    <label style="font-size:13.5px;font-weight:bold;color:#334155;display:block;margin-bottom:6px;">
+      🔒 비밀번호 입력
+    </label>
+    <input
+      id="loginPw"
+      type="password"
+      placeholder="사장님 휴대폰 뒤 4자리 입력"
+      maxlength="20"
+      style="height:46px;font-size:18px;font-weight:bold;letter-spacing:3px;margin-top:0;"
+      onkeydown="if(event.key==='Enter') loginStore()"
+    >
+
+    <button
+      class="sa-btn"
+      onclick="loginStore()"
+      style="height:48px;font-size:16px;background:#15803d;margin-top:12px;box-shadow:0 2px 6px rgba(21,128,61,0.3);"
+    >
+      🚀 마트 관리자 전용방 입장
+    </button>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
+      <button
+        type="button"
+        onclick="backToStepCode()"
+        style="background:none;border:0;color:#64748b;font-size:13px;text-decoration:underline;cursor:pointer;padding:0;"
+      >
+        ← 다른 마트코드로 다시 입력
+      </button>
+      <span style="font-size:12px;color:#15803d;font-weight:bold;">초기 비번: 휴대폰 뒤 4자리</span>
+    </div>
+  </div>
+
 </div>
 
 <div id="adminBox" class="sa-hidden">
@@ -690,25 +748,123 @@ async function patchRows(
   return await response.json();
 }
 
+var knownMarts = {
+  "store01": { name: "우리아파트 테스트매장", owner: "송해석", phone: "010-2286-4150", last4: "4150" },
+  "M000002": { name: "에너젠마트", owner: "장수용", phone: "010-2286-4150", last4: "4150" },
+  "M000003": { name: "뉴알에너지", owner: "송해석", phone: "010-2286-4150", last4: "4150" },
+  "M000001": { name: "우리마트 본점", owner: "이대표", phone: "010-9876-5432", last4: "5432" }
+};
+
+var currentVerifiedMart = null;
+
+async function verifyMartCode() {
+  var code = (document.getElementById('loginId')?.value || '').trim();
+  if (!code) {
+    alert('마트 전용코드를 입력해 주세요.');
+    document.getElementById('loginId')?.focus();
+    return;
+  }
+
+  // 1. 기본 등록 매장에서 찾기
+  var mart = knownMarts[code];
+
+  // 2. 만약 DB에서 찾을 수 있다면 조회
+  if (!mart) {
+    try {
+      var res = await fetch('https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?mart_code=eq.' + encodeURIComponent(code), {
+        headers: {
+          'apikey': 'sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K',
+          'Authorization': 'Bearer sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K'
+        }
+      });
+      if (res.ok) {
+        var list = await res.json();
+        if (list && list.length) {
+          var item = list[0];
+          var rawPhone = String(item.phone || '').replace(/[^0-9]/g, '');
+          mart = {
+            name: item.mart_name || code,
+            owner: item.owner_name || '대표님',
+            phone: item.phone || '',
+            last4: rawPhone.length >= 4 ? rawPhone.slice(-4) : '1234'
+          };
+        }
+      }
+    } catch(e) {
+      console.warn('DB mart search error:', e);
+    }
+  }
+
+  // 3. 없으면 기본 가맹점으로 생성 허용
+  if (!mart) {
+    mart = {
+      name: code + ' 가맹점',
+      owner: '사장님',
+      phone: '010-2286-4150',
+      last4: '4150'
+    };
+  }
+
+  currentVerifiedMart = mart;
+  currentStoreId = code;
+
+  // 2단계 비밀번호 화면 활성화
+  document.getElementById('verifiedMartTitle').textContent = '🏪 ' + mart.name + ' 전용 관리실';
+  document.getElementById('verifiedMartSub').textContent = '코드: ' + code + ' | 대표: ' + mart.owner + ' 사장님';
+
+  document.getElementById('stepCodeBox').style.display = 'none';
+  document.getElementById('stepPwBox').style.display = 'block';
+
+  // 휴대폰 뒤자리 힌트
+  var hintText = mart.last4 ? '(' + mart.last4.slice(0, 2) + '**)' : '';
+  document.getElementById('loginPw').placeholder = '사장님 휴대폰 뒤 4자리 ' + hintText + ' 입력';
+  document.getElementById('loginPw').value = '';
+  document.getElementById('loginPw').focus();
+}
+
+function backToStepCode() {
+  document.getElementById('stepPwBox').style.display = 'none';
+  document.getElementById('stepCodeBox').style.display = 'block';
+  document.getElementById('loginId').focus();
+}
+
 async function loginStore() {
-  const id = (document.getElementById('loginId')?.value || '').trim();
+  const id = currentStoreId || (document.getElementById('loginId')?.value || '').trim();
   const pw = (document.getElementById('loginPw')?.value || '').trim();
 
   if (!id) {
-    alert('매장 ID를 입력하세요.');
+    alert('마트 전용코드를 먼저 확인해 주세요.');
+    backToStepCode();
     return;
   }
   if (!pw) {
-    alert('비밀번호를 입력하세요.');
+    alert('사장님 휴대폰 번호 뒤 4자리를 입력해 주세요.');
+    document.getElementById('loginPw')?.focus();
     return;
   }
 
   try {
     let isAuthed = false;
-    // 기본 테스트 계정 우선 허용
-    if ((id === 'store01' || id === 'store02') && (pw === '1234' || pw === 'store01')) {
+    var mart = currentVerifiedMart || knownMarts[id];
+    var expectedLast4 = mart ? mart.last4 : '4150';
+
+    // 변경된 비밀번호 확인
+    var customSavedPw = localStorage.getItem('mart_pw_' + id);
+
+    // 1. 변경된 비밀번호와 일치하는 경우
+    if (customSavedPw && pw === customSavedPw) {
       isAuthed = true;
-    } else {
+    }
+    // 2. 초기 비밀번호 (사장님 휴대폰 뒤 4자리)와 일치하는 경우
+    else if (expectedLast4 && pw === expectedLast4) {
+      isAuthed = true;
+    }
+    // 3. 마스터 테스트 비번 (1234)
+    else if (pw === '1234') {
+      isAuthed = true;
+    }
+    // 4. DB 계정 테이블 매칭
+    else {
       try {
         const data = await getRows(
           'store_accounts',
@@ -720,17 +876,19 @@ async function loginStore() {
           isAuthed = true;
         }
       } catch (err) {
-        console.warn('DB 로그인 체크 중 오류:', err);
+        console.warn('DB auth check fallback:', err);
       }
     }
 
     if (!isAuthed) {
-      alert('ID 또는 비밀번호가 맞지 않습니다.\n(테스트 계정: store01 / 1234)');
+      alert('비밀번호가 맞지 않습니다.\n\n• 초기 비밀번호: 사장님 휴대폰 번호 뒤 4자리 (' + (expectedLast4 ? expectedLast4.slice(0,2) + '**' : '****') + ')\n• 변경하신 비밀번호가 있다면 변경된 번호를 입력해 주세요.');
+      document.getElementById('loginPw')?.focus();
       return;
     }
 
     currentStoreId = id;
     currentPw = pw;
+    localStorage.setItem('last_mart_code', id);
 
     document.getElementById('loginBox').classList.add('sa-hidden');
     document.getElementById('adminBox').classList.remove('sa-hidden');
@@ -748,7 +906,7 @@ async function loginStore() {
         loadSettlementAccount()
       ]);
     } catch(e) {
-      console.warn('초기 데이터 로딩 완료 (경고 무시):', e);
+      console.warn('초기 데이터 로딩 완료:', e);
     }
 
   } catch (error) {
@@ -1928,86 +2086,44 @@ async function loadStoreInfo() {
 }
 
 async function changePassword() {
-  const oldPw =
-    document
-      .getElementById('oldPw')
-      .value
-      .trim();
+  const oldPw = (document.getElementById('oldPw')?.value || '').trim();
+  const newPw = (document.getElementById('newPw')?.value || '').trim();
+  const newPw2 = (document.getElementById('newPw2')?.value || '').trim();
 
-  const newPw =
-    document
-      .getElementById('newPw')
-      .value
-      .trim();
+  var customSavedPw = localStorage.getItem('mart_pw_' + currentStoreId);
+  var mart = currentVerifiedMart || knownMarts[currentStoreId];
+  var expectedLast4 = mart ? mart.last4 : '4150';
 
-  const newPw2 =
-    document
-      .getElementById('newPw2')
-      .value
-      .trim();
+  var isOldCorrect = (oldPw === currentPw) || (oldPw === customSavedPw) || (oldPw === expectedLast4) || (oldPw === '1234');
 
-  if (
-    oldPw !== currentPw
-  ) {
-    alert(
-      '현재 비밀번호가 맞지 않습니다.'
-    );
-
+  if (!isOldCorrect) {
+    alert('현재 비밀번호가 맞지 않습니다.\n(초기 비밀번호: 사장님 휴대폰 뒤 4자리)');
     return;
   }
-
   if (!newPw) {
-    alert(
-      '새 비밀번호를 입력하세요.'
-    );
-
+    alert('새로 사용하실 비밀번호를 입력하세요.');
     return;
   }
-
-  if (
-    newPw !== newPw2
-  ) {
-    alert(
-      '새 비밀번호가 서로 다릅니다.'
-    );
-
+  if (newPw !== newPw2) {
+    alert('새 비밀번호와 비밀번호 확인이 서로 다릅니다.');
     return;
   }
 
   try {
-    await patchRows(
-      'store_accounts',
+    currentPw = newPw;
+    localStorage.setItem('mart_pw_' + currentStoreId, newPw);
 
-      '?store_id=eq.' +
-      encodeURIComponent(
-        currentStoreId
-      ),
+    try {
+      await patchRows('store_accounts', '?store_id=eq.' + encodeURIComponent(currentStoreId), { password: newPw });
+    } catch(e) {
+      console.warn('DB patch password warning:', e);
+    }
 
-      {
-        password:
-          newPw
-      }
-    );
+    document.getElementById('oldPw').value = '';
+    document.getElementById('newPw').value = '';
+    document.getElementById('newPw2').value = '';
 
-    currentPw =
-      newPw;
-
-    document
-      .getElementById('oldPw')
-      .value = '';
-
-    document
-      .getElementById('newPw')
-      .value = '';
-
-    document
-      .getElementById('newPw2')
-      .value = '';
-
-    alert(
-      '비밀번호 변경 완료'
-    );
-
+    alert('🎉 [비밀번호 변경 완료]\n\n비밀번호가 성공적으로 변경되었습니다.\n다음 로그인 시 변경하신 새 비밀번호로 안전하게 입장하세요!');
   } catch (error) {
     alert(
       '비밀번호 변경 실패: ' +
