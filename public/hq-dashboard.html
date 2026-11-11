@@ -588,24 +588,76 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
 <!-- ==============================================
      영업 파트너(영업인) 승인관리 룸 (hqRoomPartner)
 ============================================== -->
+<!-- ==============================================
+     영업 파트너(영업인) 승인관리 룸 (hqRoomPartner)
+============================================== -->
 <div id="hqRoomPartner" class="hq-room-shell">
   <div class="hq-room-top">
     <button type="button" class="hq-back-btn" onclick="backToHqDashboard()">← 본사 관리자</button>
   </div>
   <div id="wgPartner" style="max-width:1100px;margin:auto;padding:20px 12px;font-family:Arial,sans-serif;color:#222;">
-    <h2 style="margin:0 0 6px;font-size:22px;color:#0e6556;display:flex;align-items:center;gap:8px;">
-      <span>🤝 영업 파트너(영업인) 승인관리</span>
-      <span style="background:#ea580c;color:#fff;font-size:13px;padding:3px 10px;border-radius:999px;font-weight:700;">대기 <span id="hqPartnerPendingCount">2</span>건</span>
-    </h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
+      <h2 style="margin:0;font-size:22px;color:#0e6556;display:flex;align-items:center;gap:8px;">
+        <span>🤝 영업 파트너(영업인) 승인관리</span>
+        <span style="background:#ea580c;color:#fff;font-size:13px;padding:3px 10px;border-radius:999px;font-weight:700;">대기 <span id="hqPartnerPendingCount">2</span>건</span>
+      </h2>
+      <button type="button" onclick="window.renderHqPartners()" style="background:#0e6556;color:#fff;border:0;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:800;cursor:pointer;">🔄 새로고침</button>
+    </div>
     <p style="margin:0 0 16px;color:#64748b;font-size:14px;line-height:1.6;">
       신규 영업 파트너 신청을 승인하고 고유 4자리 추천 코드를 발급하며, 매장 유치 시 건당 <strong>5원 영업 수수료 평생 정산</strong>을 관리합니다.
     </p>
 
-    <!-- 승인 대기 파트너 목록 카드 -->
-    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
+    <!-- 정산 및 활동 중인 공식 영업 파트너 (영업 코드 준 사람들) 카드 - 상단 우선 배치 -->
+    <div style="background:#fff;border:2px solid #0e6556;border-radius:14px;padding:20px;margin-bottom:20px;box-shadow:0 4px 16px rgba(14,101,86,.08);">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+        <h3 style="margin:0;font-size:18px;color:#0e6556;display:flex;align-items:center;gap:8px;">
+          <span>👑 발급 완료된 공식 영업 파트너 목록 (건당 5원 정산)</span>
+          <span id="hqPartnerApprovedCount" style="background:#e6f4f1;color:#0e6556;font-size:13px;padding:2px 10px;border-radius:999px;font-weight:800;">총 10명</span>
+        </h3>
+        <button type="button" onclick="document.getElementById('addPartnerModal').style.display='block'" style="background:#15803d;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:800;cursor:pointer;">
+          ➕ 새 영업코드 직접 등록
+        </button>
+      </div>
+
+      <!-- 간편 파트너 등록 폼 (토글) -->
+      <div id="addPartnerModal" style="display:none;background:#f8fafc;border:1.5px dashed #0e6556;border-radius:10px;padding:16px;margin-bottom:16px;">
+        <div style="font-weight:800;color:#0e6556;margin-bottom:10px;font-size:15px;">➕ 신규 영업 파트너 즉시 추가</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px;margin-bottom:10px;">
+          <input id="newPName" placeholder="성명 (예: 홍길동)" style="padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;">
+          <input id="newPCode" placeholder="고유 4자리 코드 (예: 7777)" maxlength="4" style="padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;font-weight:700;color:#0e6556;">
+          <input id="newPPhone" placeholder="휴대폰 (010-XXXX-XXXX)" style="padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;">
+          <input id="newPBank" placeholder="정산계좌 (은행 계좌번호)" style="padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;">
+          <input id="newPMart" placeholder="담당 매장명" style="padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;">
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" onclick="window.addNewPartnerManual()" style="background:#0e6556;color:#fff;border:0;border-radius:6px;padding:8px 16px;font-weight:800;font-size:13px;cursor:pointer;">발급 저장</button>
+          <button type="button" onclick="document.getElementById('addPartnerModal').style.display='none'" style="background:#64748b;color:#fff;border:0;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;">취소</button>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table style="width:100%;min-width:780px;border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f1f5f9;color:#334155;font-size:13px;border-bottom:2px solid #cbd5e1;">
+              <th style="padding:10px;text-align:left;">파트너 성명</th>
+              <th style="padding:10px;text-align:left;">영업코드 (4자리)</th>
+              <th style="padding:10px;text-align:left;">전화번호</th>
+              <th style="padding:10px;text-align:left;">정산 계좌</th>
+              <th style="padding:10px;text-align:left;">유치 매장</th>
+              <th style="padding:10px;text-align:left;">누적 발송량</th>
+              <th style="padding:10px;text-align:left;">누적 정산액 (5원)</th>
+            </tr>
+          </thead>
+          <tbody id="hqPartnerApprovedTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 승인 대기 파트너 신청 목록 카드 -->
+    <div style="background:#fff;border:1px solid #ddd;border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
       <h3 style="margin:0 0 12px;font-size:17px;color:#1e293b;display:flex;align-items:center;justify-content:space-between;">
-        <span>📋 영업 파트너 신청 대기 목록</span>
-        <button type="button" onclick="window.renderHqPartners()" style="background:#475569;color:#fff;border:0;border-radius:6px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer;">새로고침</button>
+        <span>📋 영업 파트너 신규 신청 대기 목록</span>
+        <span style="font-size:12.5px;color:#64748b;font-weight:normal;">승인 시 자동으로 상단 목록에 등록됩니다.</span>
       </h3>
       <div style="overflow-x:auto;">
         <table style="width:100%;min-width:760px;border-collapse:collapse;">
@@ -618,39 +670,15 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
               <th style="padding:10px;text-align:left;">영업경력</th>
               <th style="padding:10px;text-align:left;">발급예정코드</th>
               <th style="padding:10px;text-align:left;">상태</th>
-              <th style="padding:10px;text-align:left;">관리/승인</th>
+              <th style="padding:10px;text-align:left;">승인 처리</th>
             </tr>
           </thead>
           <tbody id="hqPartnerTable"></tbody>
         </table>
       </div>
     </div>
-
-    <!-- 정산 및 활동 중인 파트너 목록 카드 -->
-    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
-      <h3 style="margin:0 0 12px;font-size:17px;color:#0e6556;">
-        💰 정산 및 활동 중인 공식 영업 파트너 (건당 5원 정산)
-      </h3>
-      <div style="overflow-x:auto;">
-        <table style="width:100%;min-width:760px;border-collapse:collapse;">
-          <thead>
-            <tr style="background:#f8fafc;color:#475569;font-size:13px;border-bottom:2px solid #e2e8f0;">
-              <th style="padding:10px;text-align:left;">파트너명</th>
-              <th style="padding:10px;text-align:left;">영업코드</th>
-              <th style="padding:10px;text-align:left;">연락처</th>
-              <th style="padding:10px;text-align:left;">정산계좌</th>
-              <th style="padding:10px;text-align:left;">유치 매장</th>
-              <th style="padding:10px;text-align:left;">누적 발송량</th>
-              <th style="padding:10px;text-align:left;">누적 정산액(5원)</th>
-            </tr>
-          </thead>
-          <tbody id="hqPartnerApprovedTable"></tbody>
-        </table>
-      </div>
-    </div>
   </div>
 </div>
-
 
 <div id="hqRoomInquiry" class="hq-room-shell">
   <div class="hq-room-top">
@@ -2999,18 +3027,30 @@ if(!session()){
 
 <script>
 (function(){
+  "use strict";
+
+  // 기본 승인 대기자 목록
   var defaultPendingPartners = [
     { id: 1, name: '박영수', phone: '010-3456-7890', region: '광주 광산구', exp: '7년차', company: 'DB손해보험', code: '7890', date: '2026-11-07 14:10', status: '승인대기' },
     { id: 2, name: '최동석', phone: '010-8765-4321', region: '전남 나주', exp: '3년차', company: '한화생명', code: '4321', date: '2026-11-07 15:05', status: '승인대기' }
   ];
 
+  // 영업 코드를 발급해 준 전체 공식 파트너 목록 (10명)
   var defaultApprovedPartners = [
-    { name: '공식파트너(4150)', code: '4150', phone: '010-2286-4150', bank: '농협 199-02-289684 (송해석)', mart: '에너젠마트', count: 10000, fee: 50000 },
-    { name: '공식파트너(5678)', code: '5678', phone: '010-****-5678', bank: '등록 대기', mart: '대박식자재마트', count: 50000, fee: 250000 },
-    { name: '공식파트너(1996)', code: '1996', phone: '010-4041-1996', bank: '등록 대기', mart: '개척 진행중', count: 0, fee: 0 }
+    { name: '대표 본사직통 (송해석)', code: '4150', phone: '010-2286-4150', bank: '농협 199-02-289684 (송해석)', mart: '본사 직속 / 에너젠마트', count: 100000, fee: 500000 },
+    { name: '공식파트너(1996)', code: '1996', phone: '010-4041-1996', bank: '계좌 등록 대기', mart: '개척 진행중', count: 0, fee: 0 },
+    { name: '공식파트너(3817)', code: '3817', phone: '010-****-3817', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
+    { name: '공식파트너(2114)', code: '2114', phone: '010-****-2114', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
+    { name: '공식파트너(0259)', code: '0259', phone: '010-****-0259', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
+    { name: '공식파트너(9855)', code: '9855', phone: '010-****-9855', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
+    { name: '공식파트너(1820)', code: '1820', phone: '010-****-1820', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
+    { name: '공식파트너(4004)', code: '4004', phone: '010-****-4004', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
+    { name: '김철수 파트너', code: '5678', phone: '010-1234-5678', bank: '국민 123-456-*** (김철수)', mart: '대박식자재마트', count: 50000, fee: 250000 },
+    { name: '이영희 파트너', code: '9911', phone: '010-9876-9911', bank: '농협 302-091-*** (이영희)', mart: '에이스식자재마트 광주', count: 30000, fee: 150000 }
   ];
 
   window.renderHqPartners = function() {
+    // 1. 대기 목록 렌더링
     var pending = [];
     try {
       var saved = localStorage.getItem('pendingPartners');
@@ -3025,50 +3065,73 @@ if(!session()){
     if (badge) badge.textContent = '대기 ' + pList.length + '건';
 
     var tbody = document.getElementById('hqPartnerTable');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-
-    if (pList.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:#64748b">현재 대기중인 파트너 신청이 없습니다.</td></tr>';
-    } else {
-      pList.forEach(function(item, idx){
-        var tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="padding:10px;font-size:12.5px;color:#64748b;border-bottom:1px solid #ddd">${item.date || '방금 전'}</td>
-          <td style="padding:10px;border-bottom:1px solid #ddd"><b>${item.name}</b></td>
-          <td style="padding:10px;border-bottom:1px solid #ddd">${item.phone}</td>
-          <td style="padding:10px;border-bottom:1px solid #ddd">${item.region || '광주'}</td>
-          <td style="padding:10px;border-bottom:1px solid #ddd">${item.exp} (${item.company || '일반'})</td>
-          <td style="padding:10px;border-bottom:1px solid #ddd"><span style="background:#e0f2fe;color:#0284c7;padding:3px 8px;border-radius:4px;font-weight:900">${item.code}</span></td>
-          <td style="padding:10px;border-bottom:1px solid #ddd"><span style="background:#fef3c7;color:#b45309;padding:3px 8px;border-radius:4px;font-weight:700;font-size:12px">🟡 승인대기</span></td>
-          <td style="padding:10px;border-bottom:1px solid #ddd">
-            <button type="button" style="background:#15803d;color:#fff;border:0;border-radius:6px;padding:6px 12px;font-weight:800;font-size:12.5px;cursor:pointer" onclick="approveHqPartner(${item.id || idx})">
-              ✅ 승인 및 코드 발급
-            </button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
+    if (tbody) {
+      tbody.innerHTML = '';
+      if (pList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:#64748b">현재 대기중인 파트너 신청이 없습니다.</td></tr>';
+      } else {
+        pList.forEach(function(item, idx){
+          var tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="padding:10px;font-size:12.5px;color:#64748b;border-bottom:1px solid #ddd">${item.date || '방금 전'}</td>
+            <td style="padding:10px;border-bottom:1px solid #ddd"><b>${item.name}</b></td>
+            <td style="padding:10px;border-bottom:1px solid #ddd">${item.phone}</td>
+            <td style="padding:10px;border-bottom:1px solid #ddd">${item.region || '광주'}</td>
+            <td style="padding:10px;border-bottom:1px solid #ddd">${item.exp || '-'} (${item.company || '일반'})</td>
+            <td style="padding:10px;border-bottom:1px solid #ddd"><span style="background:#e0f2fe;color:#0284c7;padding:3px 8px;border-radius:4px;font-weight:900">${item.code}</span></td>
+            <td style="padding:10px;border-bottom:1px solid #ddd"><span style="background:#fef3c7;color:#b45309;padding:3px 8px;border-radius:4px;font-weight:700;font-size:12px">🟡 승인대기</span></td>
+            <td style="padding:10px;border-bottom:1px solid #ddd">
+              <button type="button" style="background:#15803d;color:#fff;border:0;border-radius:6px;padding:6px 12px;font-weight:800;font-size:12.5px;cursor:pointer" onclick="approveHqPartner(${item.id || idx})">
+                ✅ 승인 및 코드 발급
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
     }
 
+    // 2. 승인 완료된 공식 파트너 목록 렌더링
+    var approvedList = defaultApprovedPartners.slice();
+    try {
+      var customApproved = JSON.parse(localStorage.getItem('approvedPartners') || '[]');
+      customApproved.forEach(function(c){
+        if (!approvedList.some(function(a){ return a.code === c.code; })) {
+          approvedList.push(c);
+        }
+      });
+    } catch(e) {}
+
+    var appCountEl = document.getElementById('hqPartnerApprovedCount');
+    if (appCountEl) appCountEl.textContent = '총 ' + approvedList.length + '명';
+
     var appTbody = document.getElementById('hqPartnerApprovedTable');
-    if (!appTbody) return;
-    appTbody.innerHTML = '';
-    defaultApprovedPartners.forEach(function(p){
-      var tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style="padding:10px;border-bottom:1px solid #ddd"><b>${p.name}</b></td>
-        <td style="padding:10px;border-bottom:1px solid #ddd"><span style="background:#f0fdf4;color:#166534;font-weight:800;padding:2px 7px;border-radius:4px">${p.code}</span></td>
-        <td style="padding:10px;border-bottom:1px solid #ddd">${p.phone}</td>
-        <td style="padding:10px;border-bottom:1px solid #ddd;font-size:12.5px;color:#64748b">${p.bank}</td>
-        <td style="padding:10px;border-bottom:1px solid #ddd;font-weight:700">${p.mart}</td>
-        <td style="padding:10px;border-bottom:1px solid #ddd">${p.count.toLocaleString()}건</td>
-        <td style="padding:10px;border-bottom:1px solid #ddd"><strong style="color:#b45309">${p.fee.toLocaleString()}원</strong></td>
-      `;
-      appTbody.appendChild(tr);
-    });
+    if (appTbody) {
+      appTbody.innerHTML = '';
+      approvedList.forEach(function(p){
+        var tr = document.createElement('tr');
+        var isRepresentative = (p.code === '4150');
+        var rowBg = isRepresentative ? 'background:#f0fdf4;' : '';
+        var codeBadge = isRepresentative 
+          ? '<span style="background:#166534;color:#fff;font-weight:900;padding:3px 9px;border-radius:4px;font-size:13px;">4150 (본사직통)</span>'
+          : '<span style="background:#e6f4f1;color:#0e6556;font-weight:900;padding:3px 8px;border-radius:4px;font-size:13px;">' + p.code + '</span>';
+
+        tr.style = rowBg;
+        tr.innerHTML = `
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;"><b>${p.name}</b></td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${codeBadge}</td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${p.phone}</td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;font-size:12.5px;color:#475569;">${p.bank}</td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;font-weight:700;">${p.mart}</td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${(p.count || 0).toLocaleString()}건</td>
+          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;"><strong style="color:#b45309;font-size:14px;">${(p.fee || 0).toLocaleString()}원</strong></td>
+        `;
+        appTbody.appendChild(tr);
+      });
+    }
   };
 
+  // 파트너 승인 처리 함수
   window.approveHqPartner = function(id) {
     var saved = localStorage.getItem('pendingPartners');
     var list = saved ? JSON.parse(saved) : defaultPendingPartners;
@@ -3076,17 +3139,70 @@ if(!session()){
     if (partner) {
       partner.status = '승인완료';
       localStorage.setItem('pendingPartners', JSON.stringify(list));
-      alert('🎉 [' + partner.name + ' 파트너님 승인 완료!]
 
-• 발급 영업코드: [' + partner.code + ']
-• 휴대폰(' + partner.phone + ')으로 영업인 전용 방 링크가 발송되었습니다.');
+      // 승인 완료 목록에도 추가
+      try {
+        var approved = JSON.parse(localStorage.getItem('approvedPartners') || '[]');
+        approved.unshift({
+          name: partner.name + ' 파트너',
+          code: partner.code,
+          phone: partner.phone,
+          bank: '등록 대기',
+          mart: '신규 가맹 매장 발굴중',
+          count: 0,
+          fee: 0
+        });
+        localStorage.setItem('approvedPartners', JSON.stringify(approved));
+      } catch(e) {}
+
+      alert('🎉 [' + partner.name + ' 파트너님 승인 완료!]\n\n• 발급 영업코드: [' + partner.code + ']\n• 휴대폰(' + partner.phone + ')으로 영업인 전용 방 링크가 발송되었습니다.');
       renderHqPartners();
+    }
+  };
+
+  // 신규 파트너 수동 추가 함수
+  window.addNewPartnerManual = function() {
+    var name = (document.getElementById('newPName').value || '').trim();
+    var code = (document.getElementById('newPCode').value || '').trim();
+    var phone = (document.getElementById('newPPhone').value || '').trim();
+    var bank = (document.getElementById('newPBank').value || '').trim();
+    var mart = (document.getElementById('newPMart').value || '').trim();
+
+    if (!name || !code) {
+      alert('성명과 4자리 영업코드는 필수입니다.');
+      return;
+    }
+
+    try {
+      var approved = JSON.parse(localStorage.getItem('approvedPartners') || '[]');
+      approved.unshift({
+        name: name,
+        code: code,
+        phone: phone || '010-****-' + code,
+        bank: bank || '계좌 등록 대기',
+        mart: mart || '마트 등록 대기',
+        count: 0,
+        fee: 0
+      });
+      localStorage.setItem('approvedPartners', JSON.stringify(approved));
+      alert('✅ [' + name + '] 파트너님(코드: ' + code + ')이 공식 영업 파트너로 등록되었습니다.');
+      document.getElementById('addPartnerModal').style.display = 'none';
+      renderHqPartners();
+    } catch(e) {
+      alert('등록 중 오류 발생: ' + e.message);
     }
   };
 
   window.loadHqPartner = function() {
     renderHqPartners();
   };
+
+  // 페이지 초기 로드시 즉시 렌더링
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderHqPartners);
+  } else {
+    renderHqPartners();
+  }
 })();
 </script>
 
