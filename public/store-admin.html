@@ -171,10 +171,10 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
   <div id="stepCodeBox">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
       <span style="font-size:22px;">🏪</span>
-      <b style="font-size:18px;color:#166534;">우리아파트 마트관리자 전용방 입장</b>
+      <b style="font-size:18px;color:#166534;">우리아파트 마트관리자</b>
     </div>
     <p style="font-size:13.5px;color:#64748b;margin:0 0 16px 0;line-height:1.5;">
-      본사에서 부여받으신 <strong>[마트 전용코드]</strong>를 입력하시면 사장님 매장 전용 관리실로 연결됩니다.
+      본사에서 부여받으신 <strong>[마트 전용코드]</strong>를 입력하시면 사장님 매장 관리실로 연결됩니다.
     </p>
 
     <label style="font-size:13.5px;font-weight:bold;color:#334155;display:block;margin-bottom:6px;">
@@ -194,7 +194,7 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
         onclick="verifyMartCode()"
         style="width:130px;height:46px;margin-top:0;font-size:14px;background:#166534;white-space:nowrap;"
       >
-        전용방 확인 →
+        마트 확인 →
       </button>
     </div>
 
@@ -208,9 +208,9 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
   <div id="stepPwBox" style="display:none;">
     <!-- 매장 환영 간판 -->
     <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;padding:14px;margin-bottom:14px;">
-      <div style="font-size:12px;color:#166534;font-weight:700;">✅ 마트 전용방 확인 완료</div>
+      <div style="font-size:12px;color:#166534;font-weight:700;">✅ 매장 확인 완료</div>
       <div id="verifiedMartTitle" style="font-size:18px;font-weight:900;color:#14532d;margin-top:4px;">
-        에너젠마트 사장님 전용 관리실
+        에너젠마트 사장님 관리실
       </div>
       <div id="verifiedMartSub" style="font-size:13px;color:#166534;margin-top:3px;">
         코드: store01 &nbsp;|&nbsp; 대표: 송해석 사장님
@@ -234,7 +234,7 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
       onclick="loginStore()"
       style="height:48px;font-size:16px;background:#15803d;margin-top:12px;box-shadow:0 2px 6px rgba(21,128,61,0.3);"
     >
-      🚀 마트 관리자 전용방 입장
+      🚀 마트관리자 로그인
     </button>
 
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
@@ -809,7 +809,7 @@ async function verifyMartCode() {
   currentStoreId = code;
 
   // 2단계 비밀번호 화면 활성화
-  document.getElementById('verifiedMartTitle').textContent = '🏪 ' + mart.name + ' 전용 관리실';
+  document.getElementById('verifiedMartTitle').textContent = '🏪 ' + mart.name + ' 관리실';
   document.getElementById('verifiedMartSub').textContent = '코드: ' + code + ' | 대표: ' + mart.owner + ' 사장님';
 
   document.getElementById('stepCodeBox').style.display = 'none';
