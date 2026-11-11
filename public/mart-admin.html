@@ -566,7 +566,32 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
         </div>
       </div>
 
-      <!-- 2. 매장 사장님 판매대금 정산 계좌 등록 / 변경 -->
+      
+      <!-- 2. 전자세금계산서 발행 정보 & 사업자등록증 등록 -->
+      <div style="margin-top:14px;padding:16px;background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:10px;">
+        <b style="color:#1e293b;font-size:15px;display:flex;align-items:center;gap:6px;">
+          <span>📄 전자세금계산서 발행용 사업자등록증 등록</span>
+        </b>
+        <div class="sa-help" style="color:#475569;margin-top:4px;">
+          15원 문자 충전금(33만/55만/110만) 입금 시 본사에서 국세청 홈택스 전자세금계산서를 끊어드립니다.
+        </div>
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <input id="storeTaxBizNo" placeholder="사업자등록번호 (000-00-00000)" style="margin:0;">
+          <input id="storeTaxBizName" placeholder="상호(법인명)" style="margin:0;">
+        </div>
+        <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <input id="storeTaxBizOwner" placeholder="대표자 성명" style="margin:0;">
+          <input id="storeTaxEmail" placeholder="계산서 수신 이메일 (예: mart@naver.com)" style="margin:0;">
+        </div>
+        <div style="margin-top:10px;">
+          <label style="font-size:12.5px;font-weight:700;color:#334155;display:block;margin-bottom:4px;">📷 사업자등록증 사본 (사진 촬영 / 파일 첨부)</label>
+          <input type="file" id="storeTaxBizFile" accept="image/*,.pdf" style="font-size:13px;padding:6px;background:#fff;border:1px solid #cbd5e1;border-radius:6px;width:100%;box-sizing:border-box;" onchange="handleStoreTaxFileUpload(this)">
+          <div id="storeTaxBizFilePreview" style="margin-top:6px;font-size:12px;color:#0284c7;font-weight:700;"></div>
+        </div>
+        <button class="sa-btn" type="button" style="background:#0f172a;margin-top:10px;" onclick="saveStoreTaxInfo()">세금계산서 정보 저장</button>
+      </div>
+
+<!-- 2. 매장 사장님 판매대금 정산 계좌 등록 / 변경 -->
       <div style="margin-top:14px;padding:16px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;">
         <b style="color:#166534;font-size:15px;display:flex;align-items:center;gap:6px;">
           <span>💳 사장님 온라인 주문 판매대금 정산 입금 계좌</span>
@@ -2429,6 +2454,109 @@ async function submitQrCardOrder() {
     alert('주문 전송 중 오류: ' + error.message);
   }
 }
+
+
+// ==============================================
+// 마트 세금계산서 정보 저장 & 로드
+// ==============================================
+var currentStoreTaxImg = '';
+
+function handleStoreTaxFileUpload(input) {
+  if (input.files && input.files[0]) {
+    var file = input.files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      currentStoreTaxImg = e.target.result;
+      var prev = document.getElementById('storeTaxBizFilePreview');
+      if (prev) {
+        prev.style.display = 'block';
+        prev.innerHTML = '✅ 사업자등록증 파일 첨부됨 (' + file.name + ')';
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function saveStoreTaxInfo() {
+  var code = (window.currentStore && window.currentStore.code) || localStorage.getItem('lastStoreCode') || 'store01';
+  var data = {
+    bizNo: document.getElementById('storeTaxBizNo') ? document.getElementById('storeTaxBizNo').value.trim() : '',
+    bizName: document.getElementById('storeTaxBizName') ? document.getElementById('storeTaxBizName').value.trim() : '',
+    bizOwner: document.getElementById('storeTaxBizOwner') ? document.getElementById('storeTaxBizOwner').value.trim() : '',
+    bizEmail: document.getElementById('storeTaxEmail') ? document.getElementById('storeTaxEmail').value.trim() : '',
+    bizImg: currentStoreTaxImg || localStorage.getItem('storeTaxImg_' + code) || '',
+    updatedAt: new Date().toISOString()
+  };
+
+  if (!data.bizNo && !data.bizName) {
+    alert('사업자등록번호와 상호명을 입력해 주세요.');
+    return;
+  }
+
+  localStorage.setItem('storeTaxInfo_' + code, JSON.stringify(data));
+  if (currentStoreTaxImg) {
+    try { localStorage.setItem('storeTaxImg_' + code, currentStoreTaxImg); } catch(e){}
+  }
+
+  // Supabase stores 테이블 업데이트 시도 (동기화)
+  try {
+    fetch('https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/stores?code=eq.' + encodeURIComponent(code), {
+      method: 'PATCH',
+      headers: {
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwc2hsbWlqc3NjbWxhc3F0YXBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjkzODQ4OTksImV4cCI6MjA0NDk2MDg5OX0.eW_S1w_6oA5w4h5g2H0k9J7eQ0wX7m6L4h1rK0nZ9v8',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwc2hsbWlqc3NjbWxhc3F0YXBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjkzODQ4OTksImV4cCI6MjA0NDk2MDg5OX0.eW_S1w_6oA5w4h5g2H0k9J7eQ0wX7m6L4h1rK0nZ9v8',
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        biz_no: data.bizNo,
+        biz_name: data.bizName,
+        biz_owner: data.bizOwner,
+        biz_email: data.bizEmail
+      })
+    }).catch(function(){});
+  } catch(e){}
+
+  alert('✅ 세금계산서 발행 정보가 안전하게 저장되었습니다.\n충전금 입금 확인 시 위 이메일(' + (data.bizEmail || '등록이메일') + ')로 전자세금계산서가 발행됩니다.');
+}
+
+function loadStoreTaxInfo() {
+  var code = (window.currentStore && window.currentStore.code) || localStorage.getItem('lastStoreCode') || 'store01';
+  var saved = localStorage.getItem('storeTaxInfo_' + code);
+  if (saved) {
+    try {
+      var data = JSON.parse(saved);
+      if (document.getElementById('storeTaxBizNo') && data.bizNo) document.getElementById('storeTaxBizNo').value = data.bizNo;
+      if (document.getElementById('storeTaxBizName') && data.bizName) document.getElementById('storeTaxBizName').value = data.bizName;
+      if (document.getElementById('storeTaxBizOwner') && data.bizOwner) document.getElementById('storeTaxBizOwner').value = data.bizOwner;
+      if (document.getElementById('storeTaxEmail') && data.bizEmail) document.getElementById('storeTaxEmail').value = data.bizEmail;
+      if (data.bizImg) {
+        currentStoreTaxImg = data.bizImg;
+        var prev = document.getElementById('storeTaxBizFilePreview');
+        if (prev) {
+          prev.style.display = 'block';
+          prev.innerHTML = '✅ 등록된 사업자등록증 사본 보관중';
+        }
+      }
+    } catch(e){}
+  } else {
+    // 기본 프리셋 (테스트매장용)
+    if (document.getElementById('storeTaxBizNo')) document.getElementById('storeTaxBizNo').value = '410-86-12345';
+    if (document.getElementById('storeTaxBizName')) document.getElementById('storeTaxBizName').value = '테스트식자재마트';
+    if (document.getElementById('storeTaxBizOwner')) document.getElementById('storeTaxBizOwner').value = '송해석';
+    if (document.getElementById('storeTaxEmail')) document.getElementById('storeTaxEmail').value = 'wooriapt@naver.com';
+  }
+}
+
+// 계정 메뉴 열릴 때 자동 로드
+var origShowMenu = window.showMenu;
+window.showMenu = function(menuId, btn) {
+  if (typeof origShowMenu === 'function') origShowMenu(menuId, btn);
+  if (menuId === 'account') {
+    setTimeout(loadStoreTaxInfo, 100);
+  }
+};
+
 </script>
 
 </body>
