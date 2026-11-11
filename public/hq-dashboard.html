@@ -1119,6 +1119,39 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
  <div id="wpaSelected">매장 목록에서 매장을 선택해 주세요.</div>
 </div>
 
+<!-- 3-2. 마트 충전금 전자세금계산서 발행 관리 & 홈택스 엑셀 다운로드 -->
+<div class="wpa-card" style="border:2px solid #2563eb;background:#ffffff;margin-top:16px;">
+ <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+  <h3 style="color:#1e40af;margin:0;display:flex;align-items:center;gap:8px;">
+   <span>📄 마트 충전금 전자세금계산서 발행 관리 (홈택스)</span>
+  </h3>
+  <button type="button" onclick="downloadHometaxTaxExcel()" style="background:#2563eb;color:#fff;border:0;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;">
+   📥 홈택스 일괄발행용 엑셀(CSV) 다운로드
+  </button>
+ </div>
+ <div class="wpa-table">
+  <table>
+   <thead>
+    <tr>
+     <th>충전일시</th>
+     <th>매장코드</th>
+     <th>매장명</th>
+     <th>대표자</th>
+     <th>사업자등록번호</th>
+     <th>입금총액(VAT포함)</th>
+     <th>공급가액</th>
+     <th>세액(10%)</th>
+     <th>계산서 이메일</th>
+     <th>사업자등록증</th>
+     <th>발행 상태</th>
+    </tr>
+   </thead>
+   <tbody id="hqStoreTaxTable"></tbody>
+  </table>
+ </div>
+</div>
+
+
 <!-- 3. 충전금 즉시 지급 (30만 / 50만 / 100만 원) -->
 <div class="wpa-card" style="border:2px solid #b45309;background:#fffbeb;">
  <h3 style="color:#b45309;margin-bottom:8px;">💰 15원 세일 알림 충전금 승인 & 지급 (선입금 충전)</h3>
@@ -3099,6 +3132,188 @@ if(!session()){
     renderHqPartners();
   }
 })();
+
+
+// ==============================================
+// 본사 세무 관리 & 엑셀 다운로드 시스템 (국세청 / 세무사용)
+// ==============================================
+
+// 1. 파트너 증빙 서류 보기 모달
+window.viewPartnerTaxDoc = function(code) {
+  var saved = localStorage.getItem('partnerTaxInfo_' + code);
+  var docImg = '';
+  var title = '영업 파트너 (' + code + ') 세무 증빙';
+  if (saved) {
+    try {
+      var d = JSON.parse(saved);
+      docImg = d.fileBase64 || '';
+    } catch(e){}
+  }
+
+  if (!docImg) {
+    alert('등록된 신분증 사본 또는 사업자등록증 파일이 없습니다.\n(파트너 전용방에서 파일 첨부 시 여기에 표시됩니다)');
+    return;
+  }
+
+  var w = window.open('', '_blank', 'width=650,height=750');
+  w.document.write('<html><head><title>' + title + '</title></head><body style="margin:0;padding:20px;text-align:center;background:#0f172a;color:#fff;">');
+  w.document.write('<h3>' + title + '</h3>');
+  w.document.write('<img src="' + docImg + '" style="max-width:100%;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,0.5);">');
+  w.document.write('<br><br><button onclick="window.close()" style="padding:10px 24px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-weight:bold;cursor:pointer;">닫기</button>');
+  w.document.write('</body></html>');
+};
+
+// 2. 파트너 입금완료 처리
+window.markPartnerPaid = function(code, btn) {
+  if (!confirm('파트너 [' + code + '] 님에게 이번 달 수수료 실지급액 입금을 완료하셨습니까?')) return;
+  
+  try {
+    var saved = localStorage.getItem('approvedPartners');
+    var list = saved ? JSON.parse(saved) : defaultApprovedPartners;
+    var found = list.find(function(x){ return x.code === code; });
+    if (found) {
+      found.payoutStatus = '입금완료';
+      localStorage.setItem('approvedPartners', JSON.stringify(list));
+    }
+  } catch(e){}
+
+  if (btn) {
+    btn.outerHTML = '<span style="background:#15803d;color:#fff;padding:4px 9px;border-radius:6px;font-size:12px;font-weight:800;">✅ 입금완료</span>';
+  }
+  alert('✅ 입금 처리가 완료되었습니다.\n파트너 정산 내역에 [입금완료]로 반영되었습니다.');
+};
+
+// 3. 파트너 3.3% 원천징수 세무 신고용 엑셀(CSV) 다운로드
+window.downloadPartnerTaxExcel = function() {
+  var saved = localStorage.getItem('approvedPartners');
+  var list = saved ? JSON.parse(saved) : defaultApprovedPartners;
+  
+  var now = new Date();
+  var ym = now.getFullYear() + '-' + ('0' + (now.getMonth() + 1)).slice(-2);
+  
+  var csvRows = [
+    ['지급연월', '파트너코드', '성명', '연락처', '세무구분', '주민/사업자번호', '지급총액(5원)', '소득세(3%)', '지방세(0.3%)', '실지급액', '은행계좌', '입금상태']
+  ];
+
+  list.forEach(function(p) {
+    var fee = Number(p.fee) || 0;
+    var isBiz = (p.taxType === 'business');
+    var taxTypeStr = isBiz ? '사업자(세금계산서)' : '개인(3.3%원천징수)';
+    var jumin = p.jumin || (isBiz ? '410-86-00000' : '800101-1******');
+    var incomeTax = isBiz ? 0 : Math.floor(fee * 0.03);
+    var localTax = isBiz ? 0 : Math.floor(fee * 0.003);
+    var netPayout = isBiz ? (fee + Math.floor(fee * 0.1)) : (fee - incomeTax - localTax);
+    var status = p.payoutStatus || '정산대기';
+
+    csvRows.push([
+      ym,
+      p.code,
+      p.name,
+      p.phone,
+      taxTypeStr,
+      jumin,
+      fee,
+      incomeTax,
+      localTax,
+      netPayout,
+      p.bank ? p.bank.replace(/,/g, ' ') : '',
+      status
+    ]);
+  });
+
+  var csvContent = '\uFEFF' + csvRows.map(function(e){ return e.map(function(v){ return '"' + String(v).replace(/"/g, '""') + '"'; }).join(','); }).join('\r\n');
+  var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = '우리아파트_파트너_3.3프로_원천징수_세무신고_' + ym + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+// 4. 마트 15원 충전 세금계산서 발행 내역 렌더링
+window.renderHqStoreTaxTable = function() {
+  var tbody = document.getElementById('hqStoreTaxTable');
+  if (!tbody) return;
+
+  var mockTaxList = [
+    { date: '2026-11-10 14:20', code: 'store01', name: '테스트매장', owner: '송해석', bizNo: '199-02-289684', total: 330000, supply: 300000, vat: 30000, email: 'wooriapt@naver.com', status: '발행완료' },
+    { date: '2026-11-09 11:30', code: 'M000002', name: '대박식자재마트', owner: '김대박', bizNo: '410-82-99881', total: 550000, supply: 500000, vat: 50000, email: 'daebak@daum.net', status: '발행대기' },
+    { date: '2026-11-08 17:45', code: 'M000003', name: '싱싱마트 첨단점', owner: '이싱싱', bizNo: '411-81-77662', total: 1100000, supply: 1000000, vat: 100000, email: 'singsing@gmail.com', status: '발행대기' }
+  ];
+
+  tbody.innerHTML = '';
+  mockTaxList.forEach(function(item, idx){
+    var isDone = (item.status === '발행완료');
+    var statusBadge = isDone
+      ? '<span style="background:#dcfce7;color:#166534;padding:4px 8px;border-radius:4px;font-weight:800;font-size:12px;">✅ 발행완료</span>'
+      : '<button type="button" onclick="window.markTaxDone(' + idx + ', this)" style="background:#ea580c;color:#fff;border:0;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer;">🟡 발행대기</button>';
+
+    var tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="padding:10px;font-size:12.5px;color:#64748b;">${item.date}</td>
+      <td style="padding:10px;font-weight:700;">${item.name} (${item.code})</td>
+      <td style="padding:10px;">${item.owner}</td>
+      <td style="padding:10px;font-weight:700;color:#0e6556;">${item.bizNo}</td>
+      <td style="padding:10px;font-weight:800;color:#0f172a;">${item.total.toLocaleString()}원</td>
+      <td style="padding:10px;">${item.supply.toLocaleString()}원</td>
+      <td style="padding:10px;color:#2563eb;">${item.vat.toLocaleString()}원</td>
+      <td style="padding:10px;font-size:12.5px;">${item.email}</td>
+      <td style="padding:10px;"><button type="button" onclick="alert('사업자등록번호: ' + '${item.bizNo}' + '\\n상호: ' + '${item.name}' + '\\n대표: ' + '${item.owner}')" style="background:#f1f5f9;border:1px solid #cbd5e1;padding:3px 7px;border-radius:4px;font-size:11.5px;cursor:pointer;">📄 등록증</button></td>
+      <td style="padding:10px;">${statusBadge}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+};
+
+window.markTaxDone = function(idx, btn) {
+  if (confirm('국세청 홈택스에서 해당 마트의 전자세금계산서 발행을 완료하셨습니까?')) {
+    btn.outerHTML = '<span style="background:#dcfce7;color:#166534;padding:4px 8px;border-radius:4px;font-weight:800;font-size:12px;">✅ 발행완료</span>';
+  }
+};
+
+// 5. 국세청 홈택스 일괄발행용 엑셀(CSV) 다운로드
+window.downloadHometaxTaxExcel = function() {
+  var now = new Date();
+  var todayStr = now.getFullYear() + ('0' + (now.getMonth() + 1)).slice(-2) + ('0' + now.getDate()).slice(-2);
+  
+  var csvRows = [
+    ['전자세금계산서종류', '작성일자', '공급자등록번호', '공급자상호', '공급받는자등록번호', '공급받는자상호', '대표자명', '공급가액', '세액', '이메일', '품목명']
+  ];
+
+  var mockTaxList = [
+    ['01(일반)', todayStr, '199-02-289684', '(주)뉴알에너지', '199-02-289684', '테스트매장', '송해석', 300000, 30000, 'wooriapt@naver.com', '마트 15원 세일 알림 발송 충전금 (20,000건)'],
+    ['01(일반)', todayStr, '199-02-289684', '(주)뉴알에너지', '410-82-99881', '대박식자재마트', '김대박', 500000, 50000, 'daebak@daum.net', '마트 15원 세일 알림 발송 충전금 (33,333건)'],
+    ['01(일반)', todayStr, '199-02-289684', '(주)뉴알에너지', '411-81-77662', '싱싱마트 첨단점', '이싱싱', 1000000, 100000, 'singsing@gmail.com', '마트 15원 세일 알림 발송 충전금 (66,666건)']
+  ];
+
+  mockTaxList.forEach(function(row){ csvRows.push(row); });
+
+  var csvContent = '\uFEFF' + csvRows.map(function(e){ return e.map(function(v){ return '"' + String(v).replace(/"/g, '""') + '"'; }).join(','); }).join('\r\n');
+  var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = '홈택스_전자세금계산서_일괄발행양식_' + todayStr + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+// 탭 전환 시 렌더링 호출 연동
+var origOpenHqRoom = window.openHqRoom;
+window.openHqRoom = function(roomId) {
+  if (typeof origOpenHqRoom === 'function') origOpenHqRoom(roomId);
+  if (roomId === 'hqRoomPartner') {
+    setTimeout(function(){ if (typeof window.renderHqPartners === 'function') window.renderHqPartners(); }, 100);
+  } else if (roomId === 'hqRoomPayment') {
+    setTimeout(function(){ if (typeof window.renderHqStoreTaxTable === 'function') window.renderHqStoreTaxTable(); }, 100);
+  }
+};
+
 </script>
 
 </body>
