@@ -495,19 +495,31 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
         readonly
       >
 
-      <div style="margin-top:16px;padding:14px;background:#f3f8f4;border:1px solid #d7e8dc;border-radius:8px;">
-        <b>본사 결제·계좌정보</b>
-        <div class="sa-help">본사에서 등록한 결제 및 정산정보가 자동으로 표시됩니다.</div>
-        <input id="settlementBank" readonly placeholder="은행명">
-        <input id="settlementAccount" readonly placeholder="계좌번호">
-        <input id="settlementHolder" readonly placeholder="예금주">
-        <input id="settlementMonthlyFee" readonly placeholder="결제금액">
-        <input id="settlementPaymentStatus" readonly placeholder="결제상태">
-        <input id="settlementLastPaymentDate" readonly placeholder="최근 결제일">
-        <input id="settlementNextPaymentDate" readonly placeholder="다음 결제예정일">
-        <input id="settlementPaymentMethod" readonly placeholder="결제방법">
-        <input id="settlementStatus" readonly placeholder="정산상태">
-        <button class="sa-btn" type="button" onclick="loadSettlementAccount()">결제·계좌정보 새로고침</button>
+      <!-- 1. 본사 세일 발송 선입금 공식 충전 계좌 안내 -->
+      <div style="margin-top:16px;padding:16px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;">
+        <b style="color:#b45309;font-size:15px;display:flex;align-items:center;gap:6px;">
+          <span>🏛️ 본사 15원 세일 발송 선입금 충전 계좌</span>
+        </b>
+        <div style="margin-top:8px;font-size:13.5px;color:#78350f;line-height:1.6;">
+          • <strong>은행 및 계좌:</strong> 농협은행 199-02-289684<br>
+          • <strong>예금주:</strong> 송해석 / (주)뉴알에너지 대표이사<br>
+          • <strong>최소 충전 단위:</strong> 10만 원 이상부터 충전 가능<br>
+          <span style="font-size:12px;color:#92400e;">(10만 / 20만 / 30만 / 50만 원 단위 입금 즉시 전자세금계산서 100% 자동 발행)</span>
+        </div>
+      </div>
+
+      <!-- 2. 매장 사장님 판매대금 정산 계좌 등록 / 변경 -->
+      <div style="margin-top:14px;padding:16px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;">
+        <b style="color:#166534;font-size:15px;display:flex;align-items:center;gap:6px;">
+          <span>💳 사장님 온라인 주문 판매대금 정산 입금 계좌</span>
+        </b>
+        <div class="sa-help" style="color:#166534;margin-top:4px;">
+          소비자가 매장 화면에서 온라인 주문 결제 시, 본사에서 마트 사장님께 판매대금을 송금해 드릴 입금 계좌입니다.
+        </div>
+        <input id="storeSettlementBank" placeholder="정산 받으실 은행명 (예: 농협, 국민, 신한)" value="농협">
+        <input id="storeSettlementAccount" placeholder="계좌번호 (숫자만 입력)" value="199-02-289684">
+        <input id="storeSettlementHolder" placeholder="예금주 성명 (예: 송해석)" value="송해석">
+        <button class="sa-btn" type="button" style="background:#166534;margin-top:10px;" onclick="saveStoreSettlementAccount()">정산 계좌정보 저장</button>
       </div>
 
       <input
@@ -2028,7 +2040,28 @@ function settlementStatusText(value) {
   return '정산사용';
 }
 
-async function loadSettlementAccount() {
+async 
+function saveStoreSettlementAccount() {
+  var bank = (document.getElementById('storeSettlementBank').value || '').trim();
+  var acc = (document.getElementById('storeSettlementAccount').value || '').trim();
+  var holder = (document.getElementById('storeSettlementHolder').value || '').trim();
+
+  if (!bank || !acc || !holder) {
+    alert('은행명, 계좌번호, 예금주를 모두 입력해 주세요.');
+    return;
+  }
+
+  try {
+    localStorage.setItem('store_settlement_bank', bank);
+    localStorage.setItem('store_settlement_account', acc);
+    localStorage.setItem('store_settlement_holder', holder);
+    alert('✅ [정산 계좌 저장 완료]\n\n• 은행명: ' + bank + '\n• 계좌번호: ' + acc + '\n• 예금주: ' + holder + '\n\n고객 주문 발생 시 위 계좌로 판매대금이 정확하게 정산 입금됩니다.');
+  } catch(e) {
+    alert('저장 실패: ' + e.message);
+  }
+}
+
+function loadSettlementAccount() {
   if (!currentStoreId || !currentPw) return;
 
   try {
