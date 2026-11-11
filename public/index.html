@@ -4313,23 +4313,10 @@ window.addEventListener('beforeinstallprompt', (e) => {
 function openPwaInstallGuide() {
   const modal = document.getElementById('pwaInstallModal');
   const autoBox = document.getElementById('pwaAutoInstallBox');
-  
-  if (deferredInstallPrompt) {
-    if (autoBox) autoBox.style.display = 'block';
-    // 즉시 네이티브 설치 프롬프트 시도
-    deferredInstallPrompt.prompt();
-    deferredInstallPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        deferredInstallPrompt = null;
-        if (modal) modal.style.display = 'none';
-      }
-    }).catch(() => {
-      if (modal) modal.style.display = 'flex';
-    });
-    return;
-  }
-  
   if (modal) modal.style.display = 'flex';
+  if (deferredInstallPrompt && autoBox) {
+    autoBox.style.display = 'block';
+  }
 }
 
 function triggerPwaInstallPrompt() {
