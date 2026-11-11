@@ -1,0 +1,25 @@
+{
+  "name": "우리아파트 마트 플랫폼",
+  "short_name": "우리아파트 마트",
+  "description": "마트 사장님이 스스로 운영하고 성장하는 우리아파트 마트 플랫폼",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0c4fd7",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/mart-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/mart-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
