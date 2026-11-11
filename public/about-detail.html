@@ -711,52 +711,15 @@ function submitPartnerApply(e) {
   btn.disabled = true;
   btn.innerText = '신청 접수 중...';
 
-  var nowStr = new Date().toLocaleString('ko-KR', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
-  var cleanPhone = phone.replace(/\D/g, '');
-  var assignedCode = cleanPhone.slice(-4) || '7788';
-
-  var newPartnerObj = {
-    id: Date.now(),
-    name: name,
-    phone: phone,
-    region: region,
-    exp: job,
-    company: '온라인신청',
-    code: assignedCode,
-    date: nowStr,
-    status: '승인대기'
-  };
-
-  try {
-    var defaultPendingPartners = [
-      { id: 1, name: '박영수', phone: '010-3456-7890', region: '광주 광산구', exp: '7년차', company: 'DB손해보험', code: '7890', date: '2026-11-07 14:10', status: '승인대기' },
-      { id: 2, name: '최동석', phone: '010-8765-4321', region: '전남 나주', exp: '3년차', company: '한화생명', code: '4321', date: '2026-11-07 15:05', status: '승인대기' }
-    ];
-    var list = JSON.parse(localStorage.getItem('pendingPartners') || '[]');
-    if (list.length === 0) list = defaultPendingPartners;
-    list.unshift(newPartnerObj);
-    localStorage.setItem('pendingPartners', JSON.stringify(list));
-  } catch(err) {}
-
+  // 알림 및 완료 메시지
   setTimeout(function() {
     alert(
-      '🎉 [공인 영업 파트너 신청 접수 완료!]
-
-' +
-      name + ' 님의 파트너 등록 신청이 본사 대표님 직통 관제소로 전송되었습니다!
-
-' +
-      '• 성함: ' + name + '
-' +
-      '• 휴대폰: ' + phone + '
-' +
-      '• 발급 예정 코드: [' + assignedCode + ']
-
-' +
-      '본사 대표님(010-2286-4150) 승인 즉시 휴대폰으로 전용 4자리 영업코드 및 방 링크가 발송됩니다.'
+      '[신청 완료 안내]\n\n' +
+      name + ' 소장님의 공인 영업 파트너 신청이 정상 접수되었습니다!\n\n' +
+      '본사 대표님(010-2286-4150) 확인 즉시 고객님의 휴대폰(' + phone + ')으로 [전용 4자리 영업코드]가 문자로 발송됩니다.'
     );
     btn.disabled = false;
-    btn.innerText = '신청 완료 (대표님 승인 대기 중)';
+    btn.innerText = '신청 완료 (문자 발송 대기 중)';
     document.getElementById('partnerApplyForm').reset();
   }, 700);
 }
