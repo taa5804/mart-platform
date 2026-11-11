@@ -2714,73 +2714,6 @@
   <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body class="page_ready  doz_sys  _body_menu_m20260904c80e1a667a5f2  mobile-nav-on  mobile_nav_dep1  page  new_header_site  " 	style=";"  id="doz_body">
-<!-- ==============================================
-     [우리아파트 메인 상단: 마트관리자 전용방 진입 바]
-============================================== -->
-<div id="topMartAdminBar" style="background:linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%);color:#fff;padding:10px 16px;box-shadow:0 3px 12px rgba(0,0,0,0.2);position:relative;z-index:9999999;border-bottom:2px solid #86efac;">
-  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-    
-    <!-- 좌측 타이틀 -->
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span style="font-size:22px;">🏪</span>
-      <div>
-        <strong style="font-size:16px;letter-spacing:-0.3px;color:#fff;display:flex;align-items:center;gap:6px;">
-          우리아파트 마트관리자 전용방
-          <span style="font-size:11.5px;background:#f59e0b;color:#fff;padding:2px 8px;border-radius:999px;font-weight:bold;">실시간 상황실</span>
-        </strong>
-        <div style="font-size:12px;color:#bbf7d0;margin-top:2px;">발급받으신 마트코드를 입력하시면 사장님 매장 전용 관리실로 즉시 연결됩니다.</div>
-      </div>
-    </div>
-
-    <!-- 우측 마트코드 입력 & 즉시 진입 폼 -->
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      <div style="position:relative;display:flex;align-items:center;">
-        <input 
-          id="mainTopMartCode" 
-          type="text" 
-          placeholder="마트코드 입력 (예: store01)" 
-          value="store01"
-          style="height:40px;width:220px;border:2px solid #86efac;border-radius:7px;padding:0 12px;font-size:15px;font-weight:bold;color:#1e3a8a;background:#fff;outline:none;box-shadow:inset 0 1px 3px rgba(0,0,0,0.1);"
-          onkeydown="if(event.key==='Enter') enterMartAdminFromTop()"
-        >
-      </div>
-      <button 
-        type="button" 
-        onclick="enterMartAdminFromTop()" 
-        style="height:40px;padding:0 18px;background:#f59e0b;color:#fff;border:0;border-radius:7px;font-size:14.5px;font-weight:800;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.25);white-space:nowrap;"
-      >
-        전용방 입장 ➔
-      </button>
-
-      <!-- 본사관리자 바로가기 -->
-      <a 
-        href="hq-dashboard.html" 
-        style="height:40px;display:inline-flex;align-items:center;padding:0 14px;background:rgba(0,0,0,0.3);color:#e2e8f0;border:1px solid rgba(255,255,255,0.3);border-radius:7px;font-size:13.5px;font-weight:700;text-decoration:none;white-space:nowrap;"
-      >
-        🏛️ 본사관리자
-      </a>
-    </div>
-
-  </div>
-</div>
-
-<script>
-function enterMartAdminFromTop() {
-  var code = (document.getElementById('mainTopMartCode')?.value || '').trim();
-  if (!code) {
-    alert('마트 전용코드를 입력해 주세요. (예: store01)');
-    document.getElementById('mainTopMartCode')?.focus();
-    return;
-  }
-  localStorage.setItem('last_mart_code', code);
-  location.href = 'store-admin.html?code=' + encodeURIComponent(code);
-}
-</script>
-
-
-
-
-
 <div id="site_alarm_slidemenu_container" class="notification-canvas-container">
 	<div class="notification-canvas-backdrop" id="site_alarm_slidemenu_backdrop" style="display: none"></div>
 	<div id="site_alarm_slidemenu" class="notification-canvas alarm-pane alarm_slide">
@@ -3264,6 +3197,27 @@ function enterMartAdminFromTop() {
       </div>
 
       <div class="wmv-top-right">
+
+        <!-- 마트관리자 코드 입력 및 입장 (영업코드 좌측 옆으로 나란히) -->
+        <div class="wmv-mart-quick" style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; padding:3px 8px; border-radius:8px; border:1.5px solid #2563eb; margin-right:6px;">
+          <span style="font-size:12px; font-weight:800; color:#1d4ed8; white-space:nowrap;">🏪 마트관리자:</span>
+          <input type="text" id="quickMartCode" placeholder="마트코드" value="store01" style="width:85px; padding:5px 6px; border:1px solid #93c5fd; border-radius:5px; font-size:12px; font-weight:700; outline:none; color:#1e3a8a;" onkeypress="if(event.key==='Enter') enterMartAdmin()">
+          <button type="button" onclick="enterMartAdmin()" style="background:#2563eb; color:#fff; border:none; padding:5px 10px; border-radius:5px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap;">입장</button>
+        </div>
+
+        <script>
+        function enterMartAdmin() {
+          var code = document.getElementById('quickMartCode').value.trim();
+          if (!code) {
+            alert('마트코드를 입력해 주세요! (예: store01)');
+            document.getElementById('quickMartCode').focus();
+            return;
+          }
+          localStorage.setItem('last_mart_code', code);
+          var targetUrl = (window.location.protocol === 'file:') ? 'store-admin.html?code=' + encodeURIComponent(code) : '/store-admin.html?code=' + encodeURIComponent(code);
+          location.href = targetUrl;
+        }
+        </script>
 
         <!-- 영업사원 메인화면 코드 입력 및 본인 방 입장 -->
         <div class="wmv-partner-quick" style="display:inline-flex; align-items:center; gap:5px; background:#f0fdf4; padding:3px 8px; border-radius:8px; border:1.5px solid #0e6556; margin-right:6px;">
