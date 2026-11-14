@@ -1,34 +1,1569 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title>[우리마트] 모바일 세일 전단지 도착</title>
-<meta property="og:title" content="[우리마트] 오늘의 특가 세일 전단지">
-<meta property="og:description" content="테스트입니다. 모바일 전단지와 오늘의 행사 상품을 지금 확인하세요!">
-<meta property="og:image" content="https://mart-platform.vercel.app/test-flyer.png">
-<style>
-  * { box-sizing: border-box; }
-  body { margin: 0; background: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Noto Sans KR", sans-serif; color: #0f172a; }
-  .wrap { max-width: 520px; margin: 0 auto; background: #fff; min-height: 100vh; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding-bottom: 40px; }
-  .header { background: #166534; color: #fff; padding: 16px; text-align: center; font-size: 19px; font-weight: 900; }
-  .msg-box { margin: 14px; padding: 16px; background: #f0fdf4; border: 2px solid #86efac; border-radius: 12px; font-size: 16px; font-weight: 800; color: #14532d; line-height: 1.6; }
-  .flyer-box { margin: 14px; border-radius: 14px; overflow: hidden; border: 1px solid #cbd5e1; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
-  .flyer-box img { display: block; width: 100%; height: auto; }
-  .btn-go { display: block; margin: 16px 14px; padding: 16px; border-radius: 12px; background: #ea580c; color: #fff; text-align: center; text-decoration: none; font-size: 17px; font-weight: 900; box-shadow: 0 6px 16px rgba(234,88,12,0.3); }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>에너젠마트 | 우리아파트</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background: #f8fafc; color: #0f172a; padding: 0; margin: 0; }
+    #eventMainApp {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  max-width: 960px !important;
+  margin: 0 auto;
+  background: #fff !important;
+  padding: 10px 18px 70px !important;
+  color: #111827 !important;
+}
+
+/* 상단 헤더: 깔끔한 배달앱 스타일 (홈 / 마트명 / 예쁜 프로필) */
+#eventMainApp .confirmed-header {
+  height: 70px;
+  display: grid;
+  grid-template-columns: 70px 1fr auto;
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 12px;
+}
+#eventMainApp .btn-go-home {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid #bbf7d0;
+  border-radius: 19px;
+  background: #f0fdf4;
+  color: #16a34a;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+}
+#eventMainApp .confirmed-store-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#eventMainApp .header-icon {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  position: relative;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#eventMainApp .profile-icon {
+  background: #f0fdf4;
+  border-radius: 50%;
+  border: 1.5px solid #bbf7d0;
+}
+#eventMainApp .profile-icon .profile-head {
+  position: absolute;
+  top: 9px;
+  width: 10px;
+  height: 10px;
+  background: #16a34a;
+  border-radius: 50%;
+}
+#eventMainApp .profile-icon .profile-body {
+  position: absolute;
+  bottom: 8px;
+  width: 20px;
+  height: 11px;
+  background: #16a34a;
+  border-radius: 10px 10px 0 0;
+}
+
+/* 5개 카테고리 탭 (배달앱 스타일 이모지 로고 적용) */
+#eventMainApp .confirmed-tabs {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  padding: 4px 0 16px !important;
+  border: 0 !important;
+  background: #fff !important;
+}
+#eventMainApp .confirmed-tabs .tab-btn {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  height: 60px !important;
+  padding: 6px 2px !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  background: #f8fafc !important;
+  color: #334155 !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+  transition: all .15s;
+}
+#eventMainApp .confirmed-tabs .tab-btn.active {
+  background: #16a34a !important;
+  color: #fff !important;
+  border-color: #16a34a !important;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, .25) !important;
+}
+#eventMainApp .confirmed-tabs .tab-icon {
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+#eventMainApp .confirmed-tabs em {
+  position: absolute;
+  right: 3px;
+  top: -6px;
+  padding: 2px 5px;
+  border-radius: 6px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* 상품 섹션 및 2열 그리드 */
+#eventMainApp .section { display: none; padding: 0 2px 14px !important; }
+#eventMainApp .section.active { display: block; }
+#eventMainApp .product-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+/* 상품 카드 */
+#eventMainApp .card {
+  display: flex !important;
+  flex-direction: column !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 10px !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04) !important;
+}
+#eventMainApp .product-photo-wrap {
+  position: relative !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  aspect-ratio: 1/1 !important;
+  overflow: hidden !important;
+  border-radius: 10px !important;
+  background: #f8fafc !important;
+}
+#eventMainApp .product-photo-wrap > img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  background: #f8fafc !important;
+}
+#eventMainApp .discount-badge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  min-height: 54px;
+  padding: 4px 6px;
+  border-radius: 10px 0 10px 0;
+  background: #ef4444;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, .3);
+}
+#eventMainApp .discount-badge b { font-size: 18px; line-height: 1.05; font-weight: 900; }
+#eventMainApp .discount-badge small { margin-top: 2px; font-size: 12px; line-height: 1; font-weight: 800; }
+
+#eventMainApp .card-body {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  min-height: 0 !important;
+  padding: 10px 0 0 !important;
+}
+#eventMainApp .name {
+  display: block !important;
+  margin: 0 !important;
+  color: #0f172a !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  line-height: 1.3 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+#eventMainApp .price {
+  margin-top: 4px !important;
+  color: #dc2626 !important;
+  font-size: 19px !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+}
+
+/* 장바구니/수량 버튼 비율 꽉 채움 (38:62) */
+#eventMainApp .product-action-row {
+  display: grid !important;
+  grid-template-columns: 38% 62% !important;
+  gap: 6px !important;
+  align-items: center !important;
+  margin-top: 10px !important;
+  width: 100% !important;
+}
+#eventMainApp .qty-control {
+  display: grid !important;
+  grid-template-columns: 1fr 1.2fr 1fr !important;
+  height: 38px !important;
+  overflow: hidden !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  background: #f8fafc !important;
+}
+#eventMainApp .qty-control .qty-action {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  font-size: 17px !important;
+  font-weight: 900 !important;
+  cursor: pointer;
+}
+#eventMainApp .qty-control .qty-value {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #fff !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+#eventMainApp .cart-action {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  width: 100% !important;
+  height: 38px !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: #16a34a !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+  cursor: pointer;
+}
+
+/* 오늘의 특가 하단 분양사 2개 배너 스타일 (100% 유지) */
+.main-banner-area { margin: 16px auto 0; width: 100%; box-sizing: border-box; }
+.main-banner-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.main-banner-grid.one { grid-template-columns: minmax(0, 1fr); max-width: 240px; margin: 0 auto; }
+.main-banner-item {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 138px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 13px;
+  color: #fff;
+  text-decoration: none;
+  box-sizing: border-box;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, .18);
+}
+.main-banner-item.banner-one { background: linear-gradient(145deg, #0f274d, #215a96); }
+.main-banner-item.banner-two { background: linear-gradient(145deg, #4b3415, #a06b20); }
+.main-banner-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: var(--banner-image);
+  background-position: center;
+  background-size: cover;
+  opacity: .58;
+}
+.main-banner-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(5, 15, 35, .12) 12%, rgba(5, 15, 35, .88) 100%);
+}
+.main-banner-text { min-width: 0; width: 100%; text-shadow: 0 1px 3px rgba(0, 0, 0, .45); }
+.main-banner-label {
+  display: inline-block;
+  margin-bottom: 7px;
+  padding: 3px 7px;
+  border: 1px solid rgba(255, 255, 255, .55);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .14);
+  color: #fff4c7;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+.main-banner-title {
+  display: block;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+.main-banner-content {
+  display: -webkit-box;
+  margin-top: 5px;
+  overflow: hidden;
+  color: rgba(255, 255, 255, .9);
+  font-size: 11px;
+  line-height: 1.4;
+  word-break: keep-all;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* 일반상품 리스트 */
+.general-list { display: flex; flex-direction: column; gap: 8px; }
+.general-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px;
+}
+.general-name { font-size: 15px; font-weight: 800; color: #0f172a; }
+.general-price { margin-top: 2px; color: #dc2626; font-size: 16px; font-weight: 900; }
+.general-qty { display: flex; align-items: center; gap: 6px; }
+.general-qty button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.general-cart {
+  width: 42px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: #16a34a;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* 공동구매 카드 */
+#eventMainApp #group .card { min-height: 0 !important; height: auto !important; overflow: visible !important; }
+#eventMainApp #group .group-info { margin-top: 4px; font-size: 13px; line-height: 1.4; color: #475569; }
+#eventMainApp #group .normal { text-decoration: line-through; color: #94a3b8; }
+#eventMainApp #group .group-price { color: #dc2626; font-size: 16px; font-weight: 900; }
+#eventMainApp #group .goal {
+  margin-top: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #16a34a;
+}
+#eventMainApp #group .join-btn {
+  width: 100% !important;
+  margin-top: 8px;
+  padding: 9px;
+  border: 0;
+  border-radius: 8px;
+  background: #ea580c;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.join-form { display: none; margin-top: 10px; border-top: 1px solid #e2e8f0; padding-top: 10px; }
+.join-form input, .join-form select, .join-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 6px;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.delivery-address { display: none; }
+.submit-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #ea580c;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* 배송비 안내 */
+.shipping-box { margin-bottom: 12px; padding: 12px; border: 1px solid #bbf7d0; border-radius: 10px; background: #f0fdf4; }
+.shipping-title { font-weight: 800; color: #166534; font-size: 14px; }
+.shipping-progress { height: 8px; margin-top: 8px; border-radius: 99px; background: #e2e8f0; overflow: hidden; }
+.shipping-progress span { display: block; height: 100%; border-radius: 99px; background: #16a34a; }
+.shipping-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; font-size: 11px; color: #64748b; }
+
+@media(max-width: 600px) {
+  #eventMainApp { padding: 0 8px 60px !important; }
+  #eventMainApp .confirmed-header { height: 60px; grid-template-columns: 60px 1fr 40px; }
+  #eventMainApp .btn-go-home { height: 32px; font-size: 12px; padding: 0 8px; }
+  #eventMainApp .confirmed-store-title { font-size: 20px; }
+  #eventMainApp .header-icon { width: 34px; height: 34px; }
+  #eventMainApp .confirmed-tabs { gap: 4px !important; padding: 3px 0 10px !important; }
+  #eventMainApp .confirmed-tabs .tab-btn { height: 50px !important; font-size: 12px !important; border-radius: 9px !important; }
+  #eventMainApp .confirmed-tabs .tab-icon { font-size: 15px !important; }
+  #eventMainApp .confirmed-tabs em { font-size: 8px; padding: 1px 4px; right: 2px; top: -5px; }
+  #eventMainApp .product-grid { gap: 8px !important; }
+  #eventMainApp .card { padding: 7px !important; }
+  #eventMainApp .name { font-size: 14px !important; }
+  #eventMainApp .price { font-size: 17px !important; }
+  #eventMainApp .product-action-row { grid-template-columns: 38% 62% !important; gap: 4px !important; margin-top: 8px !important; }
+  #eventMainApp .qty-control { height: 32px !important; border-radius: 6px !important; }
+  #eventMainApp .qty-control .qty-action { font-size: 15px !important; }
+  #eventMainApp .qty-control .qty-value { font-size: 12px !important; }
+  #eventMainApp .cart-action { height: 32px !important; font-size: 11px !important; padding: 0 4px !important; }
+}
+
+.empty-box { grid-column: 1/-1; background: #fff; border-radius: 10px; padding: 30px 15px; text-align: center; color: #64748b; border: 1px solid #e2e8f0; }
+.info-box { background: #fff; border-radius: 10px; padding: 14px; border: 1px solid #e2e8f0; }
+
+	.footer-section {
+	background-color : #ffffff;;
+		background-color                                                               : rgba(255,255,255,1);
+	color : #3b3b3b;;
+		color                                                                          : rgba(59,59,59,1);
+		font-size        :12px;
+	;
+	 background-size : cover; background-repeat: no-repeat; background-position : ; text-align : center;
+		padding-top                                                                    : 30px;
+		padding-bottom                                                                 : 30px;
+			}
+
+	.doz_sys .footer-section a {
+	color : #3b3b3b;;
+		color   : rgba(59,59,59,1) !important;
+	}
+	.doz_sys .footer-section .use_sub_name:hover>a>.plain_name:before {
+		color   : rgba(59,59,59,1);
+	}
+	.footer-section .custom-text {
+		margin-top : 5px;
+		margin-bottom: 10px;
+	}
+
+	.footer-section .custom-text .custom-text-info {
+		font-size        :12px;
+	}
+
+	.foot-main-nav {
+		font-size        :12px;
+	}
+
+	.foot-foot-nav {
+		font-size        :12px;
+	}
+
+	.foot-foot-nav .policy_menu, .foot-foot-nav .footer_menu {
+		float : left;
+	}
+	.footer-section .site-brand {
+		font-size        :12px;
+		margin-bottom : 0.8em;
+	}
+
+	.footer-section .copryright-area {
+		font-size        :12px;
+	}
+
+	.footer-section .nav.nav-stacked.footer-all-nav {
+		display     : inline-block;
+	}
+
+	.footer-section .nav.nav-stacked.footer-all-nav li {
+		float : left;
+	}
+
+	.footer-section .nav.nav-stacked.footer-all-nav li a {
+		padding   : 3px 7.5px;
+		font-size        :12px;
+	}
+
+
+	.footer-section .nav.nav-stacked.footer-all-nav li a:hover {
+		background : none;
+		opacity    : 1;
+	}
+
+	.nav-stacked > li + li {
+		margin-top : 0;
+	}
+
+	.footer-section .foot-sociallink {
+		display : inline-block;
+	}
+
+	.footer-section .foot-sociallink .btn-group {
+		display : block;
+	}
+
+	.footer-section .foot-sociallink .btn-group .btn {
+		background    : none;
+		font-size     : 20px;
+		border-radius : 0;
+		border        : none;
+		border-color: transparent;
+		padding       : 0 12px;
+	}
+
+	.footer-section .foot-sociallink .btn-group .btn i {
+	color : #3b3b3b;;
+		color : rgba(59,59,59,1);
+	}
+	.footer-section .foot-sociallink .btn-group .btn i.icon_naver {
+		font-family: "Arial Black", "AvenirNext-Heavy";
+		transform: translateY(-1px);
+		font-style: normal;
+	}
+	.footer-section .foot-sociallink .btn-group .btn:hover {
+		opacity : 0.7;
+		color   : inherit;
+	}
+	#doz_footer .footer-section .foot-app-menu {
+		margin-top: 30px;
+		display: inline-block;
+	}
+	#doz_footer .footer-section .foot-app-menu > div {
+		float:left;
+		margin: 2.5px;
+	}
+	#doz_footer .footer-section .foot-app-menu .btn {
+		width: 195px;
+		height: 60px;
+		padding: 0 24px;
+		color:#fff;
+	}
+	#doz_footer .footer-section .foot-app-menu .sm-txt {
+		font-size: 11px;
+		color: #999;
+		letter-spacing: 0;
+	}
+	#doz_footer .footer-section .foot-app-menu .lg-txt {
+		font-size: 15px;
+		font-weight: bold;
+		letter-spacing: 0;
+		color: #fff;
+	}
+	@media (max-width : 992px) {
+		.foot-main-nav, .foot-foot-nav, .footer-section .foot-sociallink {
+			margin : 7px 0;
+		}
+
+		.footer-section {
+			font-size : 12px;
+		}
+
+		.footer-section .footer-wrap {
+			padding : 0;
+		}
+
+		.footer-section .foot-sociallink {
+			position : inherit;
+			order    : 4;
+		}
+
+		.footer-section .nav.nav-stacked.footer-all-nav li, .foot-foot-nav .policy_menu, .foot-foot-nav .footer_menu {
+			float   : none;
+			display : inline-block;
+		}
+	}
+	@media (max-width:640px) {
+		#doz_footer .footer-section .foot-app-menu {
+			display: table;
+			margin-top: 20px;
+			width: 100%;
+		}
+		#doz_footer .footer-section .foot-app-menu .btn {
+			width: 100%;
+			padding: 0 10px;
+			letter-spacing: 0;
+		}
+		#doz_footer .footer-section .foot-app-menu > div {
+			float: none;
+			margin: 0;
+			display: table-cell;
+			padding: 0 2.5px 0 0;
+			width: 50%;
+		}
+		#doz_footer .footer-section .foot-app-menu > div.apple {
+			padding: 0 0 0 2.5px;
+		}
+		#doz_footer .footer-section .foot-app-menu .lg-txt {
+			font-size:14px;
+		}
+
+	}
+	@media all and (min-width:320px) and (max-width:639px) {
+		#doz_footer .footer-section .foot-app-menu .btn {
+			padding: 0 8px;
+		}
+	}
+    #doz_footer .footer-section .footer-company-info__item {
+        display: inline-block;
+        margin-right: 8px;
+    }
+    #doz_footer .footer-section .footer-company-info #footer-company-info-line {
+        margin: 10px 0;
+    }
+
+
+    /* 🖥️ [대표님 핵심 지시] PC 모니터 전용 4개 가로 배치 (모바일은 2열 100% 유지) */
+    @media (min-width: 768px) {
+      #eventMainApp {
+        max-width: 1200px !important;
+        padding: 10px 24px 80px !important;
+      }
+      #eventMainApp .product-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 16px !important;
+      }
+      #eventMainApp .product-photo-wrap {
+        aspect-ratio: 4 / 3 !important;
+      }
+      #eventMainApp .card {
+        padding: 10px !important;
+      }
+      #eventMainApp .name {
+        font-size: 15px !important;
+        min-height: 22px !important;
+      }
+      #eventMainApp .price {
+        font-size: 18px !important;
+      }
+    }
+  
+    /* [기존 고객 DB 문자 유입 & 단골 특가 알림 배너] */
+    .sms-push-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 8px 0 14px;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 1.5px solid #86efac;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(22, 163, 74, 0.1);
+    }
+    .sms-push-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .sms-push-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .sms-push-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .sms-push-text strong {
+      font-size: 13.5px;
+      font-weight: 900;
+      color: #166534;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sms-push-text span {
+      font-size: 11px;
+      color: #15803d;
+      margin-top: 2px;
+      line-height: 1.25;
+      word-break: keep-all;
+    }
+    .sms-push-btn {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border: 0;
+      border-radius: 20px;
+      background: #16a34a;
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .sms-push-btn:hover {
+      background: #15803d;
+      transform: scale(1.02);
+    }
+    .sms-push-btn.done {
+      background: #e2e8f0;
+      color: #475569;
+      box-shadow: none;
+      cursor: default;
+    }
+    @media (max-width: 600px) {
+      .sms-push-banner {
+        padding: 10px 12px;
+        gap: 8px;
+      }
+      .sms-push-text strong {
+        font-size: 12px;
+      }
+      .sms-push-text span {
+        font-size: 10px;
+      }
+      .sms-push-btn {
+        padding: 7px 11px;
+        font-size: 11px;
+      }
+    }
+
+    /* 알림 등록 모달 */
+    .sms-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .sms-modal-card {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      border-radius: 18px;
+      padding: 24px 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      animation: smsModalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes smsModalPop {
+      0% { opacity: 0; transform: scale(0.92) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .sms-modal-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #dcfce7;
+      color: #166534;
+      font-size: 11.5px;
+      font-weight: 800;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    .sms-modal-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1.35;
+      letter-spacing: -0.5px;
+    }
+    .sms-modal-sub {
+      font-size: 12.5px;
+      color: #64748b;
+      margin-top: 6px;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+    .sms-modal-body {
+      margin-top: 16px;
+    }
+    .sms-modal-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .sms-modal-input {
+      width: 100%;
+      height: 46px;
+      padding: 0 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      box-sizing: border-box;
+      outline: none;
+      transition: border 0.15s;
+    }
+    .sms-modal-input:focus {
+      border-color: #16a34a;
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+    }
+    .sms-modal-status {
+      min-height: 18px;
+      font-size: 12px;
+      margin-top: 6px;
+      font-weight: 700;
+    }
+    .sms-modal-status.error { color: #dc2626; }
+    .sms-modal-status.ok { color: #16a34a; }
+    .sms-modal-submit {
+      width: 100%;
+      height: 48px;
+      margin-top: 10px;
+      border: 0;
+      border-radius: 10px;
+      background: #16a34a;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(22, 163, 74, 0.25);
+      transition: background 0.15s;
+    }
+    .sms-modal-submit:hover { background: #15803d; }
+    .sms-modal-close {
+      width: 100%;
+      height: 38px;
+      margin-top: 6px;
+      border: 0;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+  </style>
+  <link rel="canonical" href="https://www.wooriapt.app/mart-store">
+  <meta property="og:url" content="https://www.wooriapt.app/mart-store">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+  <meta name="description" content="우리동네 마트 오늘의 전단 특가 및 농수축산물 직거래 산지 시세 안내 페이지입니다.">
 </head>
 <body>
-<div class="wrap">
-  <div class="header">🛒 우리마트 모바일 세일 전단지</div>
-  <div class="msg-box">
-    📢 <strong>매장 세일 알림 메세지:</strong><br>
-    <span id="msgText">테스트입니다.</span>
+
+<div id="eventMainApp">
+
+
+<div class="confirmed-header">
+  <a href="https://wooriapt.ai.kr" class="btn-go-home">🏠 홈</a>
+  <div id="storeTitle" class="confirmed-store-title">에너젠마트</div>
+
+<!-- [기존 고객 DB 문자 유입 & 단골 특가 알림 배너] -->
+<div id="smsPushBanner" class="sms-push-banner">
+  <div class="sms-push-left">
+    <span class="sms-push-icon">📢</span>
+    <div class="sms-push-text">
+      <strong id="smsBannerTitle">작은 글씨 문자 대신 이 화면으로 특가 발송!</strong>
+      <span id="smsBannerSub">알림 허용 시 매주 파격 할인 전단지를 무료로 보내드립니다.</span>
+    </div>
   </div>
-  <div class="flyer-box">
-    <img src="/test-flyer.png" alt="우리마트 세일 전단지">
-  </div>
-  <a href="/mart-view.html?store=store01" class="btn-go">🏪 매장 오늘특가 · 행사상품 전체보기 & 주문하기 ›</a>
+  <button type="button" id="smsBannerBtn" class="sms-push-btn" onclick="openSmsModal()">🔔 특가알림 받기</button>
 </div>
+
+<!-- 특가 알림 등록 모달 -->
+<div id="smsPushModal" class="sms-modal-backdrop" style="display:none" onclick="closeSmsModal(event)">
+  <div class="sms-modal-card" onclick="event.stopPropagation()">
+    <div class="sms-modal-header">
+      <div class="sms-modal-badge">단골 전용 혜택</div>
+      <div class="sms-modal-title">앞으로 특가 소식은 디지털 전단지로!</div>
+      <div class="sms-modal-sub">종이 전단지나 작은 글씨 문자 대신, 1초 만에 사진으로 확인하는 디지털 전단지 알림을 무료로 받아보세요.</div>
+    </div>
+    <div class="sms-modal-body">
+      <label class="sms-modal-label">휴대전화번호</label>
+      <input id="smsPushPhone" type="tel" inputmode="numeric" placeholder="010-XXXX-XXXX" maxlength="13" class="sms-modal-input">
+      <div id="smsPushStatus" class="sms-modal-status"></div>
+      <button type="button" id="smsPushSubmitBtn" class="sms-modal-submit" onclick="submitSmsPushRegistration()">🔔 알림 허용하고 특가 받기 (1초)</button>
+      <button type="button" class="sms-modal-close" onclick="document.getElementById('smsPushModal').style.display='none'">다음에 하기</button>
+    </div>
+  </div>
+</div>
+
+  <a href="/app-install" class="btn-app-install" style="display:inline-flex;align-items:center;justify-content:center;padding:7px 14px;border-radius:18px;background:#16a34a;color:#ffffff;font-size:13px;font-weight:900;text-decoration:none;white-space:nowrap;box-shadow:0 2px 6px rgba(22,163,74,0.35);">📱 앱설치</a>
+</div>
+
+<div class="menu-tabs confirmed-tabs">
+  <button class="tab-btn active" onclick="showSection('today',this)"><span class="tab-icon">🔥</span><span>오늘특가</span><em>SALE</em></button>
+  <button class="tab-btn" onclick="showSection('sale',this)"><span class="tab-icon">🎉</span><span>행사상품</span><em>SALE</em></button>
+  <button class="tab-btn" onclick="showSection('group',this)"><span class="tab-icon">👥</span><span>공동구매</span></button>
+  <button class="tab-btn" onclick="showSection('general',this)"><span class="tab-icon">📦</span><span>일반상품</span></button>
+  <button class="tab-btn" onclick="showSection('order',this);renderCart()"><span class="tab-icon">📋</span><span>주문하기</span></button>
+</div>
+
+<div id="today" class="section active">
+  <div class="product-grid" id="todayList"><div class="empty-box">상품을 불러오는 중입니다.</div></div>
+  <div id="mainBannerArea" class="main-banner-area" style="display:none;"></div>
+</div>
+<div id="sale" class="section"><div class="product-grid" id="saleList"><div class="empty-box">상품을 불러오는 중입니다.</div></div></div>
+<div id="group" class="section"><div class="product-grid" id="groupList"><div class="empty-box">상품을 불러오는 중입니다.</div></div></div>
+<div id="general" class="section"><div class="general-list" id="generalList"><div class="empty-box">일반상품을 불러오는 중입니다.</div></div></div>
+
+<div id="order" class="section">
+  <div class="info-box">
+    <div id="orderStoreInfo" style="margin-bottom:12px;padding:11px 12px;border:1px solid #d5e9da;border-radius:10px;background:#f7fbf8;line-height:1.65;">
+      <div id="orderStoreName" style="font-size:15px;font-weight:800;color:#166534;"></div>
+      <div id="orderStorePhone" style="font-size:12px;color:#4b5563;"></div>
+      <div id="orderStoreAddress" style="font-size:12px;color:#4b5563;"></div>
+    </div>
+    <b>주문하기</b><br><br>
+    <div id="shippingBox" class="shipping-box" style="display:none"></div>
+    <div id="cartList"></div>
+
+    <div id="fullOrderArea" style="display:none;margin-top:16px;">
+      <button
+        id="fullOrderButton"
+        type="button"
+        onclick="openFullOrderForm()"
+        style="width:100%;border:0;border-radius:8px;padding:15px;background:#16a34a;color:#fff;font-size:17px;font-weight:bold;cursor:pointer;"
+      >
+        전체 주문하기
+      </button>
+    </div>
+
+    <div id="fullOrderForm" style="display:none;margin-top:16px;padding-top:16px;border-top:2px solid #16a34a;">
+      <div style="font-size:17px;font-weight:bold;margin-bottom:12px;">주문 방법 선택</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+        <button
+          id="visitOrderButton"
+          type="button"
+          onclick="selectOrderType('방문')"
+          style="border:1px solid #16a34a;border-radius:8px;padding:13px;background:#fff;color:#16a34a;font-size:16px;font-weight:bold;cursor:pointer;"
+        >
+          방문
+        </button>
+        <button
+          id="deliveryOrderButton"
+          type="button"
+          onclick="selectOrderType('배달')"
+          style="border:1px solid #16a34a;border-radius:8px;padding:13px;background:#fff;color:#16a34a;font-size:16px;font-weight:bold;cursor:pointer;"
+        >
+          배달
+        </button>
+      </div>
+
+      <input id="orderType" type="hidden" value="">
+
+      <div id="customerInfoArea" style="display:none;">
+        <label style="display:block;font-weight:bold;margin-top:10px;">이름</label>
+        <input id="orderName" type="text" placeholder="이름을 입력하세요" style="width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border:1px solid #ccc;border-radius:7px;font-size:15px;">
+
+        <label style="display:block;font-weight:bold;margin-top:12px;">휴대전화</label>
+        <input id="orderPhone" type="tel" inputmode="numeric" placeholder="휴대전화번호를 입력하세요" style="width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border:1px solid #ccc;border-radius:7px;font-size:15px;">
+
+        <div id="visitTimeArea" style="display:none;">
+          <label style="display:block;font-weight:bold;margin-top:12px;">방문 예정 시간 <span style="font-weight:normal;color:#777;">(선택)</span></label>
+          <input id="visitTime" type="time" style="width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border:1px solid #ccc;border-radius:7px;font-size:15px;">
+        </div>
+
+        <div id="orderAddressArea" style="display:none;">
+          <label style="display:block;font-weight:bold;margin-top:12px;">배달 주소</label>
+          <textarea id="orderAddress" rows="3" placeholder="배달 받을 주소를 입력하세요" style="width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border:1px solid #ccc;border-radius:7px;font-size:15px;resize:vertical;"></textarea>
+          <label style="display:block;font-weight:bold;margin-top:12px;">공동현관 비밀번호 <span style="font-weight:normal;color:#777;">(선택)</span></label>
+          <input id="entrancePassword" type="text" placeholder="예: 종 모양 1234" style="width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border:1px solid #ccc;border-radius:7px;font-size:15px;">
+        </div>
+
+        <label style="display:block;font-weight:bold;margin-top:12px;">요청사항 <span style="font-weight:normal;color:#777;">(선택)</span></label>
+        <textarea id="orderRequest" rows="3" placeholder="매장에 전달할 요청사항을 입력하세요" style="width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border:1px solid #ccc;border-radius:7px;font-size:15px;resize:vertical;"></textarea>
+
+        <div id="finalOrderSummary" style="margin-top:14px;padding:13px;background:#f5f5f5;border-radius:8px;line-height:1.7;"></div>
+      </div>
+
+      <button type="button" onclick="completeFullOrder()" style="width:100%;border:0;border-radius:8px;padding:15px;margin-top:14px;background:#dc2626;color:#fff;font-size:17px;font-weight:bold;cursor:pointer;">주문 완료</button>
+      <button type="button" onclick="closeFullOrderForm()" style="width:100%;border:1px solid #999;border-radius:8px;padding:12px;margin-top:8px;background:#fff;color:#555;font-size:15px;font-weight:bold;cursor:pointer;">이전으로</button>
+    </div>
+
+    <div id="orderCompleteMessage" style="display:none;margin-top:16px;padding:20px;background:#f0fdf4;border:1px solid #16a34a;border-radius:9px;text-align:center;font-size:17px;font-weight:bold;line-height:1.8;">
+      주문이 완료되었습니다.<br>
+      매장에서 주문 내용을 확인합니다.
+    </div>
+  </div>
+</div>
+
+
+</div>
+</div></div></div></div></div> 		 	 			 		 		 	 			 		 		 	 			 		 		 	 			 		 		 	 			 		 		 	 			 		
+
+<script>
+const SUPABASE_URL = 'https://dcysjuxyjqtvkihdsjvv.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2';
+
+const params = new URLSearchParams(location.search);
+const CURRENT_STORE_ID = params.get('store_id') || params.get('store') || 'store01';
+
+let cartItems = [];
+let todayProducts = [];
+let saleProducts = [];
+let groupProducts = [];
+let generalProducts = [];
+let freeDeliveryAmount = 0;
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function showSection(id, btn) {
+  document.querySelectorAll('#eventMainApp .section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('#eventMainApp .tab-btn').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showSectionById(id) {
+  document.querySelectorAll('#eventMainApp .section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('#eventMainApp .tab-btn').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function getProduct(type, id) {
+  if (type === 'today') return todayProducts.find(p => p.id === id);
+  if (type === 'sale') return saleProducts.find(p => p.id === id);
+  if (type === 'group') return groupProducts.find(p => p.id === id);
+  if (type === 'general') return generalProducts.find(p => p.id === id);
+  return null;
+}
+
+function changeQty(type, id, delta) {
+  const p = getProduct(type, id);
+  if (!p) return;
+  p.qty += delta;
+  if (p.qty < 1) p.qty = 1;
+  const el = document.getElementById('qty-' + type + '-' + id);
+  if (el) el.innerText = p.qty;
+}
+
+function productCard(p) {
+  const badge = p.discount > 0
+    ? '<span class="discount-badge"><b>' + p.discount + '%</b><small>할인</small></span>'
+    : '';
+  return '<div class="card">'
+    + '<div class="product-photo-wrap">'
+    + '<img src="' + escapeHtml(p.img) + '" alt="' + escapeHtml(p.name) + '" loading="lazy" decoding="async">'
+    + badge
+    + '</div>'
+    + '<div class="card-body">'
+    + '<div class="name">' + escapeHtml(p.name) + '</div>'
+    + '<div class="price">' + escapeHtml(p.price) + '</div>'
+    + '<div class="product-action-row">'
+    + '<div class="qty-control">'
+    + '<button class="qty-action" onclick="changeQty(\'' + p.type + '\',' + p.id + ',-1)" aria-label="수량 줄이기">−</button>'
+    + '<span class="qty-value" id="qty-' + p.type + '-' + p.id + '">1</span>'
+    + '<button class="qty-action" onclick="changeQty(\'' + p.type + '\',' + p.id + ',1)" aria-label="수량 늘리기">＋</button>'
+    + '</div>'
+    + '<button class="cart-action" onclick="addCart(\'' + p.type + '\',' + p.id + ')" aria-label="장바구니 담기">🛒 <span>장바구니</span></button>'
+    + '</div>'
+    + '</div>'
+    + '</div>';
+}
+
+function generalRow(p) {
+  return '<div class="general-row">'
+    + '<div class="general-info"><div class="general-name">' + escapeHtml(p.name) + '</div><div class="general-price">' + escapeHtml(p.price) + '</div></div>'
+    + '<div class="general-qty"><button onclick="changeQty(\'general\',' + p.id + ',-1)">−</button><b id="qty-general-' + p.id + '">1</b><button onclick="changeQty(\'general\',' + p.id + ',1)">＋</button></div>'
+    + '<button class="general-cart" onclick="addCart(\'general\',' + p.id + ')" aria-label="장바구니 담기">🛒</button>'
+    + '</div>';
+}
+
+function groupCard(p) {
+  const badge = p.discount > 0 ? '<span class="discount-badge"><b>' + p.discount + '%</b><small>할인</small></span>' : '';
+  return '<div class="card group-card">'
+    + '<div class="product-photo-wrap">'
+    + '<img src="' + escapeHtml(p.img) + '" alt="' + escapeHtml(p.name) + '" loading="lazy" decoding="async">'
+    + badge
+    + '</div>'
+    + '<div class="card-body">'
+    + '<div class="name">' + escapeHtml(p.name) + '</div>'
+    + '<div class="group-info">'
+    + '정상가: <span class="normal">' + escapeHtml(p.normal) + '</span><br>'
+    + '공동구매가: <span class="group-price">' + escapeHtml(p.group) + '</span>'
+    + '</div>'
+    + '<div class="goal"><span id="joinCount' + p.id + '">' + p.join + '</span>명 / 목표 ' + p.goal + '명</div>'
+    + '<div class="product-action-row">'
+    + '<div class="qty-control">'
+    + '<button class="qty-action" onclick="changeQty(\'' + p.type + '\',' + p.id + ',-1)" aria-label="수량 줄이기">−</button>'
+    + '<span class="qty-value" id="qty-' + p.type + '-' + p.id + '">1</span>'
+    + '<button class="qty-action" onclick="changeQty(\'' + p.type + '\',' + p.id + ',1)" aria-label="수량 늘리기">＋</button>'
+    + '</div>'
+    + '<button class="cart-action" onclick="addCart(\'' + p.type + '\',' + p.id + ')" aria-label="장바구니 담기">🛒 <span>장바구니</span></button>'
+    + '</div>'
+    + '<button class="join-btn" onclick="openJoinForm(' + p.id + ')">참여하기</button>'
+    + '<div id="joinForm' + p.id + '" class="join-form">'
+    + '<input id="joinName' + p.id + '" type="text" placeholder="이름 입력">'
+    + '<input id="joinPhone' + p.id + '" type="tel" placeholder="전화번호 입력">'
+    + '<select id="receiveType' + p.id + '" onchange="toggleDeliveryAddress(' + p.id + ')"><option value="">방문/배달 선택</option><option value="방문">방문</option><option value="배달">배달</option></select>'
+    + '<textarea id="deliveryAddress' + p.id + '" class="delivery-address" placeholder="배달주소 입력"></textarea>'
+    + '<button class="submit-btn" onclick="completeJoin(' + p.id + ')">참여완료</button>'
+    + '</div>'
+    + '</div>'
+    + '</div>';
+}
+
+function renderProducts() {
+  const todayList = document.getElementById('todayList');
+  const saleList = document.getElementById('saleList');
+  const groupList = document.getElementById('groupList');
+  const generalList = document.getElementById('generalList');
+
+  if (todayList) todayList.innerHTML = todayProducts.length ? todayProducts.map(productCard).join('') : '<div class="empty-box">등록된 오늘의 특가 상품이 없습니다.</div>';
+  if (saleList) saleList.innerHTML = saleProducts.length ? saleProducts.map(productCard).join('') : '<div class="empty-box">등록된 행사상품이 없습니다.</div>';
+  if (groupList) groupList.innerHTML = groupProducts.length ? groupProducts.map(groupCard).join('') : '<div class="empty-box">등록된 공동구매 상품이 없습니다.</div>';
+  if (generalList) generalList.innerHTML = generalProducts.length ? generalProducts.map(generalRow).join('') : '<div class="empty-box">등록된 일반상품이 없습니다.</div>';
+}
+
+async function loadStoreInfo() {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/store_info?store_id=eq.' + encodeURIComponent(CURRENT_STORE_ID) + '&select=store_name,phone,address,free_delivery_amount', {
+      headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
+    });
+    if (!res.ok) throw new Error();
+    const rows = await res.json();
+    const name = rows.length && rows[0].store_name ? rows[0].store_name : '에너젠마트';
+    document.getElementById('storeTitle').textContent = name;
+
+    const s = rows.length ? rows[0] : {};
+    if (document.getElementById('orderStoreName')) document.getElementById('orderStoreName').textContent = s.store_name || CURRENT_STORE_ID;
+    if (document.getElementById('orderStorePhone')) document.getElementById('orderStorePhone').textContent = s.phone ? '☎ ' + s.phone : '';
+    if (document.getElementById('orderStoreAddress')) document.getElementById('orderStoreAddress').textContent = s.address ? '📍 ' + s.address : '';
+    freeDeliveryAmount = rows.length ? Number(rows[0].free_delivery_amount || 0) : 0;
+  } catch (e) {
+    document.getElementById('storeTitle').textContent = '에너젠마트';
+  }
+}
+
+function getDiscountRate(row, saleValue, normalValue) {
+  const direct = Number(row.discount_rate ?? row.discount_percent ?? row.discount ?? 0);
+  if (Number.isFinite(direct) && direct > 0) return Math.round(direct);
+  const sale = priceToNumber(saleValue);
+  const normal = priceToNumber(normalValue);
+  if (normal > 0 && sale > 0 && normal > sale) return Math.round(((normal - sale) / normal) * 100);
+  return 0;
+}
+
+async function loadLiveProducts() {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/store_products_live?store_id=eq.' + encodeURIComponent(CURRENT_STORE_ID) + '&select=*&order=category.asc,product_no.asc', {
+      headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
+    });
+    if (!res.ok) throw new Error();
+    const rows = await res.json();
+
+    todayProducts = rows.filter(r => r.category === 'today' && (r.image_url || r.product_name || r.price || r.description)).map(r => ({
+      type: 'today', id: Number(r.product_no), name: r.product_name || '상품명 없음', price: r.price || '', desc: r.description || '', img: r.image_url || '',
+      discount: getDiscountRate(r, r.price, r.normal_price || r.original_price || r.regular_price || r.base_price), qty: 1
+    }));
+
+    saleProducts = rows.filter(r => r.category === 'sale' && (r.image_url || r.product_name || r.price || r.description)).map(r => ({
+      type: 'sale', id: Number(r.product_no), name: r.product_name || '상품명 없음', price: r.price || '', desc: r.description || '', img: r.image_url || '',
+      discount: getDiscountRate(r, r.price, r.normal_price || r.original_price || r.regular_price || r.base_price), qty: 1
+    }));
+
+    groupProducts = rows.filter(r => r.category === 'group' && (r.image_url || r.product_name || r.group_price || r.normal_price)).map(r => ({
+      type: 'group', id: Number(r.product_no), name: r.product_name || '상품명 없음', normal: r.normal_price || '', group: r.group_price || '',
+      join: Number(r.join_count) || 0, goal: Number(r.target_count) || 0, img: r.image_url || '', discount: getDiscountRate(r, r.group_price, r.normal_price), qty: 1
+    }));
+
+    generalProducts = rows.filter(r => r.category === 'general' && (r.product_name || r.price)).map(r => ({
+      type: 'general', id: Number(r.product_no), name: r.product_name || '상품명 없음', price: r.price || '', desc: r.description || '', qty: 1
+    }));
+
+    renderProducts();
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+/* 오늘의 특가 하단 분양사 2개 배너 불러오기 (복구 완료) */
+async function loadMainBanners() {
+  const area = document.getElementById('mainBannerArea');
+  if (!area) return;
+
+  try {
+    const response = await fetch(
+      SUPABASE_URL + '/rest/v1/main_banners?store_id=eq.' + encodeURIComponent(CURRENT_STORE_ID) + '&select=slot,title,content,image_url,enabled&order=slot.asc',
+      { method: 'GET', headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY } }
+    );
+    if (!response.ok) throw new Error('배너 불러오기 실패');
+
+    const rows = (await response.json()).filter(row => row.enabled === true && row.title && row.content).slice(0, 2);
+    if (rows.length === 0) {
+      area.innerHTML = '';
+      area.style.display = 'none';
+      return;
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'main-banner-grid' + (rows.length === 1 ? ' one' : '');
+
+    rows.forEach(row => {
+      const banner = document.createElement('a');
+      banner.className = 'main-banner-item ' + (Number(row.slot) === 1 ? 'banner-one' : 'banner-two');
+      banner.href = 'https://www.wooriaptcd.com';
+      banner.target = '_self';
+      banner.setAttribute('aria-label', row.title + ' 분양 플랫폼으로 이동');
+
+      if (row.image_url) {
+        banner.style.setProperty('--banner-image', 'url("' + String(row.image_url).replace(/"/g, '%22') + '")');
+      } else {
+        banner.style.setProperty('--banner-image', 'none');
+      }
+
+      const textBox = document.createElement('div');
+      textBox.className = 'main-banner-text';
+
+      const label = document.createElement('span');
+      label.className = 'main-banner-label';
+      label.textContent = '아파트 분양정보';
+
+      const title = document.createElement('span');
+      title.className = 'main-banner-title';
+      title.textContent = row.title;
+
+      const content = document.createElement('span');
+      content.className = 'main-banner-content';
+      content.textContent = row.content;
+
+      textBox.appendChild(label);
+      textBox.appendChild(title);
+      textBox.appendChild(content);
+      banner.appendChild(textBox);
+      grid.appendChild(banner);
+    });
+
+    area.innerHTML = '';
+    area.appendChild(grid);
+    area.style.display = 'block';
+  } catch (error) {
+    console.error('메인 배너 오류:', error);
+    area.innerHTML = '';
+    area.style.display = 'none';
+  }
+}
+
+function priceToNumber(v) {
+  const n = Number(String(v || '').replace(/[^0-9]/g, ''));
+  return Number.isFinite(n) ? n : 0;
+}
+function formatWon(v) {
+  return Number(v || 0).toLocaleString('ko-KR') + '원';
+}
+
+function addCart(type, id) {
+  const p = getProduct(type, id);
+  if (!p) return;
+  const unitPriceText = type === 'group' ? p.group : p.price;
+  const unitPrice = priceToNumber(unitPriceText);
+  const existing = cartItems.find(item => item.type === type && item.id === id);
+  if (existing) {
+    existing.qty += p.qty;
+  } else {
+    cartItems.push({ type: type, id: id, name: p.name, qty: p.qty, unitPrice: unitPrice, unitPriceText: unitPriceText || '', img: p.img || '', category: type });
+  }
+  renderCart();
+  alert(p.name + ' ' + p.qty + '개를 장바구니에 담았습니다.');
+}
+
+function decreaseCartItem(i) {
+  if (!cartItems[i]) return;
+  if (cartItems[i].qty > 1) cartItems[i].qty--; else cartItems.splice(i, 1);
+  renderCart();
+}
+function increaseCartItem(i) {
+  if (!cartItems[i]) return;
+  cartItems[i].qty++;
+  renderCart();
+}
+function removeCartItem(i) {
+  if (!cartItems[i]) return;
+  cartItems.splice(i, 1);
+  renderCart();
+}
+function getCartTotal() {
+  return cartItems.reduce((sum, item) => sum + (item.unitPrice * item.qty), 0);
+}
+
+function renderShipping(total) {
+  const box = document.getElementById('shippingBox');
+  if (!box) return;
+  if (freeDeliveryAmount <= 0) { box.style.display = 'none'; return; }
+  const rem = Math.max(0, freeDeliveryAmount - total);
+  const pct = Math.min(100, Math.round((total / freeDeliveryAmount) * 100));
+  box.innerHTML = '<div class="shipping-title">🚚 ' + (rem > 0 ? '무료배송까지 <b>' + formatWon(rem) + '</b> 남았습니다.' : '<b>무료배송이 적용되었습니다.</b>') + '</div><div class="shipping-progress"><span style="width:' + pct + '%\"></span></div>';
+  box.style.display = 'block';
+}
+
+function renderCart() {
+  const list = document.getElementById('cartList');
+  const area = document.getElementById('fullOrderArea');
+  if (!list) return;
+  if (cartItems.length === 0) {
+    renderShipping(0);
+    list.innerHTML = '<div style="padding:18px 8px;text-align:center;color:#6b7280;">장바구니가 비어 있습니다.</div>';
+    if (area) area.style.display = 'none';
+    return;
+  }
+  let total = 0;
+  list.innerHTML = '<div style="font-size:15px;font-weight:800;margin-bottom:8px;">장바구니 목록</div>'
+    + cartItems.map((item, i) => {
+      const lineTotal = item.unitPrice * item.qty;
+      total += lineTotal;
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #f1f5f9;">'
+        + '<div><b>' + escapeHtml(item.name) + '</b><br><small style="color:#dc2626;">' + formatWon(item.unitPrice) + ' × ' + item.qty + '개</small></div>'
+        + '<div style="display:flex;gap:4px;">'
+        + '<button onclick="decreaseCartItem(' + i + ')" style="width:26px;height:26px;border:1px solid #ccc;border-radius:4px;background:#fff;">−</button>'
+        + '<button onclick="increaseCartItem(' + i + ')" style="width:26px;height:26px;border:1px solid #ccc;border-radius:4px;background:#fff;">＋</button>'
+        + '<button onclick="removeCartItem(' + i + ')" style="width:26px;height:26px;border:1px solid #fca5a5;border-radius:4px;background:#fff;color:#dc2626;">×</button>'
+        + '</div>'
+        + '</div>';
+    }).join('')
+    + '<div style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;text-align:right;font-size:16px;font-weight:900;">총 결제금액: <b style="color:#dc2626;">' + formatWon(total) + '</b></div>';
+  if (area) area.style.display = 'block';
+  renderShipping(total);
+}
+
+function openFullOrderForm() {
+  document.getElementById('fullOrderArea').style.display = 'none';
+  document.getElementById('fullOrderForm').style.display = 'block';
+}
+function closeFullOrderForm() {
+  document.getElementById('fullOrderForm').style.display = 'none';
+  document.getElementById('fullOrderArea').style.display = 'block';
+}
+function selectOrderType(type) {
+  document.getElementById('orderType').value = type;
+  document.getElementById('customerInfoArea').style.display = 'block';
+  document.getElementById('orderAddressArea').style.display = type === '배달' ? 'block' : 'none';
+  document.getElementById('visitTimeArea').style.display = type === '방문' ? 'block' : 'none';
+}
+function completeFullOrder() {
+  const type = document.getElementById('orderType').value;
+  const name = document.getElementById('orderName').value.trim();
+  const phone = document.getElementById('orderPhone').value.trim();
+  if (!type || !name || !phone) { alert('필수 주문 정보를 모두 입력해주세요.'); return; }
+  alert('주문이 접수되었습니다! 매장에서 확인 후 준비합니다.');
+  cartItems = [];
+  renderCart();
+  closeFullOrderForm();
+}
+function openJoinForm(id) { document.getElementById('joinForm' + id).style.display = 'block'; }
+function toggleDeliveryAddress(id) {
+  const v = document.getElementById('receiveType' + id).value;
+  document.getElementById('deliveryAddress' + id).style.display = v === '배달' ? 'block' : 'none';
+}
+function completeJoin(id) {
+  alert('공동구매 신청이 완료되었습니다.');
+  document.getElementById('joinForm' + id).style.display = 'none';
+}
+
+renderCart();
+
+const PRELOAD_STORE01_INFO = [{"store_name":"에너젠마트","phone":"062-952-4150","address":"광주광역시 광산구 하남산단8번로 176","free_delivery_amount":50000}];
+const PRELOAD_STORE01_PRODUCTS = [{"id":41,"store_id":"store01","category":"general","product_no":1,"image_url":"","product_name":"라면 5개","price":"4200원","description":"신라면","normal_price":null,"group_price":null,"target_count":1,"join_count":null,"uploaded_at":"2026-10-22T04:54:59.708+00:00"},{"id":114,"store_id":"store01","category":"general","product_no":2,"image_url":"","product_name":"참기름 200ml","price":"6,200dnjs","description":"","normal_price":null,"group_price":null,"target_count":1,"join_count":null,"uploaded_at":"2026-10-22T04:55:04.728+00:00"},{"id":115,"store_id":"store01","category":"general","product_no":3,"image_url":"","product_name":"삼양라면 5개입","price":"4,800원","description":"","normal_price":null,"group_price":null,"target_count":1,"join_count":null,"uploaded_at":"2026-10-22T04:55:04.835+00:00"},{"id":118,"store_id":"store01","category":"general","product_no":4,"image_url":"","product_name":"농심 짜바게티 5개입","price":"4,980원","description":"","normal_price":null,"group_price":null,"target_count":1,"join_count":null,"uploaded_at":"2026-10-22T04:55:04.936+00:00"},{"id":119,"store_id":"store01","category":"general","product_no":5,"image_url":"","product_name":"해표 식용유 1리터","price":"2,980원","description":"","normal_price":null,"group_price":null,"target_count":1,"join_count":null,"uploaded_at":"2026-10-22T04:55:05.052+00:00"},{"id":120,"store_id":"store01","category":"general","product_no":6,"image_url":"","product_name":"신라면 5개입","price":"4,800원","description":"","normal_price":null,"group_price":null,"target_count":1,"join_count":null,"uploaded_at":"2026-10-22T04:55:05.162+00:00"},{"id":132,"store_id":"store01","category":"general","product_no":7,"image_url":"","product_name":"목장 우유 1000ML","price":"1,200원","description":"","normal_price":null,"group_price":null,"target_count":1,"join_count":null,"uploaded_at":"2026-10-22T04:55:06.359+00:00"},{"id":133,"store_id":"store01","category":"general","product_no":8,"image_url":"","product_name":"진로 참이슬 360ml","price":"1,250원","description":"","normal_price":null,"group_price":null,"target_count":1,"join_count":null,"uploaded_at":"2026-10-22T04:55:06.502+00:00"},{"id":135,"store_id":"store01","category":"general","product_no":9,"image_url":"","product_name":"세로 소주 360ml","price":"1,650원","description":"","normal_price":null,"group_price":null,"target_count":1,"join_count":null,"uploaded_at":"2026-10-22T04:55:06.717+00:00"},{"id":134,"store_id":"store01","category":"general","product_no":10,"image_url":"","product_name":"카스맥주 500ml","price":"1,800원","description":"","normal_price":null,"group_price":null,"target_count":1,"join_count":null,"uploaded_at":"2026-10-22T04:55:06.611+00:00"},{"id":6,"store_id":"store01","category":"group","product_no":1,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/group/1/1784425698594_4jwk5kb.jpg","product_name":"무우","price":null,"description":"","normal_price":"1,200원","group_price":"1,000원","target_count":10,"join_count":1,"uploaded_at":"2026-10-22T04:54:55.394+00:00"},{"id":13,"store_id":"store01","category":"group","product_no":2,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/group/2/1784695737718_ny160he.jpg","product_name":"속 배추 - 1통","price":null,"description":"","normal_price":"1,200원","group_price":"1,000원","target_count":50,"join_count":2,"uploaded_at":"2026-10-22T04:54:55.953+00:00"},{"id":23,"store_id":"store01","category":"group","product_no":3,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/group/3/1784761275478_exs6kxx.jpg","product_name":"수박","price":null,"description":"","normal_price":"19,800원","group_price":"16,500원","target_count":30,"join_count":2,"uploaded_at":"2026-10-22T04:54:56.687+00:00"},{"id":24,"store_id":"store01","category":"group","product_no":4,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/group/4/1784761316441_690k4eo.jpg","product_name":"복숭아 1박스","price":null,"description":"","normal_price":"12,000원","group_price":"9,800원","target_count":30,"join_count":3,"uploaded_at":"2026-10-22T04:54:56.812+00:00"},{"id":25,"store_id":"store01","category":"group","product_no":5,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/group/5/1784761358849_9kcwrv0.jpg","product_name":"계란 1판","price":null,"description":"","normal_price":"6,200원","group_price":"5,500원","target_count":30,"join_count":6,"uploaded_at":"2026-10-22T04:54:57.142+00:00"},{"id":40,"store_id":"store01","category":"group","product_no":6,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/group/6/1785708245802_03urspm.webp","product_name":"오이 1박스","price":null,"description":"","normal_price":"26,000원","group_price":"22,000원","target_count":10,"join_count":2,"uploaded_at":"2026-10-22T04:54:59.595+00:00"},{"id":3,"store_id":"store01","category":"sale","product_no":1,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/1/1784424475695_12qiroo.jpg","product_name":"단호박 1개","price":"1000원","description":"무안 단호박","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:55.203+00:00"},{"id":10,"store_id":"store01","category":"sale","product_no":2,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/2/1784695550067_rqsqlou.jpg","product_name":"아오리 사과","price":"3,500원","description":"","normal_price":"3,800원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:57.816+00:00"},{"id":11,"store_id":"store01","category":"sale","product_no":3,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/3/1784695607517_1e7ns20.jpg","product_name":"느타리 버섯","price":"1,500원","description":"2개에 2,500원","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:55.529+00:00"},{"id":12,"store_id":"store01","category":"sale","product_no":4,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/4/1784695680429_uq16cb3.jpg","product_name":"찰 옥수수 -5개","price":"5,200원","description":"10개에 10,000원","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:55.813+00:00"},{"id":18,"store_id":"store01","category":"sale","product_no":5,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/5/1784760919967_spgsrt3.jpg","product_name":"카스 캔맥주(6개입)","price":"6,800원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:56.104+00:00"},{"id":19,"store_id":"store01","category":"sale","product_no":6,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/6/1784760959242_fgb12f1.jpg","product_name":"안심 콩나물 (1봉지)","price":"990원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:56.224+00:00"},{"id":20,"store_id":"store01","category":"sale","product_no":7,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/7/1784761008171_a6x9ety.jpg","product_name":"올리브유 김 (1통)","price":"8,800원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:56.34+00:00"},{"id":21,"store_id":"store01","category":"sale","product_no":8,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/8/1784761056976_h7lrrv8.jpg","product_name":"복숭아 이이스티(1개)","price":"980원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:56.456+00:00"},{"id":22,"store_id":"store01","category":"sale","product_no":9,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/9/1784761095143_wgt18nm.jpg","product_name":"목장우유(1팩)","price":"2,250원","description":"신선해요","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:56.574+00:00"},{"id":30,"store_id":"store01","category":"sale","product_no":10,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/10/1785707779718_s1of41p.webp","product_name":"두루미리 화장지(24개)","price":"18,000원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:57.278+00:00"},{"id":99,"store_id":"store01","category":"sale","product_no":11,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/11/1789444224119_10ruf17.webp","product_name":"콜라 500ml","price":"1,100원","description":"","normal_price":"1,300원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:00.166+00:00"},{"id":32,"store_id":"store01","category":"sale","product_no":12,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/12/1785707859787_7m8721p.webp","product_name":"물티슈","price":"1,000원","description":"","normal_price":"1,200원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:00.37+00:00"},{"id":31,"store_id":"store01","category":"sale","product_no":13,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/13/1785707906996_46o0bol.webp","product_name":"올리브유 김 (24개)","price":"8,800원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:57.382+00:00"},{"id":33,"store_id":"store01","category":"sale","product_no":14,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/14/1785707956370_1u8w6sg.webp","product_name":"복숭아 (1박스)","price":"19,900원","description":"","normal_price":"23,000원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:02.695+00:00"},{"id":34,"store_id":"store01","category":"sale","product_no":15,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/15/1785708005952_7q9nwc4.webp","product_name":"김치라면(5개)","price":"3,600원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:58.89+00:00"},{"id":35,"store_id":"store01","category":"sale","product_no":16,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/16/1785708048722_wjdo8lc.webp","product_name":"오이(2개)","price":"1,800원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:59.085+00:00"},{"id":36,"store_id":"store01","category":"sale","product_no":17,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/17/1785708080970_6pqsuta.webp","product_name":"대파(1단)","price":"2,980원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:59.232+00:00"},{"id":37,"store_id":"store01","category":"sale","product_no":18,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/18/1785708120753_05q15c9.webp","product_name":"속배추(1개)","price":"990원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:59.353+00:00"},{"id":38,"store_id":"store01","category":"sale","product_no":19,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/19/1785708158657_j799n7b.webp","product_name":"옥수수(6개)","price":"4,200원","description":"","normal_price":"5,000원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:02.807+00:00"},{"id":39,"store_id":"store01","category":"sale","product_no":20,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/20/1785708195491_8r3g05l.webp","product_name":"단호박","price":"990원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:59.482+00:00"},{"id":103,"store_id":"store01","category":"sale","product_no":21,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/21/1789444336010_2qwpgtk.webp","product_name":"호두정과","price":"3,200원","description":"","normal_price":"3,800원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:03.023+00:00"},{"id":104,"store_id":"store01","category":"sale","product_no":22,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/22/1789444368758_ta7myr7.webp","product_name":"복음땅콩","price":"2,800원","description":"","normal_price":"3,200원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:03.137+00:00"},{"id":105,"store_id":"store01","category":"sale","product_no":23,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/23/1789444401343_jxiiajr.webp","product_name":"과수원 사과","price":"2,000원","description":"","normal_price":"2,400원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:03.493+00:00"},{"id":106,"store_id":"store01","category":"sale","product_no":24,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/24/1789444436091_5avhn0x.webp","product_name":"펩시콜라 6개입","price":"2,750원","description":"","normal_price":"3,000원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:03.666+00:00"},{"id":107,"store_id":"store01","category":"sale","product_no":25,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/25/1789444484114_gsy9nvf.webp","product_name":"고기육포","price":"1,980원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:03.811+00:00"},{"id":108,"store_id":"store01","category":"sale","product_no":26,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/26/1789444510968_edmooie.webp","product_name":"제크","price":"1,200원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:04.019+00:00"},{"id":109,"store_id":"store01","category":"sale","product_no":27,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/27/1789444530910_ir9xtvf.webp","product_name":"빠다 코코넷","price":"1,500원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:04.133+00:00"},{"id":110,"store_id":"store01","category":"sale","product_no":28,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/28/1789444559834_041erbq.webp","product_name":"벤즈","price":"1,500원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:04.24+00:00"},{"id":111,"store_id":"store01","category":"sale","product_no":29,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/29/1789444590314_4rrwlhs.webp","product_name":"애플샌드","price":"3,000원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:04.357+00:00"},{"id":112,"store_id":"store01","category":"sale","product_no":30,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/30/1789444614757_8h4wraz.webp","product_name":"땅콩 샌드","price":"2,980원","description":"","normal_price":"3,200원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:04.47+00:00"},{"id":113,"store_id":"store01","category":"sale","product_no":31,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/31/1789444655423_cjru5ok.webp","product_name":"뽀또","price":"2,000원","description":"","normal_price":"2,400원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:04.594+00:00"},{"id":121,"store_id":"store01","category":"sale","product_no":32,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/32/1789445344170_dsn777a.webp","product_name":"밤 저스트","price":"3,200원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:05.277+00:00"},{"id":122,"store_id":"store01","category":"sale","product_no":33,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/33/1789445381465_95n5aph.webp","product_name":"파인애플 1통","price":"3,500원","description":"","normal_price":"4,000원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:05.38+00:00"},{"id":123,"store_id":"store01","category":"sale","product_no":34,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/34/1789445414196_hmge6dd.webp","product_name":"TOP 커피 1캔","price":"1,200원","description":"","normal_price":"1,600원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:05.506+00:00"},{"id":124,"store_id":"store01","category":"sale","product_no":35,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/35/1789445473585_q9rv17y.webp","product_name":"무화과 1박스","price":"11,000원","description":"","normal_price":"12,000원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:05.624+00:00"},{"id":125,"store_id":"store01","category":"sale","product_no":36,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/36/1789445511386_w1fy8mb.webp","product_name":"국물 떡복이","price":"1,980원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:05.757+00:00"},{"id":126,"store_id":"store01","category":"sale","product_no":37,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/37/1789445540422_e5vshbx.webp","product_name":"국순당 막걸리","price":"1,800원","description":"","normal_price":"1,980원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:05.855+00:00"},{"id":127,"store_id":"store01","category":"sale","product_no":38,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/38/1789445575379_gpyknjl.webp","product_name":"참깨 베지밀 6개입","price":"5,200원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:05.975+00:00"},{"id":128,"store_id":"store01","category":"sale","product_no":39,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/39/1789445639913_abhilk4.webp","product_name":"백설 소세지","price":"1,980원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:06.088+00:00"},{"id":129,"store_id":"store01","category":"sale","product_no":40,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/sale/40/1789445673213_qsnfyu3.webp","product_name":"김밥 단무지","price":"2,200원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:06.219+00:00"},{"id":1,"store_id":"store01","category":"today","product_no":1,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/1/1789349349977_iq1n72h.webp","product_name":"고구마.100g","price":"1,980원","description":"무안 밤고구마","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:54.978+00:00"},{"id":7,"store_id":"store01","category":"today","product_no":2,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/2/1789349365527_ielr4sd.webp","product_name":"긴 호박 -1개","price":"1,000원","description":"3개에 2,000원","normal_price":"1,200원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:54.767+00:00"},{"id":8,"store_id":"store01","category":"today","product_no":3,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/3/1789349375594_b9ouzpn.webp","product_name":"파프리카- 1통","price":"2,500원","description":"","normal_price":"3,000원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:57.691+00:00"},{"id":9,"store_id":"store01","category":"today","product_no":4,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/4/1789349386724_vd5l45n.webp","product_name":"대파 -1단","price":"3,200원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:57.576+00:00"},{"id":14,"store_id":"store01","category":"today","product_no":5,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/5/1789349408427_1ia7kym.webp","product_name":"김치라면 1봉지","price":"3,900원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:58.654+00:00"},{"id":15,"store_id":"store01","category":"today","product_no":6,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/6/1789349421679_3zw9gr1.webp","product_name":"목장우유 1통","price":"2,980원","description":"신선해요","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:58.789+00:00"},{"id":16,"store_id":"store01","category":"today","product_no":7,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/7/1789349432589_rl4kjfw.webp","product_name":"리챔 햄 (3캔)","price":"6,900원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:58.285+00:00"},{"id":17,"store_id":"store01","category":"today","product_no":8,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/8/1789349447044_dgu3o6l.webp","product_name":"포도(2송이)","price":"9,800원","description":"싱싱해요","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:58.405+00:00"},{"id":26,"store_id":"store01","category":"today","product_no":9,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/9/1789349459862_uk578cs.webp","product_name":"삼양라면 (1봉지)","price":"4,200원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:58.529+00:00"},{"id":27,"store_id":"store01","category":"today","product_no":10,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/10/1789349468671_ujpy7ho.webp","product_name":"계란 (24개 1판)","price":"3,980원","description":"신선해요","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:57.921+00:00"},{"id":28,"store_id":"store01","category":"today","product_no":11,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/11/1789349480346_h92m1p1.webp","product_name":"목장우유","price":"2,150원","description":"신선해요","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:58.042+00:00"},{"id":29,"store_id":"store01","category":"today","product_no":12,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/12/1789349491442_qfoh9zq.webp","product_name":"수박 (4kg)","price":"19,800원","description":"고창수박이여요","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:58.159+00:00"},{"id":43,"store_id":"store01","category":"today","product_no":13,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/13/1789349503227_qr6xgfz.webp","product_name":"수박 -3kg","price":"19,800원","description":"싱싱해요","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:00.497+00:00"},{"id":49,"store_id":"store01","category":"today","product_no":14,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/14/1789349514060_pugqzss.webp","product_name":"안심 콩나물","price":"1,500원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:00.611+00:00"},{"id":55,"store_id":"store01","category":"today","product_no":15,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/15/1789349527342_js3k9wi.webp","product_name":"복숭아 1박스","price":"28,000원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:00.731+00:00"},{"id":54,"store_id":"store01","category":"today","product_no":16,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/16/1789349542844_87s3b0t.webp","product_name":"올리브유김","price":"8,000원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:00.858+00:00"},{"id":53,"store_id":"store01","category":"today","product_no":17,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/17/1789349552644_2jigcgu.webp","product_name":"크리닉스 화장지","price":"9,800원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:00.969+00:00"},{"id":52,"store_id":"store01","category":"today","product_no":18,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/18/1789348434875_f32zedh.webp","product_name":"카스 맥주 8개","price":"12,000원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:00.052+00:00"},{"id":51,"store_id":"store01","category":"today","product_no":19,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/19/1789348466114_nckray9.webp","product_name":"단 호박죽","price":"990원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:59.935+00:00"},{"id":50,"store_id":"store01","category":"today","product_no":20,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/20/1789348499420_p5xy6hv.webp","product_name":"양파 1망","price":"12,000원","description":"","normal_price":null,"group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:54:59.819+00:00"},{"id":87,"store_id":"store01","category":"today","product_no":21,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/21/1789349812159_f3o5sj0.webp","product_name":"오곡 물티슈","price":"1,000원","description":"","normal_price":"1,200원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:01.096+00:00"},{"id":88,"store_id":"store01","category":"today","product_no":22,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/22/1789349853734_12uljvk.webp","product_name":"바나나 1손","price":"3,000원","description":"","normal_price":"3,600원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:01.232+00:00"},{"id":89,"store_id":"store01","category":"today","product_no":23,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/23/1789349890345_5fhsojs.webp","product_name":"복숭아 아이스티","price":"1,000원","description":"","normal_price":"1,200원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:01.428+00:00"},{"id":90,"store_id":"store01","category":"today","product_no":24,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/24/1789349937669_xpjdeof.webp","product_name":"느타리버섯","price":"3,500원","description":"","normal_price":"4,000원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:01.546+00:00"},{"id":91,"store_id":"store01","category":"today","product_no":25,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/25/1789349977744_o0ti9f8.webp","product_name":"무우 1개","price":"","description":"","normal_price":"1,200원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:01.653+00:00"},{"id":92,"store_id":"store01","category":"today","product_no":26,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/26/1789350011476_iqq303g.webp","product_name":"호박 1개","price":"1100원","description":"","normal_price":"1,300원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:01.79+00:00"},{"id":93,"store_id":"store01","category":"today","product_no":27,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/27/1789350067539_c7afaw0.webp","product_name":"옥수수 6개","price":"5,000원","description":"","normal_price":"5,500원","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:01.986+00:00"},{"id":94,"store_id":"store01","category":"today","product_no":28,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/28/1789350109438_gkhkoui.webp","product_name":"느타리 버섯","price":"3,800원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:02.095+00:00"},{"id":95,"store_id":"store01","category":"today","product_no":29,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/29/1789350146724_v49t65k.webp","product_name":"배추 1통","price":"1,500원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:02.197+00:00"},{"id":96,"store_id":"store01","category":"today","product_no":30,"image_url":"https://dcysjuxyjqtvkihdsjvv.supabase.co/storage/v1/object/public/product_images/store01/today/30/1789350171782_qq1ba7n.webp","product_name":"아오리 사과 5개","price":"3,500원","description":"","normal_price":"","group_price":null,"target_count":null,"join_count":null,"uploaded_at":"2026-10-22T04:55:02.323+00:00"}];
+function applyRowsToProducts(rows) {
+  todayProducts = rows.filter(r => r.category === 'today' && (r.image_url || r.product_name || r.price || r.description)).map(r => ({
+    type: 'today', id: Number(r.product_no), name: r.product_name || '상품명 없음', price: r.price || '', desc: r.description || '', img: r.image_url || '',
+    discount: getDiscountRate(r, r.price, r.normal_price || r.original_price || r.regular_price || r.base_price), qty: 1
+  }));
+  saleProducts = rows.filter(r => r.category === 'sale' && (r.image_url || r.product_name || r.price || r.description)).map(r => ({
+    type: 'sale', id: Number(r.product_no), name: r.product_name || '상품명 없음', price: r.price || '', desc: r.description || '', img: r.image_url || '',
+    discount: getDiscountRate(r, r.price, r.normal_price || r.original_price || r.regular_price || r.base_price), qty: 1
+  }));
+  groupProducts = rows.filter(r => r.category === 'group' && (r.image_url || r.product_name || r.group_price || r.normal_price)).map(r => ({
+    type: 'group', id: Number(r.product_no), name: r.product_name || '상품명 없음', normal: r.normal_price || '', group: r.group_price || '',
+    join: Number(r.join_count) || 0, goal: Number(r.target_count) || 0, img: r.image_url || '', discount: getDiscountRate(r, r.group_price, r.normal_price), qty: 1
+  }));
+  generalProducts = rows.filter(r => r.category === 'general' && (r.product_name || r.price)).map(r => ({
+    type: 'general', id: Number(r.product_no), name: r.product_name || '상품명 없음', price: r.price || '', desc: r.description || '', qty: 1
+  }));
+  renderAll();
+}
+if (CURRENT_STORE_ID === 'store01' && Array.isArray(PRELOAD_STORE01_PRODUCTS) && PRELOAD_STORE01_PRODUCTS.length) {
+  try {
+    if (Array.isArray(PRELOAD_STORE01_INFO) && PRELOAD_STORE01_INFO.length) {
+      const s = PRELOAD_STORE01_INFO[0];
+      document.getElementById('storeTitle').textContent = s.store_name || '에너젠마트';
+      if (document.getElementById('orderStoreName')) document.getElementById('orderStoreName').textContent = s.store_name || '에너젠마트';
+      if (document.getElementById('orderStorePhone')) document.getElementById('orderStorePhone').textContent = s.phone ? '☎ ' + s.phone : '';
+      if (document.getElementById('orderStoreAddress')) document.getElementById('orderStoreAddress').textContent = s.address ? '📍 ' + s.address : '';
+      freeDeliveryAmount = Number(s.free_delivery_amount || 0);
+    }
+    applyRowsToProducts(PRELOAD_STORE01_PRODUCTS);
+  } catch (e) { console.error(e); }
+}
+
+loadStoreInfo();
+loadLiveProducts();
+loadMainBanners();
+
+/* [기존 고객 DB 문자 유입 & 단골 특가 알림 등록 스크립트] */
+function checkSmsSubscribed() {
+  try {
+    const isSub = localStorage.getItem('wooriapt_mart_push_subscribed_' + CURRENT_STORE_ID) || localStorage.getItem('wooriapt_mart_push_token');
+    const btn = document.getElementById('smsBannerBtn');
+    const sub = document.getElementById('smsBannerSub');
+    if (isSub && btn) {
+      btn.textContent = '✅ 알림 수신중';
+      btn.classList.add('done');
+      btn.onclick = () => alert('이미 우리 마트 특가 알림을 받고 계십니다. 매주 파격 할인 소식을 전해드립니다!');
+      if (sub) sub.textContent = '이미 단골 알림 등록이 완료되었습니다. 이번 주 특가를 확인해보세요!';
+    }
+  } catch(e) {}
+}
+
+function openSmsModal() {
+  const modal = document.getElementById('smsPushModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    const input = document.getElementById('smsPushPhone');
+    if (input) {
+      const savedPhone = localStorage.getItem('wooriapt_customer_phone') || '';
+      if (savedPhone) input.value = savedPhone;
+      setTimeout(() => input.focus(), 100);
+    }
+  }
+}
+
+function closeSmsModal(e) {
+  if (e && e.target && e.target.id === 'smsPushModal') {
+    document.getElementById('smsPushModal').style.display = 'none';
+  }
+}
+
+async function submitSmsPushRegistration() {
+  const input = document.getElementById('smsPushPhone');
+  const status = document.getElementById('smsPushStatus');
+  const submitBtn = document.getElementById('smsPushSubmitBtn');
+  const phone = String(input.value || '').replace(/[^0-9]/g, '');
+
+  if (!/^01[016789][0-9]{7,8}$/.test(phone)) {
+    status.textContent = '올바른 010 휴대전화번호를 입력해주세요.';
+    status.className = 'sms-modal-status error';
+    input.focus();
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = '알림 권한 확인 중...';
+  status.textContent = '브라우저 알림 허용 창이 뜨면 [허용]을 눌러주세요.';
+  status.className = 'sms-modal-status ok';
+
+  try {
+    let perm = 'granted';
+    if ('Notification' in window) {
+      perm = await Notification.requestPermission();
+      if (perm !== 'granted') {
+        status.textContent = '알림 허용이 필요합니다. 브라우저 주소창 자물쇠 아이콘에서 알림을 허용해주세요.';
+        status.className = 'sms-modal-status error';
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🔔 알림 허용하고 특가 받기 (1초)';
+        return;
+      }
+    }
+
+    try {
+      await fetch(SUPABASE_URL + '/rest/v1/store_customers', {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          Prefer: 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify({
+          store_id: CURRENT_STORE_ID,
+          phone: phone,
+          subscribed_at: new Date().toISOString(),
+          channel: 'sms_link'
+        })
+      });
+    } catch(saveErr) {
+      console.warn('store_customers save log:', saveErr);
+    }
+
+    localStorage.setItem('wooriapt_mart_push_subscribed_' + CURRENT_STORE_ID, 'true');
+    localStorage.setItem('wooriapt_customer_phone', phone);
+
+    status.textContent = '✅ 특가 알림 등록이 완료되었습니다!';
+    status.className = 'sms-modal-status ok';
+
+    setTimeout(() => {
+      document.getElementById('smsPushModal').style.display = 'none';
+      checkSmsSubscribed();
+      alert('🎉 단골 등록 및 특가 알림 설정이 완료되었습니다! 앞으로 우리 마트의 파격 할인 소식을 실시간 디지털 전단지로 전해드립니다.');
+    }, 500);
+
+  } catch (err) {
+    status.textContent = err.message || '등록 중 오류가 발생했습니다.';
+    status.className = 'sms-modal-status error';
+    submitBtn.disabled = false;
+    submitBtn.textContent = '🔔 알림 허용하고 특가 받기 (1초)';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const pIn = document.getElementById('smsPushPhone');
+  if (pIn) {
+    pIn.addEventListener('input', (e) => {
+      const raw = e.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+      if (raw.length <= 3) e.target.value = raw;
+      else if (raw.length <= 7) e.target.value = raw.slice(0, 3) + '-' + raw.slice(3);
+      else e.target.value = raw.slice(0, 3) + '-' + raw.slice(3, 7) + '-' + raw.slice(7);
+    });
+  }
+  checkSmsSubscribed();
+});
+checkSmsSubscribed();
+
+
+
+</script>
+
 </body>
 </html>
