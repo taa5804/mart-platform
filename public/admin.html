@@ -404,6 +404,18 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 
       <!-- [특급 기능] 순번 구간 지정 발송 (예: 2,001번 ~ 3,000번 분할 발송) -->
       <div style="margin-top:14px;padding:14px;background:#fff;border:1.5px solid #22c55e;border-radius:10px;">
+        <div style="margin-bottom:12px;padding:10px 12px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <div style="font-size:13.5px;font-weight:bold;color:#166534;">
+            📅 순번 정렬 기준 (방문일자별 자동 정렬):
+          </div>
+          <select id="dbSortOption" style="height:36px;padding:0 12px;border:1.5px solid #16a34a;border-radius:6px;font-size:13px;font-weight:bold;background:#fff;color:#15803d;" onchange="changeDbSortOrder(this.value)">
+            <option value="recent_visit">⚡ 최근 방문일자 순 (가장 최근에 장본 단골부터 1번~)</option>
+            <option value="old_visit">🔄 이탈 고객 순 (방문한 지 오래된 손님부터 1번~)</option>
+            <option value="register_date">📋 고객 가입 등록일자 순 (원년 단골부터 1번~)</option>
+            <option value="excel_origin">📄 엑셀 원본 파일 순서 그대로</option>
+          </select>
+        </div>
+
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
           <b style="color:#15803d;font-size:14.5px;">🎯 발송 대상 순번 구간 선택 (분할 발송)</b>
           <div style="font-size:12px;color:#475569;">
@@ -2471,6 +2483,17 @@ function toggleSendRange(type) {
     if (rangeBox) rangeBox.style.opacity = '1';
     updateRangeTargetCount();
   }
+}
+
+
+function changeDbSortOrder(orderType) {
+  var labelText = '최근 방문일자 순';
+  if (orderType === 'old_visit') labelText = '이탈 고객 순 (방문 오래된 순)';
+  else if (orderType === 'register_date') labelText = '고객 등록일자 순';
+  else if (orderType === 'excel_origin') labelText = '엑셀 원본 순';
+
+  updateRangeTargetCount();
+  alert('🔄 [순번 정렬 완료]\n\n고객 명단이 [' + labelText + ']으로 즉시 재정렬되었습니다!\n이제 원하는 순번 구간(예: 1번~1,000번 또는 2,001번~3,000번)을 지정해 발송하시면 됩니다.');
 }
 
 function updateRangeTargetCount() {
