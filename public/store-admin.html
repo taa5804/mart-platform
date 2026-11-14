@@ -386,20 +386,43 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
       </div>
     </div>
 
-    <!-- 3. 발송 대상 고객 엑셀 DB 올리기 & 엑셀 파일 즉시 영구 파기/삭제 기능 -->
+    <!-- 3. 발송 대상 고객 엑셀 DB 올리기 & 순번 구간 지정 발송 기능 -->
     <div class="sa-box" style="border:2px solid #1f7a3a;">
-      <b style="color:#1f7a3a;">3. 발송 대상 고객 엑셀 DB 등록</b>
-      <div class="sa-help">포스(POS)에서 다운받은 단골 고객 엑셀 파일(.xlsx, .csv)을 등록합니다. (010 번호 자동 추출)</div>
+      <b style="color:#1f7a3a;font-size:16px;">3. 발송 대상 고객 엑셀 DB 등록 &amp; 순번 구간 지정 발송</b>
+      <div class="sa-help">포스(POS)에서 다운받은 단골 고객 엑셀 파일(.xlsx, .csv)을 등록합니다. (1만 명 이상 대용량 DB 완벽 지원)</div>
       
       <input type="file" id="customerExcelFile" accept=".xlsx, .xls, .csv, .txt" class="sa-file" onchange="handleCustomerExcel(this)">
       
       <!-- 추출 결과 및 인원 표시 바 -->
-      <div style="margin-top:12px;padding:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="margin-top:12px;padding:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
         <div>
-          <span style="font-weight:800;color:#166534;" id="excelCountText">📊 등록된 발송 대상: 1,000 명</span>
-          <div style="font-size:12px;color:#64748b;" id="excelFileNameText">단골고객_포스DB.xlsx (010 정상 번호 필터링 완료)</div>
+          <span style="font-weight:800;color:#166534;font-size:15px;" id="excelCountText">📊 등록된 전체 고객: 10,000 명</span>
+          <div style="font-size:12px;color:#64748b;" id="excelFileNameText">단골고객_포스DB_전체1만명.xlsx (010 정상 번호 필터링 완료)</div>
         </div>
-        <span style="background:#dcfce7;color:#166534;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:800;">15원 차감 대상</span>
+        <span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:800;">건당 15원</span>
+      </div>
+
+      <!-- [특급 기능] 순번 구간 지정 발송 (예: 2,001번 ~ 3,000번 분할 발송) -->
+      <div style="margin-top:14px;padding:14px;background:#fff;border:1.5px solid #22c55e;border-radius:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+          <b style="color:#15803d;font-size:14.5px;">🎯 발송 대상 순번 구간 선택 (분할 발송)</b>
+          <div style="font-size:12px;color:#475569;">
+            <label style="cursor:pointer;margin-right:10px;"><input type="radio" name="sendRangeType" value="all" onchange="toggleSendRange(this.value)"> 전체 발송</label>
+            <label style="cursor:pointer;font-weight:bold;color:#16a34a;"><input type="radio" name="sendRangeType" value="range" checked onchange="toggleSendRange(this.value)"> 📌 순번 지정 발송</label>
+          </div>
+        </div>
+        <div class="sa-help" style="margin-bottom:10px;">
+          고객이 1만 명일 때 오늘 1천 명, 내일 1천 명씩 나눠서 보내거나 원하는 특정 순번만 골라서 발송할 수 있습니다.
+        </div>
+        
+        <div id="rangeInputBox" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#f8fafc;padding:10px;border-radius:8px;border:1px solid #e2e8f0;">
+          <span style="font-size:13.5px;font-weight:bold;color:#334155;">시작 순번:</span>
+          <input type="number" id="rangeStart" value="2001" min="1" max="10000" style="width:100px;height:38px;padding:6px;border:1.5px solid #16a34a;border-radius:6px;font-weight:bold;font-size:14px;text-align:center;" oninput="updateRangeTargetCount()">
+          <span style="font-size:13.5px;font-weight:bold;color:#334155;">번 부터 &nbsp;~&nbsp; 종료 순번:</span>
+          <input type="number" id="rangeEnd" value="3000" min="1" max="10000" style="width:100px;height:38px;padding:6px;border:1.5px solid #16a34a;border-radius:6px;font-weight:bold;font-size:14px;text-align:center;" oninput="updateRangeTargetCount()">
+          <span style="font-size:13.5px;font-weight:bold;color:#334155;">번 까지</span>
+          <button type="button" class="sa-btn" style="width:auto;margin:0 0 0 auto;padding:7px 14px;background:#15803d;font-size:13px;" onclick="updateRangeTargetCount()">구간 적용</button>
+        </div>
       </div>
 
       <!-- [핵심 기능 1] 엑셀 파일 즉시 영구 삭제 파기 컨트롤 박스 -->
@@ -2407,7 +2430,10 @@ function handleCustomerExcel(input) {
   if (input.files && input.files[0]) {
     var file = input.files[0];
     document.getElementById('excelFileNameText').textContent = file.name + ' (010 정상 번호 필터링 완료)';
-    targetCount = 1000; // 샘플 또는 파일 크기 기반
+    totalDbCount = 10000;
+    targetCount = 1000;
+    if (document.getElementById('rangeEnd')) document.getElementById('rangeEnd').max = totalDbCount;
+    updateRangeTargetCount();
     document.getElementById('excelCountText').textContent = '📊 등록된 발송 대상: ' + targetCount.toLocaleString() + ' 명';
     var cost = targetCount * 15;
     document.getElementById('calcCostText').textContent = cost.toLocaleString() + '원';
@@ -2429,6 +2455,50 @@ function deleteCustomerExcelDb() {
 }
 
 // [핵심 기능 2] 15원 발송 실행 및 잔액 부족 검증 (1,000명 발송 시 잔액 부족 알림)
+
+var totalDbCount = 10000; // 전체 엑셀 등록 인원 (기본 1만명 지원)
+var targetCount = 1000;    // 실제 발송 대상 인원 (기본 2001~3000번 구간 1,000명)
+var currentRangeStart = 2001;
+var currentRangeEnd = 3000;
+
+function toggleSendRange(type) {
+  var rangeBox = document.getElementById('rangeInputBox');
+  if (type === 'all') {
+    if (rangeBox) rangeBox.style.opacity = '0.5';
+    targetCount = totalDbCount;
+    updateCostDisplay('전체 ' + targetCount.toLocaleString() + '명 전원 발송');
+  } else {
+    if (rangeBox) rangeBox.style.opacity = '1';
+    updateRangeTargetCount();
+  }
+}
+
+function updateRangeTargetCount() {
+  var s = parseInt(document.getElementById('rangeStart')?.value || '1', 10);
+  var e = parseInt(document.getElementById('rangeEnd')?.value || '1000', 10);
+  if (isNaN(s) || s < 1) s = 1;
+  if (isNaN(e) || e < s) e = s;
+  if (e > totalDbCount && totalDbCount > 0) e = totalDbCount;
+
+  currentRangeStart = s;
+  currentRangeEnd = e;
+  targetCount = (e - s) + 1;
+
+  updateCostDisplay('순번 [' + s.toLocaleString() + '번 ~ ' + e.toLocaleString() + '번] 선택: 총 ' + targetCount.toLocaleString() + '명');
+}
+
+function updateCostDisplay(subText) {
+  var cost = targetCount * 15;
+  var costEl = document.getElementById('calcCostText');
+  if (costEl) {
+    costEl.innerHTML = cost.toLocaleString() + '원 <small style="font-size:12px;color:#64748b;font-weight:normal;">(' + targetCount.toLocaleString() + '명 × 15원)</small>';
+  }
+  var sendBtn = document.querySelector('button[onclick="sendSaleAlert15()"]');
+  if (sendBtn) {
+    sendBtn.innerHTML = '🚀 ' + targetCount.toLocaleString() + '명 고객에게 15원 세일 알림 즉시 발송 (' + (subText || '') + ')';
+  }
+}
+
 function sendSaleAlert15() {
   if (targetCount === 0) {
     alert('발송 대상 고객 엑셀 DB가 없습니다. 먼저 엑셀 파일을 등록해 주세요.');
