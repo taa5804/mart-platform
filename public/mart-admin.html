@@ -380,8 +380,9 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 6. 크리넥스 3겹 화장지 30롤 13,900원
 
 (이곳에 1,000자 이내로 행사 품목 문구를 입력하시거나 붙여넣으세요!)"></textarea>
-      <div style="margin-top:8px;padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12.5px;color:#1e40af;font-weight:700;">
-        🔗 발송 시 하단 자동 첨부 링크: <span style="text-decoration:underline;">▶ 전단지 사진 &amp; 전체 행사상품 상세보기 (클릭 시 즉시 열림)</span>
+      <div id="autoAttachUrlBox" style="margin-top:8px;padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12.5px;color:#1e40af;font-weight:700;">
+        🔗 발송 시 하단 자동 첨부 URL (전단지 파일 미선택 시 마트 플랫폼 직통 연결):<br>
+        <span id="autoAttachUrlText" style="color:#1d4ed8;text-decoration:underline;word-break:break-all;">https://mart-platform.vercel.app/mart-store.html?store=store01</span>
       </div>
     </div>
 
@@ -2365,16 +2366,41 @@ function openChargeGuide() {
   alert('🏛️ [우리아파트 마트 플랫폼 선입금 충전 안내]\n\n• 입금 계좌: 농협은행 199-02-289684\n• 예금주: 송해석 / (주)뉴알에너지 대표이사\n\n[★ 충전 단위: 30만 / 50만 / 100만 원 (최소 30만 원 이상)]\n1. 30만 원 충전 (+VAT 3만 원 = 33만 원 입금) ➔ 20,000건 발송\n2. 50만 원 충전 (+VAT 5만 원 = 55만 원 입금) ➔ 33,333건 발송\n3. 100만 원 충전 (+VAT 10만 원 = 110만 원 입금) ➔ 66,666건 발송\n\n※ 입금 확인 즉시 (주)뉴알에너지 명의로 전자세금계산서가 100% 자동 발행됩니다.');
 }
 
+function getActiveStoreCode() {
+  var params = new URLSearchParams(location.search);
+  return params.get('store') || params.get('store_id') || localStorage.getItem('mart_store_id') || 'store01';
+}
+
+function updateAutoAttachUrlDisplay() {
+  var fileInput = document.getElementById('flyerImageFile');
+  var hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+  var storeCode = getActiveStoreCode();
+  var urlText = document.getElementById('autoAttachUrlText');
+  var urlBox = document.getElementById('autoAttachUrlBox');
+  if (!urlText || !urlBox) return;
+  if (hasFile) {
+    var flyerUrl = 'https://mart-platform.vercel.app/store.html?store=' + encodeURIComponent(storeCode);
+    urlBox.innerHTML = '🔗 발송 시 하단 자동 첨부 URL (📸 전단지 사진 + 마트 플랫폼 통합 연결):<br><span id="autoAttachUrlText" style="color:#15803d;text-decoration:underline;word-break:break-all;">' + flyerUrl + '</span>';
+  } else {
+    var platformUrl = 'https://mart-platform.vercel.app/mart-store.html?store=' + encodeURIComponent(storeCode);
+    urlBox.innerHTML = '🔗 발송 시 하단 자동 첨부 URL (전단지 사진 미선택 → 🛒 마트 플랫폼 직통 URL 자동 발송):<br><span id="autoAttachUrlText" style="color:#1d4ed8;text-decoration:underline;word-break:break-all;">' + platformUrl + '</span>';
+  }
+}
+
 function previewFlyerImage(input) {
+  var preview = document.getElementById('flyerPreviewImg');
   if (input.files && input.files[0]) {
     var reader = new FileReader();
     reader.onload = function(e) {
-      var img = document.getElementById('flyerPreviewImg');
-      img.src = e.target.result;
-      img.style.display = 'block';
+      preview.src = e.target.result;
+      preview.style.display = 'block';
     };
     reader.readAsDataURL(input.files[0]);
+  } else {
+    preview.src = '';
+    preview.style.display = 'none';
   }
+  updateAutoAttachUrlDisplay();
 }
 
 function handleCustomerExcel(input) {
