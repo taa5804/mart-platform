@@ -402,39 +402,70 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
         <span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:800;">건당 15원</span>
       </div>
 
-      <!-- [특급 기능] 순번 구간 지정 발송 (예: 2,001번 ~ 3,000번 분할 발송) -->
-      <div style="margin-top:14px;padding:14px;background:#fff;border:1.5px solid #22c55e;border-radius:10px;">
-        <div style="margin-bottom:12px;padding:10px 12px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-          <div style="font-size:13.5px;font-weight:bold;color:#166534;">
-            📅 순번 정렬 기준 (방문일자별 자동 정렬):
+      <!-- [특급 기능] 순번 구간 지정 발송 & 기준일자(방문일/등록일) 실시간 팩트체크 -->
+      <div style="margin-top:14px;padding:15px;background:#fff;border:2px solid #16a34a;border-radius:12px;box-shadow:0 4px 12px rgba(22,163,74,0.08);">
+        
+        <!-- 원터치 정렬 큰 버튼 2개 -->
+        <div style="margin-bottom:14px;">
+          <b style="color:#15803d;font-size:15px;display:block;margin-bottom:8px;">📅 마트 사장님 원터치 순번 정렬 버튼:</b>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <button type="button" id="btnSortVisit" class="sa-btn" style="margin:0;padding:12px 8px;background:#15803d;color:#fff;font-size:14px;border:2px solid #166534;border-radius:8px;" onclick="setSortMode('visit')">
+              ⚡ 최근 방문일자순 정렬
+            </button>
+            <button type="button" id="btnSortReg" class="sa-btn" style="margin:0;padding:12px 8px;background:#f8fafc;color:#334155;font-size:14px;border:1.5px solid #cbd5e1;border-radius:8px;" onclick="setSortMode('reg')">
+              📋 가입 등록일자순 정렬
+            </button>
           </div>
-          <select id="dbSortOption" style="height:36px;padding:0 12px;border:1.5px solid #16a34a;border-radius:6px;font-size:13px;font-weight:bold;background:#fff;color:#15803d;" onchange="changeDbSortOrder(this.value)">
-            <option value="recent_visit">⚡ 최근 방문일자 순 (가장 최근에 장본 단골부터 1번~)</option>
-            <option value="old_visit">🔄 이탈 고객 순 (방문한 지 오래된 손님부터 1번~)</option>
-            <option value="register_date">📋 고객 가입 등록일자 순 (원년 단골부터 1번~)</option>
-            <option value="excel_origin">📄 엑셀 원본 파일 순서 그대로</option>
-          </select>
+          <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+            <button type="button" style="border:0;background:none;color:#dc2626;font-size:12px;font-weight:bold;cursor:pointer;text-decoration:underline;" onclick="setSortMode('dormant')">
+              🔄 장기 미방문(이탈 단골) 고객순으로 뒤집기
+            </button>
+          </div>
         </div>
 
+        <!-- 구간 입력창 -->
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
-          <b style="color:#15803d;font-size:14.5px;">🎯 발송 대상 순번 구간 선택 (분할 발송)</b>
+          <b style="color:#0f172a;font-size:14.5px;">🎯 발송 구간 입력 (1만 명 중 자유 선택)</b>
           <div style="font-size:12px;color:#475569;">
             <label style="cursor:pointer;margin-right:10px;"><input type="radio" name="sendRangeType" value="all" onchange="toggleSendRange(this.value)"> 전체 발송</label>
-            <label style="cursor:pointer;font-weight:bold;color:#16a34a;"><input type="radio" name="sendRangeType" value="range" checked onchange="toggleSendRange(this.value)"> 📌 순번 지정 발송</label>
+            <label style="cursor:pointer;font-weight:bold;color:#16a34a;"><input type="radio" name="sendRangeType" value="range" checked onchange="toggleSendRange(this.value)"> 📌 순번 지정</label>
           </div>
         </div>
-        <div class="sa-help" style="margin-bottom:10px;">
-          고객이 1만 명일 때 오늘 1천 명, 내일 1천 명씩 나눠서 보내거나 원하는 특정 순번만 골라서 발송할 수 있습니다.
-        </div>
         
-        <div id="rangeInputBox" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#f8fafc;padding:10px;border-radius:8px;border:1px solid #e2e8f0;">
-          <span style="font-size:13.5px;font-weight:bold;color:#334155;">시작 순번:</span>
-          <input type="number" id="rangeStart" value="2001" min="1" max="10000" style="width:100px;height:38px;padding:6px;border:1.5px solid #16a34a;border-radius:6px;font-weight:bold;font-size:14px;text-align:center;" oninput="updateRangeTargetCount()">
-          <span style="font-size:13.5px;font-weight:bold;color:#334155;">번 부터 &nbsp;~&nbsp; 종료 순번:</span>
-          <input type="number" id="rangeEnd" value="3000" min="1" max="10000" style="width:100px;height:38px;padding:6px;border:1.5px solid #16a34a;border-radius:6px;font-weight:bold;font-size:14px;text-align:center;" oninput="updateRangeTargetCount()">
-          <span style="font-size:13.5px;font-weight:bold;color:#334155;">번 까지</span>
-          <button type="button" class="sa-btn" style="width:auto;margin:0 0 0 auto;padding:7px 14px;background:#15803d;font-size:13px;" onclick="updateRangeTargetCount()">구간 적용</button>
+        <div id="rangeInputBox" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid #cbd5e1;">
+          <span style="font-size:14px;font-weight:bold;color:#1e293b;">시작 순번:</span>
+          <input type="number" id="rangeStart" value="1" min="1" max="10000" style="width:90px;height:40px;padding:6px;border:2px solid #16a34a;border-radius:6px;font-weight:bold;font-size:15px;text-align:center;" oninput="updateRangeTargetCount()">
+          <span style="font-size:14px;font-weight:bold;color:#1e293b;">번 부터 &nbsp;~&nbsp; 종료 순번:</span>
+          <input type="number" id="rangeEnd" value="3000" min="1" max="10000" style="width:95px;height:40px;padding:6px;border:2px solid #16a34a;border-radius:6px;font-weight:bold;font-size:15px;text-align:center;" oninput="updateRangeTargetCount()">
+          <span style="font-size:14px;font-weight:bold;color:#1e293b;">번 까지</span>
+          <button type="button" class="sa-btn" style="width:auto;margin:0 0 0 auto;padding:8px 16px;background:#15803d;font-size:13.5px;" onclick="updateRangeTargetCount()">구간 적용</button>
         </div>
+
+        <!-- [대표님 제안 핵심] 마트 사장이 보고 결정하는 마지막 고객 날짜 검증 카드 -->
+        <div id="customerDateCheckCard" style="margin-top:12px;padding:14px;background:#f0fdf4;border:1.5px solid #22c55e;border-radius:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+            <b style="color:#15803d;font-size:14px;">🔍 발송 전 [마지막 <span id="dispEndNo">3,000</span>번째 고객] 날짜 검증 팩트체크</b>
+            <span style="font-size:12px;background:#dcfce7;color:#166534;font-weight:bold;padding:2px 8px;border-radius:4px;">사장님 최종 확인용</span>
+          </div>
+
+          <div style="margin-top:10px;background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="border-right:1px solid #e2e8f0;padding-right:8px;">
+              <div style="font-size:12px;color:#64748b;margin-bottom:3px;">1번째 고객 기준일</div>
+              <div style="font-size:14px;font-weight:800;color:#0284c7;">최근방문: <span id="firstVisitDate">2026-11-14 (오늘)</span></div>
+              <div style="font-size:12.5px;color:#475569;margin-top:2px;">최초등록: <span id="firstRegDate">2026-09-01</span></div>
+            </div>
+            <div style="padding-left:4px;">
+              <div style="font-size:12px;color:#dc2626;font-weight:bold;margin-bottom:3px;">👉 마지막 <span id="cardEndNo">3,000</span>번째 고객 기준일</div>
+              <div style="font-size:14px;font-weight:900;color:#dc2626;">최근방문: <span id="lastVisitDate">2026-11-05 (9일 전)</span></div>
+              <div style="font-size:12.5px;color:#475569;margin-top:2px;">최초등록: <span id="lastRegDate">2026-03-12</span></div>
+            </div>
+          </div>
+
+          <div style="margin-top:9px;font-size:13px;color:#166534;font-weight:bold;" id="rangeSummaryGuide">
+            💡 <b>사장님 발송 요약:</b> 1번~3,000번까지 발송 시 <b>[최근 9일 이내에 매장에 방문한 단골 3,000명]</b>에게 정확히 발송됩니다!
+          </div>
+        </div>
+
       </div>
 
       <!-- [핵심 기능 1] 엑셀 파일 즉시 영구 삭제 파기 컨트롤 박스 -->
