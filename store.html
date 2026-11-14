@@ -1,34 +1,178 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title>[우리마트] 모바일 세일 전단지 도착</title>
-<meta property="og:title" content="[우리마트] 오늘의 특가 세일 전단지">
-<meta property="og:description" content="테스트입니다. 모바일 전단지와 오늘의 행사 상품을 지금 확인하세요!">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>에너젠마트 주말 초특가 디지털 전단 | 우리아파트 마트 플랫폼</title>
+<meta property="og:title" content="[에너젠마트] 주말 초특가 디지털 세일 전단지">
+<meta property="og:description" content="생삼겹살 1,290원 · 왕란 1판 4,980원! 앱 설치 없이 터치 한 번으로 장바구니 배달 주문하세요.">
 <meta property="og:image" content="https://mart-platform.vercel.app/test-flyer.png">
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; background: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Noto Sans KR", sans-serif; color: #0f172a; }
-  .wrap { max-width: 520px; margin: 0 auto; background: #fff; min-height: 100vh; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding-bottom: 40px; }
-  .header { background: #166534; color: #fff; padding: 16px; text-align: center; font-size: 19px; font-weight: 900; }
-  .msg-box { margin: 14px; padding: 16px; background: #f0fdf4; border: 2px solid #86efac; border-radius: 12px; font-size: 16px; font-weight: 800; color: #14532d; line-height: 1.6; }
-  .flyer-box { margin: 14px; border-radius: 14px; overflow: hidden; border: 1px solid #cbd5e1; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
-  .flyer-box img { display: block; width: 100%; height: auto; }
-  .btn-go { display: block; margin: 16px 14px; padding: 16px; border-radius: 12px; background: #ea580c; color: #fff; text-align: center; text-decoration: none; font-size: 17px; font-weight: 900; box-shadow: 0 6px 16px rgba(234,88,12,0.3); }
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#f1f5f9;
+  font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR",Arial,sans-serif;
+  color:#1e293b;
+  line-height:1.6;
+}
+.wrap{
+  max-width:600px;
+  margin:0 auto;
+  background:#ffffff;
+  min-height:100vh;
+  box-shadow:0 0 20px rgba(0,0,0,.08);
+  padding-bottom:20px;
+}
+.notice-bar{
+  background:#0e6556;
+  color:#ffffff;
+  padding:14px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.notice-bar strong{ font-size:14.5px; display:block; }
+.notice-bar p{ margin:2px 0 0; font-size:12.5px; opacity:.9; }
+.allow-btn{
+  background:#ffffff;
+  color:#0e6556;
+  border:0;
+  padding:8px 14px;
+  border-radius:8px;
+  font-size:13.5px;
+  font-weight:900;
+  cursor:pointer;
+  white-space:nowrap;
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+.header{ padding:20px 18px 16px; border-bottom:1px solid #e2e8f0; }
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  background:#fee2e2;
+  color:#dc2626;
+  border-radius:6px;
+  font-size:12.5px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+.title{ margin:0; font-size:23px; font-weight:900; color:#0f172a; letter-spacing:-0.5px; }
+.period{ margin:6px 0 0; font-size:13.5px; color:#64748b; }
+.poster-box{ width:100%; background:#000; line-height:0; }
+.poster-box img{ width:100%; height:auto; display:block; }
+.content-box{ padding:20px 18px; background:#ffffff; }
+.content-title{
+  font-size:17px;
+  font-weight:800;
+  color:#0e6556;
+  margin:0 0 12px;
+  padding-bottom:8px;
+  border-bottom:2px solid #0e6556;
+}
+.text-body{ font-size:15.5px; color:#334155; white-space:pre-line; line-height:1.75; font-weight:600; }
+.external-link-box{
+  margin:8px 18px 18px;
+  padding:18px 16px;
+  background:#f0fdf4;
+  border:2px solid #0e6556;
+  border-radius:14px;
+  text-align:center;
+}
+.external-btn{
+  display:inline-block;
+  width:100%;
+  padding:15px;
+  background:#0e6556;
+  color:#ffffff;
+  text-decoration:none;
+  font-size:16.5px;
+  font-weight:900;
+  border-radius:10px;
+  box-shadow:0 6px 16px rgba(14,101,86,0.28);
+}
+.bottom-bar{
+  position:sticky;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#ffffff;
+  border-top:1px solid #cbd5e1;
+  padding:12px 18px;
+  display:flex;
+  gap:10px;
+}
+.call-btn{
+  flex:1;
+  background:#0f172a;
+  color:#fff;
+  padding:14px;
+  border-radius:10px;
+  text-align:center;
+  font-weight:800;
+  text-decoration:none;
+  font-size:15px;
+}
+.order-btn{
+  flex:1.5;
+  background:#dc2626;
+  color:#fff;
+  padding:14px;
+  border-radius:10px;
+  text-align:center;
+  font-weight:800;
+  text-decoration:none;
+  font-size:15px;
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="header">🛒 우리마트 모바일 세일 전단지</div>
-  <div class="msg-box">
-    📢 <strong>매장 세일 알림 메세지:</strong><br>
-    <span id="msgText">테스트입니다.</span>
+  <div class="notice-bar">
+    <div>
+      <strong>🔔 [에너젠마트] 세일 알림 무료 수신</strong>
+      <p>매주 파격 특가 소식을 스마트폰으로 받아보세요</p>
+    </div>
+    <button class="allow-btn" onclick="alert('✅ [에너젠마트] 단골 세일 알림 수신이 설정되었습니다!')">[알림 받기]</button>
   </div>
-  <div class="flyer-box">
-    <img src="/test-flyer.png" alt="우리마트 세일 전단지">
+
+  <div class="header">
+    <span class="badge">🔥 주말 파격 한정세일</span>
+    <h1 class="title">에너젠마트 주말 초특가 대전</h1>
+    <p class="period">행사 매장: 에너젠마트 (store01) · 앱 설치 없이 바로 주문 가능</p>
   </div>
-  <a href="/mart-store.html?store=store01" class="btn-go">🏪 매장 오늘특가 · 행사상품 전체보기 & 주문하기 ›</a>
+
+  <div class="poster-box">
+    <img id="flyerImg" src="/test-flyer.png" alt="에너젠마트 행사 전단지 사진">
+  </div>
+
+  <div class="content-box">
+    <h2 class="content-title">📢 에너젠마트 이번 주 대표 파격 품목</h2>
+    <div id="flyerText" class="text-body">■ [정육 코너 파격가]
+• 국내산 1등급 암퇘지 생삼겹살 100g ➔ 1,290원 (선착순)
+• 한우 1+ 등심 100g ➔ 6,900원 파격 할인
+
+■ [청과/야채 산지직송]
+• 싱싱한 흙대파 1단 ➔ 990원!
+• 고랭지 강원 배추 1망(3포기) ➔ 8,900원
+• 고당도 타이벡 밀감 1박스(5kg) ➔ 13,900원
+
+■ [공산/생필품 특가]
+• 신선 왕란 1판(30구) ➔ 4,980원! (1인 2판 한정)
+• 오뚜기 진라면 1번들(5입) ➔ 2,980원</div>
+  </div>
+
+  <div class="external-link-box">
+    <div style="font-weight:900; font-size:16px; color:#0e6556; margin-bottom:6px">🛒 에너젠마트 디지털 온라인 장보기 오픈!</div>
+    <div style="font-size:13.5px; color:#475569; margin-bottom:12px">오늘특가 30개 · 행사상품 40개 · 공동구매 · 일반상품 200개를 터치 한 번으로 장바구니에 담아 배달/픽업 주문하세요.</div>
+    <a href="/mart-store.html?store=store01" class="external-btn">👉 에너젠마트 디지털 매장 입장하기 ›</a>
+  </div>
+
+  <div class="bottom-bar">
+    <a href="tel:062-952-4150" class="call-btn">📞 매장 전화문의</a>
+    <a href="/mart-store.html?store=store01" class="order-btn">🛒 온라인 장바구니 주문 ›</a>
+  </div>
 </div>
 </body>
 </html>
