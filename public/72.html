@@ -120,18 +120,29 @@ moveBtn.onclick=async()=>{
 };
 
 emergencyBtn.onclick=async()=>{
- emergencyBtn.disabled=true;
- try{
-   const d=await api({action:"emergency",qr_code:qr,caller_session_id:callerSession()});
-   if(d.phone)location.href="tel:"+String(d.phone).replace(/[^0-9]/g,"");
-   else status.textContent=d.message||"긴급통화가 활성화되었습니다.";
- }catch(e){
-   status.textContent=e.message;
-   status.className="status error";
-   emergencyBtn.disabled=false;
- }
+  emergencyBtn.disabled=true;
+  status.textContent="차주 전화 연결을 준비하고 있습니다...";
+  status.className="status";
+  try{
+    const d=await api({action:"emergency",qr_code:qr,caller_session_id:callerSession()});
+    const targetPhone = d.owner_phone || d.phone || d.tel;
+    if(targetPhone){
+      const clean = String(targetPhone).replace(/[^0-9]/g,"");
+      const formatted = clean.replace(/(\d{3})(\d{3,4})(\d{4})/, "$1-$2-$3");
+      status.textContent="📞 차주(" + formatted + ")에게 긴급전화를 연결합니다.";
+      status.className="status success";
+      setTimeout(()=>{ emergencyBtn.disabled=false; }, 2500);
+      location.href="tel:" + clean;
+    }else{
+      status.textContent=d.message||"긴급통화가 활성화되었습니다.";
+      emergencyBtn.disabled=false;
+    }
+  }catch(e){
+    status.textContent=e.message||"긴급통화 연결에 실패했습니다.";
+    status.className="status error";
+    emergencyBtn.disabled=false;
+  }
 };
-
 start();
 </script>
 </body>
