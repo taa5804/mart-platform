@@ -165,18 +165,7 @@ button:disabled{
 </section>
 
 
-<section id="installCard" class="card">
-  <h1>Android 앱 설치</h1>
-
-  <div class="guide">
-    휴대전화에 표시되는 설치창에서<br>
-    설치를 눌러 주세요.
-  </div>
-
-  <div id="installStatus" class="status waiting">
-    앱 설치를 진행해 주세요.
-  </div>
-</section>
+<!-- installCard removed: 앱 설치 없이 순수 웹 알림 동의만 진행 -->
 
 
 <section id="pushCard" class="card">
@@ -625,142 +614,83 @@ phoneInput.addEventListener(
 registerBtn.addEventListener(
   "click",
   async () => {
+    if (processing) return;
 
-    ownerPhone =
-      normalizePhone(
-        phoneInput.value
-      );
+    ownerPhone = normalizePhone(phoneInput.value);
 
-    if(
-      !validPhone(
-        ownerPhone
-      )
-    ){
-
-      setStatus(
-        registerStatus,
-        "휴대전화번호를 정확히 입력해 주세요.",
-        "error"
-      );
-
+    if (!validPhone(ownerPhone)) {
+      setStatus(registerStatus, "휴대전화번호를 정확히 입력해 주세요.", "error");
       phoneInput.focus();
-
       return;
     }
 
-    if(
-      !qrCode
-    ){
-
-      setStatus(
-        registerStatus,
-        "자동차 QR 정보를 확인할 수 없습니다.",
-        "error"
-      );
-
+    if (!qrCode) {
+      setStatus(registerStatus, "자동차 QR 정보를 확인할 수 없습니다.", "error");
       return;
     }
 
-    if (!installPrompt) {
-      registerBtn.disabled = true;
-      registerBtn.textContent = "설치창 여는 중...";
-      setStatus(
-        registerStatus,
-        "앱 설치창을 준비하고 있습니다. 잠시만 기다려 주세요.",
-        "waiting"
-      );
-      let count = 0;
-      const interval = setInterval(() => {
-        count++;
-        if (installPrompt) {
-          clearInterval(interval);
-          registerBtn.disabled = false;
-          registerBtn.textContent = "등록하기";
-          registerBtn.click();
-        } else if (count >= 15) {
-          clearInterval(interval);
-          registerBtn.disabled = false;
-          registerBtn.textContent = "등록하기";
-          setStatus(
-            registerStatus,
-            "브라우저 메뉴(⋮)에서 '앱 설치' 또는 '홈 화면에 추가'를 눌러 주세요.",
-            "waiting"
-          );
-        }
-      }, 200);
-      return;
-    }
+    processing = true;
+    registerBtn.disabled = true;
+    registerBtn.textContent = "알림 등록 처리 중...";
+    setStatus(registerStatus, "알림 권한을 요청하고 있습니다...", "waiting");
 
-    const currentPrompt =
-      installPrompt;
-
-    registerBtn.disabled =
-      true;
-
-    showCard(
-      installCard
-    );
-
-    try{
-
-      await currentPrompt.prompt();
-
-      const choice =
-        await currentPrompt.userChoice;
-
-      installPrompt =
-        null;
-
-      if(
-        choice.outcome !==
-        "accepted"
-      ){
-
-        registerBtn.disabled =
-          false;
-
-        showCard(
-          registerCard
-        );
-
-        setStatus(
-          registerStatus,
-          "앱을 설치해 주세요.",
-          "error"
-        );
-
-        return;
+    try {
+      if (!("Notification" in window)) {
+        throw new Error("이 기기 브라우저에서는 알림을 지원하지 않습니다.");
       }
 
-      /*
-       * 설치를 승인한 뒤에는
-       * 실제 appinstalled 신호를 기다림
-       */
+      let permission = Notification.permission;
+      if (permission !== "granted") {
+        permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          throw new Error("차량이동 알림을 받으시려면 [알림 허용]을 눌러주셔야 합니다.");
+        }
+      }
 
-    }catch(error){
+      if (!firebase.apps.length) {
+        firebase.initializeApp(FIREBASE_CONFIG);
+      }
 
-      registerBtn.disabled =
-        false;
+      const registration = await prepareServiceWorker();
+      const messaging = firebase.messaging();
 
-      showCard(
-        registerCard
-      );
+      const token = await messaging.getToken({
+        vapidKey: VAPID_KEY,
+        serviceWorkerRegistration: registration
+      });
 
+      if (!token) {
+        throw new Error("푸시 알림 토큰 발급에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+      }
+
+      setStatus(registerStatus, "차량 정보를 등록하는 중입니다...", "waiting");
+
+      const result = await registerVehicle(token);
+
+      const storeId = String(result.store_id || "").trim();
+      if (storeId) {
+        localStorage.setItem(STORE_ID_KEY, storeId);
+      } else {
+        localStorage.removeItem(STORE_ID_KEY);
+      }
+
+      processing = false;
+      showCard(completeCard);
+
+    } catch (error) {
+      processing = false;
+      registerBtn.disabled = false;
+      registerBtn.textContent = "동의하고 1초 등록하기";
       setStatus(
         registerStatus,
-        error instanceof Error
-          ? error.message
-          : "앱 설치에 실패했습니다.",
+        error instanceof Error ? error.message : "자동차 등록에 실패했습니다.",
         "error"
       );
     }
   }
 );
 
-
 /*
- * 푸시 허용 후 자동차 등록
- */
 
 pushBtn.addEventListener(
   "click",
