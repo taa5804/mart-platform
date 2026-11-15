@@ -14,8 +14,10 @@
 body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
 .card{display:none;width:100%;max-width:420px;background:#fff;border-radius:18px;padding:28px 22px;text-align:center;box-shadow:0 10px 35px rgba(15,23,42,.1)}.card.active{display:block}
 h1{margin:0 0 14px;font-size:24px}p{color:#64748b;line-height:1.7}
-button{width:100%;min-height:54px;border:0;border-radius:11px;background:#16a34a;color:white;font-size:17px;font-weight:800;margin-top:10px}
-button:disabled{background:#cbd5e1;color:#64748b}.emergency{background:#dc2626}.status{margin-top:14px;font-weight:700;line-height:1.6}.error{color:#dc2626}.success{color:#15803d}.countdown{margin-top:14px;color:#1d4ed8;font-weight:800}
+button{width:100%;min-height:54px;border:0;border-radius:11px;background:#16a34a;color:white;font-size:17px;font-weight:800;margin-top:10px;cursor:pointer}
+button:disabled{background:#cbd5e1;color:#64748b;cursor:not-allowed}.emergency{background:#dc2626}.status{margin-top:14px;font-weight:700;line-height:1.6}.error{color:#dc2626}.success{color:#15803d}.countdown{margin-top:14px;color:#1d4ed8;font-weight:800}
+.owner-link-box{margin-top:22px;padding-top:14px;border-top:1px dashed #cbd5e1;font-size:13px;color:#64748b}
+.owner-link-box a{color:#16a34a;font-weight:700;text-decoration:underline;margin-left:4px}
 </style>
 
   <!-- Vercel Web Analytics -->
@@ -26,6 +28,7 @@ button:disabled{background:#cbd5e1;color:#64748b}.emergency{background:#dc2626}.
 </head>
 <body>
 <section id="loading" class="card active"><h1>자동차 QR 확인 중</h1><p>잠시만 기다려 주세요.</p></section>
+
 <section id="request" class="card">
 <h1>차량이동 요청</h1>
 <p>차주에게 차량이동 요청을 전달합니다.</p>
@@ -33,7 +36,13 @@ button:disabled{background:#cbd5e1;color:#64748b}.emergency{background:#dc2626}.
 <div id="countdown" class="countdown"></div>
 <button id="emergencyBtn" class="emergency" disabled>긴급통화</button>
 <div id="status" class="status"></div>
+
+<div class="owner-link-box">
+  차주 본인이신가요? 
+  <a id="reregisterLink" href="#">전화번호 / 알림 재등록하기</a>
+</div>
 </section>
+
 <section id="error" class="card"><h1>접속할 수 없습니다</h1><p id="errorText"></p></section>
 
 <script>
@@ -43,18 +52,24 @@ const SUPABASE_KEY='sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2';
 const params=new URLSearchParams(location.search);
 const qr=String(params.get("qr")||"").trim().toUpperCase().replace(/[^A-Z0-9_-]/g,"");
 const loading=document.getElementById("loading"),request=document.getElementById("request"),errorCard=document.getElementById("error");
-const moveBtn=document.getElementById("moveBtn"),emergencyBtn=document.getElementById("emergencyBtn"),countdown=document.getElementById("countdown"),status=document.getElementById("status"),errorText=document.getElementById("errorText");
+const moveBtn=document.getElementById("moveBtn"),emergencyBtn=document.getElementById("emergencyBtn"),countdown=document.getElementById("countdown"),status=document.getElementById("status"),errorText=document.getElementById("errorText"),reregisterLink=document.getElementById("reregisterLink");
 let timer=null;
+
 function show(el){[loading,request,errorCard].forEach(x=>x.classList.remove("active"));el.classList.add("active")}
 function callerSession(){let id=sessionStorage.getItem("wooriapt_vehicle_caller_session");if(!id){id="caller_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,10);sessionStorage.setItem("wooriapt_vehicle_caller_session",id)}return id}
 async function api(payload){const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+SUPABASE_KEY,apikey:SUPABASE_KEY},body:JSON.stringify(payload)});const d=await r.json().catch(()=>({}));if(!r.ok||d.ok===false||d.success===false){const e=new Error(d.message||"서버 처리에 실패했습니다.");e.data=d;throw e}return d}
-function routeRegistration(){
+
+function getRegUrl(){
  const ua=navigator.userAgent||"";
  const ios=/iphone|ipad|ipod/i.test(ua);
- const android=/android/i.test(ua);
- const target=ios?"/72-iphone.html":android?"/72-android.html":"/72-android.html";
- location.replace(target+"?qr="+encodeURIComponent(qr));
+ const target=ios?"/72-iphone.html":"/72-android.html";
+ return target+"?qr="+encodeURIComponent(qr);
 }
+
+function routeRegistration(){
+ location.replace(getRegUrl());
+}
+
 function applyState(d){
  const count=Number(d.request_count||0);
  emergencyBtn.disabled=d.emergency_enabled!==true;
@@ -63,22 +78,60 @@ function applyState(d){
  moveBtn.disabled=count>=3;
  moveBtn.textContent=count>=3?"차량이동요청 3회 완료":"차량이동요청";
 }
+
 function startCountdown(target){
  if(timer)clearInterval(timer);
  const tick=()=>{const remain=target-Date.now();if(remain<=0){clearInterval(timer);timer=null;countdown.textContent="";refresh();return}const sec=Math.ceil(remain/1000),m=Math.floor(sec/60),s=String(sec%60).padStart(2,"0");countdown.textContent="다음 요청까지 "+m+":"+s;moveBtn.disabled=true};
  tick();timer=setInterval(tick,1000);
 }
+
 async function refresh(){try{const d=await api({action:"status",qr_code:qr,caller_session_id:callerSession()});applyState(d)}catch(e){}}
+
 async function start(){
  if(!qr){errorText.textContent="올바른 자동차 QR 주소가 아닙니다.";show(errorCard);return}
+ if(reregisterLink) reregisterLink.href = getRegUrl();
  try{
    const d=await api({action:"status",qr_code:qr,caller_session_id:callerSession()});
    if(d.registered===true){applyState(d);show(request);return}
    routeRegistration();
  }catch(e){routeRegistration()}
 }
-moveBtn.onclick=async()=>{moveBtn.disabled=true;status.textContent="차량이동요청을 처리하고 있습니다.";try{const d=await api({action:"request",qr_code:qr,caller_session_id:callerSession()});status.textContent=d.message||"차량이동요청이 접수되었습니다.";applyState(d)}catch(e){let emsg=e.message||"차량이동요청 처리 중 오류가 발생했습니다.";if(emsg.includes("Device unregistered")||emsg.includes("not registered")){emsg="차주 알림 전송 중 일시적 오류가 발생했습니다. 잠시 후 다시 시도하거나 [긴급통화]를 이용해 주세요.";emergencyBtn.disabled=false;}status.textContent=emsg;status.className="status error";if(e.data)applyState(e.data);else moveBtn.disabled=false}};
-emergencyBtn.onclick=async()=>{emergencyBtn.disabled=true;try{const d=await api({action:"emergency",qr_code:qr,caller_session_id:callerSession()});if(d.phone)location.href="tel:"+String(d.phone).replace(/[^0-9]/g,"");else status.textContent=d.message||"긴급통화가 활성화되었습니다."}catch(e){status.textContent=e.message;status.className="status error";emergencyBtn.disabled=false}};
+
+moveBtn.onclick=async()=>{
+ moveBtn.disabled=true;
+ status.textContent="차량이동요청을 처리하고 있습니다.";
+ status.className="status";
+ try{
+   const d=await api({action:"request",qr_code:qr,caller_session_id:callerSession()});
+   status.textContent=d.message||"차량이동요청이 접수되었습니다.";
+   status.className="status success";
+   applyState(d);
+ }catch(e){
+   let emsg=e.message||"차량이동요청 처리 중 오류가 발생했습니다.";
+   if(/token|device|unregistered|fcm|valid/i.test(emsg)){
+     emsg="차주 알림 전송이 지연되고 있습니다. 즉시 아래 [긴급통화] 버튼으로 직접 통화하실 수 있습니다.";
+     emergencyBtn.disabled=false;
+   }
+   status.textContent=emsg;
+   status.className="status error";
+   if(e.data)applyState(e.data);
+   else moveBtn.disabled=false;
+ }
+};
+
+emergencyBtn.onclick=async()=>{
+ emergencyBtn.disabled=true;
+ try{
+   const d=await api({action:"emergency",qr_code:qr,caller_session_id:callerSession()});
+   if(d.phone)location.href="tel:"+String(d.phone).replace(/[^0-9]/g,"");
+   else status.textContent=d.message||"긴급통화가 활성화되었습니다.";
+ }catch(e){
+   status.textContent=e.message;
+   status.className="status error";
+   emergencyBtn.disabled=false;
+ }
+};
+
 start();
 </script>
 </body>
