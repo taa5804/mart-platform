@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://dcysjuxyjqtvkihdsjvv.supabase.co">
 <link rel="dns-prefetch" href="https://www.gstatic.com">
-<link rel="manifest" href="/android-manifest.webmanifest">
+
 
 <title>자동차 QR Android 등록</title>
 
@@ -284,8 +284,7 @@ const qrCode =
 const registerCard =
   document.getElementById("registerCard");
 
-const installCard =
-  document.getElementById("installCard");
+
 
 const pushCard =
   document.getElementById("pushCard");
@@ -316,7 +315,7 @@ const errorText =
 
 const cards = [
   registerCard,
-  installCard,
+  
   pushCard,
   completeCard,
   errorCard
@@ -328,8 +327,7 @@ const cards = [
  */
 
 let ownerPhone = "";
-let installPrompt = null;
-let appInstalled = false;
+/* app install variables removed */
 let processing = false;
 let serviceWorkerRegistration = null;
 
@@ -535,16 +533,7 @@ async function registerVehicle(
  * 앱 설치창 준비
  */
 
-window.addEventListener(
-  "beforeinstallprompt",
-  event => {
-
-    event.preventDefault();
-
-    installPrompt =
-      event;
-  }
-);
+/* beforeinstallprompt removed */
 
 
 /*
@@ -555,39 +544,7 @@ window.addEventListener(
  * 푸시 화면을 표시
  */
 
-window.addEventListener(
-  "appinstalled",
-  () => {
-
-    appInstalled =
-      true;
-
-    installPrompt =
-      null;
-
-    setTimeout(
-      () => {
-
-        showCard(
-          pushCard
-        );
-
-        pushBtn.disabled =
-          false;
-
-        pushBtn.textContent =
-          "푸시 알림 허용";
-
-        setStatus(
-          pushStatus,
-          "",
-          ""
-        );
-      },
-      100
-    );
-  }
-);
+/* appinstalled removed */
 
 
 /*
