@@ -2,12 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"
->
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#16a34a">
 <link rel="preconnect" href="https://dcysjuxyjqtvkihdsjvv.supabase.co" crossorigin>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
@@ -15,149 +10,31 @@
 <link rel="dns-prefetch" href="https://www.gstatic.com">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="우리가게">
+<meta name="apple-mobile-web-app-title" content="에너젠마트">
 
-<title>자동차 QR iPhone 등록</title>
+<title>에너젠마트 자동차 QR iPhone 등록</title>
 
-<link rel="manifest" id="appManifest" href="/api/iphone-manifest">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png">
-<link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
-<link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png">
-
-<script>
-(function () {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const reg = String(params.get("reg") || "").trim();
-    if (reg) {
-      const manifest = document.getElementById("appManifest");
-      if (manifest) {
-        manifest.href = "/api/iphone-manifest?reg=" + encodeURIComponent(reg);
-      }
-    }
-  } catch (e) {}
-})();
-</script>
+<link rel="apple-touch-icon" href="/mart-logo.png">
 
 <style>
-*{
-  box-sizing:border-box;
-}
-
-html,
-body{
-  width:100%;
-  min-height:100%;
-  margin:0;
-}
-
-body{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  background:#f4f7fb;
-  color:#111827;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Arial,
-    sans-serif;
-}
-
-.card{
-  display:none;
-  width:100%;
-  max-width:420px;
-  padding:28px 22px;
-  background:#ffffff;
-  border-radius:18px;
-  text-align:center;
-  box-shadow:0 10px 35px rgba(15,23,42,.1);
-}
-
-.card.active{
-  display:block;
-}
-
-h1{
-  margin:0 0 14px;
-  font-size:24px;
-}
-
-p,
-.guide{
-  color:#64748b;
-  line-height:1.7;
-}
-
-input{
-  width:100%;
-  height:54px;
-  margin:10px 0;
-  border:1px solid #cbd5e1;
-  border-radius:11px;
-  font-size:17px;
-  text-align:center;
-}
-
-button{
-  width:100%;
-  min-height:54px;
-  margin-top:10px;
-  border:0;
-  border-radius:11px;
-  background:#16a34a;
-  color:#ffffff;
-  font-size:17px;
-  font-weight:800;
-  cursor:pointer;
-}
-
-button:disabled{
-  background:#cbd5e1;
-  color:#64748b;
-  cursor:default;
-}
-
-.steps{
-  margin:20px 0 0;
-  padding:0;
-  list-style:none;
-  text-align:left;
-}
-
-.steps li{
-  margin-top:10px;
-  padding:13px 14px;
-  border-radius:10px;
-  background:#f1f5f9;
-  color:#334155;
-  line-height:1.5;
-}
-
-.status{
-  margin-top:14px;
-  font-weight:700;
-  line-height:1.6;
-  white-space:pre-line;
-}
-
-.error{
-  color:#dc2626;
-}
-
-.waiting{
-  color:#1d4ed8;
-}
-
-.success{
-  color:#15803d;
-}
+*{box-sizing:border-box}
+html,body{width:100%;min-height:100%;margin:0}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#f4f7fb;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.card{display:none;width:100%;max-width:420px;padding:28px 22px;background:#fff;border-radius:18px;text-align:center;box-shadow:0 10px 35px rgba(15,23,42,.1)}
+.card.active{display:block}
+h1{margin:0 0 14px;font-size:24px}
+p,.guide{color:#64748b;line-height:1.7}
+input{width:100%;height:54px;margin:10px 0;border:1px solid #cbd5e1;border-radius:11px;font-size:17px;text-align:center}
+button{width:100%;min-height:54px;margin-top:10px;border:0;border-radius:11px;background:#16a34a;color:#fff;font-size:17px;font-weight:800;cursor:pointer}
+button:disabled{background:#cbd5e1;color:#64748b;cursor:not-allowed}
+.status{margin-top:14px;font-weight:700;line-height:1.6;white-space:pre-line}
+.error{color:#dc2626}
+.waiting{color:#1d4ed8}
+.success{color:#15803d}
+.ios-tip-box{margin-top:20px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;text-align:left;font-size:13px;line-height:1.6;color:#334155}
+.ios-tip-box strong{color:#0f172a}
+.ios-step-list{margin:8px 0 0;padding-left:18px}
+.ios-step-list li{margin-top:4px}
 </style>
 
   <!-- Vercel Web Analytics -->
@@ -169,8 +46,9 @@ button:disabled{
 
 <body>
 
-<section id="registerCard" class="card">
-  <h1>자동차 QR 등록</h1>
+<section id="registerCard" class="card active">
+  <div style="font-size:13px;color:#16a34a;font-weight:800;margin-bottom:6px;">에너젠마트 안심주차 서비스</div>
+  <h1>자동차 QR 등록 (iPhone)</h1>
 
   <p>
     차량이동 요청을 받을<br>
@@ -185,7 +63,6 @@ button:disabled{
     placeholder="010-0000-0000"
   >
 
-  <!-- [필수] 자동차 안심주차 및 마트 특가알림 이용 동의 -->
   <div style="margin:14px 0 10px;text-align:left;background:#f8fafc;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-size:13px;line-height:1.5;">
     <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-weight:bold;color:#0f172a;margin-bottom:8px;">
       <input type="checkbox" id="agreePrivacy" checked style="width:18px;height:18px;margin-top:2px;accent-color:#16a34a;">
@@ -207,29 +84,12 @@ button:disabled{
   <div id="registerStatus" class="status"></div>
 </section>
 
-
-<section id="installCard" class="card">
-  <h1>iPhone 앱 설치</h1>
-
-  <div class="guide">
-    아래 순서대로 홈 화면에 설치해 주세요.
-  </div>
-
-  <ol class="steps">
-    <li>1. Safari 아래의 공유 버튼을 누르세요.</li>
-    <li>2. ‘홈 화면에 추가’를 누르세요.</li>
-    <li>3. 오른쪽 위의 ‘추가’를 누르세요.</li>
-    <li>4. 홈 화면에 설치된 ‘우리가게’ 앱을 누르세요.</li>
-  </ol>
-</section>
-
-
 <section id="pushCard" class="card">
-  <h1>푸시 알림 승인</h1>
+  <h1>푸시 알림 승인 (iPhone)</h1>
 
   <div class="guide">
-    차량이동 요청을 받기 위해<br>
-    푸시 알림을 허용해 주세요.
+    차량이동 요청 푸시 알림을 받으시려면<br>
+    아래 버튼을 눌러 알림을 허용해 주세요.
   </div>
 
   <button id="pushBtn" type="button">
@@ -239,26 +99,35 @@ button:disabled{
   <div id="pushStatus" class="status"></div>
 </section>
 
-
 <section id="completeCard" class="card">
-  <h1>등록 완료</h1>
+  <div style="font-size:48px;margin-bottom:12px;">✅</div>
+  <h1>자동차 QR 등록 완료</h1>
 
-  <p>
-    자동차 QR 등록이<br>
-    완료되었습니다.
+  <p style="font-size:16px;color:#0f172a;font-weight:700;">
+    에너젠마트 자동차 QR 등록이<br>
+    성공적으로 완료되었습니다!
   </p>
 
-  <div class="status success">
-    마트 플랫폼으로 이동합니다.
+  <div class="status success" style="margin-top:10px;">
+    이제 다른 사람이 차량 QR을 스캔하면<br>
+    차량이동 요청 및 긴급통화로 안전하게 연결됩니다.
+  </div>
+
+  <!-- 아이폰 Safari 팁 안내 (선택사항) -->
+  <div class="ios-tip-box" id="iosPwaTip">
+    <strong>💡 iPhone 알림 팁 (선택)</strong><br>
+    Apple 정책상 잠금화면 팝업 알림까지 실시간으로 받으시려면:
+    <ol class="ios-step-list">
+      <li>Safari 화면 하단의 <b>공유 버튼(네모+화살표)</b>을 터치합니다.</li>
+      <li><b>[홈 화면에 추가]</b>를 선택하여 추가합니다.</li>
+    </ol>
   </div>
 </section>
 
-
 <section id="errorCard" class="card">
-  <h1>등록할 수 없습���다</h1>
+  <h1>등록할 수 없습니다</h1>
   <p id="errorText"></p>
 </section>
-
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
@@ -266,737 +135,233 @@ button:disabled{
 <script>
 "use strict";
 
-
-/* 서버 설정 */
-
-const PUSH_API_URL =
-  "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/send-vehicle-push";
-
-const SUPABASE_KEY =
-  "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
-
-const VAPID_KEY =
-  "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
-
-
-/* Firebase 설정 */
+const PUSH_API_URL = "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/send-vehicle-push";
+const SUPABASE_KEY = "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
+const VAPID_KEY = "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
 
 const FIREBASE_CONFIG = {
-  apiKey:
-    "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
-
-  authDomain:
-    "wooriapt-carqr.firebaseapp.com",
-
-  projectId:
-    "wooriapt-carqr",
-
-  storageBucket:
-    "wooriapt-carqr.firebasestorage.app",
-
-  messagingSenderId:
-    "101299637796",
-
-  appId:
-    "1:101299637796:web:cb69372592026b7aa192b1",
-
-  measurementId:
-    "G-11E955VBX3"
+  apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
+  authDomain: "wooriapt-carqr.firebaseapp.com",
+  projectId: "wooriapt-carqr",
+  storageBucket: "wooriapt-carqr.firebasestorage.app",
+  messagingSenderId: "101299637796",
+  appId: "1:101299637796:web:cb69372592026b7aa192b1",
+  measurementId: "G-11E955VBX3"
 };
 
+const params = new URLSearchParams(window.location.search);
+let qrCode = cleanQr(params.get("qr"));
 
-/* 주소 정보 */
+const registerCard = document.getElementById("registerCard");
+const pushCard = document.getElementById("pushCard");
+const completeCard = document.getElementById("completeCard");
+const errorCard = document.getElementById("errorCard");
+const phoneInput = document.getElementById("phone");
+const registerBtn = document.getElementById("registerBtn");
+const pushBtn = document.getElementById("pushBtn");
+const registerStatus = document.getElementById("registerStatus");
+const pushStatus = document.getElementById("pushStatus");
+const errorText = document.getElementById("errorText");
+const iosPwaTip = document.getElementById("iosPwaTip");
 
-const params =
-  new URLSearchParams(window.location.search);
-
-let qrCode =
-  cleanQr(params.get("qr"));
-
-const registrationKey =
-  String(params.get("reg") || "")
-    .trim()
-    .toLowerCase();
-
-
-/* 화면 */
-
-const registerCard =
-  document.getElementById("registerCard");
-
-const installCard =
-  document.getElementById("installCard");
-
-const pushCard =
-  document.getElementById("pushCard");
-
-const completeCard =
-  document.getElementById("completeCard");
-
-const errorCard =
-  document.getElementById("errorCard");
-
-const phoneInput =
-  document.getElementById("phone");
-
-const registerBtn =
-  document.getElementById("registerBtn");
-
-const pushBtn =
-  document.getElementById("pushBtn");
-
-const registerStatus =
-  document.getElementById("registerStatus");
-
-const pushStatus =
-  document.getElementById("pushStatus");
-
-const errorText =
-  document.getElementById("errorText");
-
-const cards = [
-  registerCard,
-  installCard,
-  pushCard,
-  completeCard,
-  errorCard
-];
-
-
-/* 현재 등록정보 */
+const cards = [registerCard, pushCard, completeCard, errorCard];
 
 let ownerPhone = "";
-let storeId = "";
 let processing = false;
 let serviceWorkerRegistration = null;
 
-
-/* 화면 표시 */
-
 function showCard(card) {
-  cards.forEach(function (item) {
-    item.classList.remove("active");
-  });
-
+  cards.forEach(item => item.classList.remove("active"));
   card.classList.add("active");
-
   window.scrollTo(0, 0);
 }
 
-
 function showError(message) {
-  errorText.textContent =
-    message || "등록 처리에 실패했습니다.";
-
+  errorText.textContent = message || "등록 처리에 실패했습니다.";
   showCard(errorCard);
 }
 
-
 function setStatus(element, message, type) {
   element.textContent = message || "";
-
-  element.className =
-    type
-      ? "status " + type
-      : "status";
+  element.className = type ? "status " + type : "status";
 }
-
-
-/* QR 번호 */
 
 function cleanQr(value) {
-  return String(value || "")
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9_-]/g, "");
+  return String(value || "").trim().toUpperCase().replace(/[^A-Z0-9_-]/g, "");
 }
-
-
-/* 전화번호 */
 
 function normalizePhone(value) {
-  return String(value || "")
-    .replace(/[^0-9]/g, "");
+  return String(value || "").replace(/[^0-9]/g, "");
 }
-
 
 function validPhone(value) {
-  return /^01[016789][0-9]{7,8}$/
-    .test(value);
+  return /^01[016789][0-9]{7,8}$/.test(value);
 }
-
 
 function formatPhone(value) {
-  const number =
-    normalizePhone(value).slice(0, 11);
-
-  if (number.length <= 3) {
-    return number;
-  }
-
-  if (number.length <= 7) {
-    return (
-      number.slice(0, 3) +
-      "-" +
-      number.slice(3)
-    );
-  }
-
-  return (
-    number.slice(0, 3) +
-    "-" +
-    number.slice(3, 7) +
-    "-" +
-    number.slice(7)
-  );
+  const number = normalizePhone(value).slice(0, 11);
+  if (number.length <= 3) return number;
+  if (number.length <= 7) return number.slice(0, 3) + "-" + number.slice(3);
+  return number.slice(0, 3) + "-" + number.slice(3, 7) + "-" + number.slice(7);
 }
-
-
-/* 홈 화면 앱 실행 확인 */
 
 function isStandalone() {
   return (
-    window.matchMedia(
-      "(display-mode: standalone)"
-    ).matches ||
+    window.matchMedia("(display-mode: standalone)").matches ||
     window.navigator.standalone === true
   );
 }
 
-
-/* 등록 완료 확인용 키 */
-
-function completedStorageKey() {
-  return (
-    "wooriapt_ios_vehicle_completed_" +
-    registrationKey
-  );
-}
-
-
-/* 마트 번호 저장 */
-
-function saveStoreId(value) {
-  const id =
-    String(value || "").trim();
-
-  storeId = id;
-
-  if (id) {
-    localStorage.setItem(
-      "wooriapt_store_id",
-      id
-    );
-  } else {
-    localStorage.removeItem(
-      "wooriapt_store_id"
-    );
-  }
-}
-
-
-/* JSON 응답 처리 */
-
-async function readJson(response) {
-  return response
-    .json()
-    .catch(function () {
-      return {};
-    });
-}
-
-
-/* 아이폰 설치정보 생성 */
-
-async function prepareIphoneRegistration(
-  code,
-  phone
-) {
-  const response =
-    await fetch("/api/register", {
-      method:"POST",
-
-      headers:{
-        "Content-Type":
-          "application/json"
-      },
-
-      body:JSON.stringify({
-        code:code,
-        phone:phone,
-        iphone_install:true
-      })
-    });
-
-  const data =
-    await readJson(response);
-
-  if (!response.ok || data.ok === false) {
-    throw new Error(
-      data.message ||
-      data.error ||
-      "아이폰 설치정보를 만들지 못했습니다."
-    );
-  }
-
-  return data;
-}
-
-
-/* 설치된 앱에서 등록정보 복원 */
-
-async function restoreRegistration(key) {
-  const response =
-    await fetch(
-      "/api/register?reg=" +
-      encodeURIComponent(key),
-      {
-        method:"GET",
-        cache:"no-store"
-      }
-    );
-
-  const data =
-    await readJson(response);
-
-  if (!response.ok || data.ok === false) {
-    throw new Error(
-      data.message ||
-      data.error ||
-      "아이폰 등록정보를 찾을 수 없습니다."
-    );
-  }
-
-  return data;
-}
-
-
-/* 자동차 QR 최종 등록 */
-
-async function registerVehicle(token) {
-  const response =
-    await fetch(PUSH_API_URL, {
-      method:"POST",
-
-      headers:{
-        "Content-Type":
-          "application/json",
-
-        Authorization:
-          "Bearer " + SUPABASE_KEY,
-
-        apikey:
-          SUPABASE_KEY
-      },
-
-      body:JSON.stringify({
-        action:"register",
-        registration_type:"vehicle",
-        qr_code:qrCode,
-        owner_phone:ownerPhone,
-        push_token:token,
-        platform:"ios",
-        user_agent:navigator.userAgent
-      })
-    });
-
-  const data =
-    await readJson(response);
-
-  if (
-    !response.ok ||
-    data.ok === false ||
-    data.success === false
-  ) {
-    throw new Error(
-      data.message ||
-      data.error ||
-      "자동차 QR 등록에 실패했습니다."
-    );
-  }
-
-  return data;
-}
-
-
-/* 서비스워커 준비 */
-
 async function prepareServiceWorker() {
-  if (serviceWorkerRegistration) {
-    return serviceWorkerRegistration;
-  }
-
-  if (!("serviceWorker" in navigator)) {
-    throw new Error(
-      "이 iPhone에서는 푸시 알림을 지원하지 않습니다."
-    );
-  }
-
-  await navigator.serviceWorker.register(
-    "/firebase-messaging-sw.js",
-    {
-      scope:"/",
-      updateViaCache:"none"
-    }
-  );
-
-  serviceWorkerRegistration =
-    await navigator.serviceWorker.ready;
-
+  if (serviceWorkerRegistration) return serviceWorkerRegistration;
+  if (!("serviceWorker" in navigator)) throw new Error("이 기기에서는 알림을 지원하지 않습니다.");
+  await navigator.serviceWorker.register("/firebase-messaging-sw.js", { scope: "/", updateViaCache: "none" });
+  serviceWorkerRegistration = await navigator.serviceWorker.ready;
   return serviceWorkerRegistration;
 }
 
+async function registerVehicleOnServer(token) {
+  const response = await fetch(PUSH_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + SUPABASE_KEY,
+      apikey: SUPABASE_KEY
+    },
+    body: JSON.stringify({
+      action: "register",
+      registration_type: "vehicle",
+      qr_code: qrCode,
+      owner_phone: ownerPhone,
+      push_token: token || "ios_registered",
+      platform: "ios",
+      user_agent: navigator.userAgent
+    })
+  });
 
-/* 마트 플랫폼으로 이동 */
-
-function openMartPlatform() {
-  window.location.replace(
-    "/mart-open.html"
-  );
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data.ok === false || data.success === false) {
+    throw new Error(data.message || data.error || "자동차 QR 등록에 실패했습니다.");
+  }
+  return data;
 }
 
+phoneInput.addEventListener("input", function (event) {
+  event.target.value = formatPhone(event.target.value);
+});
 
-/* 전화번호 표시 */
+registerBtn.addEventListener("click", async function () {
+  if (processing) return;
+  ownerPhone = normalizePhone(phoneInput.value);
 
-phoneInput.addEventListener(
-  "input",
-  function (event) {
-    event.target.value =
-      formatPhone(event.target.value);
+  if (!validPhone(ownerPhone)) {
+    setStatus(registerStatus, "휴대전화번호를 정확히 입력해 주세요.", "error");
+    phoneInput.focus();
+    return;
   }
-);
 
+  if (!qrCode) {
+    setStatus(registerStatus, "자동차 QR 정보를 확인할 수 없습니다.", "error");
+    return;
+  }
 
-/* 전화번호 등록 후 설치 준비 */
+  processing = true;
+  registerBtn.disabled = true;
+  registerBtn.textContent = "등록 처리 중...";
+  setStatus(registerStatus, "", "");
 
-registerBtn.addEventListener(
-  "click",
-  async function () {
-    if (processing) {
-      return;
-    }
-
-    ownerPhone =
-      normalizePhone(phoneInput.value);
-
-    if (!validPhone(ownerPhone)) {
-      setStatus(
-        registerStatus,
-        "휴대전화번호를 정확히 입력해 주세요.",
-        "error"
-      );
-
-      phoneInput.focus();
-      return;
-    }
-
-    if (!qrCode) {
-      setStatus(
-        registerStatus,
-        "자동차 QR 정보를 확인할 수 없습니다.",
-        "error"
-      );
-
-      return;
-    }
-
-    processing = true;
-    registerBtn.disabled = true;
-    registerBtn.textContent =
-      "설치 준비 중...";
-
-    setStatus(registerStatus, "", "");
-
-    try {
-      const data =
-        await prepareIphoneRegistration(
-          qrCode,
-          ownerPhone
-        );
-
-      const newRegistrationKey =
-        String(
-          data.registration_key || ""
-        )
-          .trim()
-          .toLowerCase();
-
-      if (!newRegistrationKey) {
-        throw new Error(
-          "아이폰 등록키를 만들지 못했습니다."
-        );
-      }
-
+  try {
+    // 1. Try FCM token if already in standalone or notification supported
+    let token = "ios_registered";
+    if (isStandalone() && "Notification" in window) {
       try {
-        localStorage.setItem("wooriapt_ios_reg_key", newRegistrationKey);
-        localStorage.setItem("wooriapt_ios_qr_code", qrCode);
-        localStorage.setItem("wooriapt_ios_phone", ownerPhone);
-        if (data.store_id) {
-          localStorage.setItem("wooriapt_store_id", String(data.store_id));
-        }
-      } catch (e) {}
-
-      const nextUrl =
-        "/72-iphone.html" +
-        "?qr=" +
-        encodeURIComponent(qrCode) +
-        "&reg=" +
-        encodeURIComponent(
-          newRegistrationKey
-        );
-
-      window.location.replace(nextUrl);
-
-    } catch (error) {
-      processing = false;
-      registerBtn.disabled = false;
-      registerBtn.textContent =
-        "등록하기";
-
-      setStatus(
-        registerStatus,
-        error instanceof Error
-          ? error.message
-          : "설치 준비에 실패했습니다.",
-        "error"
-      );
-    }
-  }
-);
-
-
-/* 설치된 앱에서 푸시 승인 */
-
-pushBtn.addEventListener(
-  "click",
-  async function () {
-    if (processing) {
-      return;
-    }
-
-    if (!isStandalone()) {
-      return;
-    }
-
-    processing = true;
-    pushBtn.disabled = true;
-    pushBtn.textContent =
-      "등록 중...";
-
-    setStatus(
-      pushStatus,
-      "푸시 알림을 등록하고 있습니다.",
-      "waiting"
-    );
-
-    try {
-      if (!qrCode || !validPhone(ownerPhone)) {
-        throw new Error(
-          "자동차 등록정보를 확인할 수 없습니다."
-        );
-      }
-
-      if (!("Notification" in window)) {
-        throw new Error(
-          "이 iPhone에서는 알림을 지원하지 않습니다."
-        );
-      }
-
-      if (
-        Notification.permission ===
-        "denied"
-      ) {
-        throw new Error(
-          "알림 권한이 차단되어 있습니다. iPhone 설정에서 알림을 허용해 주세요."
-        );
-      }
-
-      if (
-        Notification.permission !==
-        "granted"
-      ) {
-        const permission =
+        if (Notification.permission === "default") {
           await Notification.requestPermission();
-
-        if (permission !== "granted") {
-          throw new Error(
-            "푸시 알림을 허용해 주세요."
-          );
         }
+        if (Notification.permission === "granted") {
+          if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+          const swReg = await prepareServiceWorker();
+          const messaging = firebase.messaging();
+          const fcmToken = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg });
+          if (fcmToken) token = fcmToken;
+        }
+      } catch (e) {
+        console.warn("FCM token fetch in standalone skipped:", e);
       }
-
-      if (!firebase.apps.length) {
-        firebase.initializeApp(
-          FIREBASE_CONFIG
-        );
-      }
-
-      const registration =
-        await prepareServiceWorker();
-
-      const messaging =
-        firebase.messaging();
-
-      const token =
-        await messaging.getToken({
-          vapidKey:VAPID_KEY,
-          serviceWorkerRegistration:
-            registration
-        });
-
-      if (!token) {
-        throw new Error(
-          "푸시 토큰을 발급하지 못했습니다."
-        );
-      }
-
-      const result =
-        await registerVehicle(token);
-
-      saveStoreId(
-        result.store_id || storeId
-      );
-
-      localStorage.setItem(
-        completedStorageKey(),
-        "1"
-      );
-
-      processing = false;
-
-      showCard(completeCard);
-
-      setTimeout(openMartPlatform, 400);
-
-    } catch (error) {
-      processing = false;
-      pushBtn.disabled = false;
-      pushBtn.textContent =
-        "푸시 알림 허용";
-
-      setStatus(
-        pushStatus,
-        error instanceof Error
-          ? error.message
-          : "자동차 등록에 실패했습���다.",
-        "error"
-      );
     }
+
+    // 2. Register to Supabase immediately
+    await registerVehicleOnServer(token);
+
+    // Save local state
+    try {
+      localStorage.setItem("wooriapt_ios_qr_code", qrCode);
+      localStorage.setItem("wooriapt_ios_phone", ownerPhone);
+    } catch (e) {}
+
+    processing = false;
+    if (isStandalone() && iosPwaTip) {
+      iosPwaTip.style.display = "none";
+    }
+    showCard(completeCard);
+
+  } catch (error) {
+    processing = false;
+    registerBtn.disabled = false;
+    registerBtn.textContent = "동의하고 1초 등록하기";
+    setStatus(registerStatus, error instanceof Error ? error.message : "등록에 실패했습니다.", "error");
   }
-);
+});
 
+pushBtn.addEventListener("click", async function () {
+  if (processing) return;
+  processing = true;
+  pushBtn.disabled = true;
+  pushBtn.textContent = "승인 중...";
+  setStatus(pushStatus, "알림을 활성화하고 있습니다.", "waiting");
 
-/* 처음 실행 */
+  try {
+    if (!("Notification" in window)) throw new Error("이 기기에서는 알림을 지원하지 않습니다.");
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") throw new Error("푸시 알림을 허용해 주세요.");
+
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    const swReg = await prepareServiceWorker();
+    const messaging = firebase.messaging();
+    const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg });
+
+    if (token) {
+      await registerVehicleOnServer(token);
+    }
+
+    processing = false;
+    showCard(completeCard);
+  } catch (error) {
+    processing = false;
+    pushBtn.disabled = false;
+    pushBtn.textContent = "푸시 알림 허용";
+    setStatus(pushStatus, error instanceof Error ? error.message : "알림 활성화 실패", "error");
+  }
+});
 
 (async function start() {
-  /*
-   * 홈 화면에 설치된 앱 (Standalone PWA)
-   */
-  if (isStandalone()) {
-    let activeKey =
-      registrationKey ||
-      localStorage.getItem("wooriapt_ios_reg_key") ||
-      "";
-
-    if (!activeKey) {
-      const cachedQr = localStorage.getItem("wooriapt_ios_qr_code");
-      const cachedPhone = localStorage.getItem("wooriapt_ios_phone");
-      if (cachedQr && cachedPhone) {
-        qrCode = cleanQr(cachedQr);
-        ownerPhone = normalizePhone(cachedPhone);
-        showCard(pushCard);
-        prepareServiceWorker().catch(() => {});
-        return;
-      }
-
-      showError(
-        "아이폰 등록정보를 확인할 수 없습니다. QR 코드를 다시 스캔해 주세요."
-      );
-
-      return;
-    }
-
-    /*
-     * 이미 푸시 등록을 끝낸 앱은
-     * 다시 묻지 않고 바로 마트 플랫폼으로 이동
-     */
-    if (
-      localStorage.getItem(completedStorageKey()) === "1" ||
-      localStorage.getItem("wooriapt_ios_vehicle_completed_" + activeKey) === "1"
-    ) {
-      openMartPlatform();
-      return;
-    }
-
-    try {
-      const data =
-        await restoreRegistration(
-          activeKey
-        );
-
-      qrCode =
-        cleanQr(data.qr_code);
-
-      ownerPhone =
-        normalizePhone(data.phone);
-
-      saveStoreId(data.store_id);
-
-      if (
-        !qrCode ||
-        !validPhone(ownerPhone)
-      ) {
-        throw new Error(
-          "아이폰 등록정보가 올바르지 않습니다."
-        );
-      }
-
-      showCard(pushCard);
-      prepareServiceWorker().catch(() => {});
-
-    } catch (error) {
-      const cachedQr = localStorage.getItem("wooriapt_ios_qr_code");
-      const cachedPhone = localStorage.getItem("wooriapt_ios_phone");
-      if (cachedQr && cachedPhone) {
-        qrCode = cleanQr(cachedQr);
-        ownerPhone = normalizePhone(cachedPhone);
-        showCard(pushCard);
-        prepareServiceWorker().catch(() => {});
-        return;
-      }
-
-      showError(
-        error instanceof Error
-          ? error.message
-          : "아이폰 등록정보를 불러오지 못했습니다."
-      );
-    }
-
-    return;
-  }
-
-  /*
-   * 전화번호 등록이 끝난 Safari 화면
-   */
-  if (registrationKey) {
-    showCard(installCard);
-    return;
-  }
-
-  /*
-   * 처음 QR을 스캔한 화면
-   */
   if (!qrCode) {
-    showError(
-      "자동차 QR 정보를 확인할 수 없습니다."
-    );
-
+    showError("자동차 QR 정보를 확인할 수 없습니다.");
     return;
+  }
+
+  // If opened in Standalone mode and phone exists in storage
+  if (isStandalone()) {
+    const cachedPhone = localStorage.getItem("wooriapt_ios_phone");
+    if (cachedPhone && validPhone(cachedPhone)) {
+      ownerPhone = cachedPhone;
+      showCard(pushCard);
+      return;
+    }
   }
 
   showCard(registerCard);
 })();
 </script>
-
 </body>
 </html>
