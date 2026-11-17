@@ -609,9 +609,9 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 
       <div style="font-size:12.5px;color:#92400e;margin-top:8px;line-height:1.5;">
 
-        • 1건 발송 시 건당 딱 <strong>15원</strong>만 실시간 차감됩니다. (통신비 0원)<br>
+        • 1건 발송 시 건당 <strong>15원 (부가세 포함 16.5원)</strong>이 실시간 차감됩니다. (통신비 0원)<br>
 
-        • <strong>최소 충전 단위: 30만 원 이상부터 충전 가능</strong> (30만 / 50만 / 100만 원)
+        • <strong>최소 충전 단위: 30만 원(+VAT 3만 = 33만 원) 이상부터 충전 가능</strong> (33만 / 55만 / 110만 원)
 
       </div>
 
@@ -642,7 +642,7 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
         <span id="flyerCharCount" style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;">0 / 1,000자</span>
       </div>
       <div class="sa-help" style="color:#15803d;font-weight:700;margin-top:6px;">
-        ✨ 행사 품목 안내를 <b>1,000자 이내</b>로 입력하시면 발송 시 하단에 <b>[전단지 사진 &amp; 온라인 매장 상세보기 링크]</b>가 자동 포함되어 <b>건당 15원</b>으로 발송됩니다.
+        ✨ 행사 품목 안내를 <b>1,000자 이내</b>로 입력하시면 발송 시 하단에 <b>[전단지 사진 &amp; 온라인 매장 상세보기 링크]</b>가 자동 포함되어 <b>건당 15원 (부가세 포함 16.5원)</b>으로 발송됩니다.
       </div>
       <textarea id="flyerTextMsg" maxlength="1000" rows="16" style="min-height:340px;height:340px;font-size:15px;line-height:1.65;padding:14px;border:1.5px solid #86efac;border-radius:10px;background:#fff;resize:vertical;" oninput="document.getElementById('flyerCharCount').textContent=this.value.length.toLocaleString() + ' / 1,000자'" placeholder="예: [에너젠마트 주말 파격 대세일 안내]
 
@@ -707,7 +707,7 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
           <span style="font-weight:800;color:#166534;font-size:15px;" id="excelCountText">📊 등록된 전체 고객: 0 명</span>
           <div style="font-size:12px;color:#64748b;" id="excelFileNameText">포스(POS) 고객 엑셀 파일을 선택해 등록해 주세요 (자동 중복제거·누적저장)</div>
         </div>
-        <span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:800;">건당 15원</span>
+        <span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:800;">건당 16.5원 (VAT포함)</span>
       </div>
 
       <!-- [특급 기능] 순번 구간 지정 발송 & 기준일자(방문일/등록일) 실시간 팩트체크 -->
@@ -4312,7 +4312,7 @@ var targetCount = 0; // 현재 발송 선택 인원수
 
 
 function openChargeGuide() {
-  alert('🏛️ [우리아파트 마트 플랫폼 선입금 충전 안내]\n\n• 입금 계좌: 농협은행 199-02-289684\n• 예금주: 송해석 / (주)뉴알에너지 대표이사\n\n[★ 충전 단위: 30만 / 50만 / 100만 원 (최소 30만 원 이상)]\n1. 30만 원 충전 (+VAT 3만 원 = 33만 원 입금) ➔ 20,000건 발송\n2. 50만 원 충전 (+VAT 5만 원 = 55만 원 입금) ➔ 33,333건 발송\n3. 100만 원 충전 (+VAT 10만 원 = 110만 원 입금) ➔ 66,666건 발송\n\n※ 입금 확인 즉시 (주)뉴알에너지 명의로 전자세금계산서가 100% 자동 발행됩니다.');
+  alert('🏛️ [우리아파트 마트 플랫폼 선입금 충전 안내]\n\n• 입금 계좌: 농협은행 199-02-289684\n• 예금주: 송해석 / (주)뉴알에너지 대표이사\n\n[★ 충전 단위: 입금액(VAT 포함) 그대로 캐시 적립 · 건당 16.5원 차감]\n1. 33만 원 입금 (공급가 30만 + VAT 3만) ➔ 캐시 330,000원 (20,000건 발송)\n2. 55만 원 입금 (공급가 50만 + VAT 5만) ➔ 캐시 550,000원 (33,333건 발송)\n3. 110만 원 입금 (공급가 100만 + VAT 10만) ➔ 캐시 1,100,000원 (66,666건 발송)\n\n※ 입금 확인 즉시 (주)뉴알에너지 명의로 전자세금계산서가 100% 자동 발행됩니다.');
 }
 
 
@@ -4956,18 +4956,29 @@ function updateDateCheckCard(s, e) {
   }
 }
 
+var UNIT_PRICE_VAT = 16.5; // 15원 + 부가세 1.5원 = 16.5원
+
+function calcExactWon(amount) {
+  return Math.round(amount * 10) / 10; // 부동소수점 오차 제거, 0.5원 단위까지 정확히 유지
+}
+
+function formatWon(amount) {
+  var v = calcExactWon(amount);
+  return v.toLocaleString('ko-KR', { minimumFractionDigits: Number.isInteger(v) ? 0 : 1, maximumFractionDigits: 1 });
+}
+
 function updateCostDisplay(subText) {
-  var cost = targetCount * 15;
+  var cost = calcExactWon(targetCount * UNIT_PRICE_VAT);
   var costEl = document.getElementById('calcCostText');
   if (costEl) {
-    costEl.innerHTML = cost.toLocaleString() + '원 <small style="font-size:12px;color:#64748b;font-weight:normal;">(' + targetCount.toLocaleString() + '명 × 15원)</small>';
+    costEl.innerHTML = formatWon(cost) + '원 <small style="font-size:12px;color:#64748b;font-weight:normal;">(' + targetCount.toLocaleString() + '명 × 16.5원 · 부가세 포함)</small>';
   }
   var sendBtn = document.getElementById('btnBulkSend15') || document.querySelector('button[onclick="sendSaleAlert15()"]');
   if (sendBtn) {
     if (targetCount <= 0) {
-      sendBtn.innerHTML = '🚀 고객 엑셀 등록 후 15원 세일 알림 즉시 발송';
+      sendBtn.innerHTML = '🚀 고객 엑셀 등록 후 세일 알림 즉시 발송 (건당 16.5원 · VAT포함)';
     } else {
-      sendBtn.innerHTML = '🚀 ' + targetCount.toLocaleString() + '명 고객에게 15원 세일 알림 즉시 발송 (' + (subText || '') + ')';
+      sendBtn.innerHTML = '🚀 ' + targetCount.toLocaleString() + '명 고객에게 세일 알림 즉시 발송 (' + (subText || '') + ')';
     }
   }
 }
@@ -5120,22 +5131,22 @@ async function sendSaleAlert15() {
     return;
   }
 
-  var cost = selectedList.length * 15;
+  var cost = calcExactWon(selectedList.length * UNIT_PRICE_VAT);
   if (martCash < cost) {
-    var shortage = cost - martCash;
-    alert('⚠️ [보유 캐시 잔액 부족 안내]\n\n• 발송 대상: ' + selectedList.length.toLocaleString() + ' 명 (' + currentRangeStart.toLocaleString() + '번~' + currentRangeEnd.toLocaleString() + '번)\n• 필요 금액: ' + cost.toLocaleString() + ' 원 (1명당 15원)\n• 현재 잔액: ' + martCash.toLocaleString() + ' 원\n• 부족한 금액: ' + shortage.toLocaleString() + ' 원\n\n[충전 안내]\n최소 충전 단위는 [30만 원 이상(30만 / 50만 / 100만 원, VAT 별도)] 단위입니다.\n상단의 [+ 캐시 충전하기] 버튼을 눌러 계좌 입금 후 발송해 주세요!');
+    var shortage = calcExactWon(cost - martCash);
+    alert('⚠️ [보유 캐시 잔액 부족 안내]\n\n• 발송 대상: ' + selectedList.length.toLocaleString() + ' 명 (' + currentRangeStart.toLocaleString() + '번~' + currentRangeEnd.toLocaleString() + '번)\n• 필요 금액: ' + formatWon(cost) + ' 원 (건당 16.5원 · 부가세 포함)\n• 현재 잔액: ' + formatWon(martCash) + ' 원\n• 부족한 금액: ' + formatWon(shortage) + ' 원\n\n[충전 안내]\n최소 충전 단위는 [33만 원 이상(33만 / 55만 / 110만 원, VAT 포함)] 단위입니다.\n상단의 [+ 캐시 충전하기] 버튼을 눌러 계좌 입금 후 발송해 주세요!');
     openChargeGuide();
     return;
   }
 
   var sortLabel = currentSortMode === 'visit' ? '최근 방문일자순' : (currentSortMode === 'reg' ? '가입 등록일자순' : '장기 미방문 이탈 단골순');
   if (!confirm(
-    '📢 [15원 세일 알림 실전 발송 최종 확인]\n\n' +
+    '📢 [세일 알림 실전 발송 최종 확인]\n\n' +
     '• 정렬 기준: ' + sortLabel + '\n' +
     '• 발송 구간: ' + currentRangeStart.toLocaleString() + '번 ~ ' + currentRangeEnd.toLocaleString() + '번\n' +
     '• 발송 대상: ' + selectedList.length.toLocaleString() + ' 명 (010 정상 번호)\n' +
-    '• 예상 차감: ' + cost.toLocaleString() + ' 원 (성공 건수만 차감)\n' +
-    '• 발송 후 예상 잔액: ' + (martCash - cost).toLocaleString() + ' 원\n\n' +
+    '• 예상 차감: ' + formatWon(cost) + ' 원 (건당 16.5원, VAT포함 · 성공 건수만 차감)\n' +
+    '• 발송 후 예상 잔액: ' + formatWon(martCash - cost) + ' 원\n\n' +
     '지금 즉시 실제 발송을 시작하시겠습니까?'
   )) return;
 
@@ -5193,19 +5204,19 @@ async function sendSaleAlert15() {
       }
     }
 
-    var actualCost = successCount * 15;
-    martCash = Math.max(0, martCash - actualCost);
+    var actualCost = calcExactWon(successCount * UNIT_PRICE_VAT);
+    martCash = Math.max(0, calcExactWon(martCash - actualCost));
     var cashDisp = document.getElementById('currentCashDisplay');
-    if (cashDisp) cashDisp.textContent = martCash.toLocaleString() + '원';
+    if (cashDisp) cashDisp.textContent = formatWon(martCash) + '원';
 
     if (progressBox) {
       progressBox.style.background = '#dcfce7';
       progressBox.style.color = '#14532d';
       progressBox.style.border = '1.5px solid #86efac';
-      progressBox.innerHTML = '🎉 <b>실전 발송 완료!</b> 성공: <b>' + successCount.toLocaleString() + '건</b> / 실패: ' + failCount.toLocaleString() + '건<br>실제 차감 금액: ' + actualCost.toLocaleString() + '원 (잔여 캐시: ' + martCash.toLocaleString() + '원)';
+      progressBox.innerHTML = '🎉 <b>실전 발송 완료!</b> 성공: <b>' + successCount.toLocaleString() + '건</b> / 실패: ' + failCount.toLocaleString() + '건<br>실제 차감 금액: ' + formatWon(actualCost) + '원 (건당 16.5원 · VAT포함 / 잔여 캐시: ' + formatWon(martCash) + '원)';
     }
 
-    alert('🎉 [15원 세일 알림 실전 발송 완료]\n\n• 발송 성공: ' + successCount.toLocaleString() + ' 명\n• 발송 실패: ' + failCount.toLocaleString() + ' 명\n• 실제 차감 금액: ' + actualCost.toLocaleString() + ' 원\n• 잔여 캐시: ' + martCash.toLocaleString() + ' 원');
+    alert('🎉 [세일 알림 실전 발송 완료]\n\n• 발송 성공: ' + successCount.toLocaleString() + ' 명\n• 발송 실패: ' + failCount.toLocaleString() + ' 명\n• 실제 차감 금액: ' + formatWon(actualCost) + ' 원 (건당 16.5원 · VAT포함)\n• 잔여 캐시: ' + formatWon(martCash) + ' 원');
   } catch (err) {
     console.error('Bulk Send Error:', err);
     if (progressBox) {
