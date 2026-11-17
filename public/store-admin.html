@@ -1161,29 +1161,29 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
         <button class="sa-btn" type="button" style="background:#0f172a;margin-top:10px;" onclick="saveStoreTaxInfo()">세금계산서 정보 저장</button>
       </div>
 
-<!-- 2. 매장 사장님 판매대금 정산 계좌 등록 / 변경 -->
+<!-- 2. 소비자 주문 시 직접 입금받을 마트 전용 계좌 등록 / 변경 -->
 
       <div style="margin-top:14px;padding:16px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;">
 
         <b style="color:#166534;font-size:15px;display:flex;align-items:center;gap:6px;">
 
-          <span>💳 사장님 온라인 주문 판매대금 정산 입금 계좌</span>
+          <span>💳 소비자 주문 시 직접 입금받을 마트 전용 계좌</span>
 
         </b>
 
         <div class="sa-help" style="color:#166534;margin-top:4px;">
 
-          소비자가 매장 화면에서 온라인 주문 결제 시, 본사에서 마트 사장님께 판매대금을 송금해 드릴 입금 계좌입니다.
+          소비자가 매장 화면에서 온라인 주문 시, 본사를 거치지 않고 <b>마트 사장님 계좌로 바로 직접 입금</b>할 수 있도록 안내되는 마트 전용 계좌입니다.
 
         </div>
 
-        <input id="storeSettlementBank" placeholder="정산 받으실 은행명 (예: 농협, 국민, 신한)" value="농협">
+        <input id="storeSettlementBank" placeholder="입금 받으실 은행명 (예: 농협, 국민, 신한)" value="">
 
-        <input id="storeSettlementAccount" placeholder="계좌번호 (숫자만 입력)" value="199-02-289684">
+        <input id="storeSettlementAccount" placeholder="마트 전용 계좌번호 (숫자만 입력)" value="">
 
-        <input id="storeSettlementHolder" placeholder="예금주 성명 (예: 송해석)" value="송해석">
+        <input id="storeSettlementHolder" placeholder="예금주 (마트 상호 또는 대표자명)" value="">
 
-        <button class="sa-btn" type="button" style="background:#166534;margin-top:10px;" onclick="saveStoreSettlementAccount()">정산 계좌정보 저장</button>
+        <button class="sa-btn" type="button" style="background:#166534;margin-top:10px;" onclick="saveStoreSettlementAccount()">마트 전용 입금계좌 저장</button>
 
       </div>
 
@@ -4133,13 +4133,21 @@ function saveStoreSettlementAccount() {
 
   try {
 
+    var sid = currentStoreId || (typeof getActiveStoreCode === 'function' ? getActiveStoreCode() : 'store01');
+
+    localStorage.setItem('store_settlement_bank_' + sid, bank);
+
+    localStorage.setItem('store_settlement_account_' + sid, acc);
+
+    localStorage.setItem('store_settlement_holder_' + sid, holder);
+
     localStorage.setItem('store_settlement_bank', bank);
 
     localStorage.setItem('store_settlement_account', acc);
 
     localStorage.setItem('store_settlement_holder', holder);
 
-    alert('✅ [정산 계좌 저장 완료]\n\n• 은행명: ' + bank + '\n• 계좌번호: ' + acc + '\n• 예금주: ' + holder + '\n\n고객 주문 발생 시 위 계좌로 판매대금이 정확하게 정산 입금됩니다.');
+    alert('✅ [마트 전용 입금계좌 저장 완료]\n\n• 은행명: ' + bank + '\n• 계좌번호: ' + acc + '\n• 예금주: ' + holder + '\n\n소비자 온라인 주문 시 본사를 거치지 않고 위 마트 전용 계좌로 바로 입금 안내됩니다.');
 
   } catch(e) {
 
@@ -4152,11 +4160,11 @@ function saveStoreSettlementAccount() {
 
 
 async function loadSettlementAccount() {
-  if (!currentStoreId) return;
+  var sid = currentStoreId || (typeof getActiveStoreCode === 'function' ? getActiveStoreCode() : 'store01');
   try {
-    var bank = localStorage.getItem('store_settlement_bank_' + currentStoreId) || '';
-    var acc = localStorage.getItem('store_settlement_account_' + currentStoreId) || '';
-    var holder = localStorage.getItem('store_settlement_holder_' + currentStoreId) || '';
+    var bank = localStorage.getItem('store_settlement_bank_' + sid) || localStorage.getItem('store_settlement_bank') || '';
+    var acc = localStorage.getItem('store_settlement_account_' + sid) || localStorage.getItem('store_settlement_account') || '';
+    var holder = localStorage.getItem('store_settlement_holder_' + sid) || localStorage.getItem('store_settlement_holder') || '';
     if (document.getElementById('storeSettlementBank')) document.getElementById('storeSettlementBank').value = bank;
     if (document.getElementById('storeSettlementAccount')) document.getElementById('storeSettlementAccount').value = acc;
     if (document.getElementById('storeSettlementHolder')) document.getElementById('storeSettlementHolder').value = holder;
