@@ -15,6 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="마트 매장관리자">
 <meta name="theme-color" content="#15803d">
 <title>마트 매장관리자 | 15원 세일 발송 & 단골 DB</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
 
@@ -696,15 +697,15 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
     <!-- 3. 발송 대상 고객 엑셀 DB 올리기 & 순번 구간 지정 발송 기능 -->
     <div class="sa-box" style="border:2px solid #1f7a3a;">
       <b style="color:#1f7a3a;font-size:16px;">3. 발송 대상 고객 엑셀 DB 등록 &amp; 순번 구간 지정 발송</b>
-      <div class="sa-help">포스(POS)에서 다운받은 단골 고객 엑셀 파일(.xlsx, .csv)을 등록합니다. (1만 명 이상 대용량 DB 완벽 지원)</div>
+      <div class="sa-help">포스(POS)에서 다운받은 고객 엑셀(.xlsx, .xls, .csv)을 올려주세요. <b>2차·3차 계속 올리셔도 중복 번호는 자동 제거되고 신규 고객·최신 방문일만 자동 누적 반영</b>됩니다.</div>
       
       <input type="file" id="customerExcelFile" accept=".xlsx, .xls, .csv, .txt" class="sa-file" onchange="handleCustomerExcel(this)">
       
       <!-- 추출 결과 및 인원 표시 바 -->
       <div style="margin-top:12px;padding:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
         <div>
-          <span style="font-weight:800;color:#166534;font-size:15px;" id="excelCountText">📊 등록된 전체 고객: 10,000 명</span>
-          <div style="font-size:12px;color:#64748b;" id="excelFileNameText">단골고객_포스DB_전체1만명.xlsx (010 정상 번호 필터링 완료)</div>
+          <span style="font-weight:800;color:#166534;font-size:15px;" id="excelCountText">📊 등록된 전체 고객: 0 명</span>
+          <div style="font-size:12px;color:#64748b;" id="excelFileNameText">포스(POS) 고객 엑셀 파일을 선택해 등록해 주세요 (자동 중복제거·누적저장)</div>
         </div>
         <span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:800;">건당 15원</span>
       </div>
@@ -723,8 +724,9 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
               📋 가입 등록일자순 정렬
             </button>
           </div>
-          <div style="display:flex;justify-content:flex-end;margin-top:6px;">
-            <button type="button" style="border:0;background:none;color:#dc2626;font-size:12px;font-weight:bold;cursor:pointer;text-decoration:underline;" onclick="setSortMode('dormant')">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:6px;">
+            <span id="currentSortBadge" style="font-size:12px;font-weight:800;color:#15803d;background:#dcfce7;padding:3px 8px;border-radius:4px;">현재 정렬: 최근 방문일자순</span>
+            <button type="button" id="btnSortDormant" style="border:0;background:none;color:#dc2626;font-size:12px;font-weight:bold;cursor:pointer;text-decoration:underline;" onclick="setSortMode('dormant')">
               🔄 장기 미방문(이탈 단골) 고객순으로 뒤집기
             </button>
           </div>
@@ -732,7 +734,7 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 
         <!-- 구간 입력창 -->
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
-          <b style="color:#0f172a;font-size:14.5px;">🎯 발송 구간 입력 (1만 명 중 자유 선택)</b>
+          <b style="color:#0f172a;font-size:14.5px;" id="rangeTitleText">🎯 발송 구간 입력 (등록 고객 중 자유 선택)</b>
           <div style="font-size:12px;color:#475569;">
             <label style="cursor:pointer;margin-right:10px;"><input type="radio" name="sendRangeType" value="all" onchange="toggleSendRange(this.value)"> 전체 발송</label>
             <label style="cursor:pointer;font-weight:bold;color:#16a34a;"><input type="radio" name="sendRangeType" value="range" checked onchange="toggleSendRange(this.value)"> 📌 순번 지정</label>
@@ -741,9 +743,9 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
         
         <div id="rangeInputBox" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid #cbd5e1;">
           <span style="font-size:14px;font-weight:bold;color:#1e293b;">시작 순번:</span>
-          <input type="number" id="rangeStart" value="1" min="1" max="10000" style="width:90px;height:40px;padding:6px;border:2px solid #16a34a;border-radius:6px;font-weight:bold;font-size:15px;text-align:center;" oninput="updateRangeTargetCount()">
+          <input type="number" id="rangeStart" value="1" min="1" max="1" style="width:90px;height:40px;padding:6px;border:2px solid #16a34a;border-radius:6px;font-weight:bold;font-size:15px;text-align:center;" oninput="updateRangeTargetCount()">
           <span style="font-size:14px;font-weight:bold;color:#1e293b;">번 부터 &nbsp;~&nbsp; 종료 순번:</span>
-          <input type="number" id="rangeEnd" value="3000" min="1" max="10000" style="width:95px;height:40px;padding:6px;border:2px solid #16a34a;border-radius:6px;font-weight:bold;font-size:15px;text-align:center;" oninput="updateRangeTargetCount()">
+          <input type="number" id="rangeEnd" value="0" min="1" max="1" style="width:95px;height:40px;padding:6px;border:2px solid #16a34a;border-radius:6px;font-weight:bold;font-size:15px;text-align:center;" oninput="updateRangeTargetCount()">
           <span style="font-size:14px;font-weight:bold;color:#1e293b;">번 까지</span>
           <button type="button" class="sa-btn" style="width:auto;margin:0 0 0 auto;padding:8px 16px;background:#15803d;font-size:13.5px;" onclick="updateRangeTargetCount()">구간 적용</button>
         </div>
@@ -751,25 +753,25 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
         <!-- [대표님 제안 핵심] 마트 사장이 보고 결정하는 마지막 고객 날짜 검증 카드 -->
         <div id="customerDateCheckCard" style="margin-top:12px;padding:14px;background:#f0fdf4;border:1.5px solid #22c55e;border-radius:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-            <b style="color:#15803d;font-size:14px;">🔍 발송 전 [마지막 <span id="dispEndNo">3,000</span>번째 고객] 날짜 검증 팩트체크</b>
+            <b style="color:#15803d;font-size:14px;">🔍 발송 전 [마지막 <span id="dispEndNo">0</span>번째 고객] 날짜 검증 팩트체크</b>
             <span style="font-size:12px;background:#dcfce7;color:#166534;font-weight:bold;padding:2px 8px;border-radius:4px;">사장님 최종 확인용</span>
           </div>
 
           <div style="margin-top:10px;background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div style="border-right:1px solid #e2e8f0;padding-right:8px;">
-              <div style="font-size:12px;color:#64748b;margin-bottom:3px;">1번째 고객 기준일</div>
-              <div style="font-size:14px;font-weight:800;color:#0284c7;">최근방문: <span id="firstVisitDate">2026-11-14 (오늘)</span></div>
-              <div style="font-size:12.5px;color:#475569;margin-top:2px;">최초등록: <span id="firstRegDate">2026-09-01</span></div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:3px;"><span id="cardStartNo">1</span>번째 고객 기준일</div>
+              <div style="font-size:14px;font-weight:800;color:#0284c7;">최근방문: <span id="firstVisitDate">-</span></div>
+              <div style="font-size:12.5px;color:#475569;margin-top:2px;">최초등록: <span id="firstRegDate">-</span></div>
             </div>
             <div style="padding-left:4px;">
-              <div style="font-size:12px;color:#dc2626;font-weight:bold;margin-bottom:3px;">👉 마지막 <span id="cardEndNo">3,000</span>번째 고객 기준일</div>
-              <div style="font-size:14px;font-weight:900;color:#dc2626;">최근방문: <span id="lastVisitDate">2026-11-05 (9일 전)</span></div>
-              <div style="font-size:12.5px;color:#475569;margin-top:2px;">최초등록: <span id="lastRegDate">2026-03-12</span></div>
+              <div style="font-size:12px;color:#dc2626;font-weight:bold;margin-bottom:3px;">👉 마지막 <span id="cardEndNo">0</span>번째 고객 기준일</div>
+              <div style="font-size:14px;font-weight:900;color:#dc2626;">최근방문: <span id="lastVisitDate">-</span></div>
+              <div style="font-size:12.5px;color:#475569;margin-top:2px;">최초등록: <span id="lastRegDate">-</span></div>
             </div>
           </div>
 
           <div style="margin-top:9px;font-size:13px;color:#166534;font-weight:bold;" id="rangeSummaryGuide">
-            💡 <b>사장님 발송 요약:</b> 1번~3,000번까지 발송 시 <b>[최근 9일 이내에 매장에 방문한 단골 3,000명]</b>에게 정확히 발송됩니다!
+            💡 위에서 포스(POS) 고객 엑셀 파일을 올리시면 실제 고객별 방문일·등록일 기준으로 자동 정렬됩니다.
           </div>
         </div>
 
@@ -795,15 +797,17 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 
       <div style="font-size:14px;color:#475569;margin-bottom:8px;">
 
-        예상 발송 비용: <strong id="calcCostText" style="color:#b45309;font-size:17px;">15,000원</strong> (1,000명 × 15원)
+        예상 발송 비용: <strong id="calcCostText" style="color:#b45309;font-size:17px;">0원</strong>
 
       </div>
 
-      <button type="button" class="sa-btn" style="background:#15803d;padding:14px;font-size:16px;font-weight:900;" onclick="sendSaleAlert15()">
+      <button type="button" id="btnBulkSend15" class="sa-btn" style="background:#15803d;padding:14px;font-size:16px;font-weight:900;" onclick="sendSaleAlert15()">
 
-        🚀 1,000명 고객에게 15원 세일 알림 즉시 발송
+        🚀 고객 엑셀 등록 후 15원 세일 알림 즉시 발송
 
       </button>
+
+      <div id="bulkSendProgressBox" style="display:none;margin-top:12px;padding:12px;border-radius:8px;font-size:13px;font-weight:700;text-align:left;line-height:1.6;"></div>
 
     </div>
 
@@ -4303,7 +4307,7 @@ async function sendInquiry() {
 
 var martCash = 10000; // 현재 보유 캐시 (선입금 잔액)
 
-var targetCount = 1000; // 현재 등록된 고객 인원수
+var targetCount = 0; // 현재 발송 선택 인원수
 
 
 
@@ -4351,102 +4355,605 @@ function previewFlyerImage(input) {
 
 
 
-function handleCustomerExcel(input) {
+// ==============================================================
+// [실전용] POS 단골 고객 엑셀 DB 파싱 · 누적 병합(중복제거) · 정렬 · 영구저장
+// ==============================================================
+var customerDbList = [];     // [{ phone: '01012345678', name: '', visitDate: 'YYYY-MM-DD', regDate: 'YYYY-MM-DD' }]
+var customerDbMeta = { lastFileName: '', uploadCount: 0, updatedAt: '' };
+var totalDbCount = 0;
+var currentRangeStart = 1;
+var currentRangeEnd = 0;
+var currentSortMode = 'visit'; // 'visit' | 'reg' | 'dormant'
 
-  if (input.files && input.files[0]) {
+// --- IndexedDB 영구 저장소 (10만 명 대용량 지원) ---
+function openCustomerIDB() {
+  return new Promise(function(resolve, reject) {
+    if (!window.indexedDB) return reject(new Error('IndexedDB 미지원'));
+    var req = indexedDB.open('MartCustomerDB_v1', 1);
+    req.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains('stores')) {
+        db.createObjectStore('stores', { keyPath: 'storeCode' });
+      }
+    };
+    req.onsuccess = function(e) { resolve(e.target.result); };
+    req.onerror = function(e) { reject(e.target.error); };
+  });
+}
 
-    var file = input.files[0];
+async function saveCustomerDbToStorage() {
+  var code = getActiveStoreCode();
+  var payload = {
+    storeCode: code,
+    customers: customerDbList,
+    meta: customerDbMeta
+  };
+  try {
+    var db = await openCustomerIDB();
+    await new Promise(function(resolve, reject) {
+      var tx = db.transaction('stores', 'readwrite');
+      tx.objectStore('stores').put(payload);
+      tx.oncomplete = function() { resolve(); };
+      tx.onerror = function(e) { reject(e.target.error); };
+    });
+  } catch (e) {
+    try {
+      localStorage.setItem('mart_cust_db_' + code, JSON.stringify(payload));
+    } catch (e2) {}
+  }
+}
 
-    document.getElementById('excelFileNameText').textContent = file.name + ' (010 정상 번호 필터링 완료)';
+async function loadCustomerDbFromStorage() {
+  var code = getActiveStoreCode();
+  var payload = null;
+  try {
+    var db = await openCustomerIDB();
+    payload = await new Promise(function(resolve, reject) {
+      var tx = db.transaction('stores', 'readonly');
+      var req = tx.objectStore('stores').get(code);
+      req.onsuccess = function() { resolve(req.result || null); };
+      req.onerror = function(e) { reject(e.target.error); };
+    });
+  } catch (e) {}
+  if (!payload) {
+    try {
+      var raw = localStorage.getItem('mart_cust_db_' + code);
+      if (raw) payload = JSON.parse(raw);
+    } catch (e2) {}
+  }
+  if (payload && Array.isArray(payload.customers)) {
+    customerDbList = payload.customers;
+    customerDbMeta = payload.meta || { lastFileName: '', uploadCount: 1, updatedAt: '' };
+  } else {
+    customerDbList = [];
+    customerDbMeta = { lastFileName: '', uploadCount: 0, updatedAt: '' };
+  }
+  totalDbCount = customerDbList.length;
+  sortCustomerDbArray(currentSortMode);
+  syncCustomerDbUi(true);
+}
 
-    totalDbCount = 10000;
-    targetCount = 1000;
-    if (document.getElementById('rangeEnd')) document.getElementById('rangeEnd').max = totalDbCount;
-    updateRangeTargetCount();
+async function clearCustomerDbStorage() {
+  var code = getActiveStoreCode();
+  try {
+    var db = await openCustomerIDB();
+    await new Promise(function(resolve, reject) {
+      var tx = db.transaction('stores', 'readwrite');
+      tx.objectStore('stores').delete(code);
+      tx.oncomplete = function() { resolve(); };
+      tx.onerror = function(e) { reject(e.target.error); };
+    });
+  } catch (e) {}
+  try { localStorage.removeItem('mart_cust_db_' + code); } catch (e2) {}
+}
 
-    document.getElementById('excelCountText').textContent = '📊 등록된 발송 대상: ' + targetCount.toLocaleString() + ' 명';
+// --- 날짜/전화번호 정규화 유틸 ---
+function getTodayStr() {
+  var d = new Date();
+  var y = d.getFullYear();
+  var m = String(d.getMonth() + 1).padStart(2, '0');
+  var day = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+}
 
-    var cost = targetCount * 15;
+function normalizePhone010(val) {
+  if (val === null || val === undefined) return '';
+  var s = String(val).trim();
+  if (!s) return '';
+  var digits = s.replace(/[^0-9]/g, '');
+  if (digits.length === 10 && digits.startsWith('10')) {
+    digits = '0' + digits; // 엑셀에서 앞 0이 빠진 10XXXXXXXX 보정
+  }
+  if (digits.length === 11 && digits.startsWith('010')) {
+    return digits;
+  }
+  // 셀 안에 텍스트와 함께 010 번호가 섞인 경우 추출
+  var m = s.match(/010[-.\s]?\d{4}[-.\s]?\d{4}/);
+  if (m) return m[0].replace(/[^0-9]/g, '');
+  return '';
+}
 
-    document.getElementById('calcCostText').textContent = cost.toLocaleString() + '원';
+function normalizeDateStr(val) {
+  if (val === null || val === undefined || val === '') return '';
+  // Excel serial number (e.g. 45200 ~ 55000)
+  if (typeof val === 'number' && val > 25569 && val < 70000) {
+    var utcDays = Math.floor(val - 25569);
+    var dt = new Date(utcDays * 86400 * 1000);
+    var y = dt.getUTCFullYear();
+    var m = String(dt.getUTCMonth() + 1).padStart(2, '0');
+    var d = String(dt.getUTCDate()).padStart(2, '0');
+    return y + '-' + m + '-' + d;
+  }
+  if (val instanceof Date && !isNaN(val.getTime())) {
+    var yy = val.getFullYear();
+    var mm = String(val.getMonth() + 1).padStart(2, '0');
+    var dd = String(val.getDate()).padStart(2, '0');
+    return yy + '-' + mm + '-' + dd;
+  }
+  var s = String(val).trim();
+  if (!s) return '';
+  // YYYY-MM-DD / YYYY.MM.DD / YYYY/MM/DD
+  var m1 = s.match(/(20\d{2}|19\d{2})[-./년\s]+(\d{1,2})[-./월\s]+(\d{1,2})/);
+  if (m1) {
+    return m1[1] + '-' + String(m1[2]).padStart(2, '0') + '-' + String(m1[3]).padStart(2, '0');
+  }
+  // YYYYMMDD (8자리)
+  var m2 = s.match(/^(20\d{2}|19\d{2})(\d{2})(\d{2})/);
+  if (m2) {
+    return m2[1] + '-' + m2[2] + '-' + m2[3];
+  }
+  // YY-MM-DD
+  var m3 = s.match(/^(\d{2})[-./](\d{1,2})[-./](\d{1,2})/);
+  if (m3) {
+    return '20' + m3[1] + '-' + String(m3[2]).padStart(2, '0') + '-' + String(m3[3]).padStart(2, '0');
+  }
+  return '';
+}
 
-    alert('✅ [' + file.name + '] 엑셀 파일이 정상 등록되었습니다.\n총 1,000명의 010 단골 고객이 발송 대상으로 추출되었습니다.');
+function calcDaysAgoLabel(dateStr) {
+  if (!dateStr) return '-';
+  var parts = dateStr.split('-');
+  if (parts.length !== 3) return dateStr;
+  var target = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  var now = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var diff = Math.round((today - target) / 86400000);
+  if (isNaN(diff)) return dateStr;
+  if (diff === 0) return dateStr + ' (오늘)';
+  if (diff > 0) return dateStr + ' (' + diff.toLocaleString() + '일 전)';
+  return dateStr;
+}
 
+function parseCsvRowsFallback(text) {
+  var lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  var rows = [];
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (!line) continue;
+    // 간단한 CSV/탭 분리
+    var sep = line.indexOf('\t') >= 0 ? '\t' : ',';
+    var cols = line.split(sep).map(function(c) { return c.replace(/^"|"$/g, '').trim(); });
+    rows.push(cols);
+  }
+  return rows;
+}
+
+async function readExcelOrCsvRows(file) {
+  var ext = (file.name.split('.').pop() || '').toLowerCase();
+  var buf = await file.arrayBuffer();
+
+  if (ext === 'csv' || ext === 'txt') {
+    var text = new TextDecoder('utf-8').decode(buf);
+    if (text.indexOf('\uFFFD') >= 0) {
+      try { text = new TextDecoder('euc-kr').decode(buf); } catch (e) {}
+    }
+    if (window.XLSX) {
+      var wbCsv = XLSX.read(text, { type: 'string' });
+      var sheetCsv = wbCsv.Sheets[wbCsv.SheetNames[0]];
+      return XLSX.utils.sheet_to_json(sheetCsv, { header: 1, defval: '' });
+    }
+    return parseCsvRowsFallback(text);
   }
 
+  if (!window.XLSX) {
+    throw new Error('엑셀 분석 라이브러리가 아직 로드되지 않았습니다. 잠시 후 다시 시도하거나 CSV 파일로 올려주세요.');
+  }
+  var wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
+  var firstSheet = wb.Sheets[wb.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
 }
 
+function extractCustomersFromRows(rows) {
+  if (!rows || !rows.length) return [];
+  var today = getTodayStr();
+  var headerIdx = -1;
+  var colPhone = -1, colName = -1, colVisit = -1, colReg = -1;
 
+  // 앞쪽 10줄 내에서 헤더 자동 탐색
+  for (var r = 0; r < Math.min(10, rows.length); r++) {
+    var row = rows[r] || [];
+    for (var c = 0; c < row.length; c++) {
+      var h = String(row[c] || '').replace(/\s+/g, '').toLowerCase();
+      if (!h) continue;
+      if (colPhone < 0 && /(휴대폰|핸드폰|전화|연락처|폰|phone|mobile|hp|tel)/.test(h)) colPhone = c;
+      if (colName < 0 && /(이름|성명|고객명|회원명|성함|name)/.test(h)) colName = c;
+      if (colVisit < 0 && /(방문|최근|최종|거래|구매|매출|이용)/.test(h)) colVisit = c;
+      if (colReg < 0 && /(등록|가입|최초|생성|신규)/.test(h)) colReg = c;
+    }
+    if (colPhone >= 0 || colVisit >= 0 || colReg >= 0) {
+      headerIdx = r;
+      break;
+    }
+  }
+
+  var startRow = headerIdx >= 0 ? headerIdx + 1 : 0;
+  var parsed = [];
+
+  for (var i = startRow; i < rows.length; i++) {
+    var line = rows[i];
+    if (!line || !line.length) continue;
+
+    var phone = '';
+    if (colPhone >= 0 && line[colPhone] !== undefined) {
+      phone = normalizePhone010(line[colPhone]);
+    }
+    if (!phone) {
+      // 지정 컬럼에 없으면 행 전체에서 010 번호 탐색
+      for (var j = 0; j < line.length; j++) {
+        var foundP = normalizePhone010(line[j]);
+        if (foundP) { phone = foundP; break; }
+      }
+    }
+    if (!phone) continue;
+
+    var name = (colName >= 0 && line[colName] !== undefined) ? String(line[colName]).trim() : '';
+    var visitDate = (colVisit >= 0 && line[colVisit] !== undefined) ? normalizeDateStr(line[colVisit]) : '';
+    var regDate = (colReg >= 0 && line[colReg] !== undefined) ? normalizeDateStr(line[colReg]) : '';
+
+    // 날짜 컬럼 헤더를 못 찾았으면 행 내 날짜 형태 자동 추출
+    if (!visitDate && !regDate && colVisit < 0 && colReg < 0) {
+      var datesFound = [];
+      for (var k = 0; k < line.length; k++) {
+        if (k === colPhone) continue;
+        var dStr = normalizeDateStr(line[k]);
+        if (dStr) datesFound.push(dStr);
+      }
+      if (datesFound.length >= 2) {
+        datesFound.sort();
+        regDate = datesFound[0];
+        visitDate = datesFound[datesFound.length - 1];
+      } else if (datesFound.length === 1) {
+        visitDate = datesFound[0];
+        regDate = datesFound[0];
+      }
+    }
+
+    if (!visitDate && regDate) visitDate = regDate;
+    if (!regDate && visitDate) regDate = visitDate;
+    if (!visitDate) visitDate = today;
+    if (!regDate) regDate = today;
+
+    parsed.push({ phone: phone, name: name, visitDate: visitDate, regDate: regDate });
+  }
+  return parsed;
+}
+
+// --- 1차·2차·3차 누적 병합 (010 번호 중복 자동 제거 + 최신 방문일 갱신) ---
+function mergeCustomerRecords(newRecords) {
+  var map = new Map();
+  for (var i = 0; i < customerDbList.length; i++) {
+    var ex = customerDbList[i];
+    map.set(ex.phone, ex);
+  }
+  var fileUniqueSet = new Set();
+  var addedCount = 0;
+  var mergedCount = 0;
+
+  for (var j = 0; j < newRecords.length; j++) {
+    var rec = newRecords[j];
+    if (fileUniqueSet.has(rec.phone)) continue; // 같은 파일 내 중복 제거
+    fileUniqueSet.add(rec.phone);
+
+    if (map.has(rec.phone)) {
+      var cur = map.get(rec.phone);
+      // 방문일은 더 최신 날짜로 갱신
+      if (rec.visitDate && (!cur.visitDate || rec.visitDate > cur.visitDate)) {
+        cur.visitDate = rec.visitDate;
+      }
+      // 최초 등록일은 더 오래된 날짜로 보존
+      if (rec.regDate && (!cur.regDate || rec.regDate < cur.regDate)) {
+        cur.regDate = rec.regDate;
+      }
+      if (rec.name && !cur.name) cur.name = rec.name;
+      mergedCount++;
+    } else {
+      map.set(rec.phone, {
+        phone: rec.phone,
+        name: rec.name || '',
+        visitDate: rec.visitDate,
+        regDate: rec.regDate
+      });
+      addedCount++;
+    }
+  }
+
+  customerDbList = Array.from(map.values());
+  totalDbCount = customerDbList.length;
+  return {
+    fileValidCount: fileUniqueSet.size,
+    addedCount: addedCount,
+    mergedCount: mergedCount,
+    totalCount: totalDbCount
+  };
+}
+
+async function handleCustomerExcel(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  var fileNameEl = document.getElementById('excelFileNameText');
+  if (fileNameEl) fileNameEl.textContent = '⏳ [' + file.name + '] 파일을 분석하고 중복을 정리하는 중입니다...';
+
+  try {
+    var rows = await readExcelOrCsvRows(file);
+    var parsed = extractCustomersFromRows(rows);
+    if (!parsed.length) {
+      alert('⚠️ [' + file.name + '] 파일에서 정상적인 010 휴대폰 번호를 찾지 못했습니다.\n\n엑셀 안에 010 휴대폰 번호 열이 포함되어 있는지 확인해 주세요.');
+      syncCustomerDbUi(false);
+      input.value = '';
+      return;
+    }
+
+    var stat = mergeCustomerRecords(parsed);
+    customerDbMeta.lastFileName = file.name;
+    customerDbMeta.uploadCount = (customerDbMeta.uploadCount || 0) + 1;
+    customerDbMeta.updatedAt = getTodayStr();
+
+    sortCustomerDbArray(currentSortMode);
+    await saveCustomerDbToStorage();
+    syncCustomerDbUi(true);
+
+    // 같은 이름 파일 재업로드 허용을 위해 input 초기화
+    input.value = '';
+
+    alert(
+      '✅ [' + file.name + '] 실전 고객 DB 반영 완료!\n\n' +
+      '• 이번 파일 정상 010 번호: ' + stat.fileValidCount.toLocaleString() + '명\n' +
+      '• 신규 추가된 고객: +' + stat.addedCount.toLocaleString() + '명\n' +
+      '• 기존 중복 고객 (자동 병합·최신화): ' + stat.mergedCount.toLocaleString() + '명\n' +
+      '━━━━━━━━━━━━━━━━━━━━\n' +
+      '📊 현재 누적 전체 단골 DB: 총 ' + stat.totalCount.toLocaleString() + '명\n' +
+      '(앞으로 2차·3차 엑셀을 계속 올리셔도 중복 없이 자동 누적됩니다)'
+    );
+  } catch (err) {
+    console.error('Excel Parse Error:', err);
+    alert('❌ 엑셀 파일 처리 중 오류가 발생했습니다.\n' + (err.message || err));
+    syncCustomerDbUi(false);
+    input.value = '';
+  }
+}
 
 // [핵심 기능 1] 등록된 단골 엑셀 DB 영구 삭제 파기
+async function deleteCustomerExcelDb() {
+  if (!confirm('⚠️ [경고: 고객 엑셀 DB 영구 파기]\n\n등록된 단골 고객 엑셀 명단(' + totalDbCount.toLocaleString() + '명)을 즉시 영구 파기하시겠습니까?\n삭제 후에는 복구가 불가능합니다.')) return;
 
-function deleteCustomerExcelDb() {
-
-  if (!confirm('⚠️ [경고: 고객 엑셀 DB 영구 파기]\n\n등록된 단골 고객 엑셀 명단을 서버 및 화면에서 즉시 영구 파기하시겠습니까?\n삭제 후에는 개인정보보호법에 따라 복구가 불가능합니다.')) return;
-
-
-
+  customerDbList = [];
+  totalDbCount = 0;
   targetCount = 0;
+  currentRangeStart = 1;
+  currentRangeEnd = 0;
+  customerDbMeta = { lastFileName: '', uploadCount: 0, updatedAt: '' };
+  await clearCustomerDbStorage();
 
-  document.getElementById('excelCountText').textContent = '📊 등록된 발송 대상: 0 명 (영구 파기 완료)';
+  var fileInput = document.getElementById('customerExcelFile');
+  if (fileInput) fileInput.value = '';
+  syncCustomerDbUi(true);
 
-  document.getElementById('excelFileNameText').textContent = '등록된 엑셀 파일 없음 (완전 삭제됨)';
-
-  document.getElementById('calcCostText').textContent = '0원';
-
-  document.getElementById('customerExcelFile').value = '';
-
-
-
-  alert('🔒 [영구 파기 완료]\n\n마트 고객 엑셀 DB가 서버와 브라우저에서 안전하게 100% 영구 파기되었습니다.');
-
+  alert('🔒 [영구 파기 완료]\n\n마트 고객 엑셀 DB가 안전하게 100% 영구 파기되었습니다.');
 }
 
+// --- 정렬 엔진 (원터치 정렬 버튼 3종 완전 동작) ---
+function sortCustomerDbArray(mode) {
+  currentSortMode = mode || 'visit';
+  if (currentSortMode === 'visit') {
+    customerDbList.sort(function(a, b) {
+      return (b.visitDate || '').localeCompare(a.visitDate || '') || (b.regDate || '').localeCompare(a.regDate || '');
+    });
+  } else if (currentSortMode === 'reg') {
+    customerDbList.sort(function(a, b) {
+      return (b.regDate || '').localeCompare(a.regDate || '') || (b.visitDate || '').localeCompare(a.visitDate || '');
+    });
+  } else if (currentSortMode === 'dormant') {
+    customerDbList.sort(function(a, b) {
+      return (a.visitDate || '9999-99-99').localeCompare(b.visitDate || '9999-99-99') || (a.regDate || '9999-99-99').localeCompare(b.regDate || '9999-99-99');
+    });
+  }
+}
 
+function updateSortButtonStyles() {
+  var btnVisit = document.getElementById('btnSortVisit');
+  var btnReg = document.getElementById('btnSortReg');
+  var btnDormant = document.getElementById('btnSortDormant');
+  var badge = document.getElementById('currentSortBadge');
 
-// [핵심 기능 2] 15원 발송 실행 및 잔액 부족 검증 (1,000명 발송 시 잔액 부족 알림)
+  var activeStyle = 'margin:0;padding:12px 8px;background:#15803d;color:#fff;font-size:14px;border:2px solid #166534;border-radius:8px;';
+  var inactiveStyle = 'margin:0;padding:12px 8px;background:#f8fafc;color:#334155;font-size:14px;border:1.5px solid #cbd5e1;border-radius:8px;';
 
+  if (btnVisit) btnVisit.style.cssText = (currentSortMode === 'visit') ? activeStyle : inactiveStyle;
+  if (btnReg) btnReg.style.cssText = (currentSortMode === 'reg') ? activeStyle : inactiveStyle;
+  if (btnDormant) {
+    if (currentSortMode === 'dormant') {
+      btnDormant.style.cssText = 'border:1.5px solid #dc2626;background:#fef2f2;color:#b91c1c;font-size:12px;font-weight:900;cursor:pointer;padding:4px 10px;border-radius:6px;text-decoration:none;';
+      btnDormant.textContent = '✅ 장기 미방문(이탈 단골)순 적용중';
+    } else {
+      btnDormant.style.cssText = 'border:0;background:none;color:#dc2626;font-size:12px;font-weight:bold;cursor:pointer;text-decoration:underline;';
+      btnDormant.textContent = '🔄 장기 미방문(이탈 단골) 고객순으로 뒤집기';
+    }
+  }
+  if (badge) {
+    if (currentSortMode === 'visit') {
+      badge.textContent = '현재 정렬: ⚡ 최근 방문일자순';
+      badge.style.background = '#dcfce7';
+      badge.style.color = '#15803d';
+    } else if (currentSortMode === 'reg') {
+      badge.textContent = '현재 정렬: 📋 가입 등록일자순';
+      badge.style.background = '#dbeafe';
+      badge.style.color = '#1d4ed8';
+    } else {
+      badge.textContent = '현재 정렬: 🔄 장기 미방문(이탈 단골)순';
+      badge.style.background = '#fee2e2';
+      badge.style.color = '#b91c1c';
+    }
+  }
+}
 
-var totalDbCount = 10000; // 전체 엑셀 등록 인원 (기본 1만명 지원)
-var targetCount = 1000;    // 실제 발송 대상 인원 (기본 2001~3000번 구간 1,000명)
-var currentRangeStart = 2001;
-var currentRangeEnd = 3000;
+function setSortMode(mode) {
+  sortCustomerDbArray(mode);
+  updateSortButtonStyles();
+  updateRangeTargetCount();
+}
+
+function changeDbSortOrder(orderType) {
+  if (orderType === 'old_visit') setSortMode('dormant');
+  else if (orderType === 'register_date') setSortMode('reg');
+  else setSortMode('visit');
+}
+
+function syncCustomerDbUi(resetRange) {
+  totalDbCount = customerDbList.length;
+  var countEl = document.getElementById('excelCountText');
+  var fileEl = document.getElementById('excelFileNameText');
+  var titleEl = document.getElementById('rangeTitleText');
+  var startEl = document.getElementById('rangeStart');
+  var endEl = document.getElementById('rangeEnd');
+
+  if (countEl) {
+    countEl.textContent = '📊 등록된 전체 고객: ' + totalDbCount.toLocaleString() + ' 명';
+  }
+  if (fileEl) {
+    if (totalDbCount > 0) {
+      fileEl.textContent = '최근 반영: ' + (customerDbMeta.lastFileName || '포스DB') + ' (누적 ' + (customerDbMeta.uploadCount || 1) + '회 · 010 중복제거 완료)';
+    } else {
+      fileEl.textContent = '포스(POS) 고객 엑셀 파일을 선택해 등록해 주세요 (자동 중복제거·누적저장)';
+    }
+  }
+  if (titleEl) {
+    titleEl.textContent = totalDbCount > 0
+      ? '🎯 발송 구간 입력 (전체 ' + totalDbCount.toLocaleString() + '명 중 자유 선택)'
+      : '🎯 발송 구간 입력 (엑셀 등록 후 자유 선택)';
+  }
+
+  if (startEl && endEl) {
+    startEl.max = Math.max(1, totalDbCount);
+    endEl.max = Math.max(1, totalDbCount);
+    if (resetRange) {
+      if (totalDbCount > 0) {
+        startEl.value = 1;
+        endEl.value = totalDbCount;
+      } else {
+        startEl.value = 1;
+        endEl.value = 0;
+      }
+    }
+  }
+
+  updateSortButtonStyles();
+  updateRangeTargetCount();
+}
 
 function toggleSendRange(type) {
   var rangeBox = document.getElementById('rangeInputBox');
+  var startEl = document.getElementById('rangeStart');
+  var endEl = document.getElementById('rangeEnd');
   if (type === 'all') {
     if (rangeBox) rangeBox.style.opacity = '0.5';
-    targetCount = totalDbCount;
-    updateCostDisplay('전체 ' + targetCount.toLocaleString() + '명 전원 발송');
+    if (startEl) startEl.value = totalDbCount > 0 ? 1 : 0;
+    if (endEl) endEl.value = totalDbCount;
   } else {
     if (rangeBox) rangeBox.style.opacity = '1';
-    updateRangeTargetCount();
   }
-}
-
-
-function changeDbSortOrder(orderType) {
-  var labelText = '최근 방문일자 순';
-  if (orderType === 'old_visit') labelText = '이탈 고객 순 (방문 오래된 순)';
-  else if (orderType === 'register_date') labelText = '고객 등록일자 순';
-  else if (orderType === 'excel_origin') labelText = '엑셀 원본 순';
-
   updateRangeTargetCount();
-  alert('🔄 [순번 정렬 완료]\n\n고객 명단이 [' + labelText + ']으로 즉시 재정렬되었습니다!\n이제 원하는 순번 구간(예: 1번~1,000번 또는 2,001번~3,000번)을 지정해 발송하시면 됩니다.');
 }
 
 function updateRangeTargetCount() {
-  var s = parseInt(document.getElementById('rangeStart')?.value || '1', 10);
-  var e = parseInt(document.getElementById('rangeEnd')?.value || '1000', 10);
-  if (isNaN(s) || s < 1) s = 1;
-  if (isNaN(e) || e < s) e = s;
-  if (e > totalDbCount && totalDbCount > 0) e = totalDbCount;
+  var rangeTypeEl = document.querySelector('input[name="sendRangeType"]:checked');
+  var rangeType = rangeTypeEl ? rangeTypeEl.value : 'range';
+
+  if (totalDbCount <= 0) {
+    currentRangeStart = 0;
+    currentRangeEnd = 0;
+    targetCount = 0;
+    updateDateCheckCard(0, 0);
+    updateCostDisplay('');
+    return;
+  }
+
+  var s, e;
+  if (rangeType === 'all') {
+    s = 1;
+    e = totalDbCount;
+  } else {
+    s = parseInt(document.getElementById('rangeStart')?.value || '1', 10);
+    e = parseInt(document.getElementById('rangeEnd')?.value || String(totalDbCount), 10);
+    if (isNaN(s) || s < 1) s = 1;
+    if (s > totalDbCount) s = totalDbCount;
+    if (isNaN(e) || e < s) e = s;
+    if (e > totalDbCount) e = totalDbCount;
+  }
 
   currentRangeStart = s;
   currentRangeEnd = e;
   targetCount = (e - s) + 1;
 
-  updateCostDisplay('순번 [' + s.toLocaleString() + '번 ~ ' + e.toLocaleString() + '번] 선택: 총 ' + targetCount.toLocaleString() + '명');
+  updateDateCheckCard(s, e);
+  var subLabel = (rangeType === 'all')
+    ? ('전체 ' + targetCount.toLocaleString() + '명 전원 발송')
+    : ('순번 ' + s.toLocaleString() + '~' + e.toLocaleString() + '번 · ' + targetCount.toLocaleString() + '명');
+  updateCostDisplay(subLabel);
+}
+
+function updateDateCheckCard(s, e) {
+  var dispEndNo = document.getElementById('dispEndNo');
+  var cardStartNo = document.getElementById('cardStartNo');
+  var cardEndNo = document.getElementById('cardEndNo');
+  var firstVisitEl = document.getElementById('firstVisitDate');
+  var firstRegEl = document.getElementById('firstRegDate');
+  var lastVisitEl = document.getElementById('lastVisitDate');
+  var lastRegEl = document.getElementById('lastRegDate');
+  var guideEl = document.getElementById('rangeSummaryGuide');
+
+  if (totalDbCount <= 0 || s < 1 || e < 1) {
+    if (dispEndNo) dispEndNo.textContent = '0';
+    if (cardStartNo) cardStartNo.textContent = '1';
+    if (cardEndNo) cardEndNo.textContent = '0';
+    if (firstVisitEl) firstVisitEl.textContent = '-';
+    if (firstRegEl) firstRegEl.textContent = '-';
+    if (lastVisitEl) lastVisitEl.textContent = '-';
+    if (lastRegEl) lastRegEl.textContent = '-';
+    if (guideEl) guideEl.innerHTML = '💡 위에서 포스(POS) 고객 엑셀 파일을 올리시면 실제 고객별 방문일·등록일 기준으로 자동 정렬됩니다.';
+    return;
+  }
+
+  var firstCust = customerDbList[s - 1];
+  var lastCust = customerDbList[e - 1];
+  if (dispEndNo) dispEndNo.textContent = e.toLocaleString();
+  if (cardStartNo) cardStartNo.textContent = s.toLocaleString();
+  if (cardEndNo) cardEndNo.textContent = e.toLocaleString();
+  if (firstVisitEl) firstVisitEl.textContent = calcDaysAgoLabel(firstCust.visitDate);
+  if (firstRegEl) firstRegEl.textContent = firstCust.regDate || '-';
+  if (lastVisitEl) lastVisitEl.textContent = calcDaysAgoLabel(lastCust.visitDate);
+  if (lastRegEl) lastRegEl.textContent = lastCust.regDate || '-';
+
+  if (guideEl) {
+    var modeDesc = '';
+    if (currentSortMode === 'visit') {
+      modeDesc = '<b>[최근 방문일자순]</b> ' + s.toLocaleString() + '번~' + e.toLocaleString() + '번 (방문일 ' + (lastCust.visitDate || '-') + ' ~ ' + (firstCust.visitDate || '-') + ') 단골 <b>' + targetCount.toLocaleString() + '명</b>에게 정확히 발송됩니다.';
+    } else if (currentSortMode === 'reg') {
+      modeDesc = '<b>[가입 등록일자순]</b> ' + s.toLocaleString() + '번~' + e.toLocaleString() + '번 (등록일 ' + (lastCust.regDate || '-') + ' ~ ' + (firstCust.regDate || '-') + ') 고객 <b>' + targetCount.toLocaleString() + '명</b>에게 정확히 발송됩니다.';
+    } else {
+      modeDesc = '<b>[장기 미방문 이탈 단골순]</b> ' + s.toLocaleString() + '번~' + e.toLocaleString() + '번 (방문일 ' + (firstCust.visitDate || '-') + ' ~ ' + (lastCust.visitDate || '-') + ') 이탈 고객 <b>' + targetCount.toLocaleString() + '명</b>에게 재방문 유도 발송됩니다.';
+    }
+    guideEl.innerHTML = '💡 <b>사장님 발송 요약:</b> ' + modeDesc;
+  }
 }
 
 function updateCostDisplay(subText) {
@@ -4455,11 +4962,20 @@ function updateCostDisplay(subText) {
   if (costEl) {
     costEl.innerHTML = cost.toLocaleString() + '원 <small style="font-size:12px;color:#64748b;font-weight:normal;">(' + targetCount.toLocaleString() + '명 × 15원)</small>';
   }
-  var sendBtn = document.querySelector('button[onclick="sendSaleAlert15()"]');
+  var sendBtn = document.getElementById('btnBulkSend15') || document.querySelector('button[onclick="sendSaleAlert15()"]');
   if (sendBtn) {
-    sendBtn.innerHTML = '🚀 ' + targetCount.toLocaleString() + '명 고객에게 15원 세일 알림 즉시 발송 (' + (subText || '') + ')';
+    if (targetCount <= 0) {
+      sendBtn.innerHTML = '🚀 고객 엑셀 등록 후 15원 세일 알림 즉시 발송';
+    } else {
+      sendBtn.innerHTML = '🚀 ' + targetCount.toLocaleString() + '명 고객에게 15원 세일 알림 즉시 발송 (' + (subText || '') + ')';
+    }
   }
 }
+
+// 페이지 로드 시 저장된 실전 고객 DB 자동 복원
+window.addEventListener('DOMContentLoaded', function() {
+  loadCustomerDbFromStorage();
+});
 
 // ==============================================================
 // [핵심 기능] 사장님 전용 1건 실시간 테스트 문자 즉시 발송 로직
@@ -4584,48 +5100,128 @@ async function sendDirectTestSms() {
   }
 }
 
-function sendSaleAlert15() {
-
-  if (targetCount === 0) {
-
-    alert('발송 대상 고객 엑셀 DB가 없습니다. 먼저 엑셀 파일을 등록해 주세요.');
-
+async function sendSaleAlert15() {
+  if (!customerDbList.length || targetCount <= 0) {
+    alert('발송 대상 고객 엑셀 DB가 없습니다. 먼저 포스(POS) 고객 엑셀 파일을 등록해 주세요.');
     return;
-
   }
 
+  var selectedList = customerDbList.slice(currentRangeStart - 1, currentRangeEnd);
+  if (!selectedList.length) {
+    alert('선택된 구간에 발송 대상 고객이 없습니다. 시작/종료 순번을 확인해 주세요.');
+    return;
+  }
 
+  var storeName = (document.getElementById('storeName')?.value || '').trim() || '우리아파트 제휴마트';
+  var msgText = (document.getElementById('flyerTextMsg')?.value || '').trim();
+  if (!msgText) {
+    alert('위 2번 [세일 알림 문구]를 먼저 입력해 주세요.');
+    document.getElementById('flyerTextMsg')?.focus();
+    return;
+  }
 
-  var cost = targetCount * 15; // 1,000명 × 15원 = 15,000원
-
-
-
-  // 잔액 부족 검증 로직
-
+  var cost = selectedList.length * 15;
   if (martCash < cost) {
-
     var shortage = cost - martCash;
-
-    alert('⚠️ [보유 캐시 잔액 부족 안내]\n\n• 발송 대상: ' + targetCount.toLocaleString() + ' 명\n• 필요 금액: ' + cost.toLocaleString() + ' 원 (1명당 15원)\n• 현재 잔액: ' + martCash.toLocaleString() + ' 원\n• 부족한 금액: ' + shortage.toLocaleString() + ' 원\n\n[충전 안내]\n최소 충전 단위는 [30만 원 이상(30만 / 50만 / 100만 원, VAT 별도)] 단위입니다.\n상단의 [+ 캐시 충전하기] 버튼을 눌러 계좌 입금 후 발송해 주세요!');
-
+    alert('⚠️ [보유 캐시 잔액 부족 안내]\n\n• 발송 대상: ' + selectedList.length.toLocaleString() + ' 명 (' + currentRangeStart.toLocaleString() + '번~' + currentRangeEnd.toLocaleString() + '번)\n• 필요 금액: ' + cost.toLocaleString() + ' 원 (1명당 15원)\n• 현재 잔액: ' + martCash.toLocaleString() + ' 원\n• 부족한 금액: ' + shortage.toLocaleString() + ' 원\n\n[충전 안내]\n최소 충전 단위는 [30만 원 이상(30만 / 50만 / 100만 원, VAT 별도)] 단위입니다.\n상단의 [+ 캐시 충전하기] 버튼을 눌러 계좌 입금 후 발송해 주세요!');
     openChargeGuide();
-
     return;
-
   }
 
+  var sortLabel = currentSortMode === 'visit' ? '최근 방문일자순' : (currentSortMode === 'reg' ? '가입 등록일자순' : '장기 미방문 이탈 단골순');
+  if (!confirm(
+    '📢 [15원 세일 알림 실전 발송 최종 확인]\n\n' +
+    '• 정렬 기준: ' + sortLabel + '\n' +
+    '• 발송 구간: ' + currentRangeStart.toLocaleString() + '번 ~ ' + currentRangeEnd.toLocaleString() + '번\n' +
+    '• 발송 대상: ' + selectedList.length.toLocaleString() + ' 명 (010 정상 번호)\n' +
+    '• 예상 차감: ' + cost.toLocaleString() + ' 원 (성공 건수만 차감)\n' +
+    '• 발송 후 예상 잔액: ' + (martCash - cost).toLocaleString() + ' 원\n\n' +
+    '지금 즉시 실제 발송을 시작하시겠습니까?'
+  )) return;
 
+  var storeUrl = (document.getElementById('autoAttachUrlText')?.textContent || '').trim() || ('https://mart-platform.vercel.app/mart-store.html?store=' + encodeURIComponent(getActiveStoreCode()));
+  // 표준 특수문자만 사용 (4바이트 이모지 제외)
+  var subject = '[' + storeName + '] 행사 알림';
+  var fullContent = '[' + storeName + '] 행사 알림\n\n' + msgText + '\n\n▶ 모바일 전단 및 행사 상품 확인:\n' + storeUrl + '\n\n무료수신거부: 080-870-0720';
 
-  if (!confirm('📢 [15원 세일 알림 발송 확인]\n\n• 발송 대상: ' + targetCount.toLocaleString() + ' 명\n• 차감 금액: ' + cost.toLocaleString() + ' 원\n• 발송 후 잔액: ' + (martCash - cost).toLocaleString() + ' 원\n\n지금 즉시 발송하시겠습니까?')) return;
+  var sendBtn = document.getElementById('btnBulkSend15') || document.querySelector('button[onclick="sendSaleAlert15()"]');
+  var progressBox = document.getElementById('bulkSendProgressBox');
+  if (sendBtn) {
+    sendBtn.disabled = true;
+    sendBtn.style.opacity = '0.6';
+  }
+  if (progressBox) {
+    progressBox.style.display = 'block';
+    progressBox.style.background = '#fef3c7';
+    progressBox.style.color = '#92400e';
+    progressBox.style.border = '1.5px solid #fde68a';
+    progressBox.innerHTML = '⏳ 실전 발송 진행 중... (0 / ' + selectedList.length.toLocaleString() + '명)';
+  }
 
+  var successCount = 0;
+  var failCount = 0;
+  var batchSize = 5;
 
+  try {
+    for (var i = 0; i < selectedList.length; i += batchSize) {
+      var batch = selectedList.slice(i, i + batchSize);
+      var results = await Promise.all(batch.map(async function(cust) {
+        try {
+          var res = await fetch('https://www.wooriapt.app/api/send-sms', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              phone: cust.phone,
+              content: fullContent,
+              type: 'LMS',
+              subject: subject
+            })
+          });
+          var data = await res.json();
+          return (res.ok && data.ok);
+        } catch (e) {
+          return false;
+        }
+      }));
+      for (var r = 0; r < results.length; r++) {
+        if (results[r]) successCount++;
+        else failCount++;
+      }
+      var done = successCount + failCount;
+      if (progressBox) {
+        progressBox.innerHTML = '⏳ 실전 발송 진행 중: <b>' + done.toLocaleString() + ' / ' + selectedList.length.toLocaleString() + '명</b> (성공 ' + successCount.toLocaleString() + '건 · 실패 ' + failCount.toLocaleString() + '건)';
+      }
+    }
 
-  martCash -= cost;
+    var actualCost = successCount * 15;
+    martCash = Math.max(0, martCash - actualCost);
+    var cashDisp = document.getElementById('currentCashDisplay');
+    if (cashDisp) cashDisp.textContent = martCash.toLocaleString() + '원';
 
-  document.getElementById('currentCashDisplay').textContent = martCash.toLocaleString() + '원';
+    if (progressBox) {
+      progressBox.style.background = '#dcfce7';
+      progressBox.style.color = '#14532d';
+      progressBox.style.border = '1.5px solid #86efac';
+      progressBox.innerHTML = '🎉 <b>실전 발송 완료!</b> 성공: <b>' + successCount.toLocaleString() + '건</b> / 실패: ' + failCount.toLocaleString() + '건<br>실제 차감 금액: ' + actualCost.toLocaleString() + '원 (잔여 캐시: ' + martCash.toLocaleString() + '원)';
+    }
 
-  alert('🎉 [발송 완료]\n\n총 ' + targetCount.toLocaleString() + '명의 단골 고객에게 15원 세일 알림이 성공적으로 발송되었습니다!\n차감 금액: ' + cost.toLocaleString() + '원 (잔여 캐시: ' + martCash.toLocaleString() + '원)');
-
+    alert('🎉 [15원 세일 알림 실전 발송 완료]\n\n• 발송 성공: ' + successCount.toLocaleString() + ' 명\n• 발송 실패: ' + failCount.toLocaleString() + ' 명\n• 실제 차감 금액: ' + actualCost.toLocaleString() + ' 원\n• 잔여 캐시: ' + martCash.toLocaleString() + ' 원');
+  } catch (err) {
+    console.error('Bulk Send Error:', err);
+    if (progressBox) {
+      progressBox.style.background = '#fef2f2';
+      progressBox.style.color = '#991b1b';
+      progressBox.style.border = '1.5px solid #fecaca';
+      progressBox.innerHTML = '❌ 발송 중 오류 발생: ' + (err.message || err);
+    }
+    alert('❌ 발송 중 오류가 발생했습니다.\n' + (err.message || err));
+  } finally {
+    if (sendBtn) {
+      sendBtn.disabled = false;
+      sendBtn.style.opacity = '1';
+    }
+    updateRangeTargetCount();
+  }
 }
 
 
