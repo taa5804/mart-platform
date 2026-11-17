@@ -1,169 +1,336 @@
 <!DOCTYPE html>
+
 <html lang="ko">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+
 <title>매장관리자 (store01 / 1234) | 우리아파트</title>
+
 <style>
+
 * { box-sizing: border-box; }
+
 html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height: 100%; font-family: Arial, sans-serif; }
+
 </style>
+
 </head>
+
 <body>
+
 <div id="storeAdminApp">
+
 <style>
+
 #storeAdminApp{
+
   font-family:Arial,sans-serif;
+
   max-width:560px;
+
   margin:0 auto;
+
   background:#f7f7f7;
+
   padding-bottom:40px
+
 }
+
+
 
 .sa-title{
+
   background:#1f7a3a;
+
   color:#fff;
+
   text-align:center;
+
   padding:16px;
+
   font-size:22px;
+
   font-weight:bold
+
 }
+
+
 
 .sa-box,
+
 .sa-card{
+
   background:#fff;
+
   margin:12px;
+
   padding:14px;
+
   border-radius:10px;
+
   box-shadow:0 2px 6px rgba(0,0,0,.08)
+
 }
+
+
 
 .sa-menu{
+
   display:grid;
+
   grid-template-columns:repeat(4,1fr);
+
   gap:4px;
+
   margin:12px
+
 }
+
+
 
 .sa-menu button{
+
   border:0;
+
   border-radius:6px;
+
   background:#fff;
+
   padding:10px 2px;
+
   font-size:11px;
+
   font-weight:bold
+
 }
+
+
 
 .sa-menu button.active{
+
   background:#1f7a3a;
+
   color:#fff
+
 }
+
+
 
 .sa-section{
+
   display:none
+
 }
+
+
 
 .sa-section.active{
+
   display:block
+
 }
+
+
 
 #storeAdminApp input,
-#storeAdminApp textarea{
-  width:100%;
-  box-sizing:border-box;
-  margin-top:7px;
-  padding:10px;
-  border:1px solid #ccc;
-  border-radius:6px;
-  font-size:14px
-}
 
 #storeAdminApp textarea{
-  height:60px
+
+  width:100%;
+
+  box-sizing:border-box;
+
+  margin-top:7px;
+
+  padding:10px;
+
+  border:1px solid #ccc;
+
+  border-radius:6px;
+
+  font-size:14px
+
 }
+
+
+
+#storeAdminApp textarea{
+
+  height:60px
+
+}
+
+
 
 .sa-btn{
+
   width:100%;
+
   border:0;
+
   border-radius:6px;
+
   padding:11px;
+
   margin-top:9px;
+
   font-weight:bold;
+
   color:#fff;
+
   background:#1f7a3a;
+
   cursor:pointer
+
 }
+
+
 
 .sa-upload{
+
   background:#ff7a00
+
 }
+
+
 
 .sa-logout{
+
   background:#555
+
 }
+
+
 
 .sa-preview{
+
   width:100%;
+
   height:130px;
+
   background:#ddd;
+
   border-radius:8px;
+
   object-fit:cover;
+
   margin-top:7px
+
 }
+
+
 
 .sa-help{
+
   font-size:13px;
+
   color:#555;
+
   line-height:1.6;
+
   margin-top:6px
+
 }
+
+
 
 .sa-hidden{
+
   display:none
+
 }
+
+
 
 .sa-card-title{
+
   font-weight:bold;
+
   color:#1f7a3a;
+
   margin-bottom:6px
+
 }
+
+
 
 .sa-file{
+
   display:block;
+
   width:100%;
+
   box-sizing:border-box;
+
   margin-top:7px;
+
   padding:9px;
+
   border:1px solid #ccc;
+
   border-radius:6px;
+
   background:#fff;
+
   font-size:14px
+
 }
+
+
 
 .sa-status{
+
   font-size:12px;
+
   color:#555;
+
   margin-top:5px;
+
   min-height:18px
+
 }
+
+
 
 .sa-live-status{
+
   margin-top:8px;
+
   padding:8px;
+
   border-radius:6px;
+
   background:#eef8f1;
+
   color:#1f7a3a;
+
   font-size:12px;
+
   font-weight:bold;
+
   text-align:center
+
 }
 
+
+
 .sa-general-card{background:#fff;margin:8px 12px;padding:10px;border-radius:9px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+
 .sa-general-row{display:grid;grid-template-columns:48px minmax(0,1fr) 110px;gap:7px;align-items:center}.sa-general-no{font-size:12px;font-weight:800;color:#1f7a3a}.sa-general-row input{margin-top:0!important}.sa-general-save{width:100%;border:0;border-radius:7px;padding:10px 4px;background:#1f7a3a;color:#fff;font-weight:800}
+
 @media(max-width:430px){.sa-menu{grid-template-columns:repeat(4,1fr)}.sa-general-row{grid-template-columns:42px minmax(0,1fr) 92px;gap:5px}.sa-general-row input{padding:9px 6px!important;font-size:13px!important}}
+
 </style>
 
+
+
 <div class="sa-title">매장관리자 V1</div>
+
+
 
 <div id="loginBox" class="sa-box" style="border:2px solid #166534;box-shadow:0 4px 14px rgba(22,101,52,0.15);border-radius:12px;padding:20px;">
 
@@ -253,108 +420,213 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 
 <div id="adminBox" class="sa-hidden">
 
+
+
   <div class="sa-menu">
+
     <button
+
       class="menuBtn active"
+
       onclick="showMenu('send15',this)"
+
       style="background:#b45309;color:#fff;"
+
     >
+
       📢 15원 알림발송
+
     </button>
 
+
+
     <button
+
       class="menuBtn"
+
       onclick="showMenu('qrOrder',this)"
+
       style="background:#0284c7;color:#fff;"
+
     >
+
       🚗 자동차QR 주문
+
     </button>
 
+
+
     <button
+
       class="menuBtn"
+
       onclick="showMenu('today',this)"
+
     >
+
       오늘특가
+
     </button>
 
+
+
     <button
+
       class="menuBtn"
+
       onclick="showMenu('sale',this)"
+
     >
+
       행사상품
+
     </button>
 
+
+
     <button
+
       class="menuBtn"
+
       onclick="showMenu('group',this)"
+
     >
+
       공동구매
+
     </button>
 
+
+
     <button
+
       class="menuBtn"
+
       onclick="showMenu('general',this)"
+
     >
+
       일반상품
+
     </button>
 
+
+
     <button
+
       class="menuBtn"
+
       onclick="showMenu('orders',this)"
+
     >
+
       주문
+
     </button>
 
+
+
     <button
+
       class="menuBtn"
+
       onclick="showMenu('info',this)"
+
     >
+
       매장
+
     </button>
 
+
+
     <button
+
       class="menuBtn"
+
       onclick="showMenu('account',this)"
+
     >
+
       계정
+
     </button>
 
+
+
     <button
+
       class="menuBtn"
+
       onclick="showMenu('inquiry',this)"
+
     >
+
       본사 문의
+
     </button>
+
   </div>
 
+
+
     <!-- ==============================================
+
        [1] 15원 세일 알림 발송 & 단골 엑셀 DB 관리 섹션
+
   ============================================== -->
+
   <div id="send15" class="sa-section active">
+
     <!-- 캐시 잔액 및 충전 안내 -->
+
     <div class="sa-box" style="border:2px solid #b45309;background:#fffbeb;">
+
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+
         <div>
+
           <span style="font-size:13px;color:#92400e;font-weight:700;">매장 보유 캐시 (선입금 차감 방식)</span>
+
           <div style="font-size:24px;font-weight:900;color:#b45309;" id="currentCashDisplay">10,000원</div>
+
         </div>
+
         <button type="button" class="sa-btn" style="width:auto;padding:8px 16px;background:#b45309;margin-top:0;" onclick="openChargeGuide()">
+
           + 캐시 충전하기
+
         </button>
+
       </div>
+
       <div style="font-size:12.5px;color:#92400e;margin-top:8px;line-height:1.5;">
+
         • 1건 발송 시 건당 딱 <strong>15원</strong>만 실시간 차감됩니다. (통신비 0원)<br>
+
         • <strong>최소 충전 단위: 30만 원 이상부터 충전 가능</strong> (30만 / 50만 / 100만 원)
+
       </div>
+
     </div>
 
+
+
     <!-- 1. 전단지 사진 등록 -->
+
     <div class="sa-box">
+
       <b style="color:#1f7a3a;">1. 세일 전단지 사진 등록 (종이 전단지/특가표 찰칵)</b>
+
       <div class="sa-help">종이 전단지나 손글씨 행사표를 사진으로 찍어 올리시면 단골 고객에게 1초 만에 사진으로 열립니다.</div>
+
       <input type="file" id="flyerImageFile" accept="image/*" class="sa-file" onchange="previewFlyerImage(this)">
+
       <img id="flyerPreviewImg" class="sa-preview" style="display:none;" alt="전단지 미리보기">
+
     </div>
+
+
 
             <!-- 2. 행사 알림 문구 -->
     <div class="sa-box" style="border:2px solid #16a34a;background:#f8fafc;">
@@ -385,6 +657,35 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
         <span id="autoAttachUrlText" style="color:#1d4ed8;text-decoration:underline;word-break:break-all;">https://mart-platform.vercel.app/mart-store.html?store=store01</span>
       </div>
     </div>
+
+    <!-- [핵심 기능] 사전 1건 테스트 발송 섹션 (실제 휴대폰으로 즉시 전송) -->
+    <div class="sa-box" style="border:2.5px solid #2563eb;background:#f0f7ff;border-radius:12px;box-shadow:0 4px 16px rgba(37,99,235,0.12);padding:18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+        <b style="color:#1d4ed8;font-size:16.5px;display:flex;align-items:center;gap:6px;">
+          <span>📱</span> [사전 1건 테스트 발송] 내 휴대폰으로 세일 문자 즉시 받아보기
+        </b>
+        <span style="background:#2563eb;color:#fff;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:800;letter-spacing:0.5px;">실제 통신사 1초 발송</span>
+      </div>
+      <div class="sa-help" style="color:#1e40af;margin-bottom:14px;line-height:1.55;font-size:13px;">
+        대량 고객 발송 전, <b>위 2번에 작성하신 세일 문구와 전단지 링크</b>가 단골 고객 스마트폰에 실제로 어떻게 도착하는지 <b>내 휴대폰 번호로 먼저 1건 실시간 발송</b>하여 눈으로 직접 확인합니다. (잔여 캐시 차감 없이 무료 테스트 지원)
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;">
+        <div style="flex:1;min-width:240px;position:relative;">
+          <input type="tel" id="testDirectPhone" class="sa-file" style="margin:0;padding:13px 16px;border:2px solid #3b82f6;border-radius:8px;font-size:16px;font-weight:800;color:#0f172a;background:#fff;width:100%;box-sizing:border-box;letter-spacing:1px;" placeholder="010-4397-1030" value="010-4397-1030" maxlength="13" oninput="formatTestPhone(this)">
+          <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:#64748b;font-weight:700;">수신번호</span>
+        </div>
+        <button type="button" id="btnTestDirectSend" class="sa-btn" style="width:auto;margin:0;padding:12px 24px;background:#2563eb;font-size:15px;font-weight:900;color:#fff;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;box-shadow:0 3px 8px rgba(37,99,235,0.3);transition:all 0.2s;" onclick="sendDirectTestSms()">
+          <span id="btnTestDirectIcon">🚀</span>
+          <span id="btnTestDirectText">테스트 문자 즉시 전송</span>
+        </button>
+      </div>
+
+      <!-- 실시간 발송 상태 & 결과 안내 알림창 -->
+      <div id="testDirectStatusBox" style="display:none;margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;line-height:1.6;font-weight:600;"></div>
+    </div>
+
+
 
     <!-- 3. 발송 대상 고객 엑셀 DB 올리기 & 순번 구간 지정 발송 기능 -->
     <div class="sa-box" style="border:2px solid #1f7a3a;">
@@ -483,176 +784,347 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
     </div>
 
     <!-- 발송 실행 및 잔액 부족 검증 버튼 -->
+
     <div class="sa-box" style="text-align:center;">
+
       <div style="font-size:14px;color:#475569;margin-bottom:8px;">
+
         예상 발송 비용: <strong id="calcCostText" style="color:#b45309;font-size:17px;">15,000원</strong> (1,000명 × 15원)
+
       </div>
+
       <button type="button" class="sa-btn" style="background:#15803d;padding:14px;font-size:16px;font-weight:900;" onclick="sendSaleAlert15()">
+
         🚀 1,000명 고객에게 15원 세일 알림 즉시 발송
+
       </button>
+
     </div>
+
   </div>
+
+
 
   <!-- ==============================================
+
        [2] 자동차 안심주차 QR 주문 섹션
+
   ============================================== -->
+
   <div id="qrOrder" class="sa-section">
+
     <div class="sa-box" style="border:2px solid #0284c7;background:#f0f9ff;">
+
       <b style="color:#0369a1;font-size:16px;">🚗 매장 고객 증정용 자동차 안심주차 QR 카드 주문</b>
+
       <div class="sa-help" style="color:#0369a1;margin-top:6px;">
+
         매장 방문 고객들에게 100% 무료 선물로 증정하는 방수 안심주차 QR 카드입니다.<br>
+
         <strong>1,000장 단위(1,000장당 200,000원, 장당 200원)</strong>로 유상 공급 주문됩니다.
+
       </div>
+
     </div>
+
+
 
     <div class="sa-box">
+
       <b>주문 수량 선택 (1,000장 단위)</b>
+
       <select id="qrOrderQuantity" style="width:100%;height:44px;margin-top:7px;padding:0 10px;border:1px solid #ccc;border-radius:6px;font-size:14px;" onchange="updateQrOrderPrice()">
+
         <option value="1000">1,000장 (200,000원 / 기본 패키지)</option>
+
         <option value="2000">2,000장 (400,000원)</option>
+
         <option value="3000">3,000장 (600,000원)</option>
+
         <option value="5000">5,000장 (1,000,000원 / 대형마트 추천)</option>
+
       </select>
 
+
+
       <div style="margin-top:14px;">
+
         <b>배송지 및 수령 정보</b>
+
         <input id="qrReceiverStore" placeholder="매장명 (예: 에너젠마트)" value="에너젠마트">
+
         <input id="qrReceiverPhone" placeholder="담당자 연락처" value="010-2286-4150">
+
         <input id="qrReceiverAddress" placeholder="수령 주소 (택배 배송지)" value="광주 광산구 도천동">
+
       </div>
+
+
 
       <div style="margin-top:14px;padding:12px;background:#f8fafc;border-radius:8px;font-size:13px;color:#334155;">
+
         결제 예정 금액: <strong id="qrOrderTotalCost" style="color:#0284c7;font-size:18px;">200,000원</strong> (VAT 별도)
+
       </div>
 
+
+
       <button type="button" class="sa-btn" style="background:#0284c7;padding:12px;font-size:15px;margin-top:12px;" onclick="submitQrCardOrder()">
+
         📦 본사로 안심주차 QR 카드 제작·발송 주문하기
+
       </button>
+
     </div>
+
   </div>
+
+
+
 
 
   <div id="today" class="sa-section">
+
     <div class="sa-box">
+
       <b>오늘의 특가 30개</b>
 
+
+
       <div class="sa-help">
+
         개별 저장을 누르면 소비자 행사화면에 바로 게시됩니다.
+
       </div>
+
     </div>
+
+
 
     <div id="todayList"></div>
+
   </div>
+
+
 
   <div id="sale" class="sa-section">
+
     <div class="sa-box">
+
       <b>행사상품 40개</b>
 
+
+
       <div class="sa-help">
+
         개별 저장을 누르면 소비자 행사화면에 바로 게시됩니다.
+
       </div>
+
     </div>
+
+
 
     <div id="saleList"></div>
+
   </div>
+
+
 
   <div id="group" class="sa-section">
+
     <div class="sa-box">
+
       <b>공동구매 6개</b>
 
+
+
       <div class="sa-help">
+
         공동구매는 목표인원이 달성된 후 소비자가 주문할 수 있습니다.
+
       </div>
+
     </div>
+
+
 
     <div id="groupList"></div>
+
   </div>
+
+
 
   <div id="general" class="sa-section">
+
     <div class="sa-box">
+
       <b>일반상품 200개</b>
+
       <div class="sa-help">사진 없이 상품명과 가격만 입력합니다. 개별 저장하면 일반상품 탭에 바로 표시됩니다.</div>
+
     </div>
+
     <div id="generalList"></div>
+
   </div>
 
+
+
   <div id="orders" class="sa-section">
+
     <div class="sa-box">
+
       <b>주문관리</b>
+
+
 
       <br><br>
 
+
+
       <div class="sa-help">
+
         행사메인화면 주문 기능 연결 후 주문 목록이 표시됩니다.
+
       </div>
+
     </div>
+
   </div>
 
+
+
   <div id="info" class="sa-section">
+
     <div class="sa-box">
+
       <b>매장안내</b>
 
+
+
       <input
+
         id="storeName"
+
         placeholder="상호"
+
       >
 
+
+
       <input
+
         id="storePhone"
+
         placeholder="대표전화"
+
       >
 
+
+
       <input
+
         id="storeAddress"
+
         placeholder="주소"
+
       >
+
+
 
       <textarea
+
         id="storeRoad"
+
         placeholder="오시는 길"
+
       ></textarea>
 
+
+
       <input
+
         id="freeDeliveryAmount"
+
         type="number"
+
         min="0"
+
         step="100"
+
         inputmode="numeric"
+
         placeholder="무료배송 기준금액 (예: 50000)"
+
       >
+
+
 
       <div class="sa-help">0원 또는 빈칸이면 무료배송 안내를 표시하지 않습니다.</div>
 
+
+
       <button
+
         class="sa-btn"
+
         onclick="saveStoreInfo()"
+
       >
+
         매장안내 저장
+
       </button>
+
     </div>
+
   </div>
 
+
+
   <div id="account" class="sa-section">
+
     <div class="sa-box">
+
       <b>계정관리</b>
 
+
+
       <input
+
         id="accountStoreId"
+
         readonly
+
       >
 
+
+
       <!-- 1. 본사 세일 발송 선입금 공식 충전 계좌 안내 -->
+
       <div style="margin-top:16px;padding:16px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;">
+
         <b style="color:#b45309;font-size:15px;display:flex;align-items:center;gap:6px;">
+
           <span>🏛️ 본사 15원 세일 발송 선입금 충전 계좌</span>
+
         </b>
+
         <div style="margin-top:8px;font-size:13.5px;color:#78350f;line-height:1.6;">
+
           • <strong>은행 및 계좌:</strong> 농협은행 199-02-289684<br>
+
           • <strong>예금주:</strong> 송해석 / (주)뉴알에너지 대표이사<br>
+
           • <strong>최소 충전 단위:</strong> 30만 원 이상부터 충전 가능<br>
           <span style="font-size:12px;color:#92400e;">(30만 / 50만 / 100만 원 단위 입금 즉시 전자세금계산서 100% 자동 발행)</span>
+
         </div>
+
       </div>
+
+
 
       
       <!-- 2. 전자세금계산서 발행 정보 & 사업자등록증 등록 -->
@@ -680,52 +1152,100 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
       </div>
 
 <!-- 2. 매장 사장님 판매대금 정산 계좌 등록 / 변경 -->
+
       <div style="margin-top:14px;padding:16px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;">
+
         <b style="color:#166534;font-size:15px;display:flex;align-items:center;gap:6px;">
+
           <span>💳 사장님 온라인 주문 판매대금 정산 입금 계좌</span>
+
         </b>
+
         <div class="sa-help" style="color:#166534;margin-top:4px;">
+
           소비자가 매장 화면에서 온라인 주문 결제 시, 본사에서 마트 사장님께 판매대금을 송금해 드릴 입금 계좌입니다.
+
         </div>
+
         <input id="storeSettlementBank" placeholder="정산 받으실 은행명 (예: 농협, 국민, 신한)" value="농협">
+
         <input id="storeSettlementAccount" placeholder="계좌번호 (숫자만 입력)" value="199-02-289684">
+
         <input id="storeSettlementHolder" placeholder="예금주 성명 (예: 송해석)" value="송해석">
+
         <button class="sa-btn" type="button" style="background:#166534;margin-top:10px;" onclick="saveStoreSettlementAccount()">정산 계좌정보 저장</button>
+
       </div>
 
+
+
       <input
+
         id="oldPw"
+
         type="password"
+
         placeholder="현재 비밀번호"
+
       >
 
+
+
       <input
+
         id="newPw"
+
         type="password"
+
         placeholder="새 비밀번호"
+
       >
+
+
 
       <input
+
         id="newPw2"
+
         type="password"
+
         placeholder="새 비밀번호 확인"
+
       >
 
+
+
       <button
+
         class="sa-btn"
+
         onclick="changePassword()"
+
       >
+
         비밀번호 변경
+
       </button>
 
+
+
       <button
+
         class="sa-btn sa-logout"
+
         onclick="location.reload()"
+
       >
+
         로그아웃
+
       </button>
+
     </div>
+
   </div>
+
+
 
   <div id="inquiry" class="sa-section">
     <div class="sa-box">
@@ -737,129 +1257,254 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
   </div>
 
   <div class="sa-box">
+
     <button
+
       class="sa-btn sa-upload"
+
       onclick="uploadAllProducts()"
+
     >
+
       전체상품 다시 게시
+
     </button>
 
+
+
     <div class="sa-help">
+
       저장된 모든 상품을 소비자 행사메인화면에 다시 반영합니다.
+
     </div>
+
   </div>
+
+
 
 </div>
 
+
+
 <script>
+
 const SUPABASE_URL =
+
   'https://dcysjuxyjqtvkihdsjvv.supabase.co';
 
+
+
 const SUPABASE_KEY =
+
   'sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2';
 
+
+
 const SETTLEMENT_SYNC_URL =
+
   'https://wpshlmijsscmlasqtapa.supabase.co/functions/v1/settlement-account-sync';
 
+
+
 const SETTLEMENT_PUBLIC_KEY =
+
   'sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K';
 
+
+
 const STORAGE_BUCKET =
+
   'product_images';
 
+
+
 const IMAGE_MAX_BYTES =
+
   300 * 1024;
 
+
+
 const IMAGE_SIZE =
+
   1080;
 
+
+
 const IMAGE_MIN_QUALITY =
+
   0.45;
 
+
+
 let currentStoreId = '';
+
 let currentPw = '';
 
+
+
 function api(table, params = '') {
+
   return SUPABASE_URL + '/rest/v1/' + table + params;
+
 }
+
+
 
 function headers(extra = {}) {
+
   return Object.assign(
+
     {
+
       apikey: SUPABASE_KEY,
+
       Authorization: 'Bearer ' + SUPABASE_KEY,
+
       'Content-Type': 'application/json',
+
       Prefer: 'return=representation'
+
     },
+
     extra
+
   );
+
 }
+
+
 
 async function getRows(table, params = '') {
+
   const response = await fetch(
+
     api(table, params),
+
     {
+
       headers: headers()
+
     }
+
   );
 
+
+
   if (!response.ok) {
+
     throw new Error(await response.text());
+
   }
 
+
+
   return await response.json();
+
 }
+
+
 
 async function upsertRow(
+
   table,
+
   row,
+
   onConflict
+
 ) {
+
   const response = await fetch(
+
     api(
+
       table +
+
       '?on_conflict=' +
+
       encodeURIComponent(onConflict)
+
     ),
+
     {
+
       method: 'POST',
 
+
+
       headers: headers({
+
         Prefer:
+
           'resolution=merge-duplicates,return=representation'
+
       }),
 
+
+
       body: JSON.stringify(row)
+
     }
+
   );
 
+
+
   if (!response.ok) {
+
     throw new Error(await response.text());
+
   }
 
+
+
   return await response.json();
+
 }
+
+
 
 async function patchRows(
+
   table,
+
   params,
+
   row
+
 ) {
+
   const response = await fetch(
+
     api(table, params),
+
     {
+
       method: 'PATCH',
+
       headers: headers(),
+
       body: JSON.stringify(row)
+
     }
+
   );
 
+
+
   if (!response.ok) {
+
     throw new Error(await response.text());
+
   }
 
+
+
   return await response.json();
+
 }
+
+
 
 var knownMarts = {
   "store01": { name: "우리아파트 테스트매장", owner: "송해석", phone: "010-2286-4150", last4: "4150" },
@@ -1028,1175 +1673,2346 @@ async function loginStore() {
 }
 
 function showMenu(id, button) {
+
   document
+
     .querySelectorAll(
+
       '#storeAdminApp .sa-section'
+
     )
+
     .forEach(section => {
+
       section.classList.remove('active');
+
     });
 
+
+
   document
+
     .querySelectorAll(
+
       '#storeAdminApp .menuBtn'
+
     )
+
     .forEach(menuButton => {
+
       menuButton.classList.remove('active');
+
     });
 
+
+
   document
+
     .getElementById(id)
+
     .classList
+
     .add('active');
+
+
 
   button
+
     .classList
+
     .add('active');
 
+
+
   if (id === 'inquiry') {
+
     loadInquiries();
+
   }
+
+
 
   if (id === 'account') {
+
     loadSettlementAccount();
+
   }
+
 }
+
+
 
 function renderInputs() {
-  makeProduct(
-    'today',
-    30,
-    '오늘의 특가'
-  );
 
   makeProduct(
-    'sale',
-    40,
-    '행사상품'
+
+    'today',
+
+    30,
+
+    '오늘의 특가'
+
   );
+
+
+
+  makeProduct(
+
+    'sale',
+
+    40,
+
+    '행사상품'
+
+  );
+
+
 
   makeGroup();
+
   makeGeneral();
+
 }
+
+
 
 function makeProduct(
+
   category,
+
   count,
+
   title
+
 ) {
+
   let html = '';
 
+
+
   for (
+
     let number = 1;
+
     number <= count;
+
     number++
+
   ) {
+
     html += `
+
       <div class="sa-card">
 
+
+
         <div class="sa-card-title">
+
           ${title} ${number}
+
         </div>
 
-        <input
-          id="${category}_img_${number}"
-          type="hidden"
-        >
+
 
         <input
-          class="sa-file"
-          type="file"
-          accept="image/*"
-          onchange="
-            uploadProductImage(
-              '${category}',
-              ${number},
-              this
-            )
-          "
+
+          id="${category}_img_${number}"
+
+          type="hidden"
+
         >
+
+
+
+        <input
+
+          class="sa-file"
+
+          type="file"
+
+          accept="image/*"
+
+          onchange="
+
+            uploadProductImage(
+
+              '${category}',
+
+              ${number},
+
+              this
+
+            )
+
+          "
+
+        >
+
+
 
         <div
+
           id="${category}_status_${number}"
+
           class="sa-status"
+
         >
+
           PC 또는 휴대폰에서 사진을 선택하세요.
+
         </div>
 
+
+
         <img
+
           id="${category}_preview_${number}"
+
           class="sa-preview"
+
           loading="lazy"
+
           decoding="async"
+
           alt="사진 미리보기"
+
         >
 
+
+
         <input
+
           id="${category}_name_${number}"
+
           placeholder="품명"
+
         >
 
+
+
         <input
+
           id="${category}_price_${number}"
+
           placeholder="판매가"
+
         >
+
+
 
         <textarea
+
           id="${category}_desc_${number}"
+
           placeholder="가격 밑 설명글"
+
         ></textarea>
 
+
+
         <button
+
           class="sa-btn"
+
           onclick="
+
             saveProduct(
+
               '${category}',
+
               ${number}
+
             )
+
           "
+
         >
+
           저장 및 게시
+
         </button>
 
+
+
         <div
+
           id="${category}_live_${number}"
+
           class="sa-live-status"
+
           style="display:none;"
+
         >
+
           소비자 화면 게시 완료
+
         </div>
 
+
+
       </div>
+
     `;
+
   }
 
+
+
   document
+
     .getElementById(
+
       category + 'List'
+
     )
+
     .innerHTML = html;
+
 }
+
+
 
 function makeGeneral() {
+
   let html = '';
+
   for (let number = 1; number <= 200; number++) {
+
     html += `
+
       <div class="sa-general-card">
+
         <div class="sa-general-row">
+
           <div class="sa-general-no">${number}번</div>
+
           <input id="general_name_${number}" placeholder="상품명">
+
           <input id="general_price_${number}" inputmode="numeric" placeholder="가격">
+
         </div>
+
         <button class="sa-general-save" onclick="saveProduct('general',${number})">저장 및 게시</button>
+
         <div id="general_live_${number}" class="sa-live-status" style="display:none;">소비자 화면 게시 완료</div>
+
       </div>`;
+
   }
+
   document.getElementById('generalList').innerHTML = html;
+
 }
+
+
 
 function makeGroup() {
+
   let html = '';
 
+
+
   for (
+
     let number = 1;
+
     number <= 6;
+
     number++
+
   ) {
+
     html += `
+
       <div class="sa-card">
 
+
+
         <div class="sa-card-title">
+
           공동구매 ${number}
+
         </div>
 
-        <input
-          id="group_img_${number}"
-          type="hidden"
-        >
+
 
         <input
-          class="sa-file"
-          type="file"
-          accept="image/*"
-          onchange="
-            uploadProductImage(
-              'group',
-              ${number},
-              this
-            )
-          "
+
+          id="group_img_${number}"
+
+          type="hidden"
+
         >
+
+
+
+        <input
+
+          class="sa-file"
+
+          type="file"
+
+          accept="image/*"
+
+          onchange="
+
+            uploadProductImage(
+
+              'group',
+
+              ${number},
+
+              this
+
+            )
+
+          "
+
+        >
+
+
 
         <div
+
           id="group_status_${number}"
+
           class="sa-status"
+
         >
+
           PC 또는 휴대폰에서 사진을 선택하세요.
+
         </div>
+
+
 
         <img
+
           id="group_preview_${number}"
+
           class="sa-preview"
+
           loading="lazy"
+
           decoding="async"
+
           alt="사진 미리보기"
+
         >
 
+
+
         <input
+
           id="group_name_${number}"
+
           placeholder="품명"
+
         >
 
+
+
         <input
+
           id="group_normal_${number}"
+
           placeholder="정상가"
+
         >
 
+
+
         <input
+
           id="group_price_${number}"
+
           placeholder="공동구매가"
+
         >
 
+
+
         <input
+
           id="group_target_${number}"
+
           type="number"
+
           min="1"
+
           placeholder="목표인원"
+
         >
 
+
+
         <input
+
           id="group_join_${number}"
+
           type="number"
+
           min="0"
+
           placeholder="현재참여인원"
+
           value="0"
+
         >
+
+
 
         <button
+
           class="sa-btn"
+
           onclick="
+
             saveProduct(
+
               'group',
+
               ${number}
+
             )
+
           "
+
         >
+
           저장 및 게시
+
         </button>
 
+
+
         <div
+
           id="group_live_${number}"
+
           class="sa-live-status"
+
           style="display:none;"
+
         >
+
           소비자 화면 게시 완료
+
         </div>
 
+
+
       </div>
+
     `;
+
   }
+
+
 
   document
+
     .getElementById('groupList')
+
     .innerHTML = html;
+
 }
+
+
 
 function safeFileName() {
+
   return (
+
     Date.now() +
+
     '_' +
+
     Math.random()
+
       .toString(36)
+
       .slice(2, 9) +
+
     '.webp'
+
   );
+
 }
+
+
 
 function formatBytes(bytes) {
+
   if (bytes < 1024) {
+
     return bytes + 'B';
+
   }
+
+
 
   if (bytes < 1024 * 1024) {
+
     return (
+
       Math.round(bytes / 1024) +
+
       'KB'
+
     );
+
   }
 
+
+
   return (
+
     (
+
       bytes /
+
       1024 /
+
       1024
+
     ).toFixed(1) +
+
     'MB'
+
   );
+
 }
+
+
 
 function canvasToBlob(
+
   canvas,
+
   type,
+
   quality
+
 ) {
+
   return new Promise(resolve => {
+
     canvas.toBlob(
+
       blob => resolve(blob),
+
       type,
+
       quality
+
     );
+
   });
+
 }
 
+
+
 async function compressProductImage(file) {
+
   const imageBitmap =
+
     await createImageBitmap(file);
 
+
+
   const sourceWidth =
+
     imageBitmap.width;
 
+
+
   const sourceHeight =
+
     imageBitmap.height;
 
+
+
   const sourceSize =
+
     Math.min(
+
       sourceWidth,
+
       sourceHeight
+
     );
+
+
 
   const sourceX =
+
     Math.max(
+
       0,
+
       (sourceWidth - sourceSize) / 2
+
     );
+
+
 
   const sourceY =
+
     Math.max(
+
       0,
+
       (sourceHeight - sourceSize) / 2
+
     );
 
+
+
   const canvas =
+
     document.createElement('canvas');
 
+
+
   canvas.width =
+
     IMAGE_SIZE;
+
+
 
   canvas.height =
+
     IMAGE_SIZE;
 
+
+
   const context =
+
     canvas.getContext('2d', {
+
       alpha: false
+
     });
 
+
+
   context.fillStyle =
+
     '#ffffff';
 
+
+
   context.fillRect(
+
     0,
+
     0,
+
     IMAGE_SIZE,
+
     IMAGE_SIZE
+
   );
+
+
 
   context.imageSmoothingEnabled =
+
     true;
 
+
+
   context.imageSmoothingQuality =
+
     'high';
 
+
+
   context.drawImage(
+
     imageBitmap,
+
     sourceX,
+
     sourceY,
+
     sourceSize,
+
     sourceSize,
+
     0,
+
     0,
+
     IMAGE_SIZE,
+
     IMAGE_SIZE
+
   );
+
+
 
   imageBitmap.close();
 
+
+
   let quality =
+
     0.9;
 
+
+
   let blob =
+
     await canvasToBlob(
+
       canvas,
+
       'image/webp',
+
       quality
+
     );
+
+
 
   while (
+
     blob &&
+
     blob.size >
+
       IMAGE_MAX_BYTES &&
+
     quality >
+
       IMAGE_MIN_QUALITY
+
   ) {
+
     quality =
+
       Math.max(
+
         IMAGE_MIN_QUALITY,
+
         quality - 0.08
+
       );
+
+
 
     blob =
+
       await canvasToBlob(
+
         canvas,
+
         'image/webp',
+
         quality
+
       );
+
   }
 
+
+
   if (
+
     !blob ||
+
     blob.size >
+
       IMAGE_MAX_BYTES
+
   ) {
+
     throw new Error(
+
       '300KB 이하로 압축하지 못했습니다. 다른 사진을 선택해 주세요.'
+
     );
+
   }
+
+
 
   return blob;
+
 }
+
+
 
 async function uploadProductImage(
+
   category,
+
   number,
+
   input
+
 ) {
+
   const file =
+
     input.files &&
+
     input.files[0];
 
+
+
   if (!file) {
+
     return;
+
   }
+
+
 
   const status =
+
     document.getElementById(
+
       `${category}_status_${number}`
+
     );
+
+
 
   const preview =
+
     document.getElementById(
+
       `${category}_preview_${number}`
+
     );
+
+
 
   if (
+
     !file.type.startsWith('image/')
+
   ) {
+
     alert(
+
       '이미지 파일만 선택할 수 있습니다.'
+
     );
 
+
+
     input.value = '';
+
     return;
+
   }
 
+
+
   try {
+
     status.textContent =
+
       '사진을 1080×1080, 300KB 이하로 자동 최적화 중입니다...';
 
+
+
     const compressedBlob =
+
       await compressProductImage(
+
         file
+
       );
+
+
 
     const previewUrl =
+
       URL.createObjectURL(
+
         compressedBlob
+
       );
 
+
+
     preview.src =
+
       previewUrl;
 
+
+
     const path =
+
       currentStoreId +
+
       '/' +
+
       category +
+
       '/' +
+
       number +
+
       '/' +
+
       safeFileName();
 
+
+
     status.textContent =
+
       '최적화 완료 (' +
+
       formatBytes(file.size) +
+
       ' → ' +
+
       formatBytes(
+
         compressedBlob.size
+
       ) +
+
       '), 업로드 중입니다...';
 
+
+
     const response = await fetch(
+
       SUPABASE_URL +
+
       '/storage/v1/object/' +
+
       STORAGE_BUCKET +
+
       '/' +
+
       path,
+
       {
+
         method: 'POST',
 
+
+
         headers: {
+
           apikey: SUPABASE_KEY,
+
           Authorization:
+
             'Bearer ' +
+
             SUPABASE_KEY,
+
           'Content-Type':
+
             'image/webp',
+
           'x-upsert':
+
             'true'
+
         },
 
+
+
         body: compressedBlob
+
       }
+
     );
+
+
 
     if (!response.ok) {
+
       throw new Error(
+
         await response.text()
+
       );
+
     }
 
+
+
     const publicUrl =
+
       SUPABASE_URL +
+
       '/storage/v1/object/public/' +
+
       STORAGE_BUCKET +
+
       '/' +
+
       path;
 
+
+
     document
+
       .getElementById(
+
         `${category}_img_${number}`
+
       )
+
       .value = publicUrl;
 
+
+
     preview.src =
+
       publicUrl;
 
+
+
     URL.revokeObjectURL(
+
       previewUrl
+
     );
 
+
+
     status.textContent =
+
       '사진 업로드 완료 · 1080×1080 · ' +
+
       formatBytes(
+
         compressedBlob.size
+
       );
 
+
+
   } catch (error) {
+
     status.textContent =
+
       '사진 업로드 실패';
+
+
 
     input.value = '';
 
+
+
     alert(
+
       '사진 업로드 실패: ' +
+
       error.message
+
     );
+
   }
+
 }
+
+
 
 function setVal(id, value) {
+
   const element =
+
     document.getElementById(id);
 
+
+
   if (element) {
+
     element.value =
+
       value ?? '';
+
   }
+
 }
+
+
 
 function setImg(id, value) {
+
   const element =
+
     document.getElementById(id);
 
+
+
   if (element) {
+
     element.src =
+
       value || '';
+
   }
+
 }
+
+
 
 function setStatus(
+
   category,
+
   number,
+
   value
+
 ) {
+
   const element =
+
     document.getElementById(
+
       `${category}_status_${number}`
+
     );
 
+
+
   if (
+
     element &&
+
     value
+
   ) {
+
     element.textContent =
+
       '등록된 사진이 있습니다.';
+
   }
+
 }
+
+
 
 function showLiveStatus(
+
   category,
+
   number
+
 ) {
+
   const element =
+
     document.getElementById(
+
       `${category}_live_${number}`
+
     );
+
+
 
   if (!element) {
+
     return;
+
   }
+
+
 
   element.style.display =
+
     'block';
 
+
+
   setTimeout(() => {
+
     element.style.display =
+
       'none';
+
   }, 3000);
+
 }
+
+
 
 async function loadDraftProducts() {
+
   const data = await getRows(
+
     'store_products_draft',
 
+
+
     '?store_id=eq.' +
+
     encodeURIComponent(
+
       currentStoreId
+
     ) +
 
+
+
     '&select=*'
+
   );
+
+
 
   data.forEach(product => {
+
     const category =
+
       product.category;
 
+
+
     const number =
+
       product.product_no;
 
+
+
     if (
+
       category === 'today' ||
+
       category === 'sale'
+
     ) {
+
       setVal(
+
         `${category}_img_${number}`,
+
         product.image_url
+
       );
+
+
 
       setImg(
+
         `${category}_preview_${number}`,
+
         product.image_url
+
       );
+
+
 
       setStatus(
+
         category,
+
         number,
+
         product.image_url
+
       );
 
+
+
       setVal(
+
         `${category}_name_${number}`,
+
         product.product_name
+
       );
 
+
+
       setVal(
+
         `${category}_price_${number}`,
+
         product.price
+
       );
 
+
+
       setVal(
+
         `${category}_desc_${number}`,
+
         product.description
+
       );
+
     }
+
+
 
     if (category === 'general') {
+
       setVal(`general_name_${number}`, product.product_name);
+
       setVal(`general_price_${number}`, product.price);
+
     }
 
+
+
     if (
+
       category === 'group'
+
     ) {
+
       setVal(
+
         `group_img_${number}`,
+
         product.image_url
+
       );
+
+
 
       setImg(
+
         `group_preview_${number}`,
+
         product.image_url
+
       );
+
+
 
       setStatus(
+
         'group',
+
         number,
+
         product.image_url
+
       );
 
+
+
       setVal(
+
         `group_name_${number}`,
+
         product.product_name
+
       );
 
+
+
       setVal(
+
         `group_normal_${number}`,
+
         product.normal_price
+
       );
 
+
+
       setVal(
+
         `group_price_${number}`,
+
         product.group_price
+
       );
 
+
+
       setVal(
+
         `group_target_${number}`,
+
         product.target_count
+
       );
 
+
+
       setVal(
+
         `group_join_${number}`,
+
         product.join_count
+
       );
+
     }
+
   });
+
 }
+
+
 
 function makeProductRow(
+
   category,
+
   number
+
 ) {
+
   const row = {
+
     store_id:
+
       currentStoreId,
 
+
+
     category:
+
       category,
 
+
+
     product_no:
+
       number,
 
+
+
     image_url:
+
       '',
+
+
 
     product_name:
+
       '',
+
+
 
     price:
+
       null,
+
+
 
     description:
+
       '',
 
+
+
     normal_price:
+
       null,
+
+
 
     group_price:
+
       null,
+
+
 
     target_count:
+
       null,
 
+
+
     join_count:
+
       null,
+
+
 
     updated_at:
+
       new Date()
+
         .toISOString()
+
   };
 
+
+
   if (
+
     category === 'today' ||
+
     category === 'sale'
+
   ) {
+
     row.image_url =
+
       document
+
         .getElementById(
+
           `${category}_img_${number}`
+
         )
+
         .value
+
         .trim();
 
+
+
     row.product_name =
+
       document
+
         .getElementById(
+
           `${category}_name_${number}`
+
         )
+
         .value
+
         .trim();
+
+
 
     row.price =
+
       document
+
         .getElementById(
+
           `${category}_price_${number}`
+
         )
+
         .value
+
         .trim();
+
+
 
     row.description =
+
       document
+
         .getElementById(
+
           `${category}_desc_${number}`
+
         )
+
         .value
+
         .trim();
+
   }
+
+
 
   if (category === 'general') {
+
     row.product_name = document.getElementById(`general_name_${number}`).value.trim();
+
     row.price = document.getElementById(`general_price_${number}`).value.trim();
+
     row.image_url = '';
+
     row.description = '';
+
   }
+
+
 
   if (
+
     category === 'group'
+
   ) {
+
     row.image_url =
+
       document
+
         .getElementById(
+
           `group_img_${number}`
+
         )
+
         .value
+
         .trim();
+
+
 
     row.product_name =
+
       document
+
         .getElementById(
+
           `group_name_${number}`
+
         )
+
         .value
+
         .trim();
+
+
 
     row.normal_price =
+
       document
+
         .getElementById(
+
           `group_normal_${number}`
+
         )
+
         .value
+
         .trim();
+
+
 
     row.group_price =
+
       document
+
         .getElementById(
+
           `group_price_${number}`
+
         )
+
         .value
+
         .trim();
 
+
+
     row.target_count =
+
       Number(
+
         document
+
           .getElementById(
+
             `group_target_${number}`
+
           )
+
           .value
+
       ) || 0;
+
+
 
     row.join_count =
+
       Number(
+
         document
+
           .getElementById(
+
             `group_join_${number}`
+
           )
+
           .value
+
       ) || 0;
+
   }
+
+
 
   return row;
+
 }
+
+
 
 function makeLiveRow(row) {
+
   return {
+
     store_id:
+
       row.store_id,
 
+
+
     category:
+
       row.category,
 
+
+
     product_no:
+
       row.product_no,
 
+
+
     image_url:
+
       row.image_url,
 
+
+
     product_name:
+
       row.product_name,
 
+
+
     price:
+
       row.price,
 
+
+
     description:
+
       row.description,
 
+
+
     normal_price:
+
       row.normal_price,
 
+
+
     group_price:
+
       row.group_price,
 
+
+
     target_count:
+
       row.target_count,
 
+
+
     join_count:
+
       row.join_count,
 
+
+
     uploaded_at:
+
       new Date()
+
         .toISOString()
+
   };
+
 }
+
+
 
 async function saveProduct(
+
   category,
+
   number
+
 ) {
+
   try {
+
     const row =
+
       makeProductRow(
+
         category,
+
         number
+
       );
 
+
+
     if (
+
       !row.product_name
+
     ) {
+
       alert('품명을 입력하세요.');
+
       return;
+
     }
+
+
 
     if (
+
       category === 'group' &&
+
       row.target_count < 1
+
     ) {
+
       alert(
+
         '공동구매 목표인원을 입력하세요.'
+
       );
 
+
+
       return;
+
     }
 
-    await upsertRow(
-      'store_products_draft',
-      row,
-      'store_id,category,product_no'
-    );
+
 
     await upsertRow(
-      'store_products_live',
-      makeLiveRow(row),
+
+      'store_products_draft',
+
+      row,
+
       'store_id,category,product_no'
+
     );
+
+
+
+    await upsertRow(
+
+      'store_products_live',
+
+      makeLiveRow(row),
+
+      'store_id,category,product_no'
+
+    );
+
+
 
     showLiveStatus(
+
       category,
+
       number
+
     );
 
+
+
     alert(
+
       '저장과 게시가 완료되었습니다.'
+
     );
+
+
 
   } catch (error) {
+
     alert(
+
       '저장 또는 게시 실패: ' +
+
       error.message
+
     );
+
   }
+
 }
+
+
 
 async function uploadAllProducts() {
+
   try {
+
     const data = await getRows(
+
       'store_products_draft',
 
+
+
       '?store_id=eq.' +
+
       encodeURIComponent(
+
         currentStoreId
+
       ) +
 
+
+
       '&select=*'
+
     );
+
+
 
     if (!data.length) {
+
       alert(
+
         '저장된 상품이 없습니다.'
+
       );
+
+
 
       return;
+
     }
+
+
 
     for (
+
       const product of data
+
     ) {
+
       await upsertRow(
+
         'store_products_live',
 
+
+
         {
+
           store_id:
+
             product.store_id,
 
+
+
           category:
+
             product.category,
 
+
+
           product_no:
+
             product.product_no,
 
+
+
           image_url:
+
             product.image_url,
 
+
+
           product_name:
+
             product.product_name,
 
+
+
           price:
+
             product.price,
 
+
+
           description:
+
             product.description,
 
+
+
           normal_price:
+
             product.normal_price,
 
+
+
           group_price:
+
             product.group_price,
 
+
+
           target_count:
+
             product.target_count,
 
+
+
           join_count:
+
             product.join_count,
 
+
+
           uploaded_at:
+
             new Date()
+
               .toISOString()
+
         },
 
+
+
         'store_id,category,product_no'
+
       );
+
     }
 
+
+
     alert(
+
       '전체상품 게시가 완료되었습니다.'
+
     );
 
+
+
   } catch (error) {
+
     alert(
+
       '전체상품 게시 실패: ' +
+
       error.message
+
     );
+
   }
+
 }
+
+
 
 async function saveStoreInfo() {
+
   try {
+
     await upsertRow(
+
       'store_info',
 
+
+
       {
+
         store_id:
+
           currentStoreId,
 
+
+
         store_name:
+
           document
+
             .getElementById(
+
               'storeName'
+
             )
+
             .value
+
             .trim(),
+
+
 
         phone:
+
           document
+
             .getElementById(
+
               'storePhone'
+
             )
+
             .value
+
             .trim(),
+
+
 
         address:
+
           document
+
             .getElementById(
+
               'storeAddress'
+
             )
+
             .value
+
             .trim(),
+
+
 
         road_info:
+
           document
+
             .getElementById(
+
               'storeRoad'
+
             )
+
             .value
+
             .trim(),
 
+
+
         free_delivery_amount:
+
           Number(document.getElementById('freeDeliveryAmount').value) || 0,
 
+
+
         updated_at:
+
           new Date()
+
             .toISOString()
+
       },
 
+
+
       'store_id'
+
     );
 
+
+
     alert(
+
       '매장안내 저장 완료'
+
     );
+
+
 
   } catch (error) {
+
     alert(
+
       '매장안내 저장 실패: ' +
+
       error.message
+
     );
+
   }
+
 }
+
+
 
 async function loadStoreInfo() {
+
   const data = await getRows(
+
     'store_info',
 
+
+
     '?store_id=eq.' +
+
     encodeURIComponent(
+
       currentStoreId
+
     ) +
 
+
+
     '&select=*'
+
   );
+
+
 
   if (!data.length) {
+
     return;
+
   }
 
+
+
   setVal(
+
     'storeName',
+
     data[0].store_name
+
   );
 
+
+
   setVal(
+
     'storePhone',
+
     data[0].phone
+
   );
 
+
+
   setVal(
+
     'storeAddress',
+
     data[0].address
+
   );
 
+
+
   setVal(
+
     'storeRoad',
+
     data[0].road_info
+
   );
+
+
 
   setVal('freeDeliveryAmount', data[0].free_delivery_amount || 0);
+
 }
+
+
 
 async function changePassword() {
   const oldPw = (document.getElementById('oldPw')?.value || '').trim();
@@ -2238,48 +4054,92 @@ async function changePassword() {
 
     alert('🎉 [비밀번호 변경 완료]\n\n비밀번호가 성공적으로 변경되었습니다.\n다음 로그인 시 변경하신 새 비밀번호로 안전하게 입장하세요!');
   } catch (error) {
+
     alert(
+
       '비밀번호 변경 실패: ' +
+
       error.message
+
     );
+
   }
+
 }
+
+
 
 function setSettlementValue(id, value) {
+
   const element = document.getElementById(id);
+
   if (element) element.value = value ?? '';
+
 }
+
+
 
 function paymentStatusText(value) {
+
   if (value === 'paid') return '결제완료';
+
   if (value === 'exempt') return '면제';
+
   return '미납';
+
 }
+
+
 
 function settlementStatusText(value) {
+
   if (value === 'suspended') return '정산중지';
+
   return '정산사용';
+
 }
+
+
 
 function saveStoreSettlementAccount() {
+
   var bank = (document.getElementById('storeSettlementBank').value || '').trim();
+
   var acc = (document.getElementById('storeSettlementAccount').value || '').trim();
+
   var holder = (document.getElementById('storeSettlementHolder').value || '').trim();
 
+
+
   if (!bank || !acc || !holder) {
+
     alert('은행명, 계좌번호, 예금주를 모두 입력해 주세요.');
+
     return;
+
   }
 
+
+
   try {
+
     localStorage.setItem('store_settlement_bank', bank);
+
     localStorage.setItem('store_settlement_account', acc);
+
     localStorage.setItem('store_settlement_holder', holder);
+
     alert('✅ [정산 계좌 저장 완료]\n\n• 은행명: ' + bank + '\n• 계좌번호: ' + acc + '\n• 예금주: ' + holder + '\n\n고객 주문 발생 시 위 계좌로 판매대금이 정확하게 정산 입금됩니다.');
+
   } catch(e) {
+
     alert('저장 실패: ' + e.message);
+
   }
+
 }
+
+
 
 async function loadSettlementAccount() {
   if (!currentStoreId) return;
@@ -2417,20 +4277,34 @@ async function sendInquiry() {
   }
 }
 
+
+
 </script>
+
 </div>
 
 
+
+
+
 <script>
+
 // ==========================================
+
 // 15원 세일 알림 발송 & 충전 차감 & 엑셀 영구 삭제 로직
+
 // ==========================================
+
 var martCash = 10000; // 현재 보유 캐시 (선입금 잔액)
+
 var targetCount = 1000; // 현재 등록된 고객 인원수
+
+
 
 function openChargeGuide() {
   alert('🏛️ [우리아파트 마트 플랫폼 선입금 충전 안내]\n\n• 입금 계좌: 농협은행 199-02-289684\n• 예금주: 송해석 / (주)뉴알에너지 대표이사\n\n[★ 충전 단위: 30만 / 50만 / 100만 원 (최소 30만 원 이상)]\n1. 30만 원 충전 (+VAT 3만 원 = 33만 원 입금) ➔ 20,000건 발송\n2. 50만 원 충전 (+VAT 5만 원 = 55만 원 입금) ➔ 33,333건 발송\n3. 100만 원 충전 (+VAT 10만 원 = 110만 원 입금) ➔ 66,666건 발송\n\n※ 입금 확인 즉시 (주)뉴알에너지 명의로 전자세금계산서가 100% 자동 발행됩니다.');
 }
+
 
 function getActiveStoreCode() {
   var params = new URLSearchParams(location.search);
@@ -2469,35 +4343,63 @@ function previewFlyerImage(input) {
   updateAutoAttachUrlDisplay();
 }
 
+
+
 function handleCustomerExcel(input) {
+
   if (input.files && input.files[0]) {
+
     var file = input.files[0];
+
     document.getElementById('excelFileNameText').textContent = file.name + ' (010 정상 번호 필터링 완료)';
+
     totalDbCount = 10000;
     targetCount = 1000;
     if (document.getElementById('rangeEnd')) document.getElementById('rangeEnd').max = totalDbCount;
     updateRangeTargetCount();
+
     document.getElementById('excelCountText').textContent = '📊 등록된 발송 대상: ' + targetCount.toLocaleString() + ' 명';
+
     var cost = targetCount * 15;
+
     document.getElementById('calcCostText').textContent = cost.toLocaleString() + '원';
+
     alert('✅ [' + file.name + '] 엑셀 파일이 정상 등록되었습니다.\n총 1,000명의 010 단골 고객이 발송 대상으로 추출되었습니다.');
+
   }
+
 }
+
+
 
 // [핵심 기능 1] 등록된 단골 엑셀 DB 영구 삭제 파기
+
 function deleteCustomerExcelDb() {
+
   if (!confirm('⚠️ [경고: 고객 엑셀 DB 영구 파기]\n\n등록된 단골 고객 엑셀 명단을 서버 및 화면에서 즉시 영구 파기하시겠습니까?\n삭제 후에는 개인정보보호법에 따라 복구가 불가능합니다.')) return;
 
+
+
   targetCount = 0;
+
   document.getElementById('excelCountText').textContent = '📊 등록된 발송 대상: 0 명 (영구 파기 완료)';
+
   document.getElementById('excelFileNameText').textContent = '등록된 엑셀 파일 없음 (완전 삭제됨)';
+
   document.getElementById('calcCostText').textContent = '0원';
+
   document.getElementById('customerExcelFile').value = '';
 
+
+
   alert('🔒 [영구 파기 완료]\n\n마트 고객 엑셀 DB가 서버와 브라우저에서 안전하게 100% 영구 파기되었습니다.');
+
 }
 
+
+
 // [핵심 기능 2] 15원 발송 실행 및 잔액 부족 검증 (1,000명 발송 시 잔액 부족 알림)
+
 
 var totalDbCount = 10000; // 전체 엑셀 등록 인원 (기본 1만명 지원)
 var targetCount = 1000;    // 실제 발송 대상 인원 (기본 2001~3000번 구간 1,000명)
@@ -2553,35 +4455,188 @@ function updateCostDisplay(subText) {
   }
 }
 
-function sendSaleAlert15() {
-  if (targetCount === 0) {
-    alert('발송 대상 고객 엑셀 DB가 없습니다. 먼저 엑셀 파일을 등록해 주세요.');
+// ==============================================================
+// [핵심 기능] 사장님 전용 1건 실시간 테스트 문자 즉시 발송 로직
+// ==============================================================
+function formatTestPhone(input) {
+  let val = input.value.replace(/[^0-9]/g, '');
+  if (val.length > 3 && val.length <= 7) {
+    input.value = val.slice(0, 3) + '-' + val.slice(3);
+  } else if (val.length > 7) {
+    input.value = val.slice(0, 3) + '-' + val.slice(3, 7) + '-' + val.slice(7, 11);
+  } else {
+    input.value = val;
+  }
+  if (val.length >= 10) {
+    localStorage.setItem('mart_test_phone_last', input.value);
+  }
+}
+
+// 페이지 로드 시 이전에 입력했던 번호가 있으면 자동 복원
+window.addEventListener('DOMContentLoaded', function() {
+  var savedPhone = localStorage.getItem('mart_test_phone_last');
+  var phoneInput = document.getElementById('testDirectPhone');
+  if (savedPhone && phoneInput) {
+    phoneInput.value = savedPhone;
+  }
+});
+
+async function sendDirectTestSms() {
+  var phoneInput = document.getElementById('testDirectPhone');
+  var statusBox = document.getElementById('testDirectStatusBox');
+  var sendBtn = document.getElementById('btnTestDirectSend');
+  var btnText = document.getElementById('btnTestDirectText');
+  var btnIcon = document.getElementById('btnTestDirectIcon');
+
+  var rawPhone = (phoneInput?.value || '').trim();
+  var cleanPhone = rawPhone.replace(/[^0-9]/g, '');
+
+  if (!cleanPhone || cleanPhone.length < 10 || !cleanPhone.startsWith('01')) {
+    alert('⚠️ 수신할 휴대폰 번호를 정확히 입력해 주세요.\n(예: 010-4397-1030)');
+    phoneInput?.focus();
     return;
   }
+
+  // 1. 세일 문구 및 매장 링크 추출
+  var storeName = (document.getElementById('storeName')?.value || '').trim() || '에너젠마트';
+  var msgText = (document.getElementById('flyerTextMsg')?.value || '').trim();
+  
+  if (!msgText) {
+    if (!confirm('위 2번 [세일 알림 문구]가 비어 있습니다.\n기본 안내 문구로 테스트 발송을 진행하시겠습니까?')) {
+      document.getElementById('flyerTextMsg')?.focus();
+      return;
+    }
+    msgText = '에너젠마트 테스트';
+  }
+
+  var storeUrl = (document.getElementById('autoAttachUrlText')?.textContent || '').trim();
+  if (!storeUrl) {
+    storeUrl = 'https://mart-platform.vercel.app/mart-store.html?store=store01';
+  }
+
+  // 2. LMS 완성 본문 생성 (우리아파트 안심거래 표준 규격)
+  var subject = '[' + storeName + '] 행사 알림';
+  var fullContent = '[' + storeName + '] 행사 알림\n\n' + msgText + '\n\n▶ 모바일 전단 및 행사 상품 확인:\n' + storeUrl + '\n\n무료수신거부: 080-870-0720';
+
+  // 3. UI 발송 진행 상태 표시
+  sendBtn.disabled = true;
+  sendBtn.style.opacity = '0.6';
+  btnIcon.textContent = '⏳';
+  btnText.textContent = '발송 중...';
+
+  if (statusBox) {
+    statusBox.style.display = 'block';
+    statusBox.style.background = '#fef3c7';
+    statusBox.style.color = '#92400e';
+    statusBox.style.border = '1.5px solid #fde68a';
+    statusBox.innerHTML = '<strong>⏳ [전송 진행 중]</strong> ' + rawPhone + ' 번호로 실제 통신사 LMS 문자를 발송하고 있습니다. 잠시만 기다려 주세요...';
+  }
+
+  try {
+    // 본사 정식 NCP SENS 발송 API 호출
+    var res = await fetch('https://www.wooriapt.app/api/send-sms', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        phone: cleanPhone,
+        content: fullContent,
+        type: 'LMS',
+        subject: subject
+      })
+    });
+
+    var data = await res.json();
+
+    if (res.ok && data.ok) {
+      var reqId = data.data?.requestId || 'RSLA-SUCCESS';
+      if (statusBox) {
+        statusBox.style.background = '#dcfce7';
+        statusBox.style.color = '#14532d';
+        statusBox.style.border = '1.5px solid #86efac';
+        statusBox.innerHTML = '<strong>🎉 [발송 성공!]</strong> <b>' + rawPhone + '</b> 번호로 테스트 세일 문자가 정상 전송되었습니다!<br><span style="font-size:12px;color:#166534;font-weight:normal;">• 발신번호: 062-952-4150 | 발송 접수ID: ' + reqId + ' (통신사 도착 완료)</span>';
+      }
+      alert('🎉 [테스트 문자 발송 성공!]\n\n• 수신번호: ' + rawPhone + '\n• 발송 상태: 정상 전송 완료\n\n지금 스마트폰 문자함에 도착한 세일 알림을 확인해 보세요!');
+    } else {
+      throw new Error(data.message || '발송 실패');
+    }
+  } catch (err) {
+    console.error('Test SMS Send Error:', err);
+    if (statusBox) {
+      statusBox.style.background = '#fef2f2';
+      statusBox.style.color = '#991b1b';
+      statusBox.style.border = '1.5px solid #fecaca';
+      statusBox.innerHTML = '<strong>❌ [발송 오류]</strong> ' + (err.message || '서버 통신 오류가 발생했습니다. 번호를 확인해 주세요.');
+    }
+    alert('❌ [발송 실패]\n\n' + (err.message || '문자 발송 서버와의 통신에 실패했습니다.'));
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.style.opacity = '1';
+    btnIcon.textContent = '🚀';
+    btnText.textContent = '테스트 문자 즉시 전송';
+  }
+}
+
+function sendSaleAlert15() {
+
+  if (targetCount === 0) {
+
+    alert('발송 대상 고객 엑셀 DB가 없습니다. 먼저 엑셀 파일을 등록해 주세요.');
+
+    return;
+
+  }
+
+
 
   var cost = targetCount * 15; // 1,000명 × 15원 = 15,000원
 
+
+
   // 잔액 부족 검증 로직
+
   if (martCash < cost) {
+
     var shortage = cost - martCash;
+
     alert('⚠️ [보유 캐시 잔액 부족 안내]\n\n• 발송 대상: ' + targetCount.toLocaleString() + ' 명\n• 필요 금액: ' + cost.toLocaleString() + ' 원 (1명당 15원)\n• 현재 잔액: ' + martCash.toLocaleString() + ' 원\n• 부족한 금액: ' + shortage.toLocaleString() + ' 원\n\n[충전 안내]\n최소 충전 단위는 [30만 원 이상(30만 / 50만 / 100만 원, VAT 별도)] 단위입니다.\n상단의 [+ 캐시 충전하기] 버튼을 눌러 계좌 입금 후 발송해 주세요!');
+
     openChargeGuide();
+
     return;
+
   }
+
+
 
   if (!confirm('📢 [15원 세일 알림 발송 확인]\n\n• 발송 대상: ' + targetCount.toLocaleString() + ' 명\n• 차감 금액: ' + cost.toLocaleString() + ' 원\n• 발송 후 잔액: ' + (martCash - cost).toLocaleString() + ' 원\n\n지금 즉시 발송하시겠습니까?')) return;
 
+
+
   martCash -= cost;
+
   document.getElementById('currentCashDisplay').textContent = martCash.toLocaleString() + '원';
+
   alert('🎉 [발송 완료]\n\n총 ' + targetCount.toLocaleString() + '명의 단골 고객에게 15원 세일 알림이 성공적으로 발송되었습니다!\n차감 금액: ' + cost.toLocaleString() + '원 (잔여 캐시: ' + martCash.toLocaleString() + '원)');
+
 }
 
+
+
 // [핵심 기능 3] 자동차 QR 카드 주문 로직
+
 function updateQrOrderPrice() {
+
   var qty = parseInt(document.getElementById('qrOrderQuantity').value, 10);
+
   var price = (qty / 1000) * 200000;
+
   document.getElementById('qrOrderTotalCost').textContent = price.toLocaleString() + '원';
+
 }
+
+
 
 async function submitQrCardOrder() {
   var qty = parseInt(document.getElementById('qrOrderQuantity')?.value || '1000', 10);
@@ -2625,6 +4680,7 @@ async function submitQrCardOrder() {
     alert('주문 전송 중 오류: ' + error.message);
   }
 }
+
 
 
 // ==============================================
@@ -2730,5 +4786,8 @@ window.showMenu = function(menuId, btn) {
 
 </script>
 
+
+
 </body>
+
 </html>
