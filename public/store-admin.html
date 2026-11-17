@@ -4111,65 +4111,93 @@ function settlementStatusText(value) {
 
 
 
-function saveStoreSettlementAccount() {
-
+async function saveStoreSettlementAccount() {
   var bank = (document.getElementById('storeSettlementBank').value || '').trim();
-
   var acc = (document.getElementById('storeSettlementAccount').value || '').trim();
-
   var holder = (document.getElementById('storeSettlementHolder').value || '').trim();
 
-
-
   if (!bank || !acc || !holder) {
-
     alert('은행명, 계좌번호, 예금주를 모두 입력해 주세요.');
-
     return;
-
   }
 
-
+  var sid = currentStoreId || (typeof getActiveStoreCode === 'function' ? getActiveStoreCode() : 'store01');
+  var bankPayload = JSON.stringify({
+    bank: bank,
+    account: acc,
+    holder: holder,
+    updatedAt: new Date().toISOString()
+  });
 
   try {
+    // 1. Supabase store_info.hours에 매장별 실시간 저장 (기존 행 PATCH, 없으면 UPSERT)
+    var patchRes = await fetch(SUPABASE_URL + '/rest/v1/store_info?store_id=eq.' + encodeURIComponent(sid), {
+      method: 'PATCH',
+      headers: headers({ Prefer: 'return=representation' }),
+      body: JSON.stringify({ hours: bankPayload, updated_at: new Date().toISOString() })
+    });
+    var patchRowsData = patchRes.ok ? await patchRes.json() : [];
+    if (!patchRes.ok || !Array.isArray(patchRowsData) || patchRowsData.length === 0) {
+      var storeNameVal = (document.getElementById('storeName')?.value || '').trim() || sid;
+      await upsertRow('store_info', {
+        store_id: sid,
+        store_name: storeNameVal,
+        hours: bankPayload,
+        updated_at: new Date().toISOString()
+      }, 'store_id');
+    }
 
-    var sid = currentStoreId || (typeof getActiveStoreCode === 'function' ? getActiveStoreCode() : 'store01');
-
+    // 2. 로컬 백업 저장
     localStorage.setItem('store_settlement_bank_' + sid, bank);
-
     localStorage.setItem('store_settlement_account_' + sid, acc);
-
     localStorage.setItem('store_settlement_holder_' + sid, holder);
-
     localStorage.setItem('store_settlement_bank', bank);
-
     localStorage.setItem('store_settlement_account', acc);
-
     localStorage.setItem('store_settlement_holder', holder);
 
-    alert('✅ [마트 전용 입금계좌 저장 완료]\n\n• 은행명: ' + bank + '\n• 계좌번호: ' + acc + '\n• 예금주: ' + holder + '\n\n소비자 온라인 주문 시 본사를 거치지 않고 위 마트 전용 계좌로 바로 입금 안내됩니다.');
-
+    alert('✅ [마트 전용 입금계좌 저장 완료]\n\n• 은행명: ' + bank + '\n• 계좌번호: ' + acc + '\n• 예금주: ' + holder + '\n\n소비자 주문 화면에 실시간으로 바로 반영되었습니다!');
   } catch(e) {
-
-    alert('저장 실패: ' + e.message);
-
+    console.error('saveStoreSettlementAccount error:', e);
+    alert('❌ 서버 저장 중 오류가 발생했습니다: ' + (e.message || e));
   }
-
 }
-
-
 
 async function loadSettlementAccount() {
   var sid = currentStoreId || (typeof getActiveStoreCode === 'function' ? getActiveStoreCode() : 'store01');
+  var bank = '', acc = '', holder = '';
   try {
-    var bank = localStorage.getItem('store_settlement_bank_' + sid) || localStorage.getItem('store_settlement_bank') || '';
-    var acc = localStorage.getItem('store_settlement_account_' + sid) || localStorage.getItem('store_settlement_account') || '';
-    var holder = localStorage.getItem('store_settlement_holder_' + sid) || localStorage.getItem('store_settlement_holder') || '';
+    // 1. Supabase DB에서 실시간 로드
+    var res = await fetch(SUPABASE_URL + '/rest/v1/store_info?store_id=eq.' + encodeURIComponent(sid) + '&select=hours', {
+      headers: headers()
+    });
+    if (res.ok) {
+      var rows = await res.json();
+      if (rows && rows.length && rows[0].hours) {
+        try {
+          var parsed = JSON.parse(rows[0].hours);
+          if (parsed && (parsed.bank || parsed.account || parsed.holder)) {
+            bank = parsed.bank || '';
+            acc = parsed.account || '';
+            holder = parsed.holder || '';
+          }
+        } catch (je) {}
+      }
+    }
+  } catch (e) {
+    console.warn('loadSettlementAccount DB warning:', e);
+  }
+  try {
+    // 2. DB에 값이 아직 없으면 로컬 백업 참조
+    if (!bank && !acc && !holder) {
+      bank = localStorage.getItem('store_settlement_bank_' + sid) || '';
+      acc = localStorage.getItem('store_settlement_account_' + sid) || '';
+      holder = localStorage.getItem('store_settlement_holder_' + sid) || '';
+    }
     if (document.getElementById('storeSettlementBank')) document.getElementById('storeSettlementBank').value = bank;
     if (document.getElementById('storeSettlementAccount')) document.getElementById('storeSettlementAccount').value = acc;
     if (document.getElementById('storeSettlementHolder')) document.getElementById('storeSettlementHolder').value = holder;
-  } catch (e) {
-    console.warn('loadSettlementAccount warning:', e);
+  } catch (e2) {
+    console.warn('loadSettlementAccount warning:', e2);
   }
 }
 
