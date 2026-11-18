@@ -699,39 +699,16 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
       <b style="color:#1f7a3a;font-size:16px;">3. 발송 대상 고객 엑셀 DB 등록 &amp; 순번 구간 지정 발송</b>
       <div class="sa-help">포스(POS)에서 다운받은 고객 엑셀(.xlsx, .xls, .csv)을 올려주세요. <b>2차·3차 계속 올리셔도 중복 번호는 자동 제거되고 신규 고객·최신 방문일만 자동 누적 반영</b>됩니다.</div>
       
-      <!-- [무교육 1초 등록] ① 마우스로 끌어다 놓기(Drag&Drop) + ② 포스 화면 복사·붙여넣기 통합 박스 -->
-      <div id="posDropZone"
-           ondragover="event.preventDefault(); this.style.background='#dcfce7'; this.style.borderColor='#15803d';"
-           ondragleave="this.style.background='#f0fdf4'; this.style.borderColor='#16a34a';"
-           ondrop="handlePosDrop(event)"
-           style="margin-top:10px; padding:18px 14px; border:2.5px dashed #16a34a; border-radius:12px; background:#f0fdf4; text-align:center; transition:all 0.2s;">
-        <div style="font-size:26px; margin-bottom:4px;">📥</div>
-        <div style="font-size:15px; font-weight:900; color:#14532d; margin-bottom:4px;">
-          [방법 1] 포스(POS) 엑셀·메모장 파일을 마우스로 끌어다 여기에 놓으세요!
+            <!-- 세무사 세금신고 자료 첨부하듯 가장 익숙한 [바탕화면 엑셀 파일 선택] 방식 -->
+      <div style="margin-top:10px; padding:16px; border:2px solid #16a34a; border-radius:10px; background:#f0fdf4;">
+        <div style="font-size:14.5px; font-weight:900; color:#14532d; margin-bottom:6px;">
+          📁 세무사 사무실에 세금신고 엑셀 자료 보내실 때와 방법이 똑같습니다!
         </div>
-        <div style="font-size:12.5px; color:#166534; margin-bottom:10px;">
-          파일을 마우스로 잡고 이 초록색 네모 칸 안에 떨어뜨리거나, 아래 버튼으로 파일을 선택하세요. (2차·3차 누적 시 중복 자동제거)
+        <div style="font-size:13px; color:#166534; line-height:1.6; margin-bottom:12px;">
+          <b>1단계:</b> 포스(POS) 화면 <b>[회원관리/고객조회]</b>에서 세금신고 자료 뽑듯 <b>[엑셀 저장]</b>을 눌러 <b>바탕화면</b>에 저장합니다.<br>
+          <b>2단계:</b> 아래 <b>[파일 선택]</b> 버튼을 눌러 바탕화면에 저장된 고객 엑셀 파일을 선택하면 자동으로 등록됩니다.
         </div>
-        <input type="file" id="customerExcelFile" accept=".xlsx, .xls, .csv, .txt" class="sa-file" style="max-width:420px; margin:0 auto; background:#fff;" onchange="handleCustomerExcel(this)">
-      </div>
-
-      <!-- [방법 2] 파일 저장 없이 포스 화면 / 문자사이트에서 바로 긁어서 붙여넣기 -->
-      <div style="margin-top:10px; padding:14px; border:2px solid #2563eb; border-radius:12px; background:#eff6ff;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
-          <b style="color:#1e40af; font-size:14.5px;">📋 [방법 2] 엑셀 저장 없이 포스 화면·문자사이트에서 바로 복사해 붙여넣기</b>
-          <button type="button" onclick="pasteFromClipboardAndRegister()" style="background:#2563eb; color:#fff; border:none; padding:7px 14px; border-radius:8px; font-size:12.5px; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(37,99,235,0.25);">
-            ⚡ 복사한 명단 원클릭 자동 붙여넣기
-          </button>
-        </div>
-        <div style="font-size:12px; color:#1d4ed8; margin-bottom:8px; line-height:1.45;">
-          포스 회원조회 화면이나 기존 문자사이트 주소록을 마우스로 쭉 긁어 복사(<b>Ctrl+C</b>)한 뒤, 아래 칸에 붙여넣기(<b>Ctrl+V</b>)하거나 텍스트를 마우스로 끌어다 놓으면 <b>010 전화번호만 자동으로 싹 골라내어 등록</b>합니다!
-        </div>
-        <div style="display:flex; gap:8px; align-items:stretch; flex-wrap:wrap;">
-          <textarea id="posPasteInput" rows="3" placeholder="여기에 붙여넣기(Ctrl+V) 하세요! (이름, 날짜, 기타 글자가 뒤섞여 있어도 010 번호와 이름·날짜를 자동으로 발라냅니다)" style="flex:1; min-width:220px; padding:10px; border:1.5px solid #93c5fd; border-radius:8px; font-size:13px; background:#fff; resize:vertical;" onpaste="setTimeout(function(){ registerPastedCustomerText(); }, 120)"></textarea>
-          <button type="button" onclick="registerPastedCustomerText()" style="background:#1d4ed8; color:#fff; border:none; padding:0 18px; border-radius:8px; font-size:13.5px; font-weight:900; cursor:pointer; white-space:nowrap;">
-            ➕ 붙여넣은 번호<br>즉시 등록
-          </button>
-        </div>
+        <input type="file" id="customerExcelFile" accept=".xlsx, .xls, .csv, .txt" class="sa-file" style="background:#fff; padding:10px; border:1.5px solid #16a34a; border-radius:8px; font-weight:700;" onchange="handleCustomerExcel(this)">
       </div>
       
       <!-- 추출 결과 및 인원 표시 바 -->
