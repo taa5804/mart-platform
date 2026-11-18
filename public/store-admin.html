@@ -699,7 +699,40 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
       <b style="color:#1f7a3a;font-size:16px;">3. 발송 대상 고객 엑셀 DB 등록 &amp; 순번 구간 지정 발송</b>
       <div class="sa-help">포스(POS)에서 다운받은 고객 엑셀(.xlsx, .xls, .csv)을 올려주세요. <b>2차·3차 계속 올리셔도 중복 번호는 자동 제거되고 신규 고객·최신 방문일만 자동 누적 반영</b>됩니다.</div>
       
-      <input type="file" id="customerExcelFile" accept=".xlsx, .xls, .csv, .txt" class="sa-file" onchange="handleCustomerExcel(this)">
+      <!-- [무교육 1초 등록] ① 마우스로 끌어다 놓기(Drag&Drop) + ② 포스 화면 복사·붙여넣기 통합 박스 -->
+      <div id="posDropZone"
+           ondragover="event.preventDefault(); this.style.background='#dcfce7'; this.style.borderColor='#15803d';"
+           ondragleave="this.style.background='#f0fdf4'; this.style.borderColor='#16a34a';"
+           ondrop="handlePosDrop(event)"
+           style="margin-top:10px; padding:18px 14px; border:2.5px dashed #16a34a; border-radius:12px; background:#f0fdf4; text-align:center; transition:all 0.2s;">
+        <div style="font-size:26px; margin-bottom:4px;">📥</div>
+        <div style="font-size:15px; font-weight:900; color:#14532d; margin-bottom:4px;">
+          [방법 1] 포스(POS) 엑셀·메모장 파일을 마우스로 끌어다 여기에 놓으세요!
+        </div>
+        <div style="font-size:12.5px; color:#166534; margin-bottom:10px;">
+          파일을 마우스로 잡고 이 초록색 네모 칸 안에 떨어뜨리거나, 아래 버튼으로 파일을 선택하세요. (2차·3차 누적 시 중복 자동제거)
+        </div>
+        <input type="file" id="customerExcelFile" accept=".xlsx, .xls, .csv, .txt" class="sa-file" style="max-width:420px; margin:0 auto; background:#fff;" onchange="handleCustomerExcel(this)">
+      </div>
+
+      <!-- [방법 2] 파일 저장 없이 포스 화면 / 문자사이트에서 바로 긁어서 붙여넣기 -->
+      <div style="margin-top:10px; padding:14px; border:2px solid #2563eb; border-radius:12px; background:#eff6ff;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+          <b style="color:#1e40af; font-size:14.5px;">📋 [방법 2] 엑셀 저장 없이 포스 화면·문자사이트에서 바로 복사해 붙여넣기</b>
+          <button type="button" onclick="pasteFromClipboardAndRegister()" style="background:#2563eb; color:#fff; border:none; padding:7px 14px; border-radius:8px; font-size:12.5px; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(37,99,235,0.25);">
+            ⚡ 복사한 명단 원클릭 자동 붙여넣기
+          </button>
+        </div>
+        <div style="font-size:12px; color:#1d4ed8; margin-bottom:8px; line-height:1.45;">
+          포스 회원조회 화면이나 기존 문자사이트 주소록을 마우스로 쭉 긁어 복사(<b>Ctrl+C</b>)한 뒤, 아래 칸에 붙여넣기(<b>Ctrl+V</b>)하거나 텍스트를 마우스로 끌어다 놓으면 <b>010 전화번호만 자동으로 싹 골라내어 등록</b>합니다!
+        </div>
+        <div style="display:flex; gap:8px; align-items:stretch; flex-wrap:wrap;">
+          <textarea id="posPasteInput" rows="3" placeholder="여기에 붙여넣기(Ctrl+V) 하세요! (이름, 날짜, 기타 글자가 뒤섞여 있어도 010 번호와 이름·날짜를 자동으로 발라냅니다)" style="flex:1; min-width:220px; padding:10px; border:1.5px solid #93c5fd; border-radius:8px; font-size:13px; background:#fff; resize:vertical;" onpaste="setTimeout(function(){ registerPastedCustomerText(); }, 120)"></textarea>
+          <button type="button" onclick="registerPastedCustomerText()" style="background:#1d4ed8; color:#fff; border:none; padding:0 18px; border-radius:8px; font-size:13.5px; font-weight:900; cursor:pointer; white-space:nowrap;">
+            ➕ 붙여넣은 번호<br>즉시 등록
+          </button>
+        </div>
+      </div>
       
       <!-- 추출 결과 및 인원 표시 바 -->
       <div style="margin-top:12px;padding:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
@@ -4721,6 +4754,130 @@ function mergeCustomerRecords(newRecords) {
     mergedCount: mergedCount,
     totalCount: totalDbCount
   };
+}
+
+// [무교육 1초 등록] 마우스 끌어다 놓기 (파일 드롭 & 텍스트 드롭 모두 지원)
+async function handlePosDrop(ev) {
+  ev.preventDefault();
+  var zone = document.getElementById('posDropZone');
+  if (zone) {
+    zone.style.background = '#f0fdf4';
+    zone.style.borderColor = '#16a34a';
+  }
+  if (ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files.length > 0) {
+    await processCustomerFileList(ev.dataTransfer.files);
+    return;
+  }
+  if (ev.dataTransfer) {
+    var droppedText = ev.dataTransfer.getData('text') || '';
+    if (droppedText.trim()) {
+      var pasteBox = document.getElementById('posPasteInput');
+      if (pasteBox) pasteBox.value = droppedText;
+      await registerPastedCustomerText();
+    }
+  }
+}
+
+async function processCustomerFileList(fileList) {
+  var totalAdded = 0, totalMerged = 0, totalValid = 0;
+  var lastFile = '';
+  for (var i = 0; i < fileList.length; i++) {
+    var file = fileList[i];
+    lastFile = file.name;
+    var rows = await readExcelOrCsvRows(file);
+    var parsed = extractCustomersFromRows(rows);
+    if (parsed.length > 0) {
+      var stat = mergeCustomerRecords(parsed);
+      totalValid += stat.fileValidCount;
+      totalAdded += stat.addedCount;
+      totalMerged += stat.mergedCount;
+    }
+  }
+  if (totalValid === 0) {
+    alert('⚠️ 끌어다 놓으신 파일에서 010 휴대폰 번호를 찾지 못했습니다.');
+    return;
+  }
+  customerDbMeta.lastFileName = lastFile + (fileList.length > 1 ? ' 외 ' + (fileList.length - 1) + '개' : '');
+  customerDbMeta.uploadCount = (customerDbMeta.uploadCount || 0) + 1;
+  customerDbMeta.updatedAt = getTodayStr();
+  sortCustomerDbArray(currentSortMode);
+  await saveCustomerDbToStorage();
+  syncCustomerDbUi(true);
+  alert(
+    '✅ [마우스 끌어다 놓기 고객 DB 반영 완료!]\n\n' +
+    '• 추출된 010 번호: ' + totalValid.toLocaleString() + '명\n' +
+    '• 신규 추가 고객: +' + totalAdded.toLocaleString() + '명\n' +
+    '• 중복 병합 고객: ' + totalMerged.toLocaleString() + '명\n' +
+    '━━━━━━━━━━━━━━━━━━━━\n' +
+    '📊 현재 누적 전체 단골 DB: 총 ' + customerDbList.length.toLocaleString() + '명'
+  );
+}
+
+async function pasteFromClipboardAndRegister() {
+  try {
+    var clipText = await navigator.clipboard.readText();
+    if (!clipText || !clipText.trim()) {
+      alert('클립보드에 복사된 내용이 없습니다.\n포스 화면이나 문자사이트에서 먼저 복사(Ctrl+C)를 해주세요.');
+      return;
+    }
+    var box = document.getElementById('posPasteInput');
+    if (box) box.value = clipText;
+    await registerPastedCustomerText();
+  } catch (e) {
+    var box = document.getElementById('posPasteInput');
+    if (box) box.focus();
+    alert('아래 입력칸을 클릭하시고 키보드 [Ctrl + V] (또는 마우스 우클릭 -> 붙여넣기)를 눌러주세요!');
+  }
+}
+
+async function registerPastedCustomerText() {
+  var box = document.getElementById('posPasteInput');
+  var raw = box ? box.value : '';
+  if (!raw || !raw.trim()) {
+    alert('붙여넣은 고객 명단 내용이 없습니다.');
+    return;
+  }
+  var lines = raw.split(/\r?\n/);
+  var rows = lines.map(function(l) { return l.split(/[\t,;]+/); });
+  var parsed = extractCustomersFromRows(rows);
+
+  // 만약 줄바꿈 없이 010 번호들이 뭉쳐 있는 텍스트라면 정규식으로 전수 추출
+  if (!parsed.length) {
+    var matches = raw.match(/010[-\s.]?\d{3,4}[-\s.]?\d{4}/g) || [];
+    var today = getTodayStr();
+    parsed = matches.map(function(m, idx) {
+      return {
+        phone: normalize010(m),
+        name: '단골고객',
+        visitDate: today,
+        regDate: today
+      };
+    }).filter(function(item) { return !!item.phone; });
+  }
+
+  if (!parsed.length) {
+    alert('⚠️ 붙여넣으신 내용에서 010 휴대폰 번호를 찾지 못했습니다.');
+    return;
+  }
+
+  var stat = mergeCustomerRecords(parsed);
+  customerDbMeta.lastFileName = '포스화면_직접붙여넣기';
+  customerDbMeta.uploadCount = (customerDbMeta.uploadCount || 0) + 1;
+  customerDbMeta.updatedAt = getTodayStr();
+
+  sortCustomerDbArray(currentSortMode);
+  await saveCustomerDbToStorage();
+  syncCustomerDbUi(true);
+  if (box) box.value = '';
+
+  alert(
+    '✅ [포스/클립보드 붙여넣기 즉시 등록 완료!]\n\n' +
+    '• 추출된 010 번호: ' + stat.fileValidCount.toLocaleString() + '명\n' +
+    '• 신규 추가된 고객: +' + stat.addedCount.toLocaleString() + '명\n' +
+    '• 기존 중복 고객(자동 병합): ' + stat.mergedCount.toLocaleString() + '명\n' +
+    '━━━━━━━━━━━━━━━━━━━━\n' +
+    '📊 현재 누적 전체 단골 DB: 총 ' + stat.totalCount.toLocaleString() + '명'
+  );
 }
 
 async function handleCustomerExcel(input) {
