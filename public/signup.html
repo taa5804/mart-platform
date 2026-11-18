@@ -323,6 +323,15 @@ button:disabled{
       <div class="guide">비밀번호는 최소 6자리 이상 입력해야 합니다.</div>
     </div>
 
+        <div class="field" style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:10px; padding:12px; margin-top:12px;">
+      <label style="color:#166534; font-weight:800;">추천코드 <span style="font-size:12.5px; font-weight:700; color:#15803d;">(선택사항 — 코드가 있는 매장만 입력)</span></label>
+      <input id="partnerCode" type="text" maxlength="12" placeholder="추천코드가 있는 경우에만 입력해 주세요 (없으면 비워두세요)" style="font-weight:800; font-size:15px; color:#0e6556; letter-spacing:1px;">
+      <div class="guide" style="color:#166534;">
+        ※ 협회(한국마트협회·수퍼마켓조합) 또는 영업 담당자로부터 안내받은 <b>추천코드</b>가 있는 경우에만 입력해 주세요.<br>
+        ※ <b>추천코드가 없는 일반 매장께서는 비워두셔도 동일하게 건당 15원 최저가로 즉시 가입</b>됩니다.
+      </div>
+    </div>
+
     <div class="field">
       <label>이메일 <span class="req">*</span></label>
       <input id="email" type="email" placeholder="example@email.com">
@@ -367,54 +376,54 @@ button:disabled{
       아래 제휴 계약서 내용을 확인하신 후 하단에서 동의 여부를 선택해 주세요.
     </p>
 
-    <div class="contract-box" style="line-height:1.8; font-size:13.5px; color:#334155; max-height:340px; overflow-y:auto; padding:18px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px;">
-      <h3 style="margin:0 0 14px; font-size:16px; color:#0f172a; text-align:center; font-weight:800;">[마트 고객관리 및 사진 전단지 제휴 계약서]</h3>
+        <div class="contract-box" style="line-height:1.8; font-size:13.5px; color:#334155; max-height:340px; overflow-y:auto; padding:18px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px;">
+      <h3 style="margin:0 0 14px; font-size:16px; color:#0e6556; text-align:center; font-weight:800;">[동네 마트 모바일 세일문자(LMS) 표준 가맹 제휴 계약서]</h3>
       
       <p style="margin:0 0 12px;">
-        <b>[제휴마트 상호명](이하 "갑")</b>과 <b>에너젠51(이하 "을")</b>은 안심주차 QR 기반 모바일 전단지 발송 및 고객관리 솔루션 이용에 관하여 다음과 같이 계약을 체결한다.
+        <b>[제휴마트 상호명](이하 "갑")</b>과 <b>에너젠51 마트 플랫폼 본사(이하 "을")</b>는 "갑"의 단골 고객 유치 및 주말 세일 알림 문자(LMS), 모바일 사진 전단지 발송 솔루션 이용에 관하여 다음과 같이 계약을 체결한다.
       </p>
 
-      <h4 style="margin:14px 0 6px; font-size:14px; color:#0f172a;">제1조 (목적 및 무상 혜택)</h4>
-      1. 본 계약은 “갑”의 고객유치와 편리한 관리, 매출증대를 그 목적으로 한다.<br>
-      2. 시스템 가입비, 월 고정 관리비, 프로그램 이용료는 전액 면제(0원)한다.<br>
-      3. 안심주차 QR기반 DB는 “갑”과 “을”이 상호 공유 및 활용할 수 있다.
+      <h4 style="margin:14px 0 6px; font-size:14px; color:#0f172a;">제1조 (목적 및 무상 공급 혜택)</h4>
+      1. 본 계약은 "을"이 "갑"에게 전국 최저가 모바일 세일 문자 발송 시스템을 공급하여 마트의 주말 매출을 극대화함을 목적으로 한다.<br>
+      2. 마트 초기 가입비, 월 고정 관리비, 프로그램 이용료, 모바일 전단지 웹페이지 세팅비는 <b>전액 영구 무료(0원)</b>로 지원한다.
 
-      <h4 style="margin:14px 0 6px; font-size:14px; color:#0f172a;">제2조 (사진 전단지 발송 및 선불 차감)</h4>
-      1. 컬러 사진 전단지 발송 단가는 전국 단일 정찰제 기준 <b>[1명 발송시 15원(VAT 별도)]</b>으로 한다.<br>
-      2. "갑"은 포인트를 선불(20만, 30만, 50만, 100만 원 단위)로 충전하여 사용한다.<br>
-      3. 발송 실행 시 [1명 발송시 15원(15포인트)] 기준으로 충전 잔액에서 실시간 자동 차감된다.<br>
-      4. “을”은 “갑”에게 전용 디지털 플랫폼을 개설해 주어야 하며 상품등록은 “갑”이 하여야 한다.
+      <h4 style="margin:14px 0 6px; font-size:14px; color:#0f172a;">제2조 (문자 공급 단가 및 선불 차감 방식)</h4>
+      1. 컬러 사진 세일 문자(LMS) 발송 단가는 전국 단일 정찰가 기준 <b>[건당 15원(VAT 별도)]</b>으로 영구 공급한다.<br>
+      2. "갑"은 충전금을 선불 충전하여 사용하며, 세일 문자 1건 발송 시마다 충전금에서 건당 15원씩 실시간 자동 차감된다.
 
-      <h4 style="margin:14px 0 6px; font-size:14px; color:#0f172a;">제3조 (자동차 안심주차 QR 카드 공급)</h4>
-      1. "을"은 고객 증정용 안심주차 QR 카드를 1,000장 단위(1,000장당 200,000원)로 "갑"에게 유상 공급한다.<br>
-      2. "갑"은 공급받은 카드를 고객에게 무상 공급한다.
+      <h4 style="margin:14px 0 6px; font-size:14px; color:#15803d;">제3조 (공인 영업 파트너 배정 및 현장 지원) 🛡️</h4>
+      1. 본 건당 15원 전국 최저가 요율은 본사 공인 영업 파트너가 전담 매니저로 배정되어 "갑"의 매장 시스템 세팅, 세일 전단지 디지털화, 단골 DB 관리를 지원하는 조건으로 제공되는 파트너십 전용 요율이다.<br>
+      2. "갑"의 사업자등록번호를 기준으로 최초 방문 등록한 영업 파트너에게 <b>발송 건당 5원의 관리 수당이 평생 불가역적으로 귀속</b>되며, 본사 직영 전환 또는 타인 명의 변경을 이유로 영업인의 수수료 권리를 침해할 수 없다.
 
-      <h4 style="margin:14px 0 6px; font-size:14px; color:#0284c7;">제4조 (비노출 자동차 QR 등록 및 전용 앱 연동) ★</h4>
-      1. <b>전화번호 비노출 자동차 QR 등록 시, 고객 휴대폰에 전용 앱 설치 및 푸시 알림 허용이 완료되어야 정상 등록된다.</b><br>
-      2. 등록이 완료된 고객에 한하여 "갑"의 모바일 사진 전단지 수신 및 "을"의 안심주차 호출 서비스가 정상 제공된다.<br>
-      3. "갑"과 "을"은 고객이 원활하게 앱 설치 및 알림 허용을 마칠 수 있도록 상호 협력한다.
+      <h4 style="margin:14px 0 6px; font-size:14px; color:#b91c1c;">제4조 (차명 및 특수관계인 우회 파트너 등록 금지) ⚠️</h4>
+      "갑"은 본인 매장의 문자 발송 수수료를 자가 수취하거나 단가를 추가 인하할 목적으로 <b>본인, 배우자, 직계존비속, 4촌 이내 친인척, 매장 임직원 명의를 도용·차용</b>하여 파트너로 위장 등록하거나 자가 추천(Self-Referral)할 수 없다. "을"은 전산 로그, 정산 계좌, 접속 IP 및 사업자 DB 교차 검증을 통해 차명 등록을 상시 감독한다.
 
-      <h4 style="margin:14px 0 6px; font-size:14px; color:#0f172a;">제5조 (분양사 연동 및 전자쿠폰 혜택)</h4>
-      1. "을"은 인근 신규 아파트 분양사와 제휴하여 "갑"의 고객에게 맞춤형 분양 혜택을 제공할 수 있다.<br>
-      2. <b>분양사의 전자쿠폰 발행 시 "갑"의 마트에서만 사용할 수 있으며, 그 비용은 분양사가 지급한다.</b>
+      <h4 style="margin:14px 0 6px; font-size:14px; color:#b91c1c;">제5조 (부정행위 적발 시 즉시 서비스 해지 및 5배 위약벌 부과 특약) ⚠️</h4>
+      1. <b>[즉시 해지]</b> 제4조 위반 적발 시, 사전 최고(경고) 없이 <b>해당 마트의 세일 문자 발송 서비스를 즉각 영구 중단(서비스 해지)</b>한다.<br>
+      2. <b>[5배 위약벌]</b> 본 조항의 금원은 손해배상액의 예정이 아닌 유통 질서 파괴에 대한 징벌적 <b>'위약벌(제재금)'</b>로서, 기수취한 부당이득 전액 환수 외에 <b>[누적 편취 금액의 5배 상당]의 위약벌</b>을 일괄 부과하며, 마트의 선불 충전 잔액에서 우선 상계(공제)한다.<br>
+      3. <b>[소명 절차]</b> "갑"은 서비스 정지 통지일로부터 7일 이내에 실질 독립 영업인임을 서면 소명하지 못할 경우 영구 퇴출 및 위약벌이 확정된다.
 
-      <h4 style="margin:14px 0 6px; font-size:14px; color:#0f172a;">제6조 (계약 기간 및 약관 동의 효력)</h4>
-      1. 본 계약은 "갑"이 온라인에서 약관 동의를 완료한 날로부터 1년간 유효하며, 1년 단위로 자동 연장된다.<br>
-      2. 본 계약은 전자상거래법 및 전자문서법에 따라 온라인 약관 동의 시 정식 서면 계약과 동일한 법적 효력을 갖는다.
+      <h4 style="margin:14px 0 6px; font-size:14px; color:#15803d;">제6조 (정상 이용 시의 권리 보장)</h4>
+      "갑"이 정상적으로 서비스를 이용하는 기간 동안 건당 15원 최저가 및 전담 영업인의 지원은 영구 보장되며, 폐업 등 정상 사유로 서비스 종료 시 잔여 충전금은 전액 100% 정상 환불된다.
+
+      <h4 style="margin:14px 0 6px; font-size:14px; color:#0f172a;">제7조 (계약 기간 및 전자서명 효력)</h4>
+      1. 본 계약은 온라인 전자서명 완료일로부터 효력이 발생하며, 정상 이용 시 1년 단위로 자동 연장된다.<br>
+      2. 본 전자계약은 전자문서 및 전자거래 기본법에 따라 오프라인 서면 계약서 날인과 동일한 법적 효력을 갖는다.
 
       <div style="margin-top:16px; padding-top:12px; border-top:1px dashed #cbd5e1; text-align:center; font-weight:700; color:#0f172a;">
-        계약 체결일: 2026년 11월 01일
+        계약 체결일자: 2026년 11월 11일
       </div>
 
       <div style="margin-top:14px; padding:12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; font-size:12.5px; line-height:1.6;">
-        <b>[갑 - 제휴 마트]</b> (등록 시 자동 기재)<br>
+        <b>[갑 - 제휴 마트]</b> (신청 정보 자동 기재)<br>
         • 상호명 / 사업자번호 / 대표자명 / 매장 주소 / 연락처: 입력 정보 자동 연동<br><br>
-        <b>[을 - 플랫폼 본사]</b> (고정 기재)<br>
-        • 상호명: 에너젠51 (우리아파트)<br>
+        <b>[을 - 플랫폼 본사]</b><br>
+        • 상호명: 에너젠51 마트 플랫폼 본사<br>
         • 사업자등록번호: 410-27-88141<br>
-        • <b>정산관리 예금주: 송해석 (농협은행 199-02-289684)</b><br>
-        • 본사 주소: 광주광역시 광산구 하남산단8번로 176
-      </div></div>
+        • <b>정산관리 예금주: 송해석(농협중앙 199-02-289684)</b><br>
+        • 본사 직통: 010-2286-4150 (광주광역시 광산구 하남산단8번로 176)
+      </div>
+    </div></div>
 
     <div style="margin-top:20px; padding:18px 20px; background:#f0fdf4; border:2px solid #86efac; border-radius:12px;">
       <div style="font-weight:800; font-size:15px; color:#166534; margin-bottom:12px;">
@@ -433,6 +442,38 @@ button:disabled{
       <div style="font-size:13px; color:#166534; margin-top:10px; line-height:1.5;">
         ※ 전자문서 및 전자거래 기본법 제4조에 따라 온라인 '동의함' 선택 시 정식 서면 계약 날인과 동일한 법적 효력이 발생합니다.
       </div>
+    </div>
+    <!-- 별도 필수 3대 체크박스 -->
+    <div style="margin-top:16px; padding:14px; background:#fff; border:1px solid #cbd5e1; border-radius:10px;">
+      <label style="display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; cursor:pointer; font-size:13.5px; line-height:1.5;">
+        <input type="checkbox" id="checkTerms1" onchange="checkForm()" style="width:18px; height:18px; accent-color:#0e6556; margin-top:2px;">
+        <span><strong>[필수] 건당 15원 전국 최저가 특별 상생 요율 및 전담 파트너 배정 동의</strong></span>
+      </label>
+      <label style="display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; cursor:pointer; font-size:13.5px; line-height:1.5;">
+        <input type="checkbox" id="checkTerms2" onchange="checkForm()" style="width:18px; height:18px; accent-color:#b91c1c; margin-top:2px;">
+        <span style="color:#b91c1c;"><strong>[필수] 차명·친인척(4촌이내) 우회 등록 금지 및 위반 시 즉시 서비스 영구 해지(문자 차단) 동의</strong></span>
+      </label>
+      <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer; font-size:13.5px; line-height:1.5;">
+        <input type="checkbox" id="checkTerms3" onchange="checkForm()" style="width:18px; height:18px; accent-color:#b91c1c; margin-top:2px;">
+        <span style="color:#b91c1c;"><strong>[필수] 부정 적발 시 편취 수수료 전액 환수 및 5배 위약벌 부과(충전금 우선 상계) 동의</strong></span>
+      </label>
+    </div>
+
+    <!-- 대표자 자필 전자서명 패드 -->
+    <div class="sig-wrap" style="background:#f8fafc; border:2px dashed #0e6556; border-radius:12px; padding:16px; text-align:center; margin-top:18px;">
+      <div style="font-weight:800; font-size:15px; color:#0e6556; margin-bottom:4px;">
+        ✍️ 마트 대표자 자필 전자서명 (필수)
+      </div>
+      <div style="font-size:12.5px; color:#64748b; margin-bottom:12px;">
+        아래 서명창에 손가락(또는 마우스)으로 대표자님의 자필 서명을 남겨주세요.
+      </div>
+      <canvas id="sigCanvas" class="sig-canvas" width="360" height="130" style="background:#fff; border:1px solid #cbd5e1; border-radius:8px; display:block; margin:0 auto; cursor:crosshair; touch-action:none; width:100%; max-width:360px; height:130px;"></canvas>
+      <div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+        <button type="button" class="sig-btn" onclick="clearSignature()" style="background:#fff; border:1px solid #cbd5e1; border-radius:6px; padding:6px 14px; font-size:12px; color:#475569; cursor:pointer;">
+          🔄 서명 다시 쓰기
+        </button>
+      </div>
+      <input type="hidden" id="signatureData">
     </div>
   </div>
 
@@ -495,6 +536,70 @@ const sb =
 
 
 
+
+// Signature Canvas Handling
+let sigCanvas, sigCtx, isDrawing = false, hasSigned = false;
+
+function initSignature() {
+  sigCanvas = document.getElementById('sigCanvas');
+  if (!sigCanvas) return;
+  sigCtx = sigCanvas.getContext('2d');
+  sigCtx.lineWidth = 2.5;
+  sigCtx.lineCap = 'round';
+  sigCtx.strokeStyle = '#0f172a';
+
+  function getPos(e) {
+    const rect = sigCanvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * (sigCanvas.width / rect.width),
+      y: (clientY - rect.top) * (sigCanvas.height / rect.height)
+    };
+  }
+
+  function startDraw(e) {
+    e.preventDefault();
+    isDrawing = true;
+    const pos = getPos(e);
+    sigCtx.beginPath();
+    sigCtx.moveTo(pos.x, pos.y);
+  }
+
+  function draw(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    sigCtx.lineTo(pos.x, pos.y);
+    sigCtx.stroke();
+    hasSigned = true;
+    document.getElementById('signatureData').value = sigCanvas.toDataURL();
+    checkForm();
+  }
+
+  function endDraw() {
+    isDrawing = false;
+  }
+
+  sigCanvas.addEventListener('mousedown', startDraw);
+  sigCanvas.addEventListener('mousemove', draw);
+  window.addEventListener('mouseup', endDraw);
+
+  sigCanvas.addEventListener('touchstart', startDraw, { passive: false });
+  sigCanvas.addEventListener('touchmove', draw, { passive: false });
+  window.addEventListener('touchend', endDraw);
+}
+
+function clearSignature() {
+  if (!sigCanvas || !sigCtx) return;
+  sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+  hasSigned = false;
+  document.getElementById('signatureData').value = '';
+  checkForm();
+}
+
+window.addEventListener('DOMContentLoaded', initSignature);
+
 function checkForm(){
 
   const textOK =
@@ -513,6 +618,10 @@ function checkForm(){
 
   const agreeEl = document.getElementById("agreeYes");
   const agree = agreeEl ? agreeEl.checked : false;
+  const c1 = document.getElementById("checkTerms1") ? document.getElementById("checkTerms1").checked : true;
+  const c2 = document.getElementById("checkTerms2") ? document.getElementById("checkTerms2").checked : true;
+  const c3 = document.getElementById("checkTerms3") ? document.getElementById("checkTerms3").checked : true;
+  const sigOK = hasSigned || (document.getElementById('signatureData') && document.getElementById('signatureData').value.length > 100);
 
   const allOK =
     textOK &&
