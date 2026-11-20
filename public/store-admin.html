@@ -829,7 +829,7 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 
         <b>배송지 및 수령 정보</b>
 
-        <input id="qrReceiverStore" placeholder="매장명 (예: 에너젠마트)" value="에너젠마트">
+        <input id="qrReceiverStore" placeholder="매장명 (예: 파머스마트)" value="">
 
         <input id="qrReceiverPhone" placeholder="담당자 연락처" value="010-2286-4150">
 
@@ -5195,7 +5195,7 @@ async function sendDirectTestSms() {
   }
 
   // 1. 세일 문구 1,000자 이내 검증
-  var storeName = (document.getElementById('storeName')?.value || '').trim() || '에너젠마트';
+  var storeName = (document.getElementById('storeName')?.value || '').trim() || '제휴마트';
   var msgText = (document.getElementById('flyerTextMsg')?.value || '').trim();
   if (!msgText) {
     alert('위 2번에 세일 알림 문구를 입력해 주세요.');
