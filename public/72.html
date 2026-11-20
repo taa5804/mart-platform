@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#16a34a">
-<title>자동차 QR</title>
+<title>자동차 안심주차 QR</title>
 <link rel="preconnect" href="https://dcysjuxyjqtvkihdsjvv.supabase.co" crossorigin>
 <link rel="dns-prefetch" href="https://dcysjuxyjqtvkihdsjvv.supabase.co">
 <link rel="prefetch" href="/72-android.html">
@@ -63,7 +63,8 @@ function getRegUrl(){
  const ua=navigator.userAgent||"";
  const ios=/iphone|ipad|ipod/i.test(ua);
  const target=ios?"/72-iphone.html":"/72-android.html";
- return target+"?qr="+encodeURIComponent(qr);
+ const store=String(params.get("store")||"").trim();
+ return target+"?qr="+encodeURIComponent(qr)+(store ? "&store="+encodeURIComponent(store) : "");
 }
 
 function routeRegistration(){
@@ -120,29 +121,18 @@ moveBtn.onclick=async()=>{
 };
 
 emergencyBtn.onclick=async()=>{
-  emergencyBtn.disabled=true;
-  status.textContent="차주 전화 연결을 준비하고 있습니다...";
-  status.className="status";
-  try{
-    const d=await api({action:"emergency",qr_code:qr,caller_session_id:callerSession()});
-    const targetPhone = d.owner_phone || d.phone || d.tel;
-    if(targetPhone){
-      const clean = String(targetPhone).replace(/[^0-9]/g,"");
-      const formatted = clean.replace(/(\d{3})(\d{3,4})(\d{4})/, "$1-$2-$3");
-      status.textContent="📞 차주(" + formatted + ")에게 긴급전화를 연결합니다.";
-      status.className="status success";
-      setTimeout(()=>{ emergencyBtn.disabled=false; }, 2500);
-      location.href="tel:" + clean;
-    }else{
-      status.textContent=d.message||"긴급통화가 활성화되었습니다.";
-      emergencyBtn.disabled=false;
-    }
-  }catch(e){
-    status.textContent=e.message||"긴급통화 연결에 실패했습니다.";
-    status.className="status error";
-    emergencyBtn.disabled=false;
-  }
+ emergencyBtn.disabled=true;
+ try{
+   const d=await api({action:"emergency",qr_code:qr,caller_session_id:callerSession()});
+   if(d.phone)location.href="tel:"+String(d.phone).replace(/[^0-9]/g,"");
+   else status.textContent=d.message||"긴급통화가 활성화되었습니다.";
+ }catch(e){
+   status.textContent=e.message;
+   status.className="status error";
+   emergencyBtn.disabled=false;
+ }
 };
+
 start();
 </script>
 </body>
