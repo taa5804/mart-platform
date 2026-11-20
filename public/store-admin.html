@@ -627,6 +627,10 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
           <input type="tel" id="testDirectPhone" class="sa-file" style="margin:0;padding:13px 16px;border:2px solid #3b82f6;border-radius:8px;font-size:16px;font-weight:800;color:#0f172a;background:#fff;width:100%;box-sizing:border-box;letter-spacing:1px;" placeholder="010-2286-4150" value="010-2286-4150" maxlength="13" oninput="formatTestPhone(this)">
           <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:#64748b;font-weight:700;">수신번호</span>
         </div>
+        <button type="button" id="btnTestDeviceNow" class="sa-btn" style="width:auto;margin:0;padding:12px 18px;background:#f59e0b;font-size:14.5px;font-weight:800;color:#fff;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;box-shadow:0 3px 8px rgba(245,158,11,0.3);transition:all 0.2s;" onclick="testDeviceNotificationNow()">
+          <span>🔔</span>
+          <span>내 기기 알림 수신 테스트</span>
+        </button>
         <button type="button" id="btnTestWebPushSend" class="sa-btn" style="width:auto;margin:0;padding:12px 22px;background:#16a34a;font-size:15px;font-weight:900;color:#fff;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;box-shadow:0 3px 8px rgba(22,163,74,0.3);transition:all 0.2s;" onclick="sendWebPushAlert()">
           <span>⚡</span>
           <span>웹푸시 알림 즉시 발송 (0원 무료)</span>
@@ -5601,6 +5605,89 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 
+
+// [서비스워커 등록 및 100% 안드로이드/PC 호환 네이티브 웹푸시 팝업 엔진]
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(function(reg) {
+    console.log('Admin ServiceWorker registered:', reg);
+  }).catch(function(err) {
+    console.warn('Admin ServiceWorker error:', err);
+  });
+}
+
+async function showNativeWebPushNotification(title, body, targetUrl) {
+  if (!('Notification' in window)) {
+    alert('이 브라우저는 웹푸시 알림을 지원하지 않습니다.');
+    return false;
+  }
+
+  let perm = Notification.permission;
+  if (perm !== 'granted' && perm !== 'denied') {
+    try {
+      perm = await Notification.requestPermission();
+    } catch(e) {
+      console.warn('Permission request error:', e);
+    }
+  }
+
+  if (perm === 'denied') {
+    alert('⚠️ [알림 권한 차단됨]\n\n현재 스마트폰/브라우저 주소창 설정에서 알림이 [차단]되어 있습니다.\n주소창 왼쪽 자물쇠(또는 설정) 아이콘을 눌러 [알림: 허용]으로 변경해 주세요.');
+    return false;
+  }
+
+  if (perm !== 'granted') {
+    alert('⚠️ 알림을 허용하셔야 상단 푸시 알림 배너가 표시됩니다.');
+    return false;
+  }
+
+  // 1. Android Chrome/Samsung Internet: Service Worker를 통한 정석 showNotification
+  if ('serviceWorker' in navigator) {
+    try {
+      let reg = await navigator.serviceWorker.getRegistration();
+      if (!reg) {
+        reg = await navigator.serviceWorker.register('/sw.js');
+      }
+      await navigator.serviceWorker.ready;
+      await reg.showNotification(title, {
+        body: body,
+        icon: 'https://mart-platform.vercel.app/icon-192.png',
+        badge: 'https://mart-platform.vercel.app/icon-192.png',
+        vibrate: [300, 150, 300],
+        tag: 'mart-admin-push-' + Date.now(),
+        renotify: true,
+        data: { url: targetUrl || location.href }
+      });
+      return true;
+    } catch (swErr) {
+      console.warn('SW showNotification error:', swErr);
+    }
+  }
+
+  // 2. PC 데스크톱 브라우저 폴백
+  try {
+    new Notification(title, {
+      body: body,
+      icon: 'https://mart-platform.vercel.app/icon-192.png'
+    });
+    return true;
+  } catch(e) {
+    console.warn('Desktop notification error:', e);
+  }
+  return false;
+}
+
+async function testDeviceNotificationNow() {
+  const storeName = (document.getElementById('storeName')?.value || '').trim() || '우리아파트 제휴마트';
+  const ok = await showNativeWebPushNotification(
+    '📢 [' + storeName + '] 웹푸시 정상 수신 성공!',
+    '대표님 스마트폰 상단에 실시간 웹푸시 알림이 정상적으로 수신되었습니다! (비용 0원)',
+    '/74.html'
+  );
+  if (ok) {
+    alert('🎉 [수신 확인 성공!]\n\n스마트폰 상단 알림 바에 웹푸시 배너가 정상 도착했습니다.\n화면 상단을 쓸어내려 확인해 보세요!');
+  }
+}
+
 async function sendWebPushAlert() {
   const phone = (document.getElementById('testDirectPhone')?.value || '').trim() || '010-2286-4150';
   const storeName = (document.getElementById('storeName')?.value || '').trim() || '우리아파트 제휴마트';
@@ -5615,11 +5702,6 @@ async function sendWebPushAlert() {
     statusBox.style.color = '#166534';
     statusBox.style.border = '1.5px solid #86efac';
     statusBox.innerHTML = '<strong>⚡ [웹푸시 전송 중]</strong> 등록된 단골 및 ' + phone + ' 휴대폰으로 통신비 0원 웹푸시를 실시간 전송하고 있습니다...';
-  }
-
-  // 브라우저 네이티브 알림 권한 확인 및 요청
-  if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-    try { await Notification.requestPermission(); } catch(e){}
   }
 
   try {
@@ -5649,26 +5731,18 @@ async function sendWebPushAlert() {
       if (statusBox) {
         statusBox.innerHTML = '<strong>🎉 [웹푸시 발송 성공!]</strong> <b>' + phone + '</b> 및 알림 허용 단골 고객님들의 휴대폰 상단으로 <b>100% 무료 웹푸시 알림(0원)</b>이 실시간 전송되었습니다!<br><span style="font-size:12px;color:#15803d;">스마트폰 상단 알림 바에서 [세일 알림 배너]를 즉시 확인해 보세요.</span>';
       }
-      
-      // 기기에서 직접 알림 팝업 띄우기 (동일 기기 테스트 지원)
-      if ('Notification' in window && Notification.permission === 'granted') {
-        try {
-          new Notification(`📢 [${storeName}] 실시간 웹푸시 알림`, {
-            body: msgText,
-            icon: 'https://mart-platform.vercel.app/icon-192.png'
-          });
-        } catch(e) { console.warn('Local notification error:', e); }
-      }
 
-      alert('🎉 [웹푸시 발송 성공!]
+      // 현재 기기(스마트폰/PC)에서도 즉시 네이티브 알림 팝업 실행
+      await showNativeWebPushNotification(
+        `📢 [${storeName}] 오늘의 세일 알림!`,
+        msgText,
+        '/74.html'
+      );
 
-• 수신 대상: ' + phone + ' (알림 허용 단골)
-• 발송 방식: 100% 무료 웹푸시 (통신비 0원)
-
-지금 스마트폰 상단 알림 바에 도착한 세일 알림 배너를 확인해 보세요!');
+      alert('🎉 [웹푸시 발송 성공!]\n\n• 수신 대상: ' + phone + ' (알림 허용 단골)\n• 발송 방식: 100% 무료 웹푸시 (통신비 0원)\n\n지금 스마트폰 상단 알림 바에 도착한 세일 알림 배너를 확인해 보세요!');
     } else {
       const errText = await res.text();
-      throw new Error('Supabase 웹푸시 브로드캐스트 전송 실패: ' + errText);
+      throw new Error('Supabase 웹푸시 전송 실패: ' + errText);
     }
   } catch (err) {
     if (statusBox) {
@@ -5677,9 +5751,7 @@ async function sendWebPushAlert() {
       statusBox.style.border = '1.5px solid #fca5a5';
       statusBox.innerHTML = '<strong>❌ [발송 오류]</strong> 웹푸시 전송 중 문제가 발생했습니다: ' + (err.message || err);
     }
-    alert('❌ [발송 오류]
-
-웹푸시 전송 실패: ' + (err.message || err));
+    alert('❌ [발송 오류]\n\n웹푸시 전송 실패: ' + (err.message || err));
   } finally {
     if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
   }
