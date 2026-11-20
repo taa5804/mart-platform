@@ -1325,13 +1325,13 @@ const STORAGE_BUCKET =
 
 const IMAGE_MAX_BYTES =
 
-  300 * 1024;
+  35 * 1024;
 
 
 
 const IMAGE_SIZE =
 
-  1080;
+  360;
 
 
 
@@ -2537,7 +2537,7 @@ async function compressProductImage(file) {
 
     throw new Error(
 
-      '300KB 이하로 압축하지 못했습니다. 다른 사진을 선택해 주세요.'
+      '초경량 고화질(35KB 이하)로 압축하지 못했습니다. 다른 사진을 선택해 주세요.'
 
     );
 
@@ -2623,7 +2623,7 @@ async function uploadProductImage(
 
     status.textContent =
 
-      '사진을 1080×1080, 300KB 이하로 자동 최적화 중입니다...';
+      '사진을 모바일 3열 최적화(360×360, 15~25KB WebP)로 자동 초고속 압축 중입니다...';
 
 
 
@@ -2791,7 +2791,7 @@ async function uploadProductImage(
 
     status.textContent =
 
-      '사진 업로드 완료 · 1080×1080 · ' +
+      '사진 업로드 완료 · 360×360 초경량 WebP · ' +
 
       formatBytes(
 

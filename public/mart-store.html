@@ -45,7 +45,7 @@
 
   display: grid;
 
-  grid-template-columns: auto 1fr auto; gap: 8px;
+  grid-template-columns: 70px 1fr auto;
 
   align-items: center;
 
@@ -893,7 +893,7 @@
 
   #eventMainApp { padding: 0 8px 60px !important; }
 
-  #eventMainApp .confirmed-header { height: 60px; grid-template-columns: auto 1fr auto; gap: 6px; }
+  #eventMainApp .confirmed-header { height: 60px; grid-template-columns: 60px 1fr 40px; }
 
   #eventMainApp .btn-go-home { height: 32px; font-size: 12px; padding: 0 8px; }
 
@@ -1757,7 +1757,304 @@
 
 
 
-  </style>
+  
+/* ========================================================
+   [우리아파트 마트 3열 퀵오더 & 수량 선택 모달 스타일]
+   ======================================================== */
+.sticky-red-search-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #d32f2f;
+  padding: 8px 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  margin: -10px -18px 12px;
+}
+.search-bar-wrap {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+}
+.search-bar-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: #1e293b;
+}
+.search-bar-btn {
+  background: #ffffff;
+  color: #d32f2f;
+  border: none;
+  border-left: 1px solid #f1f5f9;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#eventMainApp .product-grid, #eventMainApp .general-list {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  padding: 4px 0 80px !important;
+}
+
+#eventMainApp .card, #eventMainApp .col3-card {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+  transition: border-color 0.15s, box-shadow 0.15s !important;
+}
+#eventMainApp .col3-card.selected {
+  border-color: #d32f2f !important;
+  box-shadow: 0 2px 8px rgba(211,47,47,0.2) !important;
+}
+
+#eventMainApp .col3-photo-wrap {
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  overflow: hidden !important;
+  background: #f8fafc !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+#eventMainApp .col3-photo-wrap img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+#eventMainApp .col3-discount-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #d32f2f;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 2px 5px;
+  border-bottom-right-radius: 6px;
+  z-index: 2;
+}
+
+#eventMainApp .col3-body {
+  padding: 6px 4px 4px !important;
+  text-align: center !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+#eventMainApp .col3-price {
+  color: #d32f2f !important;
+  font-size: 13.5px !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.3px;
+}
+#eventMainApp .col3-spec {
+  color: #64748b !important;
+  font-size: 10.5px !important;
+  margin-top: 1px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+#eventMainApp .col3-name {
+  color: #1e293b !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  margin-top: 2px !important;
+  height: 31px !important;
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  line-height: 1.3 !important;
+  word-break: keep-all !important;
+}
+
+#eventMainApp .col3-qty-bar {
+  border-top: 1px solid #f1f5f9 !important;
+  padding: 6px 4px !important;
+  background: #fafafa !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  font-size: 12px !important;
+  color: #475569 !important;
+  transition: background 0.15s;
+}
+#eventMainApp .col3-qty-bar:active {
+  background: #f1f5f9 !important;
+}
+#eventMainApp .col3-qty-bar.checked {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+  font-weight: 800 !important;
+}
+#eventMainApp .col3-qty-bar input[type="checkbox"] {
+  width: 15px !important;
+  height: 15px !important;
+  cursor: pointer !important;
+  accent-color: #d32f2f !important;
+  margin: 0 !important;
+}
+
+/* 수량 선택 모달 (Image 2 스타일) */
+.qty-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 10005;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.qty-modal-box {
+  background: #ffffff;
+  width: 100%;
+  max-width: 320px;
+  max-height: 75vh;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  animation: qtyModalPop 0.18s ease-out;
+}
+@keyframes qtyModalPop {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.qty-modal-header {
+  padding: 13px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+}
+.qty-modal-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+.qty-modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #64748b;
+  cursor: pointer;
+  line-height: 1;
+}
+.qty-modal-list {
+  overflow-y: auto;
+  padding: 4px 0;
+  flex: 1 1 auto;
+}
+.qty-modal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 20px;
+  border-bottom: 1px solid #f8fafc;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+}
+.qty-modal-item:active {
+  background: #fee2e2;
+}
+.qty-modal-item.active {
+  color: #d32f2f;
+  font-weight: 800;
+  background: #fef2f2;
+}
+.qty-radio-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.qty-modal-item.active .qty-radio-circle {
+  border-color: #d32f2f;
+  background: #d32f2f;
+}
+.qty-modal-item.active .qty-radio-circle::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+/* 하단 고정 주문 바 (Image 1 스타일) */
+.sticky-red-order-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  background: #d32f2f;
+  color: #ffffff;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+  cursor: pointer;
+  max-width: 960px;
+  margin: 0 auto;
+  user-select: none;
+}
+.sticky-order-amount-box {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+}
+.sticky-order-btn-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 800;
+}
+.sticky-order-arrow-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  font-size: 11px;
+}
+
+</style>
 
   <link rel="canonical" href="https://www.wooriapt.app/mart-store">
 
@@ -1781,7 +2078,7 @@
 
 <div class="confirmed-header">
 
-  <a id="topMartAdminLink" href="/store-admin.html" onclick="this.href='/store-admin.html?store='+encodeURIComponent(new URLSearchParams(location.search).get('store')||localStorage.getItem('mart_store_id')||'store01')" class="btn-go-home" style="background:#166534;color:#ffffff;border-color:#14532d;padding:0 12px;font-weight:900;">⚙️ 마트관리자</a>
+  <a href="https://wooriapt.ai.kr" class="btn-go-home">🏠 홈</a>
 
   <div id="storeTitle" class="confirmed-store-title">에너젠마트</div>
 
@@ -1852,6 +2149,15 @@
 </div>
 
 
+
+
+<!-- [3열 퀵오더 상단 레드 검색 헤더 (Image 1 방식)] -->
+<div class="sticky-red-search-header">
+  <div class="search-bar-wrap">
+    <input id="storeSearchInput" class="search-bar-input" type="search" placeholder="상품검색" oninput="liveFilter3ColProducts(this.value)">
+    <button type="button" class="search-bar-btn" onclick="liveFilter3ColProducts(document.getElementById('storeSearchInput').value)">상품검색</button>
+  </div>
+</div>
 
 <div class="menu-tabs confirmed-tabs">
 
@@ -2163,137 +2469,192 @@ function changeQty(type, id, delta) {
 
 
 
+
+/* ========================================================
+   [우리아파트 마트 3열 퀵오더 & 수량 선택 엔진 (Image 1 & 2 방식)]
+   ======================================================== */
+let activeQtyProduct = null;
+
+function getCardSpecText(p) {
+  if (p.desc && p.desc.trim()) return p.desc.trim();
+  if (p.unit && p.unit.trim()) return p.unit.trim();
+  return '규격없음';
+}
+
+function getCardPriceText(p) {
+  if (p.type === 'group' && p.group) return p.group;
+  if (p.price) return p.price;
+  return '가격문의';
+}
+
 function productCard(p, idx) {
-  const loadAttr = (typeof idx === 'number' && idx < 6) ? 'loading="eager" fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"';
+  const loadAttr = (typeof idx === 'number' && idx < 9) ? 'loading="eager" fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"';
+  const badge = p.discount > 0 ? '<span class="col3-discount-badge">' + p.discount + '%</span>' : '';
+  const priceText = getCardPriceText(p);
+  const specText = getCardSpecText(p);
+  const existing = cartItems.find(item => item.type === p.type && item.id === p.id);
+  const isChecked = existing && existing.qty > 0;
+  const qtyLabel = isChecked ? '<b>' + existing.qty + '개</b>' : '수량';
+  const imgUrl = (p.img && p.img.trim()) ? p.img : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&q=80';
 
-  const badge = p.discount > 0
-
-    ? '<span class="discount-badge"><b>' + p.discount + '%</b><small>할인</small></span>'
-
-    : '';
-
-  return '<div class="card">'
-
-    + '<div class="product-photo-wrap">'
-
-    + '<img src="' + escapeHtml(p.img) + '" alt="' + escapeHtml(p.name) + '" ' + (typeof loadAttr !== "undefined" ? loadAttr : 'loading="lazy" decoding="async"') + '>'
-
+  return '<div class="card col3-card' + (isChecked ? ' selected' : '') + '" id="col3-card-' + p.type + '-' + p.id + '">'
+    + '<div class="col3-photo-wrap">'
+    + '<img src="' + escapeHtml(imgUrl) + '" alt="' + escapeHtml(p.name) + '" ' + loadAttr + ' onerror="this.src=\'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&q=80\'">'
     + badge
-
     + '</div>'
-
-    + '<div class="card-body">'
-
-    + '<div class="name">' + escapeHtml(p.name) + '</div>'
-
-    + '<div class="price">' + escapeHtml(p.price) + '</div>'
-
-    + '<div class="product-action-row">'
-
-    + '<div class="qty-control">'
-
-    + '<button class="qty-action" onclick="changeQty(\'' + p.type + '\',' + p.id + ',-1)" aria-label="수량 줄이기">−</button>'
-
-    + '<span class="qty-value" id="qty-' + p.type + '-' + p.id + '">1</span>'
-
-    + '<button class="qty-action" onclick="changeQty(\'' + p.type + '\',' + p.id + ',1)" aria-label="수량 늘리기">＋</button>'
-
+    + '<div class="col3-body">'
+    + '<div class="col3-price">' + escapeHtml(priceText) + '</div>'
+    + '<div class="col3-spec">' + escapeHtml(specText) + '</div>'
+    + '<div class="col3-name" title="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + '</div>'
     + '</div>'
-
-    + '<button class="cart-action" onclick="addCart(\'' + p.type + '\',' + p.id + ')" aria-label="장바구니 담기">🛒 <span>장바구니</span></button>'
-
+    + '<div class="col3-qty-bar' + (isChecked ? ' checked' : '') + '" id="col3-qtybar-' + p.type + '-' + p.id + '" onclick="openQtyModal(\'' + p.type + '\',' + p.id + ')">'
+    + '<input type="checkbox" id="col3-chk-' + p.type + '-' + p.id + '"' + (isChecked ? ' checked' : '') + ' onclick="event.stopPropagation(); toggleCol3Check(\'' + p.type + '\',' + p.id + ')">'
+    + '<span id="col3-lbl-' + p.type + '-' + p.id + '">' + qtyLabel + '</span>'
     + '</div>'
-
-    + '</div>'
-
     + '</div>';
-
 }
 
-
-
-function generalRow(p) {
-
-  return '<div class="general-row">'
-
-    + '<div class="general-info"><div class="general-name">' + escapeHtml(p.name) + '</div><div class="general-price">' + escapeHtml(p.price) + '</div></div>'
-
-    + '<div class="general-qty"><button onclick="changeQty(\'general\',' + p.id + ',-1)">−</button><b id="qty-general-' + p.id + '">1</b><button onclick="changeQty(\'general\',' + p.id + ',1)">＋</button></div>'
-
-    + '<button class="general-cart" onclick="addCart(\'general\',' + p.id + ')" aria-label="장바구니 담기">🛒</button>'
-
-    + '</div>';
-
+function generalRow(p, idx) {
+  return productCard(p, idx);
 }
 
-
-
-function groupCard(p) {
-
-  const badge = p.discount > 0 ? '<span class="discount-badge"><b>' + p.discount + '%</b><small>할인</small></span>' : '';
-
-  return '<div class="card group-card">'
-
-    + '<div class="product-photo-wrap">'
-
-    + '<img src="' + escapeHtml(p.img) + '" alt="' + escapeHtml(p.name) + '" ' + (typeof loadAttr !== "undefined" ? loadAttr : 'loading="lazy" decoding="async"') + '>'
-
-    + badge
-
-    + '</div>'
-
-    + '<div class="card-body">'
-
-    + '<div class="name">' + escapeHtml(p.name) + '</div>'
-
-    + '<div class="group-info">'
-
-    + '정상가: <span class="normal">' + escapeHtml(p.normal) + '</span><br>'
-
-    + '공동구매가: <span class="group-price">' + escapeHtml(p.group) + '</span>'
-
-    + '</div>'
-
-    + '<div class="goal"><span id="joinCount' + p.id + '">' + p.join + '</span>명 / 목표 ' + p.goal + '명</div>'
-
-    + '<div class="product-action-row">'
-
-    + '<div class="qty-control">'
-
-    + '<button class="qty-action" onclick="changeQty(\'' + p.type + '\',' + p.id + ',-1)" aria-label="수량 줄이기">−</button>'
-
-    + '<span class="qty-value" id="qty-' + p.type + '-' + p.id + '">1</span>'
-
-    + '<button class="qty-action" onclick="changeQty(\'' + p.type + '\',' + p.id + ',1)" aria-label="수량 늘리기">＋</button>'
-
-    + '</div>'
-
-    + '<button class="cart-action" onclick="addCart(\'' + p.type + '\',' + p.id + ')" aria-label="장바구니 담기">🛒 <span>장바구니</span></button>'
-
-    + '</div>'
-
-    + '<button class="join-btn" onclick="openJoinForm(' + p.id + ')">참여하기</button>'
-
-    + '<div id="joinForm' + p.id + '" class="join-form">'
-
-    + '<input id="joinName' + p.id + '" type="text" placeholder="이름 입력">'
-
-    + '<input id="joinPhone' + p.id + '" type="tel" placeholder="전화번호 입력">'
-
-    + '<select id="receiveType' + p.id + '" onchange="toggleDeliveryAddress(' + p.id + ')"><option value="">방문/배달 선택</option><option value="방문">방문</option><option value="배달">배달</option></select>'
-
-    + '<textarea id="deliveryAddress' + p.id + '" class="delivery-address" placeholder="배달주소 입력"></textarea>'
-
-    + '<button class="submit-btn" onclick="completeJoin(' + p.id + ')">참여완료</button>'
-
-    + '</div>'
-
-    + '</div>'
-
-    + '</div>';
-
+function groupCard(p, idx) {
+  return productCard(p, idx);
 }
 
+function openQtyModal(type, id) {
+  const p = getProduct(type, id);
+  if (!p) return;
+  activeQtyProduct = { type: type, id: id, product: p };
+
+  const nameEl = document.getElementById('qtyModalProdName');
+  if (nameEl) nameEl.textContent = p.name + ' - 수량 선택';
+
+  const existing = cartItems.find(item => item.type === type && item.id === id);
+  const currentQty = existing ? existing.qty : 1;
+
+  let listHtml = '';
+  for (let i = 1; i <= 15; i++) {
+    const isAct = (i === currentQty);
+    listHtml += '<div class="qty-modal-item' + (isAct ? ' active' : '') + '" onclick="selectCol3Qty(' + i + ')">'
+      + '<span>' + i + '개</span>'
+      + '<span class="qty-radio-circle"></span>'
+      + '</div>';
+  }
+  const listEl = document.getElementById('qtyModalList');
+  if (listEl) listEl.innerHTML = listHtml;
+
+  const modal = document.getElementById('qtySelectModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeQtyModal(e) {
+  if (e && e.target && e.target !== e.currentTarget) return;
+  const modal = document.getElementById('qtySelectModal');
+  if (modal) modal.style.display = 'none';
+  activeQtyProduct = null;
+}
+
+function selectCol3Qty(qty) {
+  if (!activeQtyProduct) return;
+  const { type, id, product: p } = activeQtyProduct;
+
+  const unitPriceText = type === 'group' ? p.group : p.price;
+  const unitPrice = priceToNumber(unitPriceText);
+
+  const existing = cartItems.find(item => item.type === type && item.id === id);
+  if (existing) {
+    existing.qty = qty;
+  } else {
+    cartItems.push({
+      type: type,
+      id: id,
+      name: p.name,
+      qty: qty,
+      unitPrice: unitPrice,
+      unitPriceText: unitPriceText || '',
+      img: p.img || '',
+      category: type
+    });
+  }
+
+  // Update UI card
+  updateCardSelectedState(type, id, qty);
+  updateStickyOrderBar();
+  closeQtyModal();
+}
+
+function toggleCol3Check(type, id) {
+  const p = getProduct(type, id);
+  if (!p) return;
+  const existingIdx = cartItems.findIndex(item => item.type === type && item.id === id);
+
+  if (existingIdx >= 0) {
+    // Uncheck and remove
+    cartItems.splice(existingIdx, 1);
+    updateCardSelectedState(type, id, 0);
+    updateStickyOrderBar();
+  } else {
+    // Open modal to pick quantity
+    openQtyModal(type, id);
+  }
+}
+
+function updateCardSelectedState(type, id, qty) {
+  const card = document.getElementById('col3-card-' + type + '-' + id);
+  const chk = document.getElementById('col3-chk-' + type + '-' + id);
+  const lbl = document.getElementById('col3-lbl-' + type + '-' + id);
+  const bar = document.getElementById('col3-qtybar-' + type + '-' + id);
+
+  if (qty > 0) {
+    if (card) card.classList.add('selected');
+    if (chk) chk.checked = true;
+    if (lbl) lbl.innerHTML = '<b>' + qty + '개</b>';
+    if (bar) bar.classList.add('checked');
+  } else {
+    if (card) card.classList.remove('selected');
+    if (chk) chk.checked = false;
+    if (lbl) lbl.textContent = '수량';
+    if (bar) bar.classList.remove('checked');
+  }
+}
+
+function updateStickyOrderBar() {
+  let total = 0;
+  cartItems.forEach(item => {
+    total += (item.unitPrice || 0) * (item.qty || 1);
+  });
+  const amtEl = document.getElementById('stickyOrderTotalAmt');
+  if (amtEl) {
+    amtEl.textContent = s74Won ? s74Won(total) : (total.toLocaleString() + '원');
+  }
+}
+
+function handleStickyOrderClick() {
+  let total = 0;
+  cartItems.forEach(item => { total += (item.unitPrice || 0) * (item.qty || 1); });
+  if (total <= 0) {
+    alert('주문하실 상품의 [수량]을 먼저 체크해 주세요!');
+    return;
+  }
+  showSection('order');
+  renderCart();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function liveFilter3ColProducts(query) {
+  const q = (query || '').trim().toLowerCase();
+  const allCards = document.querySelectorAll('#eventMainApp .col3-card');
+  allCards.forEach(card => {
+    const nameEl = card.querySelector('.col3-name');
+    const name = nameEl ? nameEl.textContent.toLowerCase() : '';
+    if (!q || name.includes(q)) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
 
 
 function renderProducts() {
@@ -3209,6 +3570,29 @@ checkSmsSubscribed();
 </script>
 
 
+
+
+<!-- [3열 퀵오더 하단 고정 주문 바 (Image 1 방식)] -->
+<div id="stickyRedOrderBar" class="sticky-red-order-bar" onclick="handleStickyOrderClick()">
+  <div class="sticky-order-amount-box">주문금액 <span id="stickyOrderTotalAmt">0원</span></div>
+  <div class="sticky-order-btn-box">
+    <span>주문진행</span>
+    <span class="sticky-order-arrow-icon">▲</span>
+  </div>
+</div>
+
+<!-- [수량 선택 팝업 모달 (Image 2 방식)] -->
+<div id="qtySelectModal" class="qty-modal-backdrop" style="display:none;" onclick="closeQtyModal(event)">
+  <div class="qty-modal-box" onclick="event.stopPropagation()">
+    <div class="qty-modal-header">
+      <div id="qtyModalProdName" class="qty-modal-title">수량 선택</div>
+      <button type="button" class="qty-modal-close" onclick="closeQtyModal()">✕</button>
+    </div>
+    <div id="qtyModalList" class="qty-modal-list">
+      <!-- 1개 ~ 15개 동적 생성 -->
+    </div>
+  </div>
+</div>
 
 </body>
 
