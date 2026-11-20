@@ -477,44 +477,13 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 
 
 
-    <button
-
-      class="menuBtn"
-
-      onclick="showMenu('sale',this)"
-
-    >
-
-      행사상품
-
-    </button>
-
-
+    <button class="menuBtn" onclick="showMenu('sale_general',this)"> 📄 행사+일반 상품 </button>
 
     <button
-
       class="menuBtn"
-
       onclick="showMenu('group',this)"
-
     >
-
       공동구매
-
-    </button>
-
-
-
-    <button
-
-      class="menuBtn"
-
-      onclick="showMenu('general',this)"
-
-    >
-
-      일반상품
-
     </button>
 
 
@@ -912,57 +881,87 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 
 
 
-  <div id="sale" class="sa-section">
-    <div class="sa-box" style="border: 2px solid #dc2626; background: #fef2f2; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+    <!-- ==============================================
+       [통합 4] 행사 + 일반 상품 엑셀 일괄 등록 섹션
+  ============================================== -->
+  <div id="sale_general" class="sa-section">
+    <!-- POS 엑셀 통합 업로드 컨트롤 박스 -->
+    <div class="sa-box" style="border: 2px solid #16a34a; background: #f0fdf4; border-radius: 12px; padding: 22px; margin-bottom: 20px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div>
-          <b style="font-size:18px; color:#991b1b;">📢 행사상품 엑셀 일괄 등록 (전단 특가)</b>
-          <div class="sa-help" style="margin-top:4px; color:#7f1d1d; font-size:13px;">
-            전단지 행사 엑셀 파일(.xlsx, .xls, .csv)을 올리면 행사상품이 한 번에 자동 파싱되어 소비자 화면에 등록됩니다.
+          <b style="font-size:18.5px; color:#15803d;">📄 행사 + 일반 상품 POS 엑셀 통합 등록 (1곳 업로드로 자동 분류)</b>
+          <div class="sa-help" style="margin-top:6px; color:#166534; font-size:13.5px; line-height:1.6;">
+            포스(POS)에서 다운받은 엑셀 파일(.xlsx, .xls, .csv) <b>1개만</b> 올리시면,<br>
+            • <b>[행사상품]</b>: 할인가/정상가가 지정된 품목(또는 상위 40개)은 소비자 <b>[행사상품]</b> 탭으로 자동 분류<br>
+            • <b>[일반상품]</b>: 그 외 모든 상시 판매 품목(200+개)은 소비자 <b>[일반상품]</b> 탭으로 자동 분류되어 매장에 즉시 반영됩니다.
           </div>
         </div>
-        <button type="button" class="sa-btn" style="background:#fff; color:#991b1b; border:1px solid #991b1b; width:auto; padding:8px 16px; font-size:13px; font-weight:600;" onclick="downloadSampleSaleExcel()">
-          📥 행사 엑셀 양식 다운로드
+        <button type="button" class="sa-btn" style="background:#fff; color:#15803d; border:1.5px solid #15803d; width:auto; padding:10px 18px; font-size:13.5px; font-weight:700; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.05);" onclick="downloadSampleCombinedExcel()">
+          📥 통합 엑셀 샘플 양식 다운로드
         </button>
       </div>
 
       <!-- Upload Trigger Box -->
-      <div style="margin-top:16px; border:2px dashed #fca5a5; background:#fff; border-radius:10px; padding:28px 16px; text-align:center; cursor:pointer;" onclick="document.getElementById('saleExcelInput').click()">
-        <input type="file" id="saleExcelInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleSaleExcelUpload(this)">
-        <div style="font-size:36px; margin-bottom:8px;">📑</div>
-        <div style="font-size:17px; font-weight:700; color:#dc2626;">행사상품 엑셀 파일 선택하기 (클릭 또는 파일 드래그)</div>
-        <div style="font-size:13px; color:#6b7280; margin-top:6px;">.xlsx, .xls, .csv 지원 (상품명, 행사가격, 정상가격, 규격 자동 파싱)</div>
+      <div style="margin-top:18px; border:2px dashed #86efac; background:#fff; border-radius:12px; padding:32px 16px; text-align:center; cursor:pointer; transition:all 0.2s;" onclick="document.getElementById('combinedExcelInput').click()" ondragover="event.preventDefault(); this.style.borderColor='#16a34a'; this.style.background='#f0fdf4';" ondragleave="this.style.borderColor='#86efac'; this.style.background='#fff';" ondrop="event.preventDefault(); this.style.borderColor='#86efac'; this.style.background='#fff'; if(event.dataTransfer.files.length){ document.getElementById('combinedExcelInput').files = event.dataTransfer.files; handleCombinedExcelUpload(document.getElementById('combinedExcelInput')); }">
+        <input type="file" id="combinedExcelInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleCombinedExcelUpload(this)">
+        <div style="font-size:42px; margin-bottom:10px;">📊</div>
+        <div style="font-size:18px; font-weight:800; color:#15803d;">POS 엑셀 파일 1개 선택하기 (클릭 또는 마우스로 파일 끌어다 놓기)</div>
+        <div style="font-size:13px; color:#64748b; margin-top:8px;">.xlsx, .xls, .csv 지원 (상품명, 판매가격, 정상가격, 규격 컬럼 자동 매핑)</div>
       </div>
 
-      <!-- Preview & Bulk Save Area -->
-      <div id="saleExcelPreview" style="display:none; margin-top:16px; background:#fff; border-radius:10px; padding:16px; border:1px solid #fecaca;">
-        <div id="saleExcelSummary" style="font-size:15px; font-weight:700; color:#dc2626; margin-bottom:12px;"></div>
-        <button id="btnSaveSaleBulk" type="button" class="sa-btn" style="background:#dc2626; color:#fff; font-size:16px; font-weight:700; padding:14px; width:100%; border-radius:8px;" onclick="saveSaleExcelBulk()">
-          🚀 행사상품 전체 일괄 저장 및 소비자 화면 게시하기
+      <!-- Preview & Bulk Save Area (Hidden until file selected) -->
+      <div id="combinedExcelPreview" style="display:none; margin-top:18px; background:#fff; border-radius:12px; padding:18px; border:1.5px solid #86efac; box-shadow:0 4px 12px rgba(22,163,74,0.1);">
+        <div id="combinedExcelSummary" style="font-size:15.5px; font-weight:700; color:#15803d; margin-bottom:14px; line-height:1.7;"></div>
+        <button id="btnSaveCombinedBulk" type="button" class="sa-btn" style="background:#15803d; color:#fff; font-size:16.5px; font-weight:800; padding:15px; width:100%; border-radius:8px; box-shadow:0 4px 10px rgba(21,128,61,0.3);" onclick="saveCombinedExcelBulk()">
+          🚀 행사+일반 상품 전체 일괄 저장 및 소비자 화면 즉시 게시하기
         </button>
       </div>
     </div>
 
-    <!-- Live Sale Products Status & Search Table -->
-    <div class="sa-box" style="border-radius:12px; padding:16px; background:#fff; border:1px solid #e5e7eb;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
-        <div>
-          <b style="font-size:16px; color:#111827;">현재 등록된 행사상품 (<span id="saleLiveCount">0</span>개)</b>
-          <div style="font-size:12px; color:#6b7280;">소비자 화면의 [행사상품] 탭에 실시간 표시 중인 목록입니다.</div>
+    <!-- 등록 현황 서브 탭 & 실시간 목록 테이블 -->
+    <div class="sa-box" style="border-radius:12px; padding:18px; background:#fff; border:1px solid #e5e7eb;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" id="tabBtnSale" class="sa-btn" style="background:#dc2626; color:#fff; width:auto; padding:9px 18px; font-size:14px; font-weight:800; border-radius:8px; margin:0;" onclick="switchSaleGeneralTab('sale')">
+            🏷️ 등록된 행사상품 (<span id="saleLiveCount">0</span>개)
+          </button>
+          <button type="button" id="tabBtnGeneral" class="sa-btn" style="background:#f3f4f6; color:#374151; width:auto; padding:9px 18px; font-size:14px; font-weight:700; border-radius:8px; margin:0;" onclick="switchSaleGeneralTab('general')">
+            🛒 등록된 일반상품 (<span id="generalLiveCount">0</span>개)
+          </button>
         </div>
-        <button type="button" class="sa-btn" style="background:#f3f4f6; color:#374151; width:auto; padding:6px 14px; font-size:13px;" onclick="toggleSaleManualCards()">
-          📸 매대/사진 개별 등록 펼치기 ▼
-        </button>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" id="combinedFilterKeyword" placeholder="상품명 검색 (예: 사과, 삼겹살, 라면)" style="padding:8px 14px; border:1.5px solid #d1d5db; border-radius:8px; font-size:13.5px; width:220px;" oninput="filterCombinedLiveTable(this.value)">
+        </div>
       </div>
-      <div id="saleLiveTableWrap" style="max-height: 400px; overflow-y:auto; border:1px solid #f3f4f6; border-radius:8px;"></div>
-    </div>
 
-    <!-- Optional Manual Photo Cards (collapsed by default) -->
-    <div id="saleManualCardsWrap" style="display:none; margin-top:16px;">
-      <div id="saleList"></div>
+      <!-- 행사상품 뷰 -->
+      <div id="viewSaleWrap">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-size:12.5px; color:#6b7280;">소비자 화면의 <b>[행사상품]</b> 탭에 실시간 게시 중인 목록입니다.</div>
+          <button type="button" class="sa-btn" style="background:#f3f4f6; color:#374151; width:auto; padding:6px 14px; font-size:12.5px; margin:0;" onclick="toggleSaleManualCards()">
+            📸 매대/사진 개별 수동 등록 펼치기 ▼
+          </button>
+        </div>
+        <div id="saleLiveTableWrap" style="max-height: 450px; overflow-y:auto; border:1px solid #f3f4f6; border-radius:8px;"></div>
+        
+        <!-- 매대 사진 개별 등록 (기본 접힘) -->
+        <div id="saleManualCardsWrap" style="display:none; margin-top:20px; padding:16px; background:#fafafa; border-radius:10px; border:1px dashed #d1d5db;">
+          <div style="font-size:14px; font-weight:800; color:#111827; margin-bottom:12px;">📸 행사상품 매대/실물 사진 개별 등록 (선택 사항)</div>
+          <div id="saleList"></div>
+        </div>
+      </div>
+
+      <!-- 일반상품 뷰 -->
+      <div id="viewGeneralWrap" style="display:none;">
+        <div style="font-size:12.5px; color:#6b7280; margin-bottom:10px;">소비자 화면의 <b>[일반상품]</b> 탭에 실시간 게시 중인 200여 종의 상시 상품 목록입니다.</div>
+        <div id="generalLiveTableWrap" style="max-height: 500px; overflow-y:auto; border:1px solid #f3f4f6; border-radius:8px;"></div>
+      </div>
     </div>
   </div>
 
+  <!-- ==============================================
+       [5] 공동구매 섹션
+  ============================================== -->
   <div id="group" class="sa-section">
     <div class="sa-box">
       <b>공동구매 6개</b>
@@ -973,55 +972,7 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
     <div id="groupList"></div>
   </div>
 
-  <div id="general" class="sa-section">
-    <div class="sa-box" style="border: 2px solid #15803d; background: #f0fdf4; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <b style="font-size:18px; color:#166534;">📊 일반상품 엑셀 일괄 등록 (POS 세일 엑셀 업로드)</b>
-          <div class="sa-help" style="margin-top:4px; color:#14532d; font-size:13px;">
-            POS 판매/세일 엑셀 파일(.xlsx, .xls, .csv)을 등록하면 200여 종의 상품명과 판매가가 자동으로 인식되어 즉시 등록됩니다.
-          </div>
-        </div>
-        <button type="button" class="sa-btn" style="background:#fff; color:#166534; border:1px solid #166534; width:auto; padding:8px 16px; font-size:13px; font-weight:600;" onclick="downloadSampleGeneralExcel()">
-          📥 샘플 엑셀 양식 다운로드
-        </button>
-      </div>
-
-      <!-- Upload Trigger Box -->
-      <div style="margin-top:16px; border:2px dashed #86efac; background:#fff; border-radius:10px; padding:28px 16px; text-align:center; cursor:pointer;" onclick="document.getElementById('generalExcelInput').click()">
-        <input type="file" id="generalExcelInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleGeneralExcelUpload(this)">
-        <div style="font-size:36px; margin-bottom:8px;">📁</div>
-        <div style="font-size:17px; font-weight:700; color:#15803d;">POS 엑셀 파일 선택하기 (클릭 또는 파일 드래그)</div>
-        <div style="font-size:13px; color:#6b7280; margin-top:6px;">.xlsx, .xls, .csv 지원 (상품명, 판매가격, 규격 컬럼 자동 매핑)</div>
-      </div>
-
-      <!-- Preview & Bulk Save Area (Hidden until file selected) -->
-      <div id="generalExcelPreview" style="display:none; margin-top:16px; background:#fff; border-radius:10px; padding:16px; border:1px solid #bbf7d0;">
-        <div id="generalExcelSummary" style="font-size:15px; font-weight:700; color:#15803d; margin-bottom:12px;"></div>
-        <button id="btnSaveGeneralBulk" type="button" class="sa-btn" style="background:#15803d; color:#fff; font-size:16px; font-weight:700; padding:14px; width:100%; border-radius:8px;" onclick="saveGeneralExcelBulk()">
-          🚀 일반상품 전체 일괄 저장 및 소비자 화면 게시하기
-        </button>
-      </div>
-    </div>
-
-    <!-- Live Products Status & Search Table -->
-    <div class="sa-box" style="border-radius:12px; padding:16px; background:#fff; border:1px solid #e5e7eb;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
-        <div>
-          <b style="font-size:16px; color:#111827;">현재 등록된 일반상품 (<span id="generalLiveCount">0</span>개)</b>
-          <div style="font-size:12px; color:#6b7280;">소비자 화면의 [일반상품] 탭에 실시간 표시 중인 목록입니다.</div>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <input type="text" id="generalFilterKeyword" placeholder="상품명 검색 (예: 라면, 우유)" style="padding:6px 12px; border:1px solid #d1d5db; border-radius:6px; font-size:13px; width:180px;" oninput="filterGeneralTable(this.value)">
-        </div>
-      </div>
-      <div id="generalLiveTableWrap" style="max-height: 500px; overflow-y:auto; border:1px solid #f3f4f6; border-radius:8px;"></div>
-    </div>
-  </div>
-
-
-
-  <div id="orders" class="sa-section">
+<div id="orders" class="sa-section">
 
     <div class="sa-box">
 
@@ -1723,75 +1674,44 @@ async function loginStore() {
 }
 
 function showMenu(id, button) {
+  // Alias for legacy or combined section
+  if (id === 'sale' || id === 'general' || id === 'sale_general') {
+    id = 'sale_general';
+  }
 
-  document
+  document.querySelectorAll('#storeAdminApp .sa-section').forEach(section => {
+    section.classList.remove('active');
+  });
 
-    .querySelectorAll(
+  document.querySelectorAll('#storeAdminApp .menuBtn').forEach(menuButton => {
+    menuButton.classList.remove('active');
+  });
 
-      '#storeAdminApp .sa-section'
+  const sec = document.getElementById(id);
+  if (sec) {
+    sec.classList.add('active');
+  }
 
-    )
-
-    .forEach(section => {
-
-      section.classList.remove('active');
-
+  if (button) {
+    button.classList.add('active');
+  } else {
+    // If called without button, highlight matching button
+    document.querySelectorAll('#storeAdminApp .menuBtn').forEach(b => {
+      const oc = b.getAttribute('onclick') || '';
+      if (oc.includes("'" + id + "'")) b.classList.add('active');
     });
-
-
-
-  document
-
-    .querySelectorAll(
-
-      '#storeAdminApp .menuBtn'
-
-    )
-
-    .forEach(menuButton => {
-
-      menuButton.classList.remove('active');
-
-    });
-
-
-
-  document
-
-    .getElementById(id)
-
-    .classList
-
-    .add('active');
-
-
-
-  button
-
-    .classList
-
-    .add('active');
-
-
+  }
 
   if (id === 'inquiry') {
     loadInquiries();
   }
-  if (id === 'general') {
+  if (id === 'sale_general') {
+    loadSaleLiveTable();
     loadGeneralLiveTable();
   }
-  if (id === 'sale') {
-    loadSaleLiveTable();
-  }
-
-
-
   if (id === 'account') {
-
     loadSettlementAccount();
-
   }
-
 }
 
 
@@ -2040,15 +1960,19 @@ function formatWonStr(val) {
   return num ? Number(num).toLocaleString('ko-KR') + '원' : '';
 }
 
-function parseProductExcel(rows) {
-  if (!rows || !rows.length) return [];
+// ------------------------------------------
+// [통합 엑셀 파서: 행사상품 + 일반상품 자동 분류]
+// ------------------------------------------
+function parseCombinedProductExcel(rows) {
+  if (!rows || !rows.length) return { sale: [], general: [], total: 0 };
   let headerIdx = -1;
-  let nameCol = -1, priceCol = -1, specCol = -1, normalCol = -1;
+  let typeCol = -1, nameCol = -1, priceCol = -1, specCol = -1, normalCol = -1;
 
   for (let r = 0; r < Math.min(10, rows.length); r++) {
     const row = rows[r];
     for (let c = 0; c < row.length; c++) {
       const cell = String(row[c] || '').trim();
+      if (/구분|분류|탭|행사구분|상품구분/i.test(cell)) typeCol = c;
       if (/상품명|품명|품목명|^상품$/i.test(cell)) nameCol = c;
       if (/판매가|행사가|세일가|매가|단가|^가격$/i.test(cell)) priceCol = c;
       if (/규격|단위|용량/i.test(cell)) specCol = c;
@@ -2060,18 +1984,20 @@ function parseProductExcel(rows) {
     }
   }
 
-  const products = [];
   const startRow = (headerIdx >= 0) ? headerIdx + 1 : 0;
+  const rawItems = [];
 
   for (let r = startRow; r < rows.length; r++) {
     const row = rows[r];
     if (!row || !row.length) continue;
+    let type = '';
     let name = '';
     let price = '';
     let spec = '';
     let normal = '';
 
     if (nameCol >= 0 && priceCol >= 0) {
+      if (typeCol >= 0) type = String(row[typeCol] || '').trim();
       name = String(row[nameCol] || '').trim();
       price = String(row[priceCol] || '').trim();
       if (specCol >= 0) spec = String(row[specCol] || '').trim();
@@ -2089,7 +2015,8 @@ function parseProductExcel(rows) {
     }
 
     if (name && (price || spec)) {
-      products.push({
+      rawItems.push({
+        type: type,
         product_name: name,
         price: formatWonStr(price),
         description: spec,
@@ -2097,29 +2024,79 @@ function parseProductExcel(rows) {
       });
     }
   }
-  return products;
+
+  const saleProducts = [];
+  const generalProducts = [];
+  const hasExplicitType = rawItems.some(it => /행사|세일|특가|일반|상시/i.test(it.type));
+  const hasNormalPrice = rawItems.some(it => !!it.normal_price);
+
+  if (hasExplicitType) {
+    rawItems.forEach(it => {
+      if (/행사|세일|특가/i.test(it.type)) {
+        if (saleProducts.length < 40) saleProducts.push(it);
+        else generalProducts.push(it);
+      } else {
+        generalProducts.push(it);
+      }
+    });
+  } else if (hasNormalPrice) {
+    rawItems.forEach(it => {
+      if (it.normal_price && saleProducts.length < 40) {
+        saleProducts.push(it);
+      } else {
+        generalProducts.push(it);
+      }
+    });
+  } else {
+    // No type and no normal_price: first up to 40 items become sale, rest become general
+    rawItems.forEach((it, idx) => {
+      if (idx < 40) {
+        saleProducts.push(it);
+      } else {
+        generalProducts.push(it);
+      }
+    });
+  }
+
+  return { sale: saleProducts, general: generalProducts, total: rawItems.length };
 }
 
-// --- 일반상품 엑셀 핸들러 ---
-window._pendingGeneralExcelProducts = [];
-
-function downloadSampleGeneralExcel() {
+// ------------------------------------------
+// [통합 엑셀 샘플 양식 다운로드]
+// ------------------------------------------
+function downloadSampleCombinedExcel() {
   if (!window.XLSX) { alert('엑셀 라이브러리 로드 중입니다. 잠시 후 다시 시도해 주세요.'); return; }
   const sampleData = [
-    ["상품명", "판매가격", "규격", "정상가격"],
-    ["신라면 5개입", "4800", "120g*5입", "5200"],
-    ["진라면 매운맛 5입", "4200", "120g*5입", "4600"],
-    ["동원 참치 135g 3캔", "7900", "135g*3캔", "8900"],
-    ["서울우유 1L", "2950", "1000ml", "3200"],
-    ["코카콜라 1.5L", "3200", "1.5L", "3600"]
+    ["구분(행사/일반)", "상품명", "판매(행사)가격", "정상가격(할인 전)", "규격/단위"],
+    ["행사", "아오리 사과 1봉", "3500", "4500", "5입"],
+    ["행사", "국내산 삼겹살 500g", "11800", "14800", "500g"],
+    ["행사", "대란 30구 1판", "5900", "7500", "30구"],
+    ["행사", "느타리 버섯 2팩", "2500", "3500", "200g*2"],
+    ["행사", "하우스 수박 6kg", "13900", "17900", "1통"],
+    ["일반", "신라면 5개입", "4800", "5200", "120g*5입"],
+    ["일반", "진라면 매운맛 5입", "4200", "4600", "120g*5입"],
+    ["일반", "서울우유 1L", "2950", "", "1000ml"],
+    ["일반", "동원 참치 135g 3캔", "7900", "", "135g*3캔"],
+    ["일반", "코카콜라 1.5L", "3200", "", "1.5L"],
+    ["일반", "CJ 햇반 210g 3개입", "3900", "", "210g*3"],
+    ["일반", "오뚜기 진간장 1.8L", "6800", "", "1.8L"],
+    ["일반", "해표 식용유 1L", "3800", "", "1L"]
   ];
   const ws = XLSX.utils.aoa_to_sheet(sampleData);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "일반상품양식");
-  XLSX.writeFile(wb, "우리아파트_일반상품_엑셀양식.xlsx");
+  XLSX.utils.book_append_sheet(wb, ws, "행사_일반_통합목록");
+  XLSX.writeFile(wb, "우리아파트_행사_일반_상품_통합엑셀양식.xlsx");
 }
+window.downloadSampleGeneralExcel = downloadSampleCombinedExcel;
+window.downloadSampleSaleExcel = downloadSampleCombinedExcel;
 
-function handleGeneralExcelUpload(input) {
+// ------------------------------------------
+// [통합 엑셀 업로드 핸들러]
+// ------------------------------------------
+window._pendingCombinedSaleProducts = [];
+window._pendingCombinedGeneralProducts = [];
+
+function handleCombinedExcelUpload(input) {
   const file = input.files && input.files[0];
   if (!file) return;
   const reader = new FileReader();
@@ -2129,19 +2106,37 @@ function handleGeneralExcelUpload(input) {
       const workbook = XLSX.read(data, { type: 'array' });
       const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
-      const products = parseProductExcel(rows);
+      const parsed = parseCombinedProductExcel(rows);
 
-      if (!products.length) {
-        alert('엑셀 파일에서 상품명이나 가격을 찾지 못했습니다. 양식을 확인해 주세요.');
+      if (!parsed.total) {
+        alert('엑셀 파일에서 상품 데이터를 인식하지 못했습니다. 파일 양식을 확인해 주세요.');
         return;
       }
 
-      window._pendingGeneralExcelProducts = products;
-      const preview = document.getElementById('generalExcelPreview');
-      const summary = document.getElementById('generalExcelSummary');
+      window._pendingCombinedSaleProducts = parsed.sale;
+      window._pendingCombinedGeneralProducts = parsed.general;
+
+      const preview = document.getElementById('combinedExcelPreview');
+      const summary = document.getElementById('combinedExcelSummary');
       if (summary) {
-        summary.innerHTML = `✅ <b>${products.length}개 품목</b>이 인식되었습니다.<br>`
-          + `<span style="font-size:13px; color:#4b5563; font-weight:normal;">(예: ${products[0].product_name} ${products[0].price} ${products.length > 1 ? '외 ' + (products.length - 1) + '개' : ''})</span>`;
+        summary.innerHTML = `
+          <div style="font-size:16px; font-weight:800; color:#15803d; margin-bottom:8px;">
+            🎉 엑셀 자동 파싱 완료: 총 ${parsed.total}개 품목 인식 (행사 ${parsed.sale.length}개 + 일반 ${parsed.general.length}개)
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:12px; font-size:13px; color:#166534;">
+            <div>
+              <b>🏷️ 행사상품: ${parsed.sale.length}개</b><br>
+              <span style="color:#64748b; font-size:12px;">(예: ${parsed.sale[0]?.product_name || '-'} ${parsed.sale[0]?.price || ''})</span>
+            </div>
+            <div>
+              <b>🛒 일반상품: ${parsed.general.length}개</b><br>
+              <span style="color:#64748b; font-size:12px;">(예: ${parsed.general[0]?.product_name || '-'} ${parsed.general[0]?.price || ''})</span>
+            </div>
+          </div>
+          <div style="margin-top:10px; font-size:12.5px; color:#475569;">
+            💡 아래 [일괄 저장 및 소비자 화면 즉시 게시하기] 버튼을 누르시면 소비자 화면에 즉시 반영됩니다.
+          </div>
+        `;
       }
       if (preview) preview.style.display = 'block';
     } catch (err) {
@@ -2150,129 +2145,44 @@ function handleGeneralExcelUpload(input) {
   };
   reader.readAsArrayBuffer(file);
 }
+window.handleGeneralExcelUpload = handleCombinedExcelUpload;
+window.handleSaleExcelUpload = handleCombinedExcelUpload;
 
-async function saveGeneralExcelBulk() {
-  const products = window._pendingGeneralExcelProducts;
-  if (!products || !products.length) {
-    alert('업로드할 상품 데이터가 없습니다.');
+// ------------------------------------------
+// [통합 엑셀 Supabase 원클릭 일괄 저장]
+// ------------------------------------------
+async function saveCombinedExcelBulk() {
+  const saleList = window._pendingCombinedSaleProducts || [];
+  const generalList = window._pendingCombinedGeneralProducts || [];
+  const total = saleList.length + generalList.length;
+
+  if (!total) {
+    alert('업로드할 상품 데이터가 없습니다. 먼저 엑셀 파일을 선택해 주세요.');
     return;
   }
-  const btn = document.getElementById('btnSaveGeneralBulk');
-  if (btn) { btn.disabled = true; btn.textContent = '저장 및 반영 중...'; }
+
+  const btn = document.getElementById('btnSaveCombinedBulk');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = `🚀 행사+일반 상품 일괄 저장 중... (0 / ${total})`;
+  }
 
   try {
-    const delRes = await fetch(`${SUPABASE_URL}/rest/v1/store_products_live?store_id=eq.${encodeURIComponent(currentStoreId)}&category=eq.general`, {
+    // 1. 기존 행사상품 및 일반상품 실시간 DB 삭제
+    await fetch(`${SUPABASE_URL}/rest/v1/store_products_live?store_id=eq.${encodeURIComponent(currentStoreId)}&category=in.(sale,general)`, {
       method: 'DELETE',
-      headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: 'Bearer ' + SUPABASE_KEY
+      }
     });
 
+    let savedCount = 0;
     const chunkSize = 50;
-    for (let i = 0; i < products.length; i += chunkSize) {
-      const chunk = products.slice(i, i + chunkSize);
-      const rows = chunk.map((p, idx) => ({
-        store_id: currentStoreId,
-        category: 'general',
-        product_no: i + idx + 1,
-        product_name: p.product_name,
-        price: p.price,
-        description: p.description || '',
-        normal_price: p.normal_price || null,
-        image_url: null,
-        target_count: 0,
-        join_count: 0
-      }));
 
-      await fetch(`${SUPABASE_URL}/rest/v1/store_products_live`, {
-        method: 'POST',
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: 'Bearer ' + SUPABASE_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(rows)
-      });
-    }
-
-    alert(`✅ 일반상품 ${products.length}개가 성공적으로 저장 및 소비자 화면에 게시되었습니다!`);
-    window._pendingGeneralExcelProducts = [];
-    const preview = document.getElementById('generalExcelPreview');
-    if (preview) preview.style.display = 'none';
-    loadGeneralLiveTable();
-  } catch (err) {
-    alert('저장 중 오류가 발생했습니다: ' + err.message);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '🚀 일반상품 전체 일괄 저장 및 소비자 화면 게시하기'; }
-  }
-}
-
-// --- 행사상품 엑셀 핸들러 ---
-window._pendingSaleExcelProducts = [];
-
-function downloadSampleSaleExcel() {
-  if (!window.XLSX) { alert('엑셀 라이브러리 로드 중입니다.'); return; }
-  const sampleData = [
-    ["상품명", "행사가격", "규격", "정상가격"],
-    ["아오리 사과 1봉", "3500", "5입", "4500"],
-    ["느타리 버섯 2팩", "2500", "200g*2", "3500"],
-    ["국내산 삼겹살 500g", "11800", "500g", "14800"],
-    ["대란 30구 1판", "5900", "30구", "7500"]
-  ];
-  const ws = XLSX.utils.aoa_to_sheet(sampleData);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "행사상품양식");
-  XLSX.writeFile(wb, "우리아파트_행사상품_엑셀양식.xlsx");
-}
-
-function handleSaleExcelUpload(input) {
-  const file = input.files && input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
-      const products = parseProductExcel(rows);
-
-      if (!products.length) {
-        alert('엑셀 파일에서 행사 품목을 찾지 못했습니다.');
-        return;
-      }
-
-      window._pendingSaleExcelProducts = products;
-      const preview = document.getElementById('saleExcelPreview');
-      const summary = document.getElementById('saleExcelSummary');
-      if (summary) {
-        summary.innerHTML = `✅ <b>${products.length}개 행사 품목</b>이 인식되었습니다.<br>`
-          + `<span style="font-size:13px; color:#4b5563; font-weight:normal;">(예: ${products[0].product_name} ${products[0].price} ${products.length > 1 ? '외 ' + (products.length - 1) + '개' : ''})</span>`;
-      }
-      if (preview) preview.style.display = 'block';
-    } catch (err) {
-      alert('엑셀 처리 오류: ' + err.message);
-    }
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-async function saveSaleExcelBulk() {
-  const products = window._pendingSaleExcelProducts;
-  if (!products || !products.length) {
-    alert('업로드할 행사상품 데이터가 없습니다.');
-    return;
-  }
-  const btn = document.getElementById('btnSaveSaleBulk');
-  if (btn) { btn.disabled = true; btn.textContent = '저장 및 반영 중...'; }
-
-  try {
-    const delRes = await fetch(`${SUPABASE_URL}/rest/v1/store_products_live?store_id=eq.${encodeURIComponent(currentStoreId)}&category=eq.sale`, {
-      method: 'DELETE',
-      headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY }
-    });
-
-    const chunkSize = 50;
-    for (let i = 0; i < products.length; i += chunkSize) {
-      const chunk = products.slice(i, i + chunkSize);
+    // 2. 행사상품 삽입
+    for (let i = 0; i < saleList.length; i += chunkSize) {
+      const chunk = saleList.slice(i, i + chunkSize);
       const rows = chunk.map((p, idx) => ({
         store_id: currentStoreId,
         category: 'sale',
@@ -2295,21 +2205,106 @@ async function saveSaleExcelBulk() {
         },
         body: JSON.stringify(rows)
       });
+      savedCount += chunk.length;
+      if (btn) btn.textContent = `🚀 행사+일반 상품 일괄 저장 중... (${savedCount} / ${total})`;
     }
 
-    alert(`✅ 행사상품 ${products.length}개가 성공적으로 저장 및 소비자 화면에 게시되었습니다!`);
-    window._pendingSaleExcelProducts = [];
-    const preview = document.getElementById('saleExcelPreview');
+    // 3. 일반상품 삽입
+    for (let i = 0; i < generalList.length; i += chunkSize) {
+      const chunk = generalList.slice(i, i + chunkSize);
+      const rows = chunk.map((p, idx) => ({
+        store_id: currentStoreId,
+        category: 'general',
+        product_no: i + idx + 1,
+        product_name: p.product_name,
+        price: p.price,
+        description: p.description || '',
+        normal_price: p.normal_price || null,
+        image_url: null,
+        target_count: 0,
+        join_count: 0
+      }));
+
+      await fetch(`${SUPABASE_URL}/rest/v1/store_products_live`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(rows)
+      });
+      savedCount += chunk.length;
+      if (btn) btn.textContent = `🚀 행사+일반 상품 일괄 저장 중... (${savedCount} / ${total})`;
+    }
+
+    alert(`✅ 행사+일반 상품 총 ${total}개(행사 ${saleList.length}개 + 일반 ${generalList.length}개)가 성공적으로 저장 및 소비자 화면에 실시간 게시되었습니다!`);
+
+    window._pendingCombinedSaleProducts = [];
+    window._pendingCombinedGeneralProducts = [];
+    const preview = document.getElementById('combinedExcelPreview');
     if (preview) preview.style.display = 'none';
-    loadSaleLiveTable();
+
+    // 실시간 테이블 갱신
+    await Promise.allSettled([loadSaleLiveTable(), loadGeneralLiveTable()]);
   } catch (err) {
-    alert('저장 중 오류: ' + err.message);
+    alert('저장 중 오류가 발생했습니다: ' + err.message);
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '🚀 행사상품 전체 일괄 저장 및 소비자 화면 게시하기'; }
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '🚀 행사+일반 상품 전체 일괄 저장 및 소비자 화면 즉시 게시하기';
+    }
+  }
+}
+window.saveGeneralExcelBulk = saveCombinedExcelBulk;
+window.saveSaleExcelBulk = saveCombinedExcelBulk;
+
+// ------------------------------------------
+// [서브 탭 전환 및 필터]
+// ------------------------------------------
+function switchSaleGeneralTab(tab) {
+  const saleWrap = document.getElementById('viewSaleWrap');
+  const genWrap = document.getElementById('viewGeneralWrap');
+  const btnSale = document.getElementById('tabBtnSale');
+  const btnGen = document.getElementById('tabBtnGeneral');
+
+  if (tab === 'sale') {
+    if (saleWrap) saleWrap.style.display = 'block';
+    if (genWrap) genWrap.style.display = 'none';
+    if (btnSale) {
+      btnSale.style.background = '#dc2626';
+      btnSale.style.color = '#fff';
+      btnSale.style.fontWeight = '800';
+    }
+    if (btnGen) {
+      btnGen.style.background = '#f3f4f6';
+      btnGen.style.color = '#374151';
+      btnGen.style.fontWeight = '700';
+    }
+  } else {
+    if (saleWrap) saleWrap.style.display = 'none';
+    if (genWrap) genWrap.style.display = 'block';
+    if (btnSale) {
+      btnSale.style.background = '#f3f4f6';
+      btnSale.style.color = '#374151';
+      btnSale.style.fontWeight = '700';
+    }
+    if (btnGen) {
+      btnGen.style.background = '#15803d';
+      btnGen.style.color = '#fff';
+      btnGen.style.fontWeight = '800';
+    }
   }
 }
 
-// --- 실시간 등록 상품 요약 테이블 ---
+function filterCombinedLiveTable(kw) {
+  filterSaleTable(kw);
+  filterGeneralTable(kw);
+}
+
+// ------------------------------------------
+// [실시간 등록 상품 목록 (일반상품 & 행사상품)]
+// ------------------------------------------
 async function loadGeneralLiveTable() {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/store_products_live?store_id=eq.${encodeURIComponent(currentStoreId)}&category=eq.general&order=product_no.asc&limit=1000`, {
@@ -2328,18 +2323,18 @@ function renderGeneralTableHtml(items) {
   const wrap = document.getElementById('generalLiveTableWrap');
   if (!wrap) return;
   if (!items || !items.length) {
-    wrap.innerHTML = '<div style="padding:24px; text-align:center; color:#9ca3af; font-size:14px;">등록된 일반상품이 없습니다. 위의 [POS 엑셀 파일 선택하기]로 등록해 주세요.</div>';
+    wrap.innerHTML = '<div style="padding:24px; text-align:center; color:#9ca3af; font-size:14px;">등록된 일반상품이 없습니다. 위의 [POS 엑셀 파일 1개 선택하기]로 등록해 주세요.</div>';
     return;
   }
   let h = '<table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left;">';
   h += '<thead style="background:#f9fafb; position:sticky; top:0; border-bottom:1px solid #e5e7eb;">';
-  h += '<tr><th style="padding:8px 12px; width:50px;">No</th><th style="padding:8px 12px;">상품명</th><th style="padding:8px 12px; width:100px;">판매가격</th><th style="padding:8px 12px; width:120px;">규격/단위</th></tr>';
+  h += '<tr><th style="padding:8px 12px; width:50px;">No</th><th style="padding:8px 12px;">상품명</th><th style="padding:8px 12px; width:110px;">판매가격</th><th style="padding:8px 12px; width:130px;">규격/단위</th></tr>';
   h += '</thead><tbody>';
   items.forEach(it => {
     h += `<tr style="border-bottom:1px solid #f3f4f6;">
       <td style="padding:8px 12px; color:#6b7280;">${it.product_no}</td>
       <td style="padding:8px 12px; font-weight:600; color:#111827;">${it.product_name}</td>
-      <td style="padding:8px 12px; color:#dc2626; font-weight:700;">${it.price || '-'}</td>
+      <td style="padding:8px 12px; color:#15803d; font-weight:700;">${it.price || '-'}</td>
       <td style="padding:8px 12px; color:#4b5563;">${it.description || '-'}</td>
     </tr>`;
   });
@@ -2373,7 +2368,7 @@ function renderSaleTableHtml(items) {
   const wrap = document.getElementById('saleLiveTableWrap');
   if (!wrap) return;
   if (!items || !items.length) {
-    wrap.innerHTML = '<div style="padding:24px; text-align:center; color:#9ca3af; font-size:14px;">등록된 행사상품이 없습니다. 위의 [행사상품 엑셀 파일 선택하기]로 등록해 주세요.</div>';
+    wrap.innerHTML = '<div style="padding:24px; text-align:center; color:#9ca3af; font-size:14px;">등록된 행사상품이 없습니다. 위의 [POS 엑셀 파일 1개 선택하기]로 등록해 주세요.</div>';
     return;
   }
   let h = '<table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left;">';
@@ -2393,13 +2388,19 @@ function renderSaleTableHtml(items) {
   wrap.innerHTML = h;
 }
 
+function filterSaleTable(kw) {
+  const q = (kw || '').trim().toLowerCase();
+  const all = window._saleLiveItems || [];
+  if (!q) { renderSaleTableHtml(all); return; }
+  const filtered = all.filter(it => (it.product_name || '').toLowerCase().includes(q) || (it.description || '').toLowerCase().includes(q));
+  renderSaleTableHtml(filtered);
+}
+
 function toggleSaleManualCards() {
   const wrap = document.getElementById('saleManualCardsWrap');
   if (!wrap) return;
   wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
 }
-
-
 
 function makeGroup() {
 
