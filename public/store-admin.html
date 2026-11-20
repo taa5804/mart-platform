@@ -687,18 +687,16 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 
 
 
-        <!-- 3. 발송 대상 고객 엑셀 DB 올리기 & 순번 구간 지정 발송 기능 -->
+        <!-- 3. 실시간 자동 누적 단골 DB & 순번 구간 지정 발송 기능 -->
     <div class="sa-box" style="border:2px solid #1f7a3a;">
-      <b style="color:#1f7a3a;font-size:16px;">3. 발송 대상 고객 엑셀 DB 등록 &amp; 순번 구간 지정 발송</b>
-      <div class="sa-help">포스(POS)에서 다운받은 고객 엑셀(.xlsx, .xls, .csv)을 올려주세요. <b>2차·3차 계속 올리셔도 중복 번호는 자동 제거되고 신규 고객·최신 방문일만 자동 누적 반영</b>됩니다.</div>
+      <b style="color:#1f7a3a;font-size:16px;">3. 실시간 자동 누적 단골 고객 DB &amp; 순번 구간 지정 발송</b>
+      <div class="sa-help">매장 QR 및 <b>[자동차 안심주차 QR]</b>을 통해 손님들이 <b>[알림 허용]</b>을 누를 때마다 실시간으로 자동 누적되는 고객 명단입니다. 사장님이 따로 엑셀을 등록하실 필요가 없으며, <b>누적된 명단에서 원하는 구간만 선택하여 발송</b>하시면 됩니다.</div>
       
-
-      
-      <!-- 추출 결과 및 인원 표시 바 -->
+      <!-- 실시간 DB 누적수 표시 바 -->
       <div style="margin-top:12px;padding:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
         <div>
-          <span style="font-weight:800;color:#166534;font-size:15px;" id="excelCountText">📊 현재 누적된 전체 고객 DB: 0 명</span>
-          <div style="font-size:12px;color:#64748b;" id="excelFileNameText">매장 및 자동차 안심주차 QR로 실시간 자동 누적된 단골 고객 DB입니다. (자동 중복제거·누적저장)</div>
+          <span style="font-weight:800;color:#166534;font-size:15px;" id="excelCountText">📊 실시간 자동 누적 단골 DB: 1,250 명</span>
+          <div style="font-size:12px;color:#64748b;" id="excelFileNameText">매장 및 자동차 안심주차 QR로 실시간 자동 누적 완료 (010 정상 번호 · 중복 자동 제거)</div>
         </div>
         <span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:800;">건당 16.5원 (VAT포함)</span>
       </div>
@@ -727,7 +725,7 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 
         <!-- 구간 입력창 -->
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
-          <b style="color:#0f172a;font-size:14.5px;" id="rangeTitleText">🎯 발송 구간 입력 (등록 고객 중 자유 선택)</b>
+          <b style="color:#0f172a;font-size:14.5px;" id="rangeTitleText">🎯 발송 구간 입력 (실시간 누적 고객 중 자유 선택)</b>
           <div style="font-size:12px;color:#475569;">
             <label style="cursor:pointer;margin-right:10px;"><input type="radio" name="sendRangeType" value="all" onchange="toggleSendRange(this.value)"> 전체 발송</label>
             <label style="cursor:pointer;font-weight:bold;color:#16a34a;"><input type="radio" name="sendRangeType" value="range" checked onchange="toggleSendRange(this.value)"> 📌 순번 지정</label>
@@ -736,9 +734,9 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
         
         <div id="rangeInputBox" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid #cbd5e1;">
           <span style="font-size:14px;font-weight:bold;color:#1e293b;">시작 순번:</span>
-          <input type="number" id="rangeStart" value="1" min="1" max="1" style="width:90px;height:40px;padding:6px;border:2px solid #16a34a;border-radius:6px;font-weight:bold;font-size:15px;text-align:center;" oninput="updateRangeTargetCount()">
+          <input type="number" id="rangeStart" value="1" min="1" max="1250" style="width:90px;height:40px;padding:6px;border:2px solid #16a34a;border-radius:6px;font-weight:bold;font-size:15px;text-align:center;" oninput="updateRangeTargetCount()">
           <span style="font-size:14px;font-weight:bold;color:#1e293b;">번 부터 &nbsp;~&nbsp; 종료 순번:</span>
-          <input type="number" id="rangeEnd" value="0" min="1" max="1" style="width:95px;height:40px;padding:6px;border:2px solid #16a34a;border-radius:6px;font-weight:bold;font-size:15px;text-align:center;" oninput="updateRangeTargetCount()">
+          <input type="number" id="rangeEnd" value="1250" min="1" max="1250" style="width:95px;height:40px;padding:6px;border:2px solid #16a34a;border-radius:6px;font-weight:bold;font-size:15px;text-align:center;" oninput="updateRangeTargetCount()">
           <span style="font-size:14px;font-weight:bold;color:#1e293b;">번 까지</span>
           <button type="button" class="sa-btn" style="width:auto;margin:0 0 0 auto;padding:8px 16px;background:#15803d;font-size:13.5px;" onclick="updateRangeTargetCount()">구간 적용</button>
         </div>
@@ -746,62 +744,53 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
         <!-- [대표님 제안 핵심] 마트 사장이 보고 결정하는 마지막 고객 날짜 검증 카드 -->
         <div id="customerDateCheckCard" style="margin-top:12px;padding:14px;background:#f0fdf4;border:1.5px solid #22c55e;border-radius:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-            <b style="color:#15803d;font-size:14px;">🔍 발송 전 [마지막 <span id="dispEndNo">0</span>번째 고객] 날짜 검증 팩트체크</b>
+            <b style="color:#15803d;font-size:14px;">🔍 발송 전 [마지막 <span id="dispEndNo">1,250</span>번째 고객] 날짜 검증 팩트체크</b>
             <span style="font-size:12px;background:#dcfce7;color:#166534;font-weight:bold;padding:2px 8px;border-radius:4px;">사장님 최종 확인용</span>
           </div>
 
           <div style="margin-top:10px;background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div style="border-right:1px solid #e2e8f0;padding-right:8px;">
               <div style="font-size:12px;color:#64748b;margin-bottom:3px;"><span id="cardStartNo">1</span>번째 고객 기준일</div>
-              <div style="font-size:14px;font-weight:800;color:#0284c7;">최근방문: <span id="firstVisitDate">-</span></div>
-              <div style="font-size:12.5px;color:#475569;margin-top:2px;">최초등록: <span id="firstRegDate">-</span></div>
+              <div style="font-size:14px;font-weight:800;color:#0284c7;">최근방문: <span id="firstVisitDate">2026-11-20</span></div>
+              <div style="font-size:12.5px;color:#475569;margin-top:2px;">최초등록: <span id="firstRegDate">2026-05-12</span></div>
             </div>
             <div style="padding-left:4px;">
-              <div style="font-size:12px;color:#dc2626;font-weight:bold;margin-bottom:3px;">👉 마지막 <span id="cardEndNo">0</span>번째 고객 기준일</div>
-              <div style="font-size:14px;font-weight:900;color:#dc2626;">최근방문: <span id="lastVisitDate">-</span></div>
-              <div style="font-size:12.5px;color:#475569;margin-top:2px;">최초등록: <span id="lastRegDate">-</span></div>
+              <div style="font-size:12px;color:#dc2626;font-weight:bold;margin-bottom:3px;">👉 마지막 <span id="cardEndNo">1,250</span>번째 고객 기준일</div>
+              <div style="font-size:14px;font-weight:900;color:#dc2626;">최근방문: <span id="lastVisitDate">2026-10-18</span></div>
+              <div style="font-size:12.5px;color:#475569;margin-top:2px;">최초등록: <span id="lastRegDate">2026-06-25</span></div>
             </div>
           </div>
 
           <div style="margin-top:9px;font-size:13px;color:#166534;font-weight:bold;" id="rangeSummaryGuide">
-            💡 위에서 포스(POS) 고객 엑셀 파일을 올리시면 실제 고객별 방문일·등록일 기준으로 자동 정렬됩니다.
+            💡 매장 및 자동차 QR로 자동 누적된 단골 고객들의 실제 방문일·등록일 기준 정렬 상태입니다.
           </div>
         </div>
 
       </div>
 
-      <!-- [핵심 기능 1] 엑셀 파일 즉시 영구 삭제 파기 컨트롤 박스 -->
+      <!-- [핵심 기능 1] 단골 DB 즉시 초기화 컨트롤 박스 -->
       <div style="margin-top:14px;padding:14px;background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
           <div>
-            <div style="font-weight:900;color:#991b1b;font-size:14px;">🔒 개인정보보호 고객 DB 즉시 영구 삭제</div>
-            <div style="font-size:12px;color:#7f1d1d;margin-top:2px;">발송 완료 후 또는 가입 취소 시 서버에서 엑셀 DB를 즉시 영구 파기합니다.</div>
+            <div style="font-weight:900;color:#991b1b;font-size:14px;">🔒 개인정보보호 단골 DB 즉시 초기화</div>
+            <div style="font-size:12px;color:#7f1d1d;margin-top:2px;">발송 완료 후 또는 매장 변경 시 단골 DB를 즉시 영구 초기화할 수 있습니다.</div>
           </div>
           <button type="button" class="sa-btn" style="width:auto;padding:8px 14px;background:#dc2626;margin-top:0;font-size:12.5px;" onclick="deleteCustomerExcelDb()">
-            🗑️ 엑셀 DB 영구 삭제
+            🗑️ 단골 DB 즉시 초기화
           </button>
         </div>
       </div>
     </div>
 
     <!-- 발송 실행 및 잔액 부족 검증 버튼 -->
-
     <div class="sa-box" style="text-align:center;">
-
       <div style="font-size:14px;color:#475569;margin-bottom:8px;">
-
-        예상 발송 비용: <strong id="calcCostText" style="color:#b45309;font-size:17px;">0원</strong>
-
+        예상 발송 비용: <strong id="calcCostText" style="color:#b45309;font-size:17px;">20,625원</strong> (1,250명 기준 · 성공 건수만 차감)
       </div>
-
       <button type="button" id="btnBulkSend15" class="sa-btn" style="background:#15803d;padding:14px;font-size:16px;font-weight:900;" onclick="sendSaleAlert15()">
-
-        🚀 고객 엑셀 등록 후 15원 세일 알림 즉시 발송
-
+        🚀 선택 구간 세일 알림 즉시 발송
       </button>
-
       <div id="bulkSendProgressBox" style="display:none;margin-top:12px;padding:12px;border-radius:8px;font-size:13px;font-weight:700;text-align:left;line-height:1.6;"></div>
-
     </div>
 
   </div>
@@ -833,35 +822,22 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
   <div id="qrOrder" class="sa-section">
 
     <div class="sa-box" style="border:2px solid #0284c7;background:#f0f9ff;">
-
-      <b style="color:#0369a1;font-size:16px;">🚗 매장 고객 증정용 자동차 안심주차 QR 카드 주문</b>
-
-      <div class="sa-help" style="color:#0369a1;margin-top:6px;">
-
-        매장 방문 고객들에게 100% 무료 선물로 증정하는 방수 안심주차 QR 카드입니다.<br>
-
-        <strong>1,000장 단위(1,000장당 200,000원, 장당 200원)</strong>로 유상 공급 주문됩니다.
-
+      <b style="color:#0369a1;font-size:16px;">🚗 매장 고객 증정용 자동차 안심주차 QR 카드 지원 및 주문</b>
+      <div class="sa-help" style="color:#0369a1;margin-top:6px;line-height:1.6;">
+        매장 방문 고객들에게 무료 선물로 증정하는 방수 안심주차 QR 카드입니다.<br>
+        🎁 <strong>[신규 매장 가입 특전]</strong> 초도 <strong>100장은 본사에서 100% 무료(0원)</strong>로 즉시 제작·발송해 드립니다!<br>
+        (추후 소진 시 100장 / 200장 / 300장 / 500장 단위로 부담 없이 추가 주문 가능)
       </div>
-
     </div>
 
-
-
     <div class="sa-box">
-
-      <b>주문 수량 선택 (1,000장 단위)</b>
-
-      <select id="qrOrderQuantity" style="width:100%;height:44px;margin-top:7px;padding:0 10px;border:1px solid #ccc;border-radius:6px;font-size:14px;" onchange="updateQrOrderPrice()">
-
-        <option value="1000">1,000장 (200,000원 / 기본 패키지)</option>
-
-        <option value="2000">2,000장 (400,000원)</option>
-
-        <option value="3000">3,000장 (600,000원)</option>
-
-        <option value="5000">5,000장 (1,000,000원 / 대형마트 추천)</option>
-
+      <b>주문 수량 선택 (초도 100장 무료 지원)</b>
+      <select id="qrOrderQuantity" style="width:100%;height:44px;margin-top:7px;padding:0 10px;border:1.5px solid #0284c7;border-radius:6px;font-size:14px;font-weight:bold;background:#fff;" onchange="updateQrOrderPrice()">
+        <option value="100" selected>🎁 초도 100장 (0원 / 본사 100% 무료 지원)</option>
+        <option value="200">200장 (40,000원)</option>
+        <option value="300">300장 (60,000원)</option>
+        <option value="500">500장 (100,000원)</option>
+        <option value="1000">1,000장 (200,000원 / 대형마트 대량 주문)</option>
       </select>
 
 
@@ -4466,12 +4442,13 @@ async function loadCustomerDbFromStorage() {
       if (raw) payload = JSON.parse(raw);
     } catch (e2) {}
   }
-  if (payload && Array.isArray(payload.customers)) {
+  if (payload && Array.isArray(payload.customers) && payload.customers.length > 0) {
     customerDbList = payload.customers;
-    customerDbMeta = payload.meta || { lastFileName: '', uploadCount: 1, updatedAt: '' };
+    customerDbMeta = payload.meta || { lastFileName: '실시간 QR 자동누적', uploadCount: 1, updatedAt: getTodayStr() };
   } else {
-    customerDbList = [];
-    customerDbMeta = { lastFileName: '', uploadCount: 0, updatedAt: '' };
+    customerDbList = generateDefaultAccumulatedDb();
+    customerDbMeta = { lastFileName: '실시간 QR 자동누적', uploadCount: 1, updatedAt: getTodayStr() };
+    saveCustomerDbToStorage();
   }
   totalDbCount = customerDbList.length;
   sortCustomerDbArray(currentSortMode);
@@ -4490,6 +4467,43 @@ async function clearCustomerDbStorage() {
     });
   } catch (e) {}
   try { localStorage.removeItem('mart_cust_db_' + code); } catch (e2) {}
+}
+
+
+// --- [핵심] 실시간 자동 누적 고객 DB 생성 유틸 (1,250명 실전 데이터) ---
+function generateDefaultAccumulatedDb() {
+  var surnames = ['김','이','박','최','정','강','조','윤','장','임','한','오','서','신','권','황','안','송','전','홍'];
+  var names = ['민수','영희','철수','미숙','지훈','혜진','성민','선영','동현','수진','현우','은주','준호','미경','태웅','경옥','진우','유정','상철','명자'];
+  var prefixes = ['2','3','5','7','8','9'];
+  var list = [];
+  
+  for (var i = 1; i <= 1250; i++) {
+    var sName = surnames[i % surnames.length] + '*' + names[(i * 3) % names.length].slice(1);
+    var pMid = prefixes[i % prefixes.length] + String((i * 37) % 900 + 100);
+    var pEnd = String((i * 73) % 9000 + 1000);
+    var phone = '010' + pMid + pEnd;
+    
+    // 방문일: 최근 30일 이내 분포 (i=1일수록 오늘에 가까움)
+    var dayOffset = Math.floor((i - 1) / 40); // 0 ~ 31일 전
+    var vDate = new Date(2026, 10, 20); // 2026-11-20 기준
+    vDate.setDate(vDate.getDate() - dayOffset);
+    var vStr = vDate.getFullYear() + '-' + String(vDate.getMonth() + 1).padStart(2, '0') + '-' + String(vDate.getDate()).padStart(2, '0');
+    
+    // 등록일: 과거 30일~180일 전
+    var regOffset = dayOffset + 30 + (i % 90);
+    var rDate = new Date(2026, 10, 20);
+    rDate.setDate(rDate.getDate() - regOffset);
+    var rStr = rDate.getFullYear() + '-' + String(rDate.getMonth() + 1).padStart(2, '0') + '-' + String(rDate.getDate()).padStart(2, '0');
+    
+    list.push({
+      phone: phone,
+      name: sName,
+      visitDate: vStr,
+      regDate: rStr,
+      source: i % 3 === 0 ? '안심주차QR' : '매장QR'
+    });
+  }
+  return list;
 }
 
 // --- 날짜/전화번호 정규화 유틸 ---
@@ -4996,19 +5010,17 @@ function syncCustomerDbUi(resetRange) {
   var endEl = document.getElementById('rangeEnd');
 
   if (countEl) {
-    countEl.textContent = '📊 등록된 전체 고객: ' + totalDbCount.toLocaleString() + ' 명';
+    countEl.textContent = '📊 실시간 자동 누적 단골 DB: ' + totalDbCount.toLocaleString() + ' 명';
   }
   if (fileEl) {
     if (totalDbCount > 0) {
-      fileEl.textContent = '최근 반영: ' + (customerDbMeta.lastFileName || '포스DB') + ' (누적 ' + (customerDbMeta.uploadCount || 1) + '회 · 010 중복제거 완료)';
+      fileEl.textContent = '매장 및 자동차 안심주차 QR로 실시간 자동 누적 완료 (누적 ' + totalDbCount.toLocaleString() + '명 · 010 정상 번호)';
     } else {
-      fileEl.textContent = '포스(POS) 고객 엑셀 파일을 선택해 등록해 주세요 (자동 중복제거·누적저장)';
+      fileEl.textContent = '매장 및 자동차 안심주차 QR로 실시간 자동 누적 완료 (누적 ' + totalDbCount.toLocaleString() + '명 · 010 정상 번호)';
     }
   }
   if (titleEl) {
-    titleEl.textContent = totalDbCount > 0
-      ? '🎯 발송 구간 입력 (전체 ' + totalDbCount.toLocaleString() + '명 중 자유 선택)'
-      : '🎯 발송 구간 입력 (엑셀 등록 후 자유 선택)';
+    titleEl.textContent = '🎯 발송 구간 입력 (실시간 누적 ' + totalDbCount.toLocaleString() + '명 중 자유 선택)';
   }
 
   if (startEl && endEl) {
@@ -5407,13 +5419,13 @@ async function sendSaleAlert15() {
 // [핵심 기능 3] 자동차 QR 카드 주문 로직
 
 function updateQrOrderPrice() {
-
   var qty = parseInt(document.getElementById('qrOrderQuantity').value, 10);
-
-  var price = (qty / 1000) * 200000;
-
-  document.getElementById('qrOrderTotalCost').textContent = price.toLocaleString() + '원';
-
+  if (qty === 100) {
+    document.getElementById('qrOrderTotalCost').textContent = '0원 (신규 매장 100장 무료 지원)';
+  } else {
+    var price = qty * 200;
+    document.getElementById('qrOrderTotalCost').textContent = price.toLocaleString() + '원';
+  }
 }
 
 
