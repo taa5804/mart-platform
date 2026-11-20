@@ -2328,6 +2328,60 @@
     s74LoadStoreInfo();
     s74LoadProducts();
     s74LoadBanners();
+    
+    // [서비스워커 및 실시간 웹푸시 리스너 등록]
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then((reg) => {
+        console.log('ServiceWorker registered:', reg);
+      }).catch(err => console.warn('ServiceWorker error:', err));
+    }
+
+    // 웹푸시 브로드캐스트 실시간 감지 및 푸시 팝업 표시
+    let s74LastPushBroadcastId = parseInt(localStorage.getItem('s74_last_push_id') || '0', 10);
+    async function s74CheckWebPushBroadcasts() {
+      try {
+        const res = await fetch(S74_SUPABASE_URL + '/rest/v1/store_products_live?store_id=eq.' + encodeURIComponent(S74_STORE_ID) + '&category=eq.push_broadcast&order=id.desc&limit=1', {
+          headers: { apikey: S74_SUPABASE_KEY, Authorization: 'Bearer ' + S74_SUPABASE_KEY }
+        });
+        if (!res.ok) return;
+        const rows = await res.json();
+        if (!rows || !rows.length) return;
+        const b = rows[0];
+        if (b.id > s74LastPushBroadcastId) {
+          s74LastPushBroadcastId = b.id;
+          localStorage.setItem('s74_last_push_id', String(b.id));
+
+          // 사용자가 알림 허용을 한 상태라면 네이티브 푸시 알림 배너 팝업!
+          if ('Notification' in window && Notification.permission === 'granted') {
+            const title = b.product_name || '📢 [우리아파트 제휴마트] 파격 세일 알림!';
+            const body = b.description || '오늘의 세일 전단지가 도착했습니다. 터치하여 확인하세요!';
+            if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+              navigator.serviceWorker.ready.then(reg => {
+                reg.showNotification(title, {
+                  body: body,
+                  icon: 'https://mart-platform.vercel.app/icon-192.png',
+                  badge: 'https://mart-platform.vercel.app/icon-192.png',
+                  vibrate: [200, 100, 200],
+                  data: { url: location.href }
+                });
+              });
+            } else {
+              new Notification(title, {
+                body: body,
+                icon: 'https://mart-platform.vercel.app/icon-192.png'
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Check push broadcasts error:', e);
+      }
+    }
+
+    // 5초 주기로 신규 웹푸시 확인
+    setInterval(s74CheckWebPushBroadcasts, 5000);
+    setTimeout(s74CheckWebPushBroadcasts, 1000);
+
     s74CheckSubscribed();
   </script>
 </div>
