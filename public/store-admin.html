@@ -5176,45 +5176,7 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-async // EUC-KR 바이트 계산 (CRLF 2바이트 포함 통신사 단문 SMS 규격)
-function getEucKrBytes(str) {
-  var normalized = (str || '').replace(/\r\n/g, '\n').replace(/\n/g, '\r\n');
-  var b = 0;
-  for (var i = 0; i < normalized.length; i++) {
-    b += (normalized.charCodeAt(i) > 127) ? 2 : 1;
-  }
-  return b;
-}
-
-function updateSmsByteCount(ta) {
-  var b = getEucKrBytes(ta.value);
-  var badge = document.getElementById('flyerCharCount');
-  if (badge) {
-    if (b <= 90) {
-      badge.style.background = '#dcfce7';
-      badge.style.color = '#166534';
-      badge.textContent = b + ' / 90 Byte (단문 SMS 9원 통과)';
-    } else {
-      badge.style.background = '#fee2e2';
-      badge.style.color = '#991b1b';
-      badge.textContent = b + ' / 90 Byte (⚠️ 90Byte 초과 - LMS 위험)';
-    }
-  }
-}
-
-function applySmsExample(idx) {
-  var ta = document.getElementById('flyerTextMsg');
-  if (!ta) return;
-  var examples = {
-    1: "(광고)에너젠 삼겹살990원\n전단 wooriapt.app/1\n문의:062-952-4150\n무료거부:0808700720",
-    2: "(광고)파머스 주말대세일\n전단 wooriapt.app/1\n문의:062-952-4150\n무료거부:0808700720",
-    3: "(광고)파머스마트 삼겹특가\n전단 wooriapt.app/1\n문의:062-952-4150\n무료거부:0808700720"
-  };
-  ta.value = examples[idx] || '';
-  updateSmsByteCount(ta);
-}
-
-function sendDirectTestSms() {
+async function sendDirectTestSms() {
   var phoneInput = document.getElementById('testDirectPhone');
   var statusBox = document.getElementById('testDirectStatusBox');
   var sendBtn = document.getElementById('btnTestDirectSend');
