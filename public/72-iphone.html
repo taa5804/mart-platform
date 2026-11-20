@@ -10,9 +10,9 @@
 <link rel="dns-prefetch" href="https://www.gstatic.com">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="에너젠마트">
+<meta name="apple-mobile-web-app-title" content="안심주차">
 
-<title>에너젠마트 자동차 QR iPhone 등록</title>
+<title id="pageTitle">자동차 안심주차 QR 등록</title>
 
 <link rel="apple-touch-icon" href="/mart-logo.png">
 
@@ -47,7 +47,7 @@ button:disabled{background:#cbd5e1;color:#64748b;cursor:not-allowed}
 <body>
 
 <section id="registerCard" class="card active">
-  <div style="font-size:13px;color:#16a34a;font-weight:800;margin-bottom:6px;">에너젠마트 안심주차 서비스</div>
+  <div style="font-size:13px;color:#16a34a;font-weight:800;margin-bottom:6px;">우리아파트 안심주차 서비스</div>
   <h1>자동차 QR 등록 (iPhone)</h1>
 
   <p>
@@ -104,7 +104,7 @@ button:disabled{background:#cbd5e1;color:#64748b;cursor:not-allowed}
   <h1>자동차 QR 등록 완료</h1>
 
   <p style="font-size:16px;color:#0f172a;font-weight:700;">
-    에너젠마트 자동차 QR 등록이<br>
+    자동차 안심주차 QR 등록이<br>
     성공적으로 완료되었습니다!
   </p>
 
@@ -361,6 +361,17 @@ pushBtn.addEventListener("click", async function () {
   }
 
   showCard(registerCard);
+
+// Dynamic store branding patch
+try {
+  const urlStore = (params.get("store") || "").trim();
+  if (urlStore) {
+    document.title = urlStore + " 자동차 안심주차 QR 등록";
+    const brandEl = document.querySelector("#registerCard > div:first-child");
+    if (brandEl) brandEl.textContent = urlStore + " 안심주차 서비스";
+  }
+} catch(e) {}
+
 })();
 </script>
 </body>
