@@ -1,3 +1,43 @@
+
+async function s74ShowNativePush(title, body, targetUrl) {
+  if (!('Notification' in window)) return false;
+
+  let perm = Notification.permission;
+  if (perm !== 'granted' && perm !== 'denied') {
+    try { perm = await Notification.requestPermission(); } catch(e){}
+  }
+
+  if (perm !== 'granted') return false;
+
+  if ('serviceWorker' in navigator) {
+    try {
+      let reg = await navigator.serviceWorker.getRegistration();
+      if (!reg) {
+        reg = await navigator.serviceWorker.register('/sw.js');
+      }
+      await navigator.serviceWorker.ready;
+      await reg.showNotification(title, {
+        body: body,
+        icon: 'https://mart-platform.vercel.app/icon-192.png',
+        badge: 'https://mart-platform.vercel.app/icon-192.png',
+        vibrate: [300, 150, 300],
+        tag: 'mart-sale-' + Date.now(),
+        renotify: true,
+        data: { url: targetUrl || location.href }
+      });
+      return true;
+    } catch(swErr) {
+      console.warn('SW notification error:', swErr);
+    }
+  }
+
+  try {
+    new Notification(title, { body: body, icon: 'https://mart-platform.vercel.app/icon-192.png' });
+    return true;
+  } catch(e) {}
+  return false;
+}
+
 <link rel="preconnect" href="https://dcysjuxyjqtvkihdsjvv.supabase.co" crossorigin>
 <link rel="dns-prefetch" href="https://dcysjuxyjqtvkihdsjvv.supabase.co">
 <script>
@@ -2373,27 +2413,12 @@
           // 1. 화면 내 상단 실시간 플로팅 알림 배너 표시
           s74ShowPushFloatingBanner(b);
 
-          // 2. 사용자가 알림 허용을 한 상태라면 OS 시스템 푸시 알림 배너 팝업!
-          if ('Notification' in window && Notification.permission === 'granted') {
-            const title = b.product_name || '📢 [우리아파트 제휴마트] 파격 세일 알림!';
-            const body = b.description || '오늘의 세일 전단지가 도착했습니다. 터치하여 확인하세요!';
-            if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
-              navigator.serviceWorker.ready.then(reg => {
-                reg.showNotification(title, {
-                  body: body,
-                  icon: 'https://mart-platform.vercel.app/icon-192.png',
-                  badge: 'https://mart-platform.vercel.app/icon-192.png',
-                  vibrate: [200, 100, 200],
-                  data: { url: location.href }
-                });
-              });
-            } else {
-              new Notification(title, {
-                body: body,
-                icon: 'https://mart-platform.vercel.app/icon-192.png'
-              });
-            }
-          }
+          // 2. OS 시스템 네이티브 푸시 알림 배너 팝업!
+          await s74ShowNativePush(
+            b.product_name || '📢 [우리아파트 제휴마트] 파격 세일 알림!',
+            b.description || '오늘의 세일 전단지가 도착했습니다. 터치하여 확인하세요!',
+            location.href
+          );
         }
       } catch (e) {
         console.warn('Check push broadcasts error:', e);
