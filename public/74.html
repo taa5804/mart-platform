@@ -1482,6 +1482,10 @@
       return Number.isFinite(n)?n:0;
     }
 
+    function s74Num(value){
+      return s74PriceNumber(value);
+    }
+
     function s74Won(value){
       return Number(value||0).toLocaleString('ko-KR')+'원';
     }
@@ -1504,12 +1508,26 @@
     function s74Show(type,button){
       document.querySelectorAll('#store74App .section').forEach(el=>el.classList.remove('active'));
       document.querySelectorAll('#store74App .tab-btn').forEach(el=>el.classList.remove('active'));
-      document.getElementById('s74-'+type).classList.add('active');
-      if(button)button.classList.add('active');
+      const sec = document.getElementById('s74-'+type);
+      if (sec) sec.classList.add('active');
+      const b = button || document.querySelector(`.tab-btn[onclick*="${type}"]`);
+      if (b) b.classList.add('active');
+    }
+
+    function s74ShowSection(type){
+      s74Show(type);
     }
 
     function s74FindProduct(type,id){
-      return s74Products[type].find(p=>p.id===id);
+      if (type && s74Products[type]) {
+        const found = s74Products[type].find(p=>String(p.id)===String(id));
+        if (found) return found;
+      }
+      for (const k of ['today', 'sale', 'group', 'general']) {
+        const found = (s74Products[k] || []).find(p=>String(p.id)===String(id));
+        if (found) return found;
+      }
+      return null;
     }
 
     function s74ChangeQty(type,id,delta){
@@ -1530,23 +1548,29 @@
 
     function s74GetSpecText(p) {
       if (p.desc && p.desc.trim()) return p.desc.trim();
+      if (p.spec && p.spec.trim()) return p.spec.trim();
       return '규격없음';
     }
 
     function s74GetPriceText(p) {
-      if (p.category === 'group' && p.group_price) return p.group_price;
-      if (p.price) return p.price;
+      const type = p.type || p.category || 'today';
+      if (type === 'group' && (p.group || p.group_price)) return s74Won(s74PriceNumber(p.group || p.group_price));
+      if (p.price) {
+        const n = s74PriceNumber(p.price);
+        return n > 0 ? s74Won(n) : p.price;
+      }
       return '가격문의';
     }
 
     function s74ProductCard(p) {
-      const type = p.category || 'today';
+      const type = p.type || p.category || 'today';
       const spec = s74GetSpecText(p);
       const priceText = s74GetPriceText(p);
-      const existing = s74Cart.find(it => it.category === type && it.id === p.id);
+      const existing = s74Cart.find(it => (it.category === type || it.type === type) && String(it.id) === String(p.id));
       const isChecked = existing && existing.qty > 0;
       const qtyLabel = isChecked ? '<b>' + existing.qty + '개</b>' : '수량';
-      const imgUrl = (p.image_url && p.image_url.trim()) ? p.image_url : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&q=80';
+      const rawImg = p.img || p.image_url;
+      const imgUrl = (rawImg && rawImg.trim()) ? rawImg : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&q=80';
       const badge = p.discount ? '<span class="s74-discount-badge">' + p.discount + '%</span>' : '';
 
       return `
@@ -1560,8 +1584,8 @@
             <div class="s74-spec">${s74Esc(spec)}</div>
             <div class="s74-name" title="${s74Esc(p.name)}">${s74Esc(p.name)}</div>
           </div>
-          <div class="s74-qty-bar${isChecked ? ' checked' : ''}" id="s74qtybar-${type}-${p.id}" onclick="s74OpenQtyModal('${type}',${p.id})">
-            <input type="checkbox" id="s74chk-${type}-${p.id}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); s74ToggleCheck('${type}',${p.id})">
+          <div class="s74-qty-bar${isChecked ? ' checked' : ''}" id="s74qtybar-${type}-${p.id}" onclick="s74OpenQtyModal('${type}','${p.id}')">
+            <input type="checkbox" id="s74chk-${type}-${p.id}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); s74ToggleCheck('${type}','${p.id}')">
             <span id="s74lbl-${type}-${p.id}">${qtyLabel}</span>
           </div>
         </article>`;
@@ -1583,8 +1607,8 @@
       const titleEl = document.getElementById('s74QtyModalTitle');
       if (titleEl) titleEl.textContent = p.name + ' - 수량 선택';
 
-      const existing = s74Cart.find(it => it.category === type && it.id === id);
-      const currentQty = existing ? existing.qty : 1;
+      const existing = s74Cart.find(it => (it.category === type || it.type === type) && String(it.id) === String(id));
+      const currentQty = existing ? Number(existing.qty) : 1;
 
       let listHtml = '';
       for (let i = 1; i <= 15; i++) {
@@ -1611,32 +1635,36 @@
     function s74SelectQty(qty) {
       if (!s74ActiveQtyProd) return;
       const { type, id, product: p } = s74ActiveQtyProd;
-      const priceText = type === 'group' ? p.group_price : p.price;
-      const unitPrice = s74Num(priceText);
+      const priceText = (type === 'group') ? (p.group || p.group_price || p.price) : p.price;
+      const unitPrice = s74PriceNumber(priceText);
+      const chosenQty = Number(qty) || 1;
 
-      const existing = s74Cart.find(it => it.category === type && it.id === id);
+      const existing = s74Cart.find(it => (it.category === type || it.type === type) && String(it.id) === String(id));
       if (existing) {
-        existing.qty = qty;
+        existing.qty = chosenQty;
+        existing.unitPrice = unitPrice;
       } else {
         s74Cart.push({
           category: type,
+          type: type,
           id: id,
           name: p.name,
-          qty: qty,
+          qty: chosenQty,
           unitPrice: unitPrice,
           unitPriceText: priceText || '',
-          image_url: p.image_url || ''
+          img: p.img || p.image_url || '',
+          image_url: p.img || p.image_url || ''
         });
       }
 
-      s74UpdateCardState(type, id, qty);
+      s74UpdateCardState(type, id, chosenQty);
       s74UpdateStickyBar();
       s74CloseQtyModal();
       try { s74RenderCart(); } catch(e){}
     }
 
     function s74ToggleCheck(type, id) {
-      const existingIdx = s74Cart.findIndex(it => it.category === type && it.id === id);
+      const existingIdx = s74Cart.findIndex(it => (it.category === type || it.type === type) && String(it.id) === String(id));
       if (existingIdx >= 0) {
         s74Cart.splice(existingIdx, 1);
         s74UpdateCardState(type, id, 0);
@@ -1820,6 +1848,8 @@
             name:r.product_name||'상품명 없음',
             price:r.price||'',
             desc:r.description||'',
+            img:r.image_url||'',
+            image_url:r.image_url||'',
             qty:1
           }));
 
@@ -1837,29 +1867,32 @@
       const p=s74FindProduct(type,id);
       if(!p)return;
 
-      const priceText=type==='group'?p.group:p.price;
+      const priceText=type==='group'?(p.group||p.group_price):p.price;
       const price=s74PriceNumber(priceText);
-      const existing=s74Cart.find(item=>item.type===type&&item.id===id);
+      const existing=s74Cart.find(item=>(item.category===type||item.type===type)&&String(item.id)===String(id));
 
       if(existing){
         existing.qty+=p.qty;
       }else{
         s74Cart.push({
           type,
+          category:type,
           id,
           name:p.name,
           qty:p.qty,
           unitPrice:price,
-          img:p.img||''
+          img:p.img||p.image_url||''
         });
       }
 
+      s74UpdateCardState(type, id, existing ? existing.qty : p.qty);
+      s74UpdateStickyBar();
       s74RenderCart();
       alert(`${p.name} ${p.qty}개를 장바구니에 담았습니다.`);
     }
 
     function s74CartTotal(){
-      return s74Cart.reduce((sum,item)=>sum+(item.unitPrice*item.qty),0);
+      return s74Cart.reduce((sum,item)=>sum+(s74PriceNumber(item.unitPrice)*(Number(item.qty)||1)),0);
     }
 
     function s74RenderShipping(total){
@@ -1902,12 +1935,12 @@
 
       const rows=s74Cart.map((item,index)=>{
         const lineTotal=item.unitPrice*item.qty;
-        const image=item.img
-          ? `<img class="cart-thumb" src="${s74Esc(item.img)}" alt="${s74Esc(item.name)}">`
+        const image=(item.img||item.image_url)
+          ? `<img class="cart-thumb" src="${s74Esc(item.img||item.image_url)}" alt="${s74Esc(item.name)}">`
           : '';
 
         return `
-          <div class="cart-row ${item.img?'':'no-image'}">
+          <div class="cart-row ${(item.img||item.image_url)?'':'no-image'}">
             ${image}
             <div>
               <div class="cart-name">${s74Esc(item.name)}</div>
@@ -1931,20 +1964,34 @@
     function s74CartMinus(index){
       const item=s74Cart[index];
       if(!item)return;
-      if(item.qty>1)item.qty--;
-      else s74Cart.splice(index,1);
+      const cat = item.category || item.type;
+      const id = item.id;
+      if(item.qty>1){
+        item.qty--;
+        s74UpdateCardState(cat, id, item.qty);
+      } else {
+        s74Cart.splice(index,1);
+        s74UpdateCardState(cat, id, 0);
+      }
+      s74UpdateStickyBar();
       s74RenderCart();
     }
 
     function s74CartPlus(index){
       if(!s74Cart[index])return;
       s74Cart[index].qty++;
+      s74UpdateCardState(s74Cart[index].category || s74Cart[index].type, s74Cart[index].id, s74Cart[index].qty);
+      s74UpdateStickyBar();
       s74RenderCart();
     }
 
     function s74CartRemove(index){
       if(!s74Cart[index])return;
+      const cat = s74Cart[index].category || s74Cart[index].type;
+      const id = s74Cart[index].id;
       s74Cart.splice(index,1);
+      s74UpdateCardState(cat, id, 0);
+      s74UpdateStickyBar();
       s74RenderCart();
     }
 
