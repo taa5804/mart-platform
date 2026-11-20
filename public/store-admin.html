@@ -638,18 +638,19 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
             <!-- 2. 행사 알림 문구 -->
     <div class="sa-box" style="border:2px solid #16a34a;background:#f8fafc;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-        <b style="color:#1f7a3a;font-size:16px;">2. 세일 알림 문구 입력 (45자 이내)</b>
+        <b style="color:#1f7a3a;font-size:16px;">2. 세일 알림 문구 입력 (1,000자 이내)</b>
+        <span id="flyerCharCount" style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;">0 / 1,000자</span>
       </div>
       <div class="sa-help" style="color:#15803d;font-weight:700;margin-top:6px;">
-        ✨ 세일 알림 문구를 <b>45자 이내</b>로 입력해 주세요. (45자 초과 시 시스템에서 자동으로 입력이 제한됩니다)
+        ✨ 행사 품목 안내를 <b>1,000자 이내</b>로 입력하시면 발송 시 하단에 <b>[전단지 사진 &amp; 모바일 전단 상세 링크]</b>가 자동으로 첨부됩니다.
       </div>
       <div style="margin-top:8px;">
-        <textarea id="flyerTextMsg" maxlength="45" rows="4" style="width:100%;min-height:115px;height:115px;font-size:15px;line-height:1.65;padding:12px;border:1.5px solid #86efac;border-radius:10px;background:#fff;resize:none;box-sizing:border-box;" oninput="if(this.value.length>45){this.value=this.value.slice(0,45);}document.getElementById('flyerCharCount').textContent=this.value.length + ' / 45자';" placeholder="예: (광고)에너젠 삼겹특가
-문의:062-952-4150
-무료거부:0808700720"></textarea>
-        <div style="display:flex;justify-content:flex-end;margin-top:4px;">
-          <span id="flyerCharCount" style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;">0 / 45자</span>
-        </div>
+        <textarea id="flyerTextMsg" maxlength="1000" rows="8" style="width:100%;min-height:180px;height:180px;font-size:15px;line-height:1.65;padding:12px;border:1.5px solid #86efac;border-radius:10px;background:#fff;resize:vertical;box-sizing:border-box;" oninput="document.getElementById('flyerCharCount').textContent=this.value.length.toLocaleString() + ' / 1,000자';" placeholder="예: [파머스마트 주간 파격세일]
+■ 삼겹살(100g) : 1,980원
+■ 판란(30구/대란) : 4,980원
+■ 감귤(3kg/박스) : 9,900원
+
+※ 사진 전단지와 전체 세일 품목은 아래 링크에서 확인하세요!"></textarea>
       </div>
       <div id="autoAttachUrlBox" style="margin-top:8px;padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12.5px;color:#1e40af;font-weight:700;">
         🔗 발송 시 하단 자동 첨부 URL:<br>
@@ -5192,7 +5193,7 @@ async function sendDirectTestSms() {
     return;
   }
 
-  // 1. 세일 문구 45자 이내 검증
+  // 1. 세일 문구 1,000자 이내 검증
   var storeName = (document.getElementById('storeName')?.value || '').trim() || '에너젠마트';
   var msgText = (document.getElementById('flyerTextMsg')?.value || '').trim();
   if (!msgText) {
@@ -5200,8 +5201,8 @@ async function sendDirectTestSms() {
     document.getElementById('flyerTextMsg')?.focus();
     return;
   }
-  if (msgText.length > 45) {
-    alert('⚠️ 세일 알림 문구는 45자 이내로만 입력 가능합니다. (현재 ' + msgText.length + '자)');
+  if (msgText.length > 1000) {
+    alert('⚠️ 세일 알림 문구는 1,000자 이내로만 입력 가능합니다. (현재 ' + msgText.length + '자)');
     document.getElementById('flyerTextMsg')?.focus();
     return;
   }
@@ -5219,7 +5220,7 @@ async function sendDirectTestSms() {
     statusBox.style.background = '#fef3c7';
     statusBox.style.color = '#92400e';
     statusBox.style.border = '1.5px solid #fde68a';
-    statusBox.innerHTML = '<strong>⏳ [전송 진행 중]</strong> ' + rawPhone + ' 번호로 실제 통신사 단문(SMS 9원) 문자를 발송하고 있습니다. 잠시만 기다려 주세요...';
+    statusBox.innerHTML = '<strong>⏳ [전송 진행 중]</strong> ' + rawPhone + ' 번호로 실제 통신사 세일 알림 문자를 발송하고 있습니다. 잠시만 기다려 주세요...';
   }
 
   try {
@@ -5232,7 +5233,7 @@ async function sendDirectTestSms() {
       body: JSON.stringify({
         phone: cleanPhone,
         content: fullContent,
-        type: 'SMS',
+        type: fullContent.length > 45 ? 'LMS' : 'SMS',
         subject: subject
       })
     });
@@ -5287,8 +5288,8 @@ async function sendSaleAlert15() {
     document.getElementById('flyerTextMsg')?.focus();
     return;
   }
-  if (msgText.length > 45) {
-    alert('⚠️ 세일 알림 문구는 45자 이내로만 입력 가능합니다. (현재 ' + msgText.length + '자)');
+  if (msgText.length > 1000) {
+    alert('⚠️ 세일 알림 문구는 1,000자 이내로만 입력 가능합니다. (현재 ' + msgText.length + '자)');
     document.getElementById('flyerTextMsg')?.focus();
     return;
   }
@@ -5344,7 +5345,7 @@ async function sendSaleAlert15() {
             body: JSON.stringify({
               phone: cust.phone,
               content: fullContent,
-              type: 'SMS',
+              type: fullContent.length > 45 ? 'LMS' : 'SMS',
               subject: subject
             })
           });
