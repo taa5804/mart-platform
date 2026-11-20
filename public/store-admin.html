@@ -675,13 +675,40 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
       <b style="color:#1f7a3a;font-size:16px;">3. 실시간 자동 누적 단골 고객 DB &amp; 순번 구간 지정 발송</b>
       <div class="sa-help">매장 QR 및 <b>[자동차 안심주차 QR]</b>을 통해 손님들이 <b>[알림 허용]</b>을 누를 때마다 실시간으로 자동 누적되는 고객 명단입니다. 사장님이 따로 엑셀을 등록하실 필요가 없으며, <b>누적된 명단에서 원하는 구간만 선택하여 발송</b>하시면 됩니다.</div>
       
-      <!-- 실시간 DB 누적수 표시 바 -->
-      <div style="margin-top:12px;padding:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-        <div>
-          <span style="font-weight:800;color:#166534;font-size:15px;" id="excelCountText">📊 실시간 자동 누적 단골 DB: 1,250 명</span>
-          <div style="font-size:12px;color:#64748b;" id="excelFileNameText">매장 및 자동차 안심주차 QR로 실시간 자동 누적 완료 (010 정상 번호 · 중복 자동 제거)</div>
+      <!-- 실시간 DB 누적수 표시 바 & 푸시 자동 전환 현황 -->
+      <div style="margin-top:12px;padding:14px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <div>
+            <span style="font-weight:900;color:#166534;font-size:16px;" id="excelCountText">📊 실시간 자동 누적 단골 DB: 1,250 명</span>
+            <div style="font-size:12px;color:#64748b;margin-top:3px;" id="excelFileNameText">매장 포스(POS) 고객 + 자동차 안심주차 QR 실시간 자동 누적 (010 번호 전용)</div>
+          </div>
+          <span style="background:#dcfce7;color:#166534;padding:5px 12px;border-radius:6px;font-size:13px;font-weight:800;">초도 무료 100건 지원</span>
         </div>
-        <span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:800;">초도 100건 무료 지원</span>
+
+        <!-- 2대 경로 푸시 전환 팩트 현황 박스 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+          <div style="background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:10px 12px;">
+            <div style="font-size:11.5px;color:#15803d;font-weight:700;">⚡ 100% 무료 푸시 전환 완료 (발송비 0원)</div>
+            <div style="font-size:18px;font-weight:900;color:#166534;margin-top:2px;">
+              <span id="pushConvertedCount">420</span> 명
+              <span style="font-size:11.5px;font-weight:normal;color:#15803d;">(통신비 0원 즉시 발송)</span>
+            </div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px;">• 안심주차 QR 등록자 + 링크 알림 허용 단골</div>
+          </div>
+          <div style="background:#fff;border:1px solid #fed7aa;border-radius:8px;padding:10px 12px;">
+            <div style="font-size:11.5px;color:#c2410c;font-weight:700;">📱 문자(LMS) 발송 대상 (푸시 전환 대기)</div>
+            <div style="font-size:18px;font-weight:900;color:#9a3412;margin-top:2px;">
+              <span id="smsPendingCount">830</span> 명
+              <span style="font-size:11.5px;font-weight:normal;color:#ea580c;">(전단지 링크 자동 포함)</span>
+            </div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px;">• 링크 열람 후 [알림 허용] 시 무료 푸시로 즉시 전환</div>
+          </div>
+        </div>
+
+        <!-- 핵심 운영 안내 배너 -->
+        <div style="margin-top:10px;padding:9px 12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:6px;font-size:12px;color:#334155;line-height:1.5;">
+          💡 <strong>[사장님 문자 비용 0원 전환 원리]</strong> 기존 포스(POS) 고객에게 문자를 보내면, 고객이 전단지 링크를 열고 <strong>[알림 허용]</strong>을 누르는 순간 <strong>'100% 무료 웹 푸시(0원)' 고객으로 자동 전환</strong>됩니다. 매주 세일을 보낼수록 마트 문자 비용은 0원으로 급감합니다!
+        </div>
       </div>
 
       <!-- [특급 기능] 순번 구간 지정 발송 & 기준일자(방문일/등록일) 실시간 팩트체크 -->
