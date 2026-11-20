@@ -282,48 +282,95 @@ button:disabled{
 
   <div class="card">
 
-    <h2>1. 마트 기본정보 (30초 간편 등록)</h2>
-    <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; margin-bottom:16px; font-size:13px; color:#1e40af; line-height:1.55;">
-      💡 <strong>사업자등록증 사본과 이메일은 지금 입력하실 필요가 없습니다!</strong><br>
-      지금은 아래 기본 정보만 입력하시면 <strong>즉시 마트 전용 플랫폼과 관리자 방이 개통(무료 1,000건 지급)</strong>되며, 사업자등록증과 이메일은 추후 유료 충전 후 <strong>[세금계산서 발행 신청 시]</strong>에만 입력하시면 됩니다.
+    <h2>1. 마트 기본정보</h2>
+
+    <div class="field">
+      <label>마트명 <span class="req">*</span></label>
+      <input id="martName" type="text" placeholder="마트명을 입력해 주세요">
     </div>
 
     <div class="field">
-      <label>마트 상호명 <span class="req">*</span></label>
-      <input id="martName" type="text" placeholder="예: 한마음식자재마트" oninput="checkForm()">
+      <label>대표자명 <span class="req">*</span></label>
+      <input id="ownerName" type="text" placeholder="대표자명을 입력해 주세요">
     </div>
 
     <div class="field">
-      <label>대표자 성함 <span class="req">*</span></label>
-      <input id="ownerName" type="text" placeholder="예: 홍길동" oninput="checkForm()">
+      <label>사업자등록번호 <span class="req">*</span></label>
+      <input id="businessNo" type="text" placeholder="사업자등록번호를 입력해 주세요">
     </div>
 
     <div class="field">
-      <label>마트 주소 (시·구·동) <span class="req">*</span></label>
-      <input id="address" type="text" placeholder="예: 광주광역시 광산구 도천동" oninput="checkForm()">
+      <label>마트 주소 <span class="req">*</span></label>
+      <input id="address" type="text" placeholder="마트 주소를 입력해 주세요">
     </div>
 
     <div class="field">
-      <label>사장님 휴대전화번호 <span class="req">*</span></label>
-      <input id="phone" type="tel" placeholder="01012345678 (숫자만 입력)" oninput="checkForm()">
+      <label>담당자명 <span class="req">*</span></label>
+      <input id="managerName" type="text" placeholder="담당자명을 입력해 주세요">
+    </div>
+
+    <div class="field">
+      <label>휴대전화번호 <span class="req">*</span></label>
+      <input id="phone" type="tel" placeholder="01012345678">
       <div class="guide">
-        휴대전화번호 뒤 4자리가 매장관리자 초기 비밀번호로 자동 설정됩니다.
+        휴대전화번호는 로그인 ID로 사용됩니다.
       </div>
     </div>
 
-    <div class="field" style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:10px; padding:12px; margin-top:12px;">
-      <label style="color:#166534; font-weight:800;">추천코드 <span style="font-size:12.5px; font-weight:700; color:#15803d;">(선택사항)</span></label>
-      <input id="partnerCode" type="text" maxlength="12" placeholder="추천코드가 있는 경우에만 입력해 주세요 (없으면 비워두세요)" style="font-weight:800; font-size:15px; color:#0e6556; letter-spacing:1px;">
+    <div class="field">
+      <label>비밀번호 <span class="req">*</span></label>
+      <input id="password" type="password" minlength="6" placeholder="비밀번호를 입력해 주세요 (최소 6자리 이상)">
+      <div class="guide">비밀번호는 최소 6자리 이상 입력해야 합니다.</div>
+    </div>
+
+        <div class="field" style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:10px; padding:12px; margin-top:12px;">
+      <label style="color:#166534; font-weight:800;">추천 영업 파트너 코드 (4자리) <span style="font-size:12px; font-weight:normal; color:#15803d;">(※ 현장 전담 파트너 코드 입력 시 15원 특판가 적용)</span></label>
+      <input id="partnerCode" type="text" maxlength="4" placeholder="예: 5089, 1996 (없을 경우 4150 입력)" style="font-weight:800; font-size:16px; color:#0e6556; letter-spacing:2px;">
       <div class="guide" style="color:#166534;">
-        ※ 협회(한국마트협회·수퍼마켓조합) 또는 영업 담당자로부터 부여받은 <b>추천코드</b>가 있는 경우에만 입력해 주세요.<br>
-        ※ <b>추천코드가 없는 일반 매장께서는 비워두셔도 동일하게 첫 1,000건 무료 및 건당 15원 최저가로 즉시 개통</b>됩니다.
+        공인 파트너 코드를 입력하시면 본사 전담 매니저 배정 및 건당 15원 상생 특별 요율이 평생 적용됩니다.
+      </div>
+    </div>
+
+    <div class="field">
+      <label>이메일 <span class="req">*</span></label>
+      <input id="email" type="email" placeholder="example@email.com">
+      <div class="guide">
+        비밀번호 찾기 및 인증번호 발송에 사용됩니다.
       </div>
     </div>
 
   </div>
 
+
   <div class="card">
-    <h2>2. 마트 제휴 계약서 확인 및 온라인 동의</h2>
+  <h2>
+    2. 필수서류 첨부 (사업자등록증)
+  </h2>
+
+  <div class="notice">
+    원활한 가맹점 승인 및 매장 확인을 위해 사업자등록증 사본 1부를 업로드해 주세요.
+  </div>
+
+  <br>
+
+  <div class="upload-box">
+    <div class="upload-title">
+      사업자등록증 사본 <span class="req">*</span>
+    </div>
+    <div class="upload-guide">
+      현재 운영 중인 마트의 사업자등록증(사진 또는 PDF)을 업로드해 주세요.
+    </div>
+    <input
+      id="businessFile"
+      type="file"
+      accept=".pdf,.jpg,.jpeg,.png"
+      onchange="checkForm()"
+    >
+  </div>
+</div>
+
+  <div class="card">
+    <h2>3. 마트 제휴 계약서 확인 및 온라인 동의</h2>
     <p class="guide" style="margin-bottom:10px;">
       아래 제휴 계약서 내용을 확인하신 후 하단에서 동의 여부를 선택해 주세요.
     </p>
@@ -345,7 +392,7 @@ button:disabled{
 
       <h4 style="margin:14px 0 6px; font-size:14px; color:#15803d;">제3조 (공인 영업 파트너 배정 및 현장 지원) 🛡️</h4>
       1. 본 건당 15원 전국 최저가 요율은 본사 공인 영업 파트너가 전담 매니저로 배정되어 "갑"의 매장 시스템 세팅, 세일 전단지 디지털화, 단골 DB 관리를 지원하는 조건으로 제공되는 파트너십 전용 요율이다.<br>
-      2. "갑"의 사업자등록번호를 기준으로 최초 방문 등록한 영업 파트너에게 <b>발송 건당 5원의 관리 수당이 평생 불가역적으로 귀속</b>되며, 본사 직영 전환 또는 타인 명의 변경을 이유로 영업인의 수수료 권리를 침해할 수 없다.
+      2. "갑"의 사업자등록번호를 기준으로 최초 방문 등록한 영업 파트너에게 <b>발송 건당 2원의 관리 수당이 평생 불가역적으로 귀속</b>되며, 본사 직영 전환 또는 타인 명의 변경을 이유로 영업인의 수수료 권리를 침해할 수 없다.
 
       <h4 style="margin:14px 0 6px; font-size:14px; color:#b91c1c;">제4조 (차명 및 특수관계인 우회 파트너 등록 금지) ⚠️</h4>
       "갑"은 본인 매장의 문자 발송 수수료를 자가 수취하거나 단가를 추가 인하할 목적으로 <b>본인, 배우자, 직계존비속, 4촌 이내 친인척, 매장 임직원 명의를 도용·차용</b>하여 파트너로 위장 등록하거나 자가 추천(Self-Referral)할 수 없다. "을"은 전산 로그, 정산 계좌, 접속 IP 및 사업자 DB 교차 검증을 통해 차명 등록을 상시 감독한다.
@@ -430,216 +477,47 @@ button:disabled{
   </div>
 
   <div class="card">
-    <h2>3. 최종 가맹 등록 및 무료 1,000건 즉시 개통</h2>
+    <h2>4. 최종 가입 신청</h2>
     <button
       id="submitBtn"
       type="button"
       disabled
       onclick="submitSignup()"
-      style="height:54px; font-size:17px; font-weight:900; background:#16a34a;"
+      style="height:52px; font-size:17px; font-weight:800;"
     >
-      🚀 무료 1,000건 받고 내 마트 플랫폼 즉시 열기
+      온라인 제휴 계약 체결 및 무료 가입 신청
     </button>
     <div id="msg" class="msg"></div>
+  </div> 및 계좌 안내</h2>
+
+    <label class="agree">
+      <input
+        id="agree"
+        type="checkbox"
+        onchange="checkForm()"
+      >
+      <span>
+        서비스 이용약관 및 개인정보 수집·이용에 동의합니다.
+      </span>
+    </label>
+
+    <button
+      id="submitBtn"
+      type="button"
+      disabled
+      onclick="submitSignup()"
+    >
+      가입 신청
+    </button>
+
+    <div id="msg" class="msg"></div>
+
   </div>
 
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = "https://dcysjuxyjqtvkihdsjvv.supabase.co";
-const SUPABASE_KEY = "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
-
-const requiredTextFields = ["martName", "ownerName", "address", "phone"];
-
-// Signature Canvas Handling
-let sigCanvas, sigCtx, isDrawing = false, hasSigned = false;
-
-function initSignature() {
-  sigCanvas = document.getElementById('sigCanvas');
-  if (!sigCanvas) return;
-  sigCtx = sigCanvas.getContext('2d');
-  sigCtx.lineWidth = 2.5;
-  sigCtx.lineCap = 'round';
-  sigCtx.strokeStyle = '#0f172a';
-
-  function getPos(e) {
-    const rect = sigCanvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return {
-      x: (clientX - rect.left) * (sigCanvas.width / rect.width),
-      y: (clientY - rect.top) * (sigCanvas.height / rect.height)
-    };
-  }
-
-  function startDraw(e) {
-    e.preventDefault();
-    isDrawing = true;
-    const pos = getPos(e);
-    sigCtx.beginPath();
-    sigCtx.moveTo(pos.x, pos.y);
-  }
-
-  function draw(e) {
-    if (!isDrawing) return;
-    e.preventDefault();
-    const pos = getPos(e);
-    sigCtx.lineTo(pos.x, pos.y);
-    sigCtx.stroke();
-    hasSigned = true;
-    document.getElementById('signatureData').value = sigCanvas.toDataURL();
-    checkForm();
-  }
-
-  function endDraw() {
-    isDrawing = false;
-  }
-
-  sigCanvas.addEventListener('mousedown', startDraw);
-  sigCanvas.addEventListener('mousemove', draw);
-  window.addEventListener('mouseup', endDraw);
-  sigCanvas.addEventListener('touchstart', startDraw, { passive: false });
-  sigCanvas.addEventListener('touchmove', draw, { passive: false });
-  window.addEventListener('touchend', endDraw);
-}
-
-function clearSignature() {
-  if (!sigCanvas || !sigCtx) return;
-  sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
-  hasSigned = false;
-  document.getElementById('signatureData').value = '';
-  checkForm();
-}
-
-window.addEventListener('DOMContentLoaded', initSignature);
-
-function checkForm() {
-  const textOK = requiredTextFields.every(function(id) {
-    const el = document.getElementById(id);
-    return el && el.value.trim() !== "";
-  });
-  const agreeEl = document.getElementById("agreeYes");
-  const agree = agreeEl ? agreeEl.checked : false;
-  document.getElementById("submitBtn").disabled = !(textOK && agree);
-}
-
-// PC 바탕화면 바로가기 아이콘(.url) 2개 동시 자동 생성 함수
-function downloadDesktopShortcuts(storeCode, martName) {
-  const origin = window.location.origin || "https://mart-platform.vercel.app";
-  const adminUrl = origin + "/store-admin.html?store=" + encodeURIComponent(storeCode);
-  const storeUrl = origin + "/mart-store.html?store=" + encodeURIComponent(storeCode);
-
-  const files = [
-    { name: `[마트관리자]_${martName}.url`, url: adminUrl },
-    { name: `[마트매장화면]_${martName}.url`, url: storeUrl }
-  ];
-
-  files.forEach(function(item, idx) {
-    setTimeout(function() {
-      const content = "[InternetShortcut]\r\nURL=" + item.url + "\r\nIconIndex=0\r\n";
-      const blob = new Blob([content], { type: "application/octet-stream" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = item.name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }, idx * 450);
-  });
-}
-
-async function submitSignup() {
-  const msg = document.getElementById("msg");
-  const submitBtn = document.getElementById("submitBtn");
-
-  const martName = document.getElementById("martName").value.trim();
-  const ownerName = document.getElementById("ownerName").value.trim();
-  const address = document.getElementById("address").value.trim();
-  const phone = document.getElementById("phone").value.replace(/\D/g, "");
-  const partnerCode = (document.getElementById("partnerCode")?.value || "").trim().toUpperCase();
-
-  if (phone.length < 10) {
-    msg.style.color = "#d93025";
-    msg.textContent = "올바른 휴대전화번호(010)를 입력해 주세요.";
-    return;
-  }
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = "내 마트 전용 플랫폼 개통 중...";
-
-  // 마트 고유코드 생성 (예: M + 전화번호 뒤 4자리)
-  const last4 = phone.slice(-4) || "0001";
-  const storeCode = "M" + last4;
-
-  // 유입 경로 판별 (협회 KMA / 조합 KOSA / 영업인 코드 / 자율가입 DIRECT)
-  let channelType = "DIRECT";
-  if (partnerCode === "KMA" || partnerCode === "1004") channelType = "KMA_협회(3원)";
-  else if (partnerCode === "KOSA" || partnerCode === "2004") channelType = "KOSA_조합(3원)";
-  else if (partnerCode.length > 0 && partnerCode !== "4150") channelType = "PARTNER_" + partnerCode + "(5원)";
-
-  // 1) 로컬스토리지 및 무료 1,000건(16,500원) 초기 캐시 세팅
-  try {
-    localStorage.setItem("mart_store_id", storeCode);
-    localStorage.setItem("mart_cash_" + storeCode, "16500"); // 1,000건 무료 체험 (16.5원 × 1,000건 = 16,500원)
-    const customMarts = JSON.parse(localStorage.getItem("customRegisteredMarts") || "{}");
-    customMarts[storeCode] = {
-      id: storeCode,
-      name: martName,
-      ceo: ownerName,
-      phone: phone,
-      address: address,
-      pw: last4,
-      partnerCode: partnerCode || "DIRECT",
-      channelType: channelType,
-      freeTrialGranted: true,
-      createdAt: new Date().toISOString()
-    };
-    localStorage.setItem("customRegisteredMarts", JSON.stringify(customMarts));
-  } catch (e) {}
-
-  // 2) Supabase store_info에 신규 마트 즉시 등록
-  try {
-    const metaJson = JSON.stringify({
-      owner_name: ownerName,
-      partner_code: partnerCode || "DIRECT",
-      channel_type: channelType,
-      free_trial_cash: 16500,
-      pw: last4
-    });
-    await fetch(`${SUPABASE_URL}/rest/v1/store_info`, {
-      method: "POST",
-      headers: {
-        apikey: SUPABASE_KEY,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal"
-      },
-      body: JSON.stringify({
-        store_id: storeCode,
-        store_name: martName,
-        phone: phone,
-        address: address,
-        ceo_name: ownerName,
-        hours: metaJson
-      })
-    });
-  } catch (e) {}
-
-  // 3) PC 바탕화면 바로가기 파일 2개([마트관리자], [마트매장화면]) 자동 다운로드 트리거
-  downloadDesktopShortcuts(storeCode, martName);
-
-  // 4) 홍보용 메인화면 대신, 상단에 [⚙️ 마트관리자]가 있는 해당 마트 전용 플랫폼 화면으로 즉시 이동!
-  alert(
-    "🎉 [" + martName + "] 가맹 등록 및 무료 1,000건(16,500원) 지급 완료!\n\n" +
-    "• 마트 전용코드: " + storeCode + "\n" +
-    "• 관리자 초기 비밀번호: " + last4 + " (휴대폰 뒤 4자리)\n" +
-    "• PC 바탕화면용 [마트관리자] & [마트매장화면] 바로가기 파일 2개가 다운로드되었습니다.\n\n" +
-    "이제 사장님의 [마트 전용 플랫폼] 화면이 바로 열립니다. 화면 맨 위의 [⚙️ 마트관리자] 버튼을 눌러 고객 엑셀과 세일 상품을 등록해 보세요!"
-  );
-
-  window.location.href = "/mart-store.html?store=" + encodeURIComponent(storeCode) + "&new=1";
-}
-</script>
 
 <script>
 
