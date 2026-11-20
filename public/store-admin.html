@@ -687,59 +687,138 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
 
 
 
-        <!-- 3. 실시간 웹푸시 단골 구독 현황 & 세일 전단 즉시 발송 -->
-    <div class="sa-box" style="border:2px solid #1f7a3a;background:#fff;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-        <b style="color:#1f7a3a;font-size:16px;">3. 단골 웹푸시 알림 구독 현황 &amp; 세일 전단 즉시 발송</b>
-        <span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:800;">발송비 0원 (평생 무료)</span>
-      </div>
+        <!-- 3. 발송 대상 고객 엑셀 DB 올리기 & 순번 구간 지정 발송 기능 -->
+    <div class="sa-box" style="border:2px solid #1f7a3a;">
+      <b style="color:#1f7a3a;font-size:16px;">3. 발송 대상 고객 엑셀 DB 등록 &amp; 순번 구간 지정 발송</b>
+      <div class="sa-help">포스(POS)에서 다운받은 고객 엑셀(.xlsx, .xls, .csv)을 올려주세요. <b>2차·3차 계속 올리셔도 중복 번호는 자동 제거되고 신규 고객·최신 방문일만 자동 누적 반영</b>됩니다.</div>
       
-      <div class="sa-help" style="color:#15803d;font-weight:700;margin-top:6px;line-height:1.6;">
-        ✨ 손님들이 매장 QR이나 <b>[자동차 안심주차 QR]</b>을 스마트폰 카메라로 비추고 <b>[알림 허용]</b>을 누르면 <b>실시간으로 자동 누적 등록</b>됩니다.<br>
-        <span style="color:#166534;font-weight:normal;font-size:12.5px;">• 복잡한 포스 엑셀 파일을 올리실 필요가 없습니다. (고객 전화번호·개인정보 미보관으로 유출 위험 0%)</span>
+
+      
+      <!-- 추출 결과 및 인원 표시 바 -->
+      <div style="margin-top:12px;padding:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <div>
+          <span style="font-weight:800;color:#166534;font-size:15px;" id="excelCountText">📊 현재 누적된 전체 고객 DB: 0 명</span>
+          <div style="font-size:12px;color:#64748b;" id="excelFileNameText">매장 및 자동차 안심주차 QR로 실시간 자동 누적된 단골 고객 DB입니다. (자동 중복제거·누적저장)</div>
+        </div>
+        <span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:6px;font-size:12.5px;font-weight:800;">건당 16.5원 (VAT포함)</span>
       </div>
 
-      <!-- 실시간 웹푸시 구독 현황 카드 -->
-      <div style="margin-top:12px;padding:16px;background:#f0fdf4;border:2px solid #86efac;border-radius:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <!-- [특급 기능] 순번 구간 지정 발송 & 기준일자(방문일/등록일) 실시간 팩트체크 -->
+      <div style="margin-top:14px;padding:15px;background:#fff;border:2px solid #16a34a;border-radius:12px;box-shadow:0 4px 12px rgba(22,163,74,0.08);">
+        
+        <!-- 원터치 정렬 큰 버튼 2개 -->
+        <div style="margin-bottom:14px;">
+          <b style="color:#15803d;font-size:15px;display:block;margin-bottom:8px;">📅 마트 사장님 원터치 순번 정렬 버튼:</b>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <button type="button" id="btnSortVisit" class="sa-btn" style="margin:0;padding:12px 8px;background:#15803d;color:#fff;font-size:14px;border:2px solid #166534;border-radius:8px;" onclick="setSortMode('visit')">
+              ⚡ 최근 방문일자순 정렬
+            </button>
+            <button type="button" id="btnSortReg" class="sa-btn" style="margin:0;padding:12px 8px;background:#f8fafc;color:#334155;font-size:14px;border:1.5px solid #cbd5e1;border-radius:8px;" onclick="setSortMode('reg')">
+              📋 가입 등록일자순 정렬
+            </button>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:6px;">
+            <span id="currentSortBadge" style="font-size:12px;font-weight:800;color:#15803d;background:#dcfce7;padding:3px 8px;border-radius:4px;">현재 정렬: 최근 방문일자순</span>
+            <button type="button" id="btnSortDormant" style="border:0;background:none;color:#dc2626;font-size:12px;font-weight:bold;cursor:pointer;text-decoration:underline;" onclick="setSortMode('dormant')">
+              🔄 장기 미방문(이탈 단골) 고객순으로 뒤집기
+            </button>
+          </div>
+        </div>
+
+        <!-- 구간 입력창 -->
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+          <b style="color:#0f172a;font-size:14.5px;" id="rangeTitleText">🎯 발송 구간 입력 (등록 고객 중 자유 선택)</b>
+          <div style="font-size:12px;color:#475569;">
+            <label style="cursor:pointer;margin-right:10px;"><input type="radio" name="sendRangeType" value="all" onchange="toggleSendRange(this.value)"> 전체 발송</label>
+            <label style="cursor:pointer;font-weight:bold;color:#16a34a;"><input type="radio" name="sendRangeType" value="range" checked onchange="toggleSendRange(this.value)"> 📌 순번 지정</label>
+          </div>
+        </div>
+        
+        <div id="rangeInputBox" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid #cbd5e1;">
+          <span style="font-size:14px;font-weight:bold;color:#1e293b;">시작 순번:</span>
+          <input type="number" id="rangeStart" value="1" min="1" max="1" style="width:90px;height:40px;padding:6px;border:2px solid #16a34a;border-radius:6px;font-weight:bold;font-size:15px;text-align:center;" oninput="updateRangeTargetCount()">
+          <span style="font-size:14px;font-weight:bold;color:#1e293b;">번 부터 &nbsp;~&nbsp; 종료 순번:</span>
+          <input type="number" id="rangeEnd" value="0" min="1" max="1" style="width:95px;height:40px;padding:6px;border:2px solid #16a34a;border-radius:6px;font-weight:bold;font-size:15px;text-align:center;" oninput="updateRangeTargetCount()">
+          <span style="font-size:14px;font-weight:bold;color:#1e293b;">번 까지</span>
+          <button type="button" class="sa-btn" style="width:auto;margin:0 0 0 auto;padding:8px 16px;background:#15803d;font-size:13.5px;" onclick="updateRangeTargetCount()">구간 적용</button>
+        </div>
+
+        <!-- [대표님 제안 핵심] 마트 사장이 보고 결정하는 마지막 고객 날짜 검증 카드 -->
+        <div id="customerDateCheckCard" style="margin-top:12px;padding:14px;background:#f0fdf4;border:1.5px solid #22c55e;border-radius:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+            <b style="color:#15803d;font-size:14px;">🔍 발송 전 [마지막 <span id="dispEndNo">0</span>번째 고객] 날짜 검증 팩트체크</b>
+            <span style="font-size:12px;background:#dcfce7;color:#166534;font-weight:bold;padding:2px 8px;border-radius:4px;">사장님 최종 확인용</span>
+          </div>
+
+          <div style="margin-top:10px;background:#fff;border:1px solid #bbf7d0;border-radius:8px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="border-right:1px solid #e2e8f0;padding-right:8px;">
+              <div style="font-size:12px;color:#64748b;margin-bottom:3px;"><span id="cardStartNo">1</span>번째 고객 기준일</div>
+              <div style="font-size:14px;font-weight:800;color:#0284c7;">최근방문: <span id="firstVisitDate">-</span></div>
+              <div style="font-size:12.5px;color:#475569;margin-top:2px;">최초등록: <span id="firstRegDate">-</span></div>
+            </div>
+            <div style="padding-left:4px;">
+              <div style="font-size:12px;color:#dc2626;font-weight:bold;margin-bottom:3px;">👉 마지막 <span id="cardEndNo">0</span>번째 고객 기준일</div>
+              <div style="font-size:14px;font-weight:900;color:#dc2626;">최근방문: <span id="lastVisitDate">-</span></div>
+              <div style="font-size:12.5px;color:#475569;margin-top:2px;">최초등록: <span id="lastRegDate">-</span></div>
+            </div>
+          </div>
+
+          <div style="margin-top:9px;font-size:13px;color:#166534;font-weight:bold;" id="rangeSummaryGuide">
+            💡 위에서 포스(POS) 고객 엑셀 파일을 올리시면 실제 고객별 방문일·등록일 기준으로 자동 정렬됩니다.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- [핵심 기능 1] 엑셀 파일 즉시 영구 삭제 파기 컨트롤 박스 -->
+      <div style="margin-top:14px;padding:14px;background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
           <div>
-            <div style="font-size:12px;color:#166534;font-weight:700;margin-bottom:3px;">📡 실시간 등록된 웹푸시 단골 고객</div>
-            <div style="font-size:22px;font-weight:900;color:#15803d;">
-              <span id="pushSubscriberCount">1,250</span> <span style="font-size:15px;font-weight:700;">명 (스마트폰 알림 구독 완료)</span>
-            </div>
-            <div style="font-size:12px;color:#64748b;margin-top:4px;">
-              • 매장 계산대·카트 QR 등록: <b>780명</b> &nbsp;|&nbsp; 자동차 안심주차 QR 등록: <b>470명</b>
-            </div>
+            <div style="font-weight:900;color:#991b1b;font-size:14px;">🔒 개인정보보호 고객 DB 즉시 영구 삭제</div>
+            <div style="font-size:12px;color:#7f1d1d;margin-top:2px;">발송 완료 후 또는 가입 취소 시 서버에서 엑셀 DB를 즉시 영구 파기합니다.</div>
           </div>
-          <div style="text-align:right;">
-            <div style="font-size:12px;color:#64748b;margin-bottom:2px;">1회 발송 비용</div>
-            <div style="font-size:20px;font-weight:900;color:#16a34a;">0 원 <span style="font-size:12px;color:#15803d;font-weight:bold;">(무료)</span></div>
-            <div style="font-size:11px;color:#15803d;background:#dcfce7;padding:2px 8px;border-radius:4px;display:inline-block;margin-top:2px;">Google Web Push 망</div>
-          </div>
+          <button type="button" class="sa-btn" style="width:auto;padding:8px 14px;background:#dc2626;margin-top:0;font-size:12.5px;" onclick="deleteCustomerExcelDb()">
+            🗑️ 엑셀 DB 영구 삭제
+          </button>
         </div>
-      </div>
-
-      <!-- 발송 안내 및 보안 안심 카드 -->
-      <div style="margin-top:12px;padding:12px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-        <div style="font-size:12.5px;color:#334155;">
-          🔒 <b>100% 합법 사전동의 (Opt-in)</b>: 손님이 직접 [알림 허용]을 누른 스마트폰에만 안전하게 전단지가 전달됩니다.
-        </div>
-        <span style="font-size:11.5px;color:#0284c7;background:#e0f2fe;padding:2px 8px;border-radius:4px;font-weight:700;">통신법 스팸 과태료 걱정 0%</span>
       </div>
     </div>
 
-    <!-- 발송 실행 및 진행 박스 -->
-    <div class="sa-box" style="text-align:center;background:#f0fdf4;border:2px solid #16a34a;">
-      <div style="font-size:14.5px;color:#166534;font-weight:800;margin-bottom:8px;">
-        📢 발송 대상: <strong>등록 단골 전체 (1,250명)</strong> &nbsp;|&nbsp; 발송 비용: <strong style="color:#15803d;font-size:18px;">0원 (무료)</strong>
+    <!-- 발송 실행 및 잔액 부족 검증 버튼 -->
+
+    <div class="sa-box" style="text-align:center;">
+
+      <div style="font-size:14px;color:#475569;margin-bottom:8px;">
+
+        예상 발송 비용: <strong id="calcCostText" style="color:#b45309;font-size:17px;">0원</strong>
+
       </div>
-      <button type="button" id="btnBulkSend15" class="sa-btn" style="background:#15803d;padding:16px;font-size:17px;font-weight:900;border-radius:10px;box-shadow:0 4px 14px rgba(21,128,61,0.3);width:100%;max-width:500px;margin:0 auto;" onclick="sendWebPushBroadcast()">
-        🚀 등록된 전체 단골에게 세일 전단 즉시 발송 (발송비 0원)
+
+      <button type="button" id="btnBulkSend15" class="sa-btn" style="background:#15803d;padding:14px;font-size:16px;font-weight:900;" onclick="sendSaleAlert15()">
+
+        🚀 고객 엑셀 등록 후 15원 세일 알림 즉시 발송
+
       </button>
-      <div id="bulkSendProgressBox" style="display:none;margin-top:12px;padding:14px;border-radius:8px;font-size:13.5px;font-weight:700;text-align:left;line-height:1.6;"></div>
+
+      <div id="bulkSendProgressBox" style="display:none;margin-top:12px;padding:12px;border-radius:8px;font-size:13px;font-weight:700;text-align:left;line-height:1.6;"></div>
+
     </div>
 
   </div>
+
+
+
+  <!-- ==============================================
+
+       [2] 자동차 안심주차 QR 주문 섹션
+
+  ============================================== -->
+
+  <div id="
+
+  </div>
+
+  
 
   
 
