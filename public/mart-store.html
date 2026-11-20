@@ -2436,17 +2436,11 @@ function showSectionById(id) {
 
 
 function getProduct(type, id) {
-
-  if (type === 'today') return todayProducts.find(p => p.id === id);
-
-  if (type === 'sale') return saleProducts.find(p => p.id === id);
-
-  if (type === 'group') return groupProducts.find(p => p.id === id);
-
-  if (type === 'general') return generalProducts.find(p => p.id === id);
-
+  if (type === 'today') return todayProducts.find(p => String(p.id) === String(id));
+  if (type === 'sale') return saleProducts.find(p => String(p.id) === String(id));
+  if (type === 'group') return groupProducts.find(p => String(p.id) === String(id));
+  if (type === 'general') return generalProducts.find(p => String(p.id) === String(id));
   return null;
-
 }
 
 
@@ -2530,7 +2524,7 @@ function openQtyModal(type, id) {
   const nameEl = document.getElementById('qtyModalProdName');
   if (nameEl) nameEl.textContent = p.name + ' - 수량 선택';
 
-  const existing = cartItems.find(item => item.type === type && item.id === id);
+  const existing = cartItems.find(item => item.type === type && String(item.id) === String(id));
   const currentQty = existing ? existing.qty : 1;
 
   let listHtml = '';
@@ -2559,12 +2553,13 @@ function selectCol3Qty(qty) {
   if (!activeQtyProduct) return;
   const { type, id, product: p } = activeQtyProduct;
 
-  const unitPriceText = type === 'group' ? p.group : p.price;
+  const unitPriceText = type === 'group' ? (p.group || p.price) : p.price;
   const unitPrice = priceToNumber(unitPriceText);
 
-  const existing = cartItems.find(item => item.type === type && item.id === id);
+  const existing = cartItems.find(item => item.type === type && String(item.id) === String(id));
   if (existing) {
     existing.qty = qty;
+    existing.unitPrice = unitPrice;
   } else {
     cartItems.push({
       type: type,
@@ -2587,7 +2582,7 @@ function selectCol3Qty(qty) {
 function toggleCol3Check(type, id) {
   const p = getProduct(type, id);
   if (!p) return;
-  const existingIdx = cartItems.findIndex(item => item.type === type && item.id === id);
+  const existingIdx = cartItems.findIndex(item => item.type === type && String(item.id) === String(id));
 
   if (existingIdx >= 0) {
     // Uncheck and remove
