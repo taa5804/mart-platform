@@ -638,17 +638,35 @@ html, body { margin: 0; padding: 0; background: #f7f7f7; width: 100%; min-height
             <!-- 2. 행사 알림 문구 -->
     <div class="sa-box" style="border:2px solid #16a34a;background:#f8fafc;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-        <b style="color:#1f7a3a;font-size:16px;">2. 세일 알림 문구 입력 (45자 이내 · 단문 SMS 규격)</b>
-        <span id="flyerCharCount" style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;">0 / 45자</span>
+        <b style="color:#1f7a3a;font-size:16px;">2. 세일 알림 문구 입력 (단문 SMS 90Byte 규격 · 필수항목 포함)</b>
+        <span id="flyerCharCount" style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;">0 / 90 Byte (단문 SMS 9원 규격)</span>
       </div>
-      <div class="sa-help" style="color:#15803d;font-weight:700;margin-top:6px;">
-        ✨ 단문(SMS) 9원 규격 준수를 위해 세일 문구는 <b>45자 이내로 엄격히 제한</b>됩니다. (발송 시 하단에 <b>[전단지 사진 &amp; 모바일 전단 상세 링크]</b>가 자동 첨부되어 45자 초과 없이 15원으로 발송됩니다)
+      <div class="sa-help" style="color:#15803d;font-weight:700;margin-top:6px;line-height:1.5;">
+        ✨ 단문(SMS 9원) 규격 준수를 위해 <b>[ (광고) + 마트명 + 세일품목 + 전단링크 + 문의처 + 무료수신거부 ]</b> 필수 5개 항목이 모두 포함된 <b>90바이트 이하</b>로 작성하셔야 15원(부가세포함 16.5원)으로 발송됩니다. (아래 예시 버튼을 누르면 규격에 맞게 자동 입력됩니다)
       </div>
-      <textarea id="flyerTextMsg" maxlength="45" rows="4" style="min-height:110px;height:110px;font-size:15px;line-height:1.65;padding:14px;border:1.5px solid #86efac;border-radius:10px;background:#fff;resize:none;" oninput="if(this.value.length>45){this.value=this.value.slice(0,45);}document.getElementById('flyerCharCount').textContent=this.value.length.toLocaleString() + ' / 45자'" placeholder="예: 주말 삼겹살 990원 / 신선 영양란 1판 4,980원 파격특가!
-(45자 이내로 핵심 품목을 입력하세요 - 45자 초과 시 입력이 제한됩니다)"></textarea>
-      <div id="autoAttachUrlBox" style="margin-top:8px;padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12.5px;color:#1e40af;font-weight:700;">
-        🔗 발송 시 하단 자동 첨부 URL (전단지 파일 미선택 시 마트 플랫폼 직통 연결):<br>
-        <span id="autoAttachUrlText" style="color:#1d4ed8;text-decoration:underline;word-break:break-all;">https://mart-platform.vercel.app/mart-store.html?store=store01</span>
+
+      <!-- 실전 표준 예시 원클릭 버튼 -->
+      <div style="display:flex;gap:8px;margin-top:8px;margin-bottom:8px;flex-wrap:wrap;">
+        <button type="button" onclick="applySmsExample(1)" style="background:#eff6ff;border:1.5px solid #93c5fd;color:#1d4ed8;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">
+          ⚡ [예시 1] 삼겹살 특가 (85B)
+        </button>
+        <button type="button" onclick="applySmsExample(2)" style="background:#eff6ff;border:1.5px solid #93c5fd;color:#1d4ed8;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">
+          ⚡ [예시 2] 주말 대세일 (84B)
+        </button>
+        <button type="button" onclick="applySmsExample(3)" style="background:#eff6ff;border:1.5px solid #93c5fd;color:#1d4ed8;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">
+          ⚡ [예시 3] 파머스 삼겹특가 (86B)
+        </button>
+      </div>
+
+      <textarea id="flyerTextMsg" rows="5" style="min-height:130px;height:130px;font-size:14.5px;line-height:1.6;padding:12px;border:1.5px solid #86efac;border-radius:10px;background:#fff;resize:none;font-family:monospace;" oninput="updateSmsByteCount(this)" placeholder="예시)
+(광고)에너젠 삼겹살990원
+전단 wooriapt.app/1
+문의:062-952-4150
+무료거부:0808700720"></textarea>
+
+      <div id="autoAttachUrlBox" style="margin-top:8px;padding:8px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;color:#1e40af;font-weight:700;display:flex;justify-content:space-between;align-items:center;">
+        <span>🔗 모바일 전단 단축 URL: <span id="autoAttachUrlText" style="color:#1d4ed8;text-decoration:underline;">wooriapt.app/1</span></span>
+        <span style="font-size:11px;color:#2563eb;background:#dbeafe;padding:2px 8px;border-radius:4px;">KISA 정보통신망법 필수 5개 항목 완벽 준수</span>
       </div>
     </div>
 
@@ -5171,7 +5189,45 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-async function sendDirectTestSms() {
+async // EUC-KR 바이트 계산 (CRLF 2바이트 포함 통신사 단문 SMS 규격)
+function getEucKrBytes(str) {
+  var normalized = (str || '').replace(/\r\n/g, '\n').replace(/\n/g, '\r\n');
+  var b = 0;
+  for (var i = 0; i < normalized.length; i++) {
+    b += (normalized.charCodeAt(i) > 127) ? 2 : 1;
+  }
+  return b;
+}
+
+function updateSmsByteCount(ta) {
+  var b = getEucKrBytes(ta.value);
+  var badge = document.getElementById('flyerCharCount');
+  if (badge) {
+    if (b <= 90) {
+      badge.style.background = '#dcfce7';
+      badge.style.color = '#166534';
+      badge.textContent = b + ' / 90 Byte (단문 SMS 9원 통과)';
+    } else {
+      badge.style.background = '#fee2e2';
+      badge.style.color = '#991b1b';
+      badge.textContent = b + ' / 90 Byte (⚠️ 90Byte 초과 - LMS 위험)';
+    }
+  }
+}
+
+function applySmsExample(idx) {
+  var ta = document.getElementById('flyerTextMsg');
+  if (!ta) return;
+  var examples = {
+    1: "(광고)에너젠 삼겹살990원\n전단 wooriapt.app/1\n문의:062-952-4150\n무료거부:0808700720",
+    2: "(광고)파머스 주말대세일\n전단 wooriapt.app/1\n문의:062-952-4150\n무료거부:0808700720",
+    3: "(광고)파머스마트 삼겹특가\n전단 wooriapt.app/1\n문의:062-952-4150\n무료거부:0808700720"
+  };
+  ta.value = examples[idx] || '';
+  updateSmsByteCount(ta);
+}
+
+function sendDirectTestSms() {
   var phoneInput = document.getElementById('testDirectPhone');
   var statusBox = document.getElementById('testDirectStatusBox');
   var sendBtn = document.getElementById('btnTestDirectSend');
@@ -5187,30 +5243,28 @@ async function sendDirectTestSms() {
     return;
   }
 
-  // 1. 세일 문구 및 매장 링크 추출
+  // 1. 세일 문구 추출 및 단문(SMS 90Byte) 검증
   var storeName = (document.getElementById('storeName')?.value || '').trim() || '에너젠마트';
   var msgText = (document.getElementById('flyerTextMsg')?.value || '').trim();
-  if (msgText.length > 45) {
-    alert('⚠️ 세일 알림 문구는 단문(SMS) 규격인 45자 이내로만 입력 가능합니다. (현재 ' + msgText.length + '자)');
+  if (!msgText) {
+    alert('위 2번에 세일 알림 문구를 입력하시거나 [예시 버튼]을 눌러주세요.');
     document.getElementById('flyerTextMsg')?.focus();
     return;
   }
-  if (!msgText) {
-    if (!confirm('위 2번 [세일 알림 문구]가 비어 있습니다.\n기본 안내 문구로 테스트 발송을 진행하시겠습니까?')) {
-      document.getElementById('flyerTextMsg')?.focus();
-      return;
-    }
-    msgText = '에너젠마트 테스트';
+
+  var fullContent = msgText;
+  if (!fullContent.startsWith('(광고)')) {
+    fullContent = '(광고)' + storeName + ' ' + msgText + '\n전단 wooriapt.app/1\n문의:062-952-4150\n무료거부:0808700720';
   }
 
-  var storeUrl = (document.getElementById('autoAttachUrlText')?.textContent || '').trim();
-  if (!storeUrl) {
-    storeUrl = 'https://mart-platform.vercel.app/mart-store.html?store=store01';
+  var byteLen = getEucKrBytes(fullContent);
+  if (byteLen > 90) {
+    alert('⚠️ 세일 알림 문구가 단문(SMS) 규격인 90Byte를 초과했습니다. (현재 ' + byteLen + ' Byte)\n\n단문 9원(판매가 15원) 규격을 준수하기 위해 문구를 줄여주세요.');
+    document.getElementById('flyerTextMsg')?.focus();
+    return;
   }
 
-  // 2. LMS 완성 본문 생성 (우리아파트 안심거래 표준 규격)
   var subject = '[' + storeName + '] 행사 알림';
-  var fullContent = '[' + storeName + '] 행사 알림\n\n' + msgText + '\n\n▶ 모바일 전단 및 행사 상품 확인:\n' + storeUrl + '\n\n무료수신거부: 080-870-0720';
 
   // 3. UI 발송 진행 상태 표시
   sendBtn.disabled = true;
@@ -5223,7 +5277,7 @@ async function sendDirectTestSms() {
     statusBox.style.background = '#fef3c7';
     statusBox.style.color = '#92400e';
     statusBox.style.border = '1.5px solid #fde68a';
-    statusBox.innerHTML = '<strong>⏳ [전송 진행 중]</strong> ' + rawPhone + ' 번호로 실제 통신사 LMS 문자를 발송하고 있습니다. 잠시만 기다려 주세요...';
+    statusBox.innerHTML = '<strong>⏳ [전송 진행 중]</strong> ' + rawPhone + ' 번호로 실제 통신사 단문(SMS 9원) 문자를 발송하고 있습니다. 잠시만 기다려 주세요...';
   }
 
   try {
@@ -5236,7 +5290,7 @@ async function sendDirectTestSms() {
       body: JSON.stringify({
         phone: cleanPhone,
         content: fullContent,
-        type: 'LMS',
+        type: 'SMS',
         subject: subject
       })
     });
@@ -5286,13 +5340,20 @@ async function sendSaleAlert15() {
 
   var storeName = (document.getElementById('storeName')?.value || '').trim() || '우리아파트 제휴마트';
   var msgText = (document.getElementById('flyerTextMsg')?.value || '').trim();
-  if (msgText.length > 45) {
-    alert('⚠️ 세일 알림 문구는 단문(SMS) 규격인 45자 이내로만 입력 가능합니다. (현재 ' + msgText.length + '자)');
+  if (!msgText) {
+    alert('위 2번 [세일 알림 문구]를 먼저 입력하거나 [예시 버튼]을 눌러주세요.');
     document.getElementById('flyerTextMsg')?.focus();
     return;
   }
-  if (!msgText) {
-    alert('위 2번 [세일 알림 문구]를 먼저 입력해 주세요.');
+
+  var fullContent = msgText;
+  if (!fullContent.startsWith('(광고)')) {
+    fullContent = '(광고)' + storeName + ' ' + msgText + '\n전단 wooriapt.app/1\n문의:062-952-4150\n무료거부:0808700720';
+  }
+
+  var byteLen = getEucKrBytes(fullContent);
+  if (byteLen > 90) {
+    alert('⚠️ 세일 알림 문구가 단문(SMS) 규격인 90Byte를 초과했습니다. (현재 ' + byteLen + ' Byte)\n\n단문 9원(판매가 15원) 규격을 준수하기 위해 문구를 줄여주세요.');
     document.getElementById('flyerTextMsg')?.focus();
     return;
   }
@@ -5316,10 +5377,7 @@ async function sendSaleAlert15() {
     '지금 즉시 실제 발송을 시작하시겠습니까?'
   )) return;
 
-  var storeUrl = (document.getElementById('autoAttachUrlText')?.textContent || '').trim() || ('https://mart-platform.vercel.app/mart-store.html?store=' + encodeURIComponent(getActiveStoreCode()));
-  // 표준 특수문자만 사용 (4바이트 이모지 제외)
   var subject = '[' + storeName + '] 행사 알림';
-  var fullContent = '[' + storeName + '] 행사 알림\n\n' + msgText + '\n\n▶ 모바일 전단 및 행사 상품 확인:\n' + storeUrl + '\n\n무료수신거부: 080-870-0720';
 
   var sendBtn = document.getElementById('btnBulkSend15') || document.querySelector('button[onclick="sendSaleAlert15()"]');
   var progressBox = document.getElementById('bulkSendProgressBox');
@@ -5350,7 +5408,7 @@ async function sendSaleAlert15() {
             body: JSON.stringify({
               phone: cust.phone,
               content: fullContent,
-              type: 'LMS',
+              type: 'SMS',
               subject: subject
             })
           });
