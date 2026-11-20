@@ -2338,6 +2338,25 @@
 
     // 웹푸시 브로드캐스트 실시간 감지 및 푸시 팝업 표시
     let s74LastPushBroadcastId = parseInt(localStorage.getItem('s74_last_push_id') || '0', 10);
+    
+    function s74ShowPushFloatingBanner(b) {
+      try {
+        var existing = document.getElementById('s74PushBannerAlert');
+        if (existing) existing.remove();
+        var box = document.createElement('div');
+        box.id = 's74PushBannerAlert';
+        box.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);width:92%;max-width:440px;background:linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);color:#ffffff;padding:14px 18px;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.35);z-index:999999;display:flex;align-items:flex-start;gap:12px;border:1.5px solid #60a5fa;';
+        box.innerHTML = '<span style="font-size:24px;line-height:1;">📢</span>' +
+          '<div style="flex:1;">' +
+          '<div style="font-size:14.5px;font-weight:800;color:#fde047;margin-bottom:4px;">' + (b.product_name || '실시간 세일 알림!') + '</div>' +
+          '<div style="font-size:13px;line-height:1.45;color:#f1f5f9;">' + (b.description || '') + '</div>' +
+          '</div>' +
+          '<button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:#94a3b8;font-size:18px;cursor:pointer;padding:0 4px;font-weight:bold;">✕</button>';
+        document.body.appendChild(box);
+        setTimeout(function() { if (box && box.parentElement) box.remove(); }, 12000);
+      } catch(e) { console.warn('Banner error:', e); }
+    }
+
     async function s74CheckWebPushBroadcasts() {
       try {
         const res = await fetch(S74_SUPABASE_URL + '/rest/v1/store_products_live?store_id=eq.' + encodeURIComponent(S74_STORE_ID) + '&category=eq.push_broadcast&order=id.desc&limit=1', {
@@ -2351,7 +2370,10 @@
           s74LastPushBroadcastId = b.id;
           localStorage.setItem('s74_last_push_id', String(b.id));
 
-          // 사용자가 알림 허용을 한 상태라면 네이티브 푸시 알림 배너 팝업!
+          // 1. 화면 내 상단 실시간 플로팅 알림 배너 표시
+          s74ShowPushFloatingBanner(b);
+
+          // 2. 사용자가 알림 허용을 한 상태라면 OS 시스템 푸시 알림 배너 팝업!
           if ('Notification' in window && Notification.permission === 'granted') {
             const title = b.product_name || '📢 [우리아파트 제휴마트] 파격 세일 알림!';
             const body = b.description || '오늘의 세일 전단지가 도착했습니다. 터치하여 확인하세요!';
