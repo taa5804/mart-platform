@@ -982,7 +982,311 @@
       cursor: pointer;
     }
 
-  </style>
+  
+/* ========================================================
+   [74.html 3열 퀵오더 & 수량 선택 모달 & 하단 고정 바]
+   ======================================================== */
+.s74-sticky-red-search {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #d32f2f;
+  padding: 8px 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  margin: 0 -18px 12px;
+}
+.s74-search-bar-wrap {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+}
+.s74-search-bar-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: #1e293b;
+}
+.s74-search-bar-btn {
+  background: #ffffff;
+  color: #d32f2f;
+  border: none;
+  border-left: 1px solid #f1f5f9;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#store74App .product-grid, #store74App .general-list {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  padding-bottom: 75px !important;
+}
+
+#store74App .s74-col3-card {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+  transition: border-color 0.15s, box-shadow 0.15s !important;
+}
+#store74App .s74-col3-card.selected {
+  border-color: #d32f2f !important;
+  box-shadow: 0 2px 8px rgba(211,47,47,0.2) !important;
+}
+
+#store74App .s74-photo-wrap {
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  overflow: hidden !important;
+  background: #f8fafc !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+#store74App .s74-photo-wrap img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+#store74App .s74-discount-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #d32f2f;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 2px 5px;
+  border-bottom-right-radius: 6px;
+  z-index: 2;
+}
+
+#store74App .s74-card-body {
+  padding: 6px 4px 4px !important;
+  text-align: center !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+#store74App .s74-price {
+  color: #d32f2f !important;
+  font-size: 13.5px !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.3px;
+}
+#store74App .s74-spec {
+  color: #64748b !important;
+  font-size: 10.5px !important;
+  margin-top: 1px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+#store74App .s74-name {
+  color: #1e293b !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  margin-top: 2px !important;
+  height: 31px !important;
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  line-height: 1.3 !important;
+  word-break: keep-all !important;
+}
+
+#store74App .s74-qty-bar {
+  border-top: 1px solid #f1f5f9 !important;
+  padding: 6px 4px !important;
+  background: #fafafa !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  font-size: 12px !important;
+  color: #475569 !important;
+  transition: background 0.15s;
+}
+#store74App .s74-qty-bar:active {
+  background: #f1f5f9 !important;
+}
+#store74App .s74-qty-bar.checked {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+  font-weight: 800 !important;
+}
+#store74App .s74-qty-bar input[type="checkbox"] {
+  width: 15px !important;
+  height: 15px !important;
+  cursor: pointer !important;
+  accent-color: #d32f2f !important;
+  margin: 0 !important;
+}
+
+/* 수량 선택 모달 (Image 2 스타일) */
+.s74-qty-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 10005;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.s74-qty-modal-box {
+  background: #ffffff;
+  width: 100%;
+  max-width: 320px;
+  max-height: 75vh;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  animation: s74ModalPop 0.18s ease-out;
+}
+@keyframes s74ModalPop {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.s74-qty-modal-header {
+  padding: 13px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+}
+.s74-qty-modal-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+.s74-qty-modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #64748b;
+  cursor: pointer;
+  line-height: 1;
+}
+.s74-qty-modal-list {
+  overflow-y: auto;
+  padding: 4px 0;
+  flex: 1 1 auto;
+}
+.s74-qty-modal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 20px;
+  border-bottom: 1px solid #f8fafc;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+}
+.s74-qty-modal-item:active {
+  background: #fee2e2;
+}
+.s74-qty-modal-item.active {
+  color: #d32f2f;
+  font-weight: 800;
+  background: #fef2f2;
+}
+.s74-qty-radio-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.s74-qty-modal-item.active .s74-qty-radio-circle {
+  border-color: #d32f2f;
+  background: #d32f2f;
+}
+.s74-qty-modal-item.active .s74-qty-radio-circle::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+/* 하단 고정 주문 바 (Image 1 스타일) */
+.s74-sticky-order-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  background: #d32f2f;
+  color: #ffffff;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+  cursor: pointer;
+  max-width: 1120px;
+  margin: 0 auto;
+  user-select: none;
+}
+.s74-sticky-order-amount {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+}
+.s74-sticky-order-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 800;
+}
+.s74-sticky-order-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  font-size: 11px;
+}
+
+</style>
+
+  
+  <!-- [74.html 3열 퀵오더 상단 레드 검색 헤더 (Image 1 방식)] -->
+  <div class="s74-sticky-red-search">
+    <div class="s74-search-bar-wrap">
+      <input id="s74SearchInput" class="s74-search-bar-input" type="search" placeholder="상품검색" oninput="s74LiveFilterProducts(this.value)">
+      <button type="button" class="s74-search-bar-btn" onclick="s74LiveFilterProducts(document.getElementById('s74SearchInput').value)">상품검색</button>
+    </div>
+  </div>
 
   <div class="store-head">
     <div id="s74StoreName" class="store-name">매장 상품을 불러오는 중입니다.</div>
@@ -1103,6 +1407,26 @@
     </div>
   </section>
 
+  <!-- [74.html 하단 고정 주문 바 (Image 1 방식)] -->
+  <div id="s74StickyOrderBar" class="s74-sticky-order-bar" onclick="s74HandleStickyOrderClick()">
+    <div class="s74-sticky-order-amount">주문금액 <span id="s74StickyOrderAmt">0원</span></div>
+    <div class="s74-sticky-order-btn">
+      <span>주문진행</span>
+      <span class="s74-sticky-order-arrow">▲</span>
+    </div>
+  </div>
+
+  <!-- [74.html 수량 선택 팝업 모달 (Image 2 방식)] -->
+  <div id="s74QtyModal" class="s74-qty-modal-backdrop" style="display:none;" onclick="s74CloseQtyModal(event)">
+    <div class="s74-qty-modal-box" onclick="event.stopPropagation()">
+      <div class="s74-qty-modal-header">
+        <div id="s74QtyModalTitle" class="s74-qty-modal-title">수량 선택</div>
+        <button type="button" class="s74-qty-modal-close" onclick="s74CloseQtyModal()">✕</button>
+      </div>
+      <div id="s74QtyModalList" class="s74-qty-modal-list"></div>
+    </div>
+  </div>
+
   <script>
     const S74_SUPABASE_URL='https://dcysjuxyjqtvkihdsjvv.supabase.co';
     const S74_SUPABASE_KEY='sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2';
@@ -1120,8 +1444,8 @@
         if(cachedInfo){
           const row=JSON.parse(cachedInfo);
           if(row.store_name){
-            document.getElementById('s74StoreName').textContent=row.store_name;
-            document.getElementById('s74OrderStoreName').textContent=row.store_name;
+            document.getElementById('s74StoreName').textContent=s74CleanStoreName(row.store_name);
+            document.getElementById('s74OrderStoreName').textContent=s74CleanStoreName(row.store_name);
             if(row.phone)document.getElementById('s74OrderPhone').textContent='☎ '+row.phone;
             if(row.address)document.getElementById('s74OrderAddress').textContent='📍 '+row.address;
             s74FreeDelivery=Number(row.free_delivery_amount||0);
@@ -1132,7 +1456,7 @@
           const parsed=JSON.parse(cached);
           if(parsed&&(parsed.today?.length||parsed.sale?.length||parsed.group?.length||parsed.general?.length)){
             s74Products=parsed;
-            s74RenderProducts();
+            s74RenderProducts(); if(typeof s74UpdateStickyBar==='function')s74UpdateStickyBar();
             return true;
           }
         }
@@ -1196,92 +1520,183 @@
       if(el)el.textContent=p.qty;
     }
 
-    function s74ProductCard(p){
-      const discount=p.discount>0
-        ? `<span class="discount"><strong>${p.discount}%</strong><span>할인</span></span>`
-        : '';
+    
+    let s74ActiveQtyProd = null;
+
+    function s74CleanStoreName(raw) {
+      if (!raw || raw === '우리아파트 제휴마트' || raw === 'store01') return '우리아파트 제휴마트';
+      return raw;
+    }
+
+    function s74GetSpecText(p) {
+      if (p.desc && p.desc.trim()) return p.desc.trim();
+      return '규격없음';
+    }
+
+    function s74GetPriceText(p) {
+      if (p.category === 'group' && p.group_price) return p.group_price;
+      if (p.price) return p.price;
+      return '가격문의';
+    }
+
+    function s74ProductCard(p) {
+      const type = p.category || 'today';
+      const spec = s74GetSpecText(p);
+      const priceText = s74GetPriceText(p);
+      const existing = s74Cart.find(it => it.category === type && it.id === p.id);
+      const isChecked = existing && existing.qty > 0;
+      const qtyLabel = isChecked ? '<b>' + existing.qty + '개</b>' : '수량';
+      const imgUrl = (p.image_url && p.image_url.trim()) ? p.image_url : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&q=80';
+      const badge = p.discount ? '<span class="s74-discount-badge">' + p.discount + '%</span>' : '';
 
       return `
-        <article class="card">
-          <div class="photo-wrap">
-            ${p.img?`<img src="${s74Esc(p.img)}" alt="${s74Esc(p.name)}">`:''}
-            ${discount}
+        <article class="s74-col3-card${isChecked ? ' selected' : ''}" id="s74card-${type}-${p.id}">
+          <div class="s74-photo-wrap">
+            <img src="${s74Esc(imgUrl)}" alt="${s74Esc(p.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&q=80'">
+            ${badge}
           </div>
-          <div class="card-body">
-            <div class="product-name">${s74Esc(p.name)}</div>
-            <div class="product-desc">${s74Esc(p.desc||'')}</div>
-            <div class="price">${s74Esc(p.price||'')}</div>
-            <div class="actions">
-              <div class="qty">
-                <button type="button" onclick="s74ChangeQty('${p.type}',${p.id},-1)">−</button>
-                <span id="s74qty-${p.type}-${p.id}">1</span>
-                <button type="button" onclick="s74ChangeQty('${p.type}',${p.id},1)">＋</button>
-              </div>
-              <button class="cart-btn" type="button" onclick="s74AddCart('${p.type}',${p.id})" aria-label="장바구니 담기">🛒</button>
-            </div>
+          <div class="s74-card-body">
+            <div class="s74-price">${s74Esc(priceText)}</div>
+            <div class="s74-spec">${s74Esc(spec)}</div>
+            <div class="s74-name" title="${s74Esc(p.name)}">${s74Esc(p.name)}</div>
+          </div>
+          <div class="s74-qty-bar${isChecked ? ' checked' : ''}" id="s74qtybar-${type}-${p.id}" onclick="s74OpenQtyModal('${type}',${p.id})">
+            <input type="checkbox" id="s74chk-${type}-${p.id}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); s74ToggleCheck('${type}',${p.id})">
+            <span id="s74lbl-${type}-${p.id}">${qtyLabel}</span>
           </div>
         </article>`;
     }
 
-    function s74GroupCard(p){
-      const discount=p.discount>0
-        ? `<span class="discount"><strong>${p.discount}%</strong><span>할인</span></span>`
-        : '';
-
-      return `
-        <article class="card">
-          <div class="photo-wrap">
-            ${p.img?`<img src="${s74Esc(p.img)}" alt="${s74Esc(p.name)}">`:''}
-            ${discount}
-          </div>
-          <div class="card-body">
-            <div class="product-name">${s74Esc(p.name)}</div>
-            <div class="normal-price">정상가 ${s74Esc(p.normal||'')}</div>
-            <div class="group-price">${s74Esc(p.group||'')}</div>
-            <div class="group-goal"><span id="s74JoinCount${p.id}">${p.join}</span>명 / 목표 ${p.goal}명</div>
-            <div class="actions">
-              <div class="qty">
-                <button type="button" onclick="s74ChangeQty('group',${p.id},-1)">−</button>
-                <span id="s74qty-group-${p.id}">1</span>
-                <button type="button" onclick="s74ChangeQty('group',${p.id},1)">＋</button>
-              </div>
-              <button class="cart-btn" type="button" onclick="s74AddCart('group',${p.id})" aria-label="장바구니 담기">🛒</button>
-            </div>
-
-            <button class="join-btn" type="button" onclick="s74OpenJoin(${p.id})">참여하기</button>
-
-            <div id="s74JoinForm${p.id}" class="join-form">
-              <input id="s74JoinName${p.id}" type="text" placeholder="이름">
-              <input id="s74JoinPhone${p.id}" type="tel" placeholder="전화번호">
-              <select id="s74ReceiveType${p.id}" onchange="s74ToggleJoinAddress(${p.id})">
-                <option value="">방문/배달 선택</option>
-                <option value="방문">방문</option>
-                <option value="배달">배달</option>
-              </select>
-              <textarea id="s74JoinAddress${p.id}" style="display:none" placeholder="배달주소"></textarea>
-              <button class="submit-btn" type="button" onclick="s74CompleteJoin(${p.id})">참여완료</button>
-            </div>
-          </div>
-        </article>`;
+    function s74GeneralRow(p) {
+      return s74ProductCard(p);
     }
 
-    function s74GeneralRow(p){
-      return `
-        <div class="general-row">
-          <div>
-            <div class="general-name">${s74Esc(p.name)}</div>
-            <div class="general-price">${s74Esc(p.price||'')}</div>
-          </div>
+    function s74GroupCard(p) {
+      return s74ProductCard(p);
+    }
 
-          <div class="general-qty">
-            <button type="button" onclick="s74ChangeQty('general',${p.id},-1)">−</button>
-            <b id="s74qty-general-${p.id}">1</b>
-            <button type="button" onclick="s74ChangeQty('general',${p.id},1)">＋</button>
-          </div>
+    function s74OpenQtyModal(type, id) {
+      const p = s74FindProduct(type, id);
+      if (!p) return;
+      s74ActiveQtyProd = { type: type, id: id, product: p };
 
-          <button class="general-cart" type="button" onclick="s74AddCart('general',${p.id})">🛒</button>
+      const titleEl = document.getElementById('s74QtyModalTitle');
+      if (titleEl) titleEl.textContent = p.name + ' - 수량 선택';
+
+      const existing = s74Cart.find(it => it.category === type && it.id === id);
+      const currentQty = existing ? existing.qty : 1;
+
+      let listHtml = '';
+      for (let i = 1; i <= 15; i++) {
+        const isAct = (i === currentQty);
+        listHtml += `<div class="s74-qty-modal-item${isAct ? ' active' : ''}" onclick="s74SelectQty(${i})">
+          <span>${i}개</span>
+          <span class="s74-qty-radio-circle"></span>
         </div>`;
+      }
+      const listEl = document.getElementById('s74QtyModalList');
+      if (listEl) listEl.innerHTML = listHtml;
+
+      const modal = document.getElementById('s74QtyModal');
+      if (modal) modal.style.display = 'flex';
     }
+
+    function s74CloseQtyModal(e) {
+      if (e && e.target && e.target !== e.currentTarget) return;
+      const modal = document.getElementById('s74QtyModal');
+      if (modal) modal.style.display = 'none';
+      s74ActiveQtyProd = null;
+    }
+
+    function s74SelectQty(qty) {
+      if (!s74ActiveQtyProd) return;
+      const { type, id, product: p } = s74ActiveQtyProd;
+      const priceText = type === 'group' ? p.group_price : p.price;
+      const unitPrice = s74Num(priceText);
+
+      const existing = s74Cart.find(it => it.category === type && it.id === id);
+      if (existing) {
+        existing.qty = qty;
+      } else {
+        s74Cart.push({
+          category: type,
+          id: id,
+          name: p.name,
+          qty: qty,
+          unitPrice: unitPrice,
+          unitPriceText: priceText || '',
+          image_url: p.image_url || ''
+        });
+      }
+
+      s74UpdateCardState(type, id, qty);
+      s74UpdateStickyBar();
+      s74CloseQtyModal();
+      try { s74RenderCart(); } catch(e){}
+    }
+
+    function s74ToggleCheck(type, id) {
+      const existingIdx = s74Cart.findIndex(it => it.category === type && it.id === id);
+      if (existingIdx >= 0) {
+        s74Cart.splice(existingIdx, 1);
+        s74UpdateCardState(type, id, 0);
+        s74UpdateStickyBar();
+        try { s74RenderCart(); } catch(e){}
+      } else {
+        s74OpenQtyModal(type, id);
+      }
+    }
+
+    function s74UpdateCardState(type, id, qty) {
+      const card = document.getElementById('s74card-' + type + '-' + id);
+      const chk = document.getElementById('s74chk-' + type + '-' + id);
+      const lbl = document.getElementById('s74lbl-' + type + '-' + id);
+      const bar = document.getElementById('s74qtybar-' + type + '-' + id);
+
+      if (qty > 0) {
+        if (card) card.classList.add('selected');
+        if (chk) chk.checked = true;
+        if (lbl) lbl.innerHTML = '<b>' + qty + '개</b>';
+        if (bar) bar.classList.add('checked');
+      } else {
+        if (card) card.classList.remove('selected');
+        if (chk) chk.checked = false;
+        if (lbl) lbl.textContent = '수량';
+        if (bar) bar.classList.remove('checked');
+      }
+    }
+
+    function s74UpdateStickyBar() {
+      const total = s74CartTotal();
+      const amtEl = document.getElementById('s74StickyOrderAmt');
+      if (amtEl) amtEl.textContent = s74Won(total);
+    }
+
+    function s74HandleStickyOrderClick() {
+      const total = s74CartTotal();
+      if (total <= 0) {
+        alert('주문하실 상품의 [수량]을 먼저 체크해 주세요!');
+        return;
+      }
+      s74ShowSection('order');
+      s74RenderCart();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function s74LiveFilterProducts(query) {
+      const q = (query || '').trim().toLowerCase();
+      const allCards = document.querySelectorAll('#store74App .s74-col3-card');
+      allCards.forEach(card => {
+        const nameEl = card.querySelector('.s74-name');
+        const name = nameEl ? nameEl.textContent.toLowerCase() : '';
+        if (!q || name.includes(q)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
 
     function s74RenderType(type){
       const map={
@@ -1333,8 +1748,8 @@
         const row=rows[0]||{};
         try{localStorage.setItem(S74_INFO_CACHE_KEY,JSON.stringify(row));}catch(e){}
 
-        document.getElementById('s74StoreName').textContent=row.store_name||S74_STORE_ID;
-        document.getElementById('s74OrderStoreName').textContent=row.store_name||S74_STORE_ID;
+        document.getElementById('s74StoreName').textContent=s74CleanStoreName(row.store_name);
+        document.getElementById('s74OrderStoreName').textContent=s74CleanStoreName(row.store_name);
         document.getElementById('s74OrderPhone').textContent=row.phone?'☎ '+row.phone:'';
         document.getElementById('s74OrderAddress').textContent=row.address?'📍 '+row.address:'';
 
@@ -1409,7 +1824,7 @@
           }));
 
         s74Visible={today:S74_BATCH,sale:S74_BATCH,group:S74_BATCH,general:S74_BATCH};
-        s74RenderProducts();
+        s74RenderProducts(); if(typeof s74UpdateStickyBar==='function')s74UpdateStickyBar();
         try{localStorage.setItem(S74_CACHE_KEY,JSON.stringify(s74Products));}catch(e){}
       }catch(error){
         ['s74TodayList','s74SaleList','s74GroupList','s74GeneralList'].forEach(id=>{
