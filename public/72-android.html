@@ -185,16 +185,21 @@ button:disabled{
 
 
 <section id="completeCard" class="card">
-  <h1>등록 완료</h1>
+  <h1>자동차 QR 등록 완료</h1>
 
   <p>
-    자동차 QR 등록이<br>
-    완료되었습니다.
+    스마트폰 알림 등록이<br>
+    성공적으로 완료되었습니다!
   </p>
 
-  <div class="status success">
-    이제 차량이동 요청 알림을 받을 수 있습니다.
+  <div class="status success" style="margin-bottom:14px;line-height:1.6;">
+    이제 주차 중 차량이동 요청이 접수되면 스마트폰 상단 푸시 알림으로 즉시 안내받으실 수 있습니다.
   </div>
+
+  <button id="testSelfPushBtn" type="button" style="background:#2563eb;font-weight:900;margin-top:10px;">
+    🔔 내 폰으로 알림 수신 즉시 테스트하기
+  </button>
+  <div id="testSelfPushStatus" class="status" style="margin-top:10px;"></div>
 </section>
 
 
@@ -647,163 +652,51 @@ registerBtn.addEventListener(
   }
 );
 
-/*
-
-pushBtn.addEventListener(
-  "click",
-  async () => {
-
-    if(
-      processing
-    ){
-      return;
-    }
-
-    if(
-      !appInstalled
-    ){
-      return;
-    }
-
-    processing =
-      true;
-
-    pushBtn.disabled =
-      true;
-
-    pushBtn.textContent =
-      "등록 중...";
-
-    setStatus(
-      pushStatus,
-      "",
-      ""
-    );
-
-    try{
-
-      if(
-        !("Notification" in window)
-      ){
-        throw new Error(
-          "이 기기에서는 알림을 지원하지 않습니다."
-        );
-      }
-
-      if(
-        Notification.permission ===
-        "denied"
-      ){
-        throw new Error(
-          "알림 권한이 차단되어 있습니다."
-        );
-      }
-
-      if(
-        Notification.permission !==
-        "granted"
-      ){
-
-        const permission =
-          await Notification.requestPermission();
-
-        if(
-          permission !==
-          "granted"
-        ){
-          throw new Error(
-            "푸시 알림을 허용해 주세요."
-          );
-        }
-      }
-
-      if(
-        !firebase.apps.length
-      ){
-        firebase.initializeApp(
-          FIREBASE_CONFIG
-        );
-      }
-
-      const registration =
-        await prepareServiceWorker();
-
-      const messaging =
-        firebase.messaging();
-
-      const token =
-        await messaging.getToken({
-          vapidKey:
-            VAPID_KEY,
-
-          serviceWorkerRegistration:
-            registration
-        });
-
-      if(
-        !token
-      ){
-        throw new Error(
-          "푸시 토큰을 발급하지 못했습니다."
-        );
-      }
-
-      const result =
-        await registerVehicle(
-          token
-        );
-
-      const storeId =
-        String(
-          result.store_id || ""
-        ).trim();
-
-      if(
-        storeId
-      ){
-        localStorage.setItem(
-          STORE_ID_KEY,
-          storeId
-        );
-      }else{
-        localStorage.removeItem(
-          STORE_ID_KEY
-        );
-      }
-
-      processing =
-        false;
-
-      showCard(
-        completeCard
-      );
-
-    }catch(error){
-
-      processing =
-        false;
-
-      pushBtn.disabled =
-        false;
-
-      pushBtn.textContent =
-        "푸시 알림 허용";
-
-      setStatus(
-        pushStatus,
-        error instanceof Error
-          ? error.message
-          : "자동차 등록에 실패했습니다.",
-        "error"
-      );
-    }
-  }
-);
-
 
 /*
- * 처음 시작
+ * 등록 직후 내 휴대폰 알림 수신 즉시 테스트
  */
+const testSelfPushBtn = document.getElementById("testSelfPushBtn");
+const testSelfPushStatus = document.getElementById("testSelfPushStatus");
+
+if (testSelfPushBtn) {
+  testSelfPushBtn.addEventListener("click", async () => {
+    testSelfPushBtn.disabled = true;
+    testSelfPushBtn.textContent = "테스트 알림 전송 중...";
+    setStatus(testSelfPushStatus, "서버에서 푸시 신호를 쏘고 있습니다...", "waiting");
+
+    try {
+      const resp = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + SUPABASE_KEY,
+          "apikey": SUPABASE_KEY
+        },
+        body: JSON.stringify({
+          action: "request",
+          qr_code: qrCode,
+          caller_session_id: "self_test_" + Date.now()
+        })
+      });
+
+      const data = await resp.json();
+      if (data.ok || data.success) {
+        setStatus(testSelfPushStatus, "✅ 테스트 알림이 발송되었습니다! 스마트폰 상단 알림 바를 확인해 보세요.", "success");
+        testSelfPushBtn.textContent = "✅ 발송 성공 (상단 알림 확인)";
+      } else {
+        setStatus(testSelfPushStatus, "⚠️ 알림 결과: " + (data.message || "알림 발송 실패"), "error");
+        testSelfPushBtn.disabled = false;
+        testSelfPushBtn.textContent = "다시 테스트하기";
+      }
+    } catch(e) {
+      setStatus(testSelfPushStatus, "⚠️ 통신 오류: " + e.message, "error");
+      testSelfPushBtn.disabled = false;
+      testSelfPushBtn.textContent = "다시 테스트하기";
+    }
+  });
+}
+
 
 (async function start(){
 
