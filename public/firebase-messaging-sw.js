@@ -30,13 +30,13 @@ function getNotificationDetails(payload) {
              (payload && payload.data && payload.data.body) ||
              "주차된 차량의 이동 요청이 접수되었습니다. 지금 확인해 주세요.";
 
-  let targetUrl = (payload && payload.data && payload.data.url) || "/72.html";
+  let targetUrl = (payload && payload.data && payload.data.url) || "/72.html?view=owner";
 
   // 제목이나 내용에 마트/세일이 있을 때만 74.html, 차량이동은 무조건 72.html
   if (/마트|세일|특가|전단|할인/i.test(title + " " + body)) {
     targetUrl = "/74.html";
   } else {
-    targetUrl = "/72.html";
+    targetUrl = "/72.html?view=owner";
   }
 
   const options = {
@@ -82,7 +82,7 @@ try {
 self.addEventListener("notificationclick", function(event) {
   event.notification.close();
   
-  let targetUrl = "/72.html";
+  let targetUrl = "/72.html?view=owner";
   const notifData = event.notification.data || {};
   const notifTitle = event.notification.title || "";
   const notifBody = event.notification.body || "";
@@ -92,7 +92,7 @@ self.addEventListener("notificationclick", function(event) {
   } else if (/마트|세일|특가|전단|할인/i.test(notifTitle + " " + notifBody)) {
     targetUrl = "/74.html";
   } else {
-    targetUrl = "/72.html";
+    targetUrl = "/72.html?view=owner";
   }
 
   event.waitUntil(
