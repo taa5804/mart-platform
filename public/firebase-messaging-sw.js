@@ -22,15 +22,22 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 function getNotificationDetails(payload) {
-  const title = (payload && payload.notification && payload.notification.title) ||
-                (payload && payload.data && payload.data.title) ||
-                "🚗 [우리아파트 안심주차] 차량이동 요청";
+  let title = (payload && payload.notification && payload.notification.title) ||
+              (payload && payload.data && payload.data.title) ||
+              "🚗 [우리아파트 안심주차] 차량이동 요청";
 
-  const body = (payload && payload.notification && payload.notification.body) ||
-               (payload && payload.data && payload.data.body) ||
-               "주차된 차량의 이동 요청이 접수되었습니다. 지금 확인해 주세요.";
+  let body = (payload && payload.notification && payload.notification.body) ||
+             (payload && payload.data && payload.data.body) ||
+             "주차된 차량의 이동 요청이 접수되었습니다. 지금 확인해 주세요.";
 
-  const targetUrl = (payload && payload.data && payload.data.url) || "/72.html";
+  let targetUrl = (payload && payload.data && payload.data.url) || "/72.html";
+
+  // 제목이나 내용에 마트/세일이 있을 때만 74.html, 차량이동은 무조건 72.html
+  if (/마트|세일|특가|전단|할인/i.test(title + " " + body)) {
+    targetUrl = "/74.html";
+  } else {
+    targetUrl = "/72.html";
+  }
 
   const options = {
     body: body,
@@ -49,7 +56,6 @@ function getNotificationDetails(payload) {
 
 // 1. Native ServiceWorker Push Event Listener (100% Guaranteed with event.waitUntil)
 self.addEventListener("push", function(event) {
-  console.log("[SW] Push event received:", event);
   let payload = {};
   if (event.data) {
     try {
@@ -67,23 +73,32 @@ self.addEventListener("push", function(event) {
 // 2. Firebase onBackgroundMessage fallback
 try {
   messaging.onBackgroundMessage(function(payload) {
-    console.log("[SW] Firebase onBackgroundMessage:", payload);
     const { title, options } = getNotificationDetails(payload);
     self.registration.showNotification(title, options);
   });
-} catch(e) {
-  console.warn("onBackgroundMessage error:", e);
-}
+} catch(e) {}
 
-// 3. Notification Click
+// 3. Notification Click: 차량이동은 무조건 72.html, 마트만 74.html
 self.addEventListener("notificationclick", function(event) {
   event.notification.close();
-  const targetUrl = (event.notification.data && event.notification.data.url) || "/72.html";
+  
+  let targetUrl = "/72.html";
+  const notifData = event.notification.data || {};
+  const notifTitle = event.notification.title || "";
+  const notifBody = event.notification.body || "";
+
+  if (notifData.url) {
+    targetUrl = notifData.url;
+  } else if (/마트|세일|특가|전단|할인/i.test(notifTitle + " " + notifBody)) {
+    targetUrl = "/74.html";
+  } else {
+    targetUrl = "/72.html";
+  }
 
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then(function(clientList) {
       for (let client of clientList) {
-        if (client.url.includes("72.html") && "focus" in client) {
+        if (client.url.includes(targetUrl) && "focus" in client) {
           return client.focus();
         }
       }
