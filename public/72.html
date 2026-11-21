@@ -253,7 +253,7 @@ emergencyBtn.onclick=async()=>{
   emergencyBtn.disabled=true;
   try{
     const d=await api({action:"emergency",qr_code:qr,caller_session_id:callerSession()});
-    if(d.phone)location.href="tel:"+String(d.phone).replace(/[^0-9]/g,"");
+    const pNum = d.owner_phone || d.phone; if(pNum) location.href="tel:"+String(pNum).replace(/[^0-9]/g,"");
     else status.textContent=d.message||"긴급통화가 활성화되었습니다.";
   }catch(e){
     status.textContent=e.message;
