@@ -2196,11 +2196,11 @@ async function s74ShowNativePush(title, body, targetUrl) {
           <div class="banner-grid ${rows.length===1?'one':''}">
             ${rows.map(row=>`
               <a class="banner-item"
-                 href="https://www.wooriaptcd.com"
+                 href="#"
                  target="_self"
                  style="--banner-image:${row.image_url?`url('${String(row.image_url).replace(/'/g,'%27')}')`:'none'}">
                 <span class="banner-text">
-                  <span class="banner-label">아파트 분양정보</span>
+                  <span class="banner-label">매장 소식</span>
                   <span class="banner-title">${s74Esc(row.title)}</span>
                   <span class="banner-content">${s74Esc(row.content)}</span>
                 </span>
