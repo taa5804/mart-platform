@@ -2,6 +2,14 @@
 importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js");
 
+self.addEventListener("install", function(event) {
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", function(event) {
+  event.waitUntil(self.clients.claim());
+});
+
 firebase.initializeApp({
   apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
   authDomain: "wooriapt-carqr.firebaseapp.com",
@@ -13,31 +21,61 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage(function(payload) {
-  console.log("[firebase-messaging-sw.js] Background push received:", payload);
-  const title = (payload.notification && payload.notification.title) ||
-                (payload.data && payload.data.title) ||
+function getNotificationDetails(payload) {
+  const title = (payload && payload.notification && payload.notification.title) ||
+                (payload && payload.data && payload.data.title) ||
                 "🚗 [우리아파트 안심주차] 차량이동 요청";
 
-  const body = (payload.notification && payload.notification.body) ||
-               (payload.data && payload.data.body) ||
+  const body = (payload && payload.notification && payload.notification.body) ||
+               (payload && payload.data && payload.data.body) ||
                "주차된 차량의 이동 요청이 접수되었습니다. 지금 확인해 주세요.";
 
-  const targetUrl = (payload.data && payload.data.url) || "/72.html";
+  const targetUrl = (payload && payload.data && payload.data.url) || "/72.html";
 
   const options = {
     body: body,
     icon: "https://mart-platform.vercel.app/icon-192.png",
     badge: "https://mart-platform.vercel.app/icon-192.png",
-    vibrate: [300, 150, 300, 150, 300],
+    vibrate: [500, 250, 500, 250, 500],
+    requireInteraction: true,
+    renotify: true,
+    tag: "car-move-" + Date.now(),
     data: {
       url: targetUrl
     }
   };
+  return { title, options };
+}
 
-  self.registration.showNotification(title, options);
+// 1. Native ServiceWorker Push Event Listener (100% Guaranteed with event.waitUntil)
+self.addEventListener("push", function(event) {
+  console.log("[SW] Push event received:", event);
+  let payload = {};
+  if (event.data) {
+    try {
+      payload = event.data.json();
+    } catch(e) {
+      payload = { notification: { body: event.data.text() } };
+    }
+  }
+  const { title, options } = getNotificationDetails(payload);
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
 });
 
+// 2. Firebase onBackgroundMessage fallback
+try {
+  messaging.onBackgroundMessage(function(payload) {
+    console.log("[SW] Firebase onBackgroundMessage:", payload);
+    const { title, options } = getNotificationDetails(payload);
+    self.registration.showNotification(title, options);
+  });
+} catch(e) {
+  console.warn("onBackgroundMessage error:", e);
+}
+
+// 3. Notification Click
 self.addEventListener("notificationclick", function(event) {
   event.notification.close();
   const targetUrl = (event.notification.data && event.notification.data.url) || "/72.html";
