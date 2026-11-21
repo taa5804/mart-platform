@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mart-platform-v1';
+const CACHE_NAME = 'mart-platform-v2';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
@@ -10,47 +10,76 @@ self.addEventListener('activate', (e) => {
 
 // [1] Web Push Notification Listener
 self.addEventListener('push', (event) => {
-  let data = {
-    title: '[우리아파트 제휴마트] 파격 세일 알림!',
-    body: '오늘의 파격 세일 및 특가 상품이 도착했습니다! 지금 바로 확인해 보세요.',
-    url: '/74.html'
-  };
+  let title = '🚗 [우리아파트 안심주차] 차량이동 요청';
+  let body = '주차된 차량의 이동 요청이 접수되었습니다. 지금 확인해 주세요.';
+  let targetUrl = '/72.html';
 
-  try {
-    if (event.data) {
+  if (event.data) {
+    try {
       const json = event.data.json();
-      data = Object.assign(data, json);
-    }
-  } catch (e) {
-    if (event.data) {
-      data.body = event.data.text();
+      if (json.notification) {
+        title = json.notification.title || title;
+        body = json.notification.body || body;
+      }
+      if (json.data) {
+        title = json.data.title || title;
+        body = json.data.body || body;
+        if (json.data.url) targetUrl = json.data.url;
+      }
+      if (json.title) title = json.title;
+      if (json.body) body = json.body;
+      if (json.url) targetUrl = json.url;
+    } catch (e) {
+      body = event.data.text() || body;
     }
   }
 
+  // 알림 내용에 '마트/세일/특가'가 있으면 74.html, '차량/주차'가 있으면 무조건 72.html
+  if (/마트|세일|특가|전단|할인/i.test(title + ' ' + body)) {
+    targetUrl = '/74.html';
+  } else {
+    targetUrl = '/72.html';
+  }
+
   const options = {
-    body: data.body,
-    icon: data.icon || 'https://mart-platform.vercel.app/icon-192.png',
-    badge: data.badge || 'https://mart-platform.vercel.app/icon-192.png',
-    vibrate: [200, 100, 200],
+    body: body,
+    icon: 'https://mart-platform.vercel.app/icon-192.png',
+    badge: 'https://mart-platform.vercel.app/icon-192.png',
+    vibrate: [500, 250, 500, 250, 500],
+    requireInteraction: true,
+    renotify: true,
+    tag: 'car-push-' + Date.now(),
     data: {
-      url: data.url || '/74.html'
+      url: targetUrl
     }
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title, options)
+    self.registration.showNotification(title, options)
   );
 });
 
-// [2] Notification Click Handler -> Open 74.html
+// [2] Notification Click Handler -> 차량이동은 72.html, 마트알림은 74.html
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const targetUrl = (event.notification.data && event.notification.data.url) || '/74.html';
+  
+  let targetUrl = '/72.html';
+  const notifData = event.notification.data || {};
+  const notifTitle = event.notification.title || '';
+  const notifBody = event.notification.body || '';
+
+  if (notifData.url) {
+    targetUrl = notifData.url;
+  } else if (/마트|세일|특가|전단|할인/i.test(notifTitle + ' ' + notifBody)) {
+    targetUrl = '/74.html';
+  } else {
+    targetUrl = '/72.html';
+  }
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (let client of clientList) {
-        if (client.url.includes('74.html') && 'focus' in client) {
+        if (client.url.includes(targetUrl) && 'focus' in client) {
           return client.focus();
         }
       }
