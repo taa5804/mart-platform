@@ -1376,7 +1376,7 @@ async function s74ShowNativePush(title, body, targetUrl) {
       <div class="s74-skeleton-card"><div class="s74-skeleton-img"></div><div class="s74-skeleton-line"></div><div class="s74-skeleton-line short"></div></div>
       <div class="s74-skeleton-card"><div class="s74-skeleton-img"></div><div class="s74-skeleton-line"></div><div class="s74-skeleton-line short"></div></div>
     </div>
-    <div id="s74BannerArea" class="banner-area"></div>
+    
   </section>
 
   <section id="s74-sale" class="section">
@@ -2173,45 +2173,7 @@ async function s74ShowNativePush(title, body, targetUrl) {
     }
 
     async function s74LoadBanners(){
-      const area=document.getElementById('s74BannerArea');
-
-      try{
-        const res=await fetch(
-          `${S74_SUPABASE_URL}/rest/v1/main_banners?store_id=eq.${encodeURIComponent(S74_STORE_ID)}&select=slot,title,content,image_url,enabled&order=slot.asc`,
-          {headers:{apikey:S74_SUPABASE_KEY,Authorization:'Bearer '+S74_SUPABASE_KEY}}
-        );
-        if(!res.ok)throw new Error();
-
-        const rows=(await res.json())
-          .filter(row=>row.enabled===true&&row.title&&row.content)
-          .slice(0,2);
-
-        if(!rows.length){
-          area.style.display='none';
-          area.innerHTML='';
-          return;
-        }
-
-        area.innerHTML=`
-          <div class="banner-grid ${rows.length===1?'one':''}">
-            ${rows.map(row=>`
-              <a class="banner-item"
-                 href="#"
-                 target="_self"
-                 style="--banner-image:${row.image_url?`url('${String(row.image_url).replace(/'/g,'%27')}')`:'none'}">
-                <span class="banner-text">
-                  <span class="banner-label">매장 소식</span>
-                  <span class="banner-title">${s74Esc(row.title)}</span>
-                  <span class="banner-content">${s74Esc(row.content)}</span>
-                </span>
-              </a>`).join('')}
-          </div>`;
-
-        area.style.display='block';
-      }catch(e){
-        area.style.display='none';
-        area.innerHTML='';
-      }
+      return;
     }
 
     function s74ActiveProductType(){
