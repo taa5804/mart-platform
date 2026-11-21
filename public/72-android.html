@@ -627,6 +627,8 @@ registerBtn.addEventListener(
       const storeId = String(result.store_id || "").trim();
       if (storeId) {
         localStorage.setItem(STORE_ID_KEY, storeId);
+      localStorage.setItem("wooriapt_my_qr", qrCode);
+      localStorage.setItem("wooriapt_my_phone", ownerPhone);
       } else {
         localStorage.removeItem(STORE_ID_KEY);
       }
