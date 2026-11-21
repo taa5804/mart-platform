@@ -5706,12 +5706,20 @@ async function sendWebPushAlert() {
 
   try {
     const dynamicProductNo = Math.floor(Date.now() / 1000) % 1000000;
+    
+    // 정보통신망법 제50조 필수 표기 항목 자동 조립: (광고) [상호명] + 본문 + 080 무료거부
+    let legalTitle = `(광고) [${storeName}] 세일 행사 안내`;
+    let legalBody = `(광고) [${storeName}]\n${msgText}`;
+    if (!legalBody.includes('080')) {
+      legalBody += `\n무료거부: 080-870-0720`;
+    }
+
     const payload = {
       store_id: currentStoreId || 'store01',
       category: 'push_broadcast',
       product_no: dynamicProductNo,
-      product_name: `📢 [${storeName}] 오늘의 파격 세일 행사 알림!`,
-      description: msgText,
+      product_name: legalTitle,
+      description: legalBody,
       price: phone,
       uploaded_at: new Date().toISOString()
     };
@@ -5786,8 +5794,13 @@ async function sendDirectTestSms() {
     document.getElementById('flyerTextMsg')?.focus();
     return;
   }
-  var fullContent = msgText;
-  var subject = '[' + storeName + '] 행사 알림';
+  // 법적 필수 5대 항목 자동 조립: (광고) + 상호명 + 본문 + 080 수신거부
+  var legalSubject = '(광고) [' + storeName + ']';
+  var fullContent = '(광고) [' + storeName + ']\n' + msgText;
+  if (!fullContent.includes('080')) {
+    fullContent += '\n무료거부: 080-870-0720';
+  }
+  var subject = legalSubject;
 
   // 3. UI 발송 진행 상태 표시
   sendBtn.disabled = true;
