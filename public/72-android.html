@@ -648,49 +648,6 @@ registerBtn.addEventListener(
 );
 
 
-/*
- * 등록 직후 내 휴대폰 알림 수신 즉시 테스트
- */
-const testSelfPushBtn = document.getElementById("testSelfPushBtn");
-const testSelfPushStatus = document.getElementById("testSelfPushStatus");
-
-if (testSelfPushBtn) {
-  testSelfPushBtn.addEventListener("click", async () => {
-    testSelfPushBtn.disabled = true;
-    testSelfPushBtn.textContent = "테스트 알림 전송 중...";
-    setStatus(testSelfPushStatus, "서버에서 푸시 신호를 쏘고 있습니다...", "waiting");
-
-    try {
-      const resp = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + SUPABASE_KEY,
-          "apikey": SUPABASE_KEY
-        },
-        body: JSON.stringify({
-          action: "request",
-          qr_code: qrCode,
-          caller_session_id: "self_test_" + Date.now()
-        })
-      });
-
-      const data = await resp.json();
-      if (data.ok || data.success) {
-        setStatus(testSelfPushStatus, "✅ 테스트 알림이 발송되었습니다! 스마트폰 상단 알림 바를 확인해 보세요.", "success");
-        testSelfPushBtn.textContent = "✅ 발송 성공 (상단 알림 확인)";
-      } else {
-        setStatus(testSelfPushStatus, "⚠️ 알림 결과: " + (data.message || "알림 발송 실패"), "error");
-        testSelfPushBtn.disabled = false;
-        testSelfPushBtn.textContent = "다시 테스트하기";
-      }
-    } catch(e) {
-      setStatus(testSelfPushStatus, "⚠️ 통신 오류: " + e.message, "error");
-      testSelfPushBtn.disabled = false;
-      testSelfPushBtn.textContent = "다시 테스트하기";
-    }
-  });
-}
 
 
 (async function start(){
