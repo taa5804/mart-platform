@@ -4,12 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#15803d">
-<link rel="icon" type="image/png" href="/mart-logo.png">
-<link rel="apple-touch-icon" href="/mart-logo.png">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="마트 본사관리자">
-<title>마트 본사관리자</title>
+<title>본사 관리자</title>
 
 <style>
 *{box-sizing:border-box}
@@ -151,22 +146,10 @@ body{
           <span>매장을 선택하고 배너 2개를 관리합니다.</span>
         </button>
 
-        <button type="button" class="menu-card" onclick="openHqRoom('approval')" style="border:2px solid #16a34a; background:#f0fdf4;">
-          <div class="menu-icon" style="background:#dcfce7; color:#15803d;">🏪</div>
-          <strong style="color:#166534;">가맹점 승인관리 <span id="hqMartBadge" style="background:#ea580c;color:#fff;font-size:12px;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle;">대기 1건</span></strong>
-          <span>신규 마트 가맹 신청 및 포스 엑셀 확인, 1,000건 무료 개통을 승인합니다.</span>
-        </button>
-
-        <button type="button" class="menu-card" onclick="openHqRoom('partner')" style="border:2px solid #0e6556; background:#f8fafc;">
-          <div class="menu-icon" style="background:#e6f4f1; color:#0e6556;">🤝</div>
-          <strong style="color:#0e6556;">영업 파트너(영업인) 승인관리 <span id="hqPartnerBadge" style="background:#ea580c;color:#fff;font-size:12px;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle;">대기 2건</span></strong>
-          <span>영업 파트너 신청 승인 및 고유 4자리 코드 발급, 5원 정산을 관리합니다.</span>
-        </button>
-
-        <button type="button" class="menu-card" onclick="location.href='/admin.html'" style="border:2px solid #0284c7; background:#f0f9ff;">
-          <div class="menu-icon" style="background:#e0f2fe; color:#0284c7;">📢</div>
-          <strong style="color:#0369a1;">마트관리자 (15원 세일 알림 발송)</strong>
-          <span>매장 15원 세일 발송 및 단골 엑셀 DB 관리, 고객 DB 영구 파기를 확인합니다.</span>
+        <button type="button" class="menu-card" onclick="openHqRoom('approval')">
+          <div class="menu-icon">🏪</div>
+          <strong>가맹점 승인관리</strong>
+          <span>가맹점 신청과 승인 상태를 관리합니다.</span>
         </button>
 
         <button type="button" class="menu-card" onclick="openHqRoom('payment')">
@@ -269,7 +252,6 @@ body{
 <th>매장 ID</th>
 <th>매장명</th>
 <th>로그인 ID</th>
-<th>비밀번호</th>
 <th>대표자</th>
 <th>전화번호</th>
 <th>권역</th>
@@ -296,29 +278,150 @@ body{
 
 <script>
 (function(){
+
 var ROOT=document.getElementById("wgAccount");
 if(!ROOT)return;
+
 var $=function(s){return ROOT.querySelector(s);};
+
 var URL="https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-store-account";
 var KEY="wooriapt_hq_admin_session";
+
 var stores=[];
 var selected=null;
 
-function session(){return localStorage.getItem(KEY)||"";}
-function msg(text,error){var e=$("#wgMsg");e.textContent=text||"";e.style.color=error?"#dc2626":"#15803d";}
-function esc(v){var d=document.createElement("div");d.textContent=v||"";return d.innerHTML;}
-
-async function api(action,data){
- var body=data||{};
- body.action=action;
- body.session_token=session();
- var r=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
- var x=await r.json();
- if(!r.ok||!x.ok)throw new Error(x.message||"처리에 실패했습니다.");
- return x;
+function session(){
+ return localStorage.getItem(KEY)||"";
 }
 
-window.loadHqAccount=async function(){
+function msg(text,error){
+ var e=$("#wgMsg");
+ e.textContent=text||"";
+ e.style.color=error?"#dc2626":"#15803d";
+}
+
+function esc(v){
+ var d=document.createElement("div");
+ d.textContent=v||"";
+ return d.innerHTML;
+}
+
+async function api(action,data){
+ if(action==="list_stores"){
+  var r=await fetch("https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?order=created_at.desc",{
+   headers:{
+    "apikey":"sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Authorization":"Bearer sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K"
+   }
+  });
+  if(!r.ok) throw new Error("가맹점 목록을 불러오지 못했습니다.");
+  var rows=await r.json();
+  var mapped=rows.map(function(row){
+   var code = row.mart_code || ("M" + String(row.id).padStart(6, "0"));
+   var st = (row.approval_status||"PENDING").toUpperCase();
+   var pending = (st==="PENDING" || st==="WAITING");
+   return {
+    id: row.id,
+    store_id: code,
+    store_name: row.mart_name,
+    admin_id: row.email || row.phone,
+    owner_name: row.owner_name,
+    phone: row.phone,
+    region_name: row.address ? row.address.split(" ").slice(0, 2).join(" ") : "전체",
+    address: row.address,
+    business_file: row.business_file,
+    db_file: row.db_file,
+    sales_file: row.sales_file,
+    account_status: pending ? "pending" : "정상",
+    approval_status: row.approval_status
+   };
+  });
+  return {ok:true, stores:mapped};
+ }
+ if(action==="create_store"){
+  var r=await fetch("https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members",{
+   method:"POST",
+   headers:{
+    "apikey":"sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Authorization":"Bearer sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Content-Type":"application/json",
+    "Prefer":"return=minimal"
+   },
+   body:JSON.stringify({
+    mart_code:data.store_id,
+    mart_name:data.store_name,
+    owner_name:data.owner_name,
+    phone:data.phone,
+    address:data.address,
+    approval_status:"APPROVED",
+    service_status:"ACTIVE"
+   })
+  });
+  if(!r.ok) throw new Error("매장 등록에 실패했습니다.");
+  return {ok:true, message:"매장이 등록되었습니다."};
+ }
+ if(action==="activate_store"){
+  var storeId = data.store_id || ("M" + String(data.raw_id || data.id).padStart(6, "0"));
+  var targetId = data.raw_id || data.id;
+  var patchUrl = targetId ? "https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?id=eq." + encodeURIComponent(targetId) : "https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?mart_code=eq." + encodeURIComponent(storeId);
+  var r=await fetch(patchUrl,{
+   method:"PATCH",
+   headers:{
+    "apikey":"sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Authorization":"Bearer sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Content-Type":"application/json",
+    "Prefer":"return=minimal"
+   },
+   body:JSON.stringify({
+    approval_status:"APPROVED",
+    service_status:"ACTIVE",
+    mart_code:storeId
+   })
+  });
+  if(!r.ok) throw new Error("사용 승인 처리에 실패했습니다.");
+
+  // Call /api/mart-notify for LMS + ClawOps call
+  try {
+    await fetch("/api/mart-notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "APPROVED",
+        mart_name: data.mart_name,
+        owner_name: data.owner_name,
+        phone: data.phone,
+        mart_code: storeId
+      })
+    });
+  } catch(notifyErr) {
+    console.warn("Notify error:", notifyErr);
+  }
+
+  return {ok:true, message:"사용 승인 완료! 개통 문자와 클로옵스 음성 알림이 전송되었습니다."};
+ }
+ if(action==="update_store"){
+  var r=await fetch("https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?mart_code=eq."+encodeURIComponent(data.store_id),{
+   method:"PATCH",
+   headers:{
+    "apikey":"sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Authorization":"Bearer sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Content-Type":"application/json",
+    "Prefer":"return=minimal"
+   },
+   body:JSON.stringify({
+    mart_name:data.store_name,
+    owner_name:data.owner_name,
+    phone:data.phone,
+    address:data.address
+   })
+  });
+  if(!r.ok) throw new Error("매장 정보 수정에 실패했습니다.");
+  return {ok:true, message:"매장 정보가 수정되었습니다."};
+ }
+ throw new Error("알 수 없는 작업입니다.");
+}
+
+async function load(){
  try{
   var x=await api("list_stores",{});
   stores=x.stores||[];
@@ -327,24 +430,38 @@ window.loadHqAccount=async function(){
   $("#wgCount").textContent="목록을 불러오지 못했습니다.";
   msg(e.message,true);
  }
-};
+}
 
 function render(){
  var q=$("#wgSearch").value.toLowerCase().trim();
  var tbody=$("#wgTable");
  tbody.innerHTML="";
+
  var list=stores.filter(function(s){
-  return [s.store_id,s.store_name,s.admin_id,s.owner_name,s.phone,s.region_name].join(" ").toLowerCase().indexOf(q)>-1;
+  return [
+   s.store_id,s.store_name,s.admin_id,
+   s.owner_name,s.phone,s.region_name
+  ].join(" ").toLowerCase().indexOf(q)>-1;
  });
+
  $("#wgCount").textContent="총 "+list.length+"개 매장";
+
  list.forEach(function(s){
   var tr=document.createElement("tr");
+
   var status="정상";
   if(s.account_status==="suspended")status="정지";
   if(s.account_status==="pending")status="승인대기";
-  var pwVal=s.password||"1234";
-  var pwCell="<span style='font-size:12px;font-weight:700;color:#2563eb;'>"+esc(pwVal)+"</span>";
-  tr.innerHTML="<td>"+esc(s.store_id)+"</td><td><b>"+esc(s.store_name)+"</b></td><td>"+esc(s.admin_id)+"</td><td>"+pwCell+"</td><td>"+esc(s.owner_name)+"</td><td>"+esc(s.phone)+"</td><td>"+esc(s.region_name)+"</td><td>"+status+"</td>";
+
+  tr.innerHTML=
+   "<td>"+esc(s.store_id)+"</td>"+
+   "<td><b>"+esc(s.store_name)+"</b></td>"+
+   "<td>"+esc(s.admin_id)+"</td>"+
+   "<td>"+esc(s.owner_name)+"</td>"+
+   "<td>"+esc(s.phone)+"</td>"+
+   "<td>"+esc(s.region_name)+"</td>"+
+   "<td>"+status+"</td>";
+
   tr.onclick=function(){selectStore(s);};
   tbody.appendChild(tr);
  });
@@ -352,6 +469,7 @@ function render(){
 
 function selectStore(s){
  selected=s;
+
  $("#wgStoreId").value=s.store_id||"";
  $("#wgAdminId").value=s.admin_id||"";
  $("#wgPassword").value="";
@@ -360,13 +478,23 @@ function selectStore(s){
  $("#wgPhone").value=s.phone||"";
  $("#wgRegion").value=s.region_name||"";
  $("#wgAddress").value=s.address||"";
+
  $("#wgStoreId").readOnly=true;
- $("#wgSelected").textContent=(s.store_name||"")+" ("+(s.store_id||"")+")";
+ var docLinks = "";
+ if(s.business_file) docLinks += ' <a href="https://wpshlmijsscmlasqtapa.supabase.co/storage/v1/object/public/mart-signup-documents/' + s.business_file + '" target="_blank" style="color:#1d4ed8;margin-left:8px;font-size:13px;font-weight:700;">[📄 사업자등록증]</a>';
+ if(s.db_file) docLinks += ' <a href="https://wpshlmijsscmlasqtapa.supabase.co/storage/v1/object/public/mart-signup-documents/' + s.db_file + '" target="_blank" style="color:#1d4ed8;margin-left:8px;font-size:13px;font-weight:700;">[📄 고객DB]</a>';
+ if(s.sales_file) docLinks += ' <a href="https://wpshlmijsscmlasqtapa.supabase.co/storage/v1/object/public/mart-signup-documents/' + s.sales_file + '" target="_blank" style="color:#1d4ed8;margin-left:8px;font-size:13px;font-weight:700;">[📄 매출자료]</a>';
+ $("#wgSelected").innerHTML = (esc(s.store_name)||"") + " (" + esc(s.store_id) + ")" + docLinks;
 }
 
 function clearForm(){
  selected=null;
- ["#wgStoreId","#wgAdminId","#wgPassword","#wgStoreName","#wgOwner","#wgPhone","#wgRegion","#wgAddress"].forEach(function(id){$(id).value="";});
+
+ ["#wgStoreId","#wgAdminId","#wgPassword","#wgStoreName",
+ "#wgOwner","#wgPhone","#wgRegion","#wgAddress"].forEach(function(id){
+  $(id).value="";
+ });
+
  $("#wgStoreId").readOnly=false;
  $("#wgSelected").textContent="매장을 선택해 주세요.";
 }
@@ -374,23 +502,39 @@ function clearForm(){
 $("#wgCreate").onclick=async function(){
  try{
   var x=await api("create_store",{
-   store_id:$("#wgStoreId").value.trim(),admin_id:$("#wgAdminId").value.trim(),password:$("#wgPassword").value,
-   store_name:$("#wgStoreName").value.trim(),owner_name:$("#wgOwner").value.trim(),phone:$("#wgPhone").value.trim(),
-   region_name:$("#wgRegion").value.trim(),address:$("#wgAddress").value.trim()
+   store_id:$("#wgStoreId").value.trim(),
+   admin_id:$("#wgAdminId").value.trim(),
+   password:$("#wgPassword").value,
+   store_name:$("#wgStoreName").value.trim(),
+   owner_name:$("#wgOwner").value.trim(),
+   phone:$("#wgPhone").value.trim(),
+   region_name:$("#wgRegion").value.trim(),
+   address:$("#wgAddress").value.trim()
   });
-  clearForm();msg(x.message,false);await window.loadHqAccount();
+
+  clearForm();
+  msg(x.message,false);
+  await load();
  }catch(e){msg(e.message,true);}
 };
 
 $("#wgUpdate").onclick=async function(){
  if(!selected){alert("매장을 먼저 선택하세요.");return;}
+
  try{
   var x=await api("update_store",{
-   store_id:selected.store_id,admin_id:$("#wgAdminId").value.trim(),
-   store_name:$("#wgStoreName").value.trim(),owner_name:$("#wgOwner").value.trim(),
-   phone:$("#wgPhone").value.trim(),region_name:$("#wgRegion").value.trim(),address:$("#wgAddress").value.trim()
+   store_id:selected.store_id,
+   admin_id:$("#wgAdminId").value.trim(),
+   store_name:$("#wgStoreName").value.trim(),
+   owner_name:$("#wgOwner").value.trim(),
+   phone:$("#wgPhone").value.trim(),
+   region_name:$("#wgRegion").value.trim(),
+   address:$("#wgAddress").value.trim()
   });
-  clearForm();msg(x.message,false);await window.loadHqAccount();
+
+  clearForm();
+  msg(x.message,false);
+  await load();
  }catch(e){msg(e.message,true);}
 };
 
@@ -398,27 +542,46 @@ $("#wgClear").onclick=clearForm;
 
 $("#wgActivate").onclick=async function(){
  if(!selected){alert("매장을 먼저 선택하세요.");return;}
+ if(!confirm((selected.store_name||"선택 매장")+"을 최종 사용 승인하시겠습니까?\n승인 즉시 마트 사장님에게 개통 LMS 문자와 클로옵스 음성 전화가 자동 발송됩니다.")) return;
+
  try{
-  var x=await api("activate_store",{store_id:selected.store_id});
-  clearForm();msg(x.message,false);await window.loadHqAccount();
+  msg("사용 승인 및 알림 발송 중...", false);
+  var x=await api("activate_store",{
+    store_id:selected.store_id,
+    raw_id:selected.id,
+    phone:selected.phone,
+    mart_name:selected.store_name,
+    owner_name:selected.owner_name
+  });
+  clearForm();
+  msg(x.message || "사용 승인 완료! 개통 문자와 클로옵스 음성 알림이 전송되었습니다.", false);
+  await load();
  }catch(e){msg(e.message,true);}
 };
 
 $("#wgSuspend").onclick=async function(){
  if(!selected){alert("매장을 먼저 선택하세요.");return;}
  if(!confirm("이 매장의 사용을 정지하시겠습니까?"))return;
+
  try{
   var x=await api("suspend_store",{store_id:selected.store_id});
-  clearForm();msg(x.message,false);await window.loadHqAccount();
+  clearForm();
+  msg(x.message,false);
+  await load();
  }catch(e){msg(e.message,true);}
 };
 
 $("#wgReset").onclick=async function(){
  if(!selected){alert("매장을 먼저 선택하세요.");return;}
+
  var pw=prompt("새 임시 비밀번호를 입력하세요.\n영문+숫자 8자 이상");
  if(!pw)return;
+
  try{
-  var x=await api("reset_store_password",{store_id:selected.store_id,new_password:pw});
+  var x=await api("reset_store_password",{
+   store_id:selected.store_id,
+   new_password:pw
+  });
   alert(x.message);
  }catch(e){alert(e.message);}
 };
@@ -426,22 +589,29 @@ $("#wgReset").onclick=async function(){
 $("#wgDelete").onclick=async function(){
  if(!selected){alert("매장을 먼저 선택하세요.");return;}
  if(!confirm((selected.store_name||"")+" 매장 계정을 삭제하시겠습니까?"))return;
+
  try{
   var x=await api("delete_store",{store_id:selected.store_id});
-  clearForm();msg(x.message,false);await window.loadHqAccount();
+  clearForm();
+  msg(x.message,false);
+  await load();
  }catch(e){msg(e.message,true);}
 };
 
 $("#wgSearch").oninput=render;
-if(session()) window.loadHqAccount();
+
+load();
+
 })();
 </script>
-  </div>
+</div>
 </div>
 
-<!-- ==============================================
-     가맹점 승인관리 룸 (hqRoomApproval)
-============================================== -->
+
+
+
+
+
 <div id="hqRoomApproval" class="hq-room-shell">
   <div class="hq-room-top">
     <button type="button" class="hq-back-btn" onclick="backToHqDashboard()">← 본사 관리자</button>
@@ -450,46 +620,45 @@ if(session()) window.loadHqAccount();
 <style>
 #wgApproval{max-width:1100px;margin:auto;padding:20px 12px;font-family:Arial,sans-serif;color:#222}
 #wgApproval *{box-sizing:border-box}
-#wgApproval h2{margin:0 0 6px;font-size:22px;color:#166534}
+#wgApproval h2{margin:0 0 6px;font-size:22px}
 #wgApproval .wa-sub{margin:0 0 16px;color:#64748b;font-size:14px;line-height:1.6}
-#wgApproval .wa-card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+#wgApproval .wa-card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px}
 #wgApproval .wa-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 #wgApproval input{flex:1;min-width:220px;height:44px;padding:0 11px;border:1px solid #ccc;border-radius:7px;font-size:14px}
 #wgApproval button{border:0;border-radius:7px;padding:10px 15px;color:#fff;font-weight:700;cursor:pointer}
 #wgApproval .green{background:#15803d}
 #wgApproval .gray{background:#475569}
 #wgApproval .wa-table{overflow-x:auto}
-#wgApproval table{width:100%;min-width:760px;border-collapse:collapse}
+#wgApproval table{width:100%;min-width:720px;border-collapse:collapse}
 #wgApproval th,#wgApproval td{padding:11px 10px;border-bottom:1px solid #ddd;text-align:left;font-size:13px;vertical-align:middle}
-#wgApproval th{background:#f8fafc;color:#475569;font-weight:700}
+#wgApproval th{background:#f5f5f5}
 #wgApproval tbody tr:hover{background:#f0fdf4}
 #wgApproval .wa-badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:12px;font-weight:700}
-#wgApproval .wa-badge-done{display:inline-block;padding:5px 9px;border-radius:999px;background:#dcfce7;color:#166534;font-size:12px;font-weight:700}
 #wgApproval .wa-empty{padding:24px 10px;text-align:center;color:#64748b}
 #wgApproval #waMsg{margin-top:12px;font-weight:700}
 @media(max-width:700px){#wgApproval .wa-top{align-items:stretch}#wgApproval input{width:100%}}
 </style>
 
-<h2>🏪 가맹점 승인관리 (1,000건 무료 개통)</h2>
-<p class="wa-sub">신규 마트의 가맹 신청 및 포스(POS) 고객 엑셀 DB 접수 건을 확인하고, <strong>1,000건 무료 문자 개통</strong>을 승인합니다.</p>
+<h2>가맹점 승인관리</h2>
+<p class="wa-sub">가맹점 신청 중 승인대기 상태의 매장을 확인하고 사용 승인합니다.</p>
 
 <div class="wa-card">
   <div class="wa-top">
-    <input id="waSearch" placeholder="마트명 · 대표자 · 전화번호 · 추천 파트너코드 검색">
+    <input id="waSearch" placeholder="마트번호 · 매장명 · 대표자 · 전화번호 검색">
     <button id="waRefresh" class="gray" type="button">새로고침</button>
   </div>
-  <p id="waCount" style="font-weight:700;color:#166534;margin:8px 0 14px;">불러오는 중...</p>
+  <p id="waCount">불러오는 중...</p>
   <div class="wa-table">
     <table>
       <thead>
         <tr>
-          <th>신청일시</th>
-          <th>마트명</th>
-          <th>소재지(동) / 추천코드</th>
-          <th>사장님 전화번호</th>
-          <th>첨부 엑셀 DB</th>
+          <th>마트번호</th>
+          <th>매장명</th>
+          <th>대표자</th>
+          <th>전화번호</th>
+          <th>권역</th>
           <th>상태</th>
-          <th>승인 및 개통</th>
+          <th>승인</th>
         </tr>
       </thead>
       <tbody id="waTable"></tbody>
@@ -503,185 +672,130 @@ if(session()) window.loadHqAccount();
 var ROOT=document.getElementById("wgApproval");
 if(!ROOT)return;
 var $=function(s){return ROOT.querySelector(s);};
-var defaultPendingMarts = [
-  { id: 101, mart: "에너젠마트", dong: "광주 광산구 도천동", phone: "010-2286-4150", fileName: "단골고객_10000건.xlsx", partnerCode: "4150", count: "1,000건 (무료)", status: "승인대기", date: "2026-11-11 09:02" }
-];
+var URL="https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-store-account";
+var KEY="wooriapt_hq_admin_session";
+var stores=[];
 
-function msg(text,error){
-  var e=$("#waMsg");
-  e.textContent=text||"";
-  e.style.color=error?"#dc2626":"#15803d";
-}
+function session(){return localStorage.getItem(KEY)||"";}
 function esc(v){var d=document.createElement("div");d.textContent=v||"";return d.innerHTML;}
-
-window.loadHqApproval = async function(){
-  try{
-    msg("",false);
-    var saved = localStorage.getItem("pendingMarts");
-    var list = saved ? JSON.parse(saved) : defaultPendingMarts;
-    var pendingList = list.filter(function(m){ return m.status === "승인대기"; });
-    
-    var badge = document.getElementById("hqMartBadge");
-    if(badge) badge.textContent = "대기 " + pendingList.length + "건";
-    
-    renderApprovalList(list);
-  }catch(e){
-    $("#waCount").textContent="승인 목록을 불러오지 못했습니다.";
-    msg(e.message,true);
-  }
-};
-
-function renderApprovalList(list){
-  var q=$("#waSearch").value.toLowerCase().trim();
-  var filtered = list.filter(function(m){
-    return [m.mart, m.dong, m.phone, m.partnerCode, m.fileName].join(" ").toLowerCase().indexOf(q)>-1;
+function msg(text,error){var e=$("#waMsg");e.textContent=text||"";e.style.color=error?"#dc2626":"#15803d";}
+async function api(action,data){
+ if(action==="list_stores"){
+  var r=await fetch("https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?order=created_at.desc",{
+   headers:{
+    "apikey":"sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Authorization":"Bearer sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K"
+   }
   });
-  var pendingCount = filtered.filter(function(m){ return m.status === "승인대기"; }).length;
-  $("#waCount").textContent = "가맹 승인대기 총 " + pendingCount + "건 (전체 신청 " + filtered.length + "건)";
-
-  var tbody=$("#waTable");
-  tbody.innerHTML="";
-  if(!filtered.length){
-    tbody.innerHTML='<tr><td colspan="7" class="wa-empty">신청 내역이 없습니다.</td></tr>';
-    return;
-  }
-
-  filtered.forEach(function(m){
-    var tr=document.createElement("tr");
-    var isPending = (m.status === "승인대기");
-    var statusBadge = isPending 
-      ? '<span class="wa-badge">승인대기</span>' 
-      : '<span class="wa-badge-done">개통완료</span>';
-    var actionBtn = isPending
-      ? '<button type="button" class="green wa-approve" style="padding:7px 12px;font-size:12.5px;font-weight:800;border:0;border-radius:6px;background:#15803d;color:#fff;cursor:pointer;">✅ 1,000건 개통 승인</button>'
-      : '<span style="color:#15803d;font-weight:700;font-size:12.5px;">✓ 개통 완료</span>';
-
-    tr.innerHTML = 
-      '<td style="color:#64748b;font-size:12.5px;">' + esc(m.date || "2026-11-11") + '</td>' +
-      '<td><b>' + esc(m.mart) + '</b></td>' +
-      '<td>' + esc(m.dong || "광주 광산구") + ' <span style="background:#e0f2fe;color:#0369a1;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:700;">추천:' + esc(m.partnerCode||"-") + '</span></td>' +
-      '<td>' + esc(m.phone) + '</td>' +
-      '<td><span style="background:#f1f5f9;color:#334155;padding:3px 8px;border-radius:4px;font-size:12px;">📄 ' + esc(m.fileName||"단골고객.xlsx") + '</span></td>' +
-      '<td>' + statusBadge + '</td>' +
-      '<td>' + actionBtn + '</td>';
-
-    if(isPending){
-      tr.querySelector(".wa-approve").onclick = async function(){
-        if(!confirm("[" + m.mart + "] 마트의 가맹 및 1,000건 무료 문자를 즉시 승인 개통하시겠습니까?")) return;
-        this.disabled = true;
-        m.status = "개통완료";
-        var saved = localStorage.getItem("pendingMarts");
-        var all = saved ? JSON.parse(saved) : defaultPendingMarts;
-        all.forEach(function(item){ if(item.id === m.id || item.phone === m.phone) item.status = "개통완료"; });
-        localStorage.setItem("pendingMarts", JSON.stringify(all));
-
-        alert("🎉 [" + m.mart + "] 가맹 승인 및 무료 개통 완료!\n\n• 본사 지원 1,000건 무료 세일 문자가 즉시 활성화되었습니다.\n• 사장님 휴대폰(" + m.phone + ")으로 마트관리자 15원 발송 링크가 자동 전송되었습니다.");
-        window.loadHqApproval();
-      };
-    }
-    tbody.appendChild(tr);
+  if(!r.ok) throw new Error("가맹점 목록을 불러오지 못했습니다.");
+  var rows=await r.json();
+  var mapped=rows.map(function(row){
+   var code = row.mart_code || ("M" + String(row.id).padStart(6, "0"));
+   var st = (row.approval_status||"PENDING").toUpperCase();
+   var pending = (st==="PENDING" || st==="WAITING");
+   return {
+    id: row.id,
+    store_id: code,
+    store_name: row.mart_name,
+    admin_id: row.email || row.phone,
+    owner_name: row.owner_name,
+    phone: row.phone,
+    region_name: row.address ? row.address.split(" ").slice(0, 2).join(" ") : "전체",
+    address: row.address,
+    account_status: pending ? "pending" : "정상",
+    approval_status: row.approval_status
+   };
   });
+  return {ok:true, stores:mapped};
+ }
+ if(action==="activate_store"){
+  var r=await fetch("https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?id=eq." + encodeURIComponent(data.raw_id || data.id || data.store_id),{
+   method:"PATCH",
+   headers:{
+    "apikey":"sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Authorization":"Bearer sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Content-Type":"application/json",
+    "Prefer":"return=minimal"
+   },
+   body:JSON.stringify({
+    approval_status:"APPROVED",
+    service_status:"ACTIVE",
+    mart_code:data.store_id
+   })
+  });
+  if(!r.ok) throw new Error("승인 처리에 실패했습니다.");
+  return {ok:true, message:"사용 승인되었습니다."};
+ }
+ var body=data||{};
+ body.action=action;
+ body.session_token=session();
+ var r=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+ var x=await r.json();
+ if(!r.ok||!x.ok)throw new Error(x.message||"처리에 실패했습니다.");
+ return x;
 }
-
-$("#waSearch").oninput = function(){ window.loadHqApproval(); };
-$("#waRefresh").onclick = function(){ window.loadHqApproval(); };
+function isPending(s){return !s.account_status||s.account_status==="pending"||s.account_status==="waiting"||s.account_status==="승인대기";}
+async function load(){
+ try{
+  msg("",false);
+  $("#waCount").textContent="불러오는 중...";
+  var x=await api("list_stores",{});
+  stores=(x.stores||[]).filter(isPending);
+  render();
+ }catch(e){
+  $("#waCount").textContent="승인대기 목록을 불러오지 못했습니다.";
+  msg(e.message,true);
+ }
+}
+function render(){
+ var q=$("#waSearch").value.toLowerCase().trim();
+ var list=stores.filter(function(s){
+  return [s.store_id,s.store_name,s.owner_name,s.phone,s.region_name].join(" ").toLowerCase().indexOf(q)>-1;
+ });
+ var tbody=$("#waTable");
+ tbody.innerHTML="";
+ $("#waCount").textContent="승인대기 총 "+list.length+"개 매장";
+ if(!list.length){
+  var tr=document.createElement("tr");
+  tr.innerHTML='<td colspan="7" class="wa-empty">승인대기 중인 가맹점이 없습니다.</td>';
+  tbody.appendChild(tr);
+  return;
+ }
+ list.forEach(function(s){
+  var tr=document.createElement("tr");
+  tr.innerHTML=
+   "<td>"+esc(s.store_id)+"</td>"+
+   "<td><b>"+esc(s.store_name)+"</b></td>"+
+   "<td>"+esc(s.owner_name)+"</td>"+
+   "<td>"+esc(s.phone)+"</td>"+
+   "<td>"+esc(s.region_name)+"</td>"+
+   '<td><span class="wa-badge">승인대기</span></td>'+
+   '<td><button type="button" class="green wa-approve">사용 승인</button></td>';
+  tr.querySelector(".wa-approve").onclick=async function(){
+   if(!confirm((s.store_name||s.store_id||"해당 매장")+"을 사용 승인하시겠습니까?"))return;
+   try{
+    this.disabled=true;
+    var x=await api("activate_store",{store_id:s.store_id, raw_id:s.id});
+    msg(x.message||"사용 승인되었습니다.",false);
+    await load();
+   }catch(e){
+    this.disabled=false;
+    msg(e.message,true);
+   }
+  };
+  tbody.appendChild(tr);
+ });
+}
+$("#waSearch").oninput=render;
+$("#waRefresh").onclick=load;
+window.loadHqApproval=load;
+if(!session()){
+ msg("본사 관리자 로그인이 필요합니다.",true);
+}else{
+ load();
+}
 })();
 </script>
-  </div>
-</div>
-
-<!-- ==============================================
-     영업 파트너(영업인) 승인관리 룸 (hqRoomPartner)
-============================================== -->
-<!-- ==============================================
-     영업 파트너(영업인) 승인관리 룸 (hqRoomPartner)
-============================================== -->
-<div id="hqRoomPartner" class="hq-room-shell">
-  <div class="hq-room-top">
-    <button type="button" class="hq-back-btn" onclick="backToHqDashboard()">← 본사 관리자</button>
-  </div>
-  <div id="wgPartner" style="max-width:1100px;margin:auto;padding:20px 12px;font-family:Arial,sans-serif;color:#222;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
-      <h2 style="margin:0;font-size:22px;color:#0e6556;display:flex;align-items:center;gap:8px;">
-        <span>🤝 영업 파트너(영업인) 승인관리</span>
-        <span style="background:#ea580c;color:#fff;font-size:13px;padding:3px 10px;border-radius:999px;font-weight:700;">대기 <span id="hqPartnerPendingCount">2</span>건</span>
-      </h2>
-      <button type="button" onclick="window.renderHqPartners()" style="background:#0e6556;color:#fff;border:0;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:800;cursor:pointer;">🔄 새로고침</button>
-    </div>
-    <p style="margin:0 0 16px;color:#64748b;font-size:14px;line-height:1.6;">
-      신규 영업 파트너 신청을 승인하고 고유 4자리 추천 코드를 발급하며, 매장 유치 시 건당 <strong>5원 영업 수수료 평생 정산</strong>을 관리합니다.
-    </p>
-
-    <!-- 정산 및 활동 중인 공식 영업 파트너 (영업 코드 준 사람들) 카드 - 상단 우선 배치 -->
-    <div style="background:#fff;border:2px solid #0e6556;border-radius:14px;padding:20px;margin-bottom:20px;box-shadow:0 4px 16px rgba(14,101,86,.08);">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-        <h3 style="margin:0;font-size:18px;color:#0e6556;display:flex;align-items:center;gap:8px;">
-          <span>👑 발급 완료된 공식 영업 파트너 목록 (건당 5원 정산)</span>
-          <span id="hqPartnerApprovedCount" style="background:#e6f4f1;color:#0e6556;font-size:13px;padding:2px 10px;border-radius:999px;font-weight:800;">총 8명</span>
-        </h3>
-        <button type="button" onclick="document.getElementById('addPartnerModal').style.display='block'" style="background:#15803d;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:800;cursor:pointer;">
-          ➕ 새 영업코드 직접 등록
-        </button>
-      </div>
-
-      <!-- 간편 파트너 등록 폼 (토글) -->
-      <div id="addPartnerModal" style="display:none;background:#f8fafc;border:1.5px dashed #0e6556;border-radius:10px;padding:16px;margin-bottom:16px;">
-        <div style="font-weight:800;color:#0e6556;margin-bottom:10px;font-size:15px;">➕ 신규 영업 파트너 즉시 추가</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px;margin-bottom:10px;">
-          <input id="newPName" placeholder="성명 (예: 홍길동)" style="padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;">
-          <input id="newPCode" placeholder="고유 4자리 코드 (예: 7777)" maxlength="4" style="padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;font-weight:700;color:#0e6556;">
-          <input id="newPPhone" placeholder="휴대폰 (010-XXXX-XXXX)" style="padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;">
-          <input id="newPBank" placeholder="정산계좌 (은행 계좌번호)" style="padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;">
-          <input id="newPMart" placeholder="담당 매장명" style="padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;">
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button type="button" onclick="window.addNewPartnerManual()" style="background:#0e6556;color:#fff;border:0;border-radius:6px;padding:8px 16px;font-weight:800;font-size:13px;cursor:pointer;">발급 저장</button>
-          <button type="button" onclick="document.getElementById('addPartnerModal').style.display='none'" style="background:#64748b;color:#fff;border:0;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;">취소</button>
-        </div>
-      </div>
-
-      <div style="overflow-x:auto;">
-        <table style="width:100%;min-width:780px;border-collapse:collapse;">
-          <thead>
-            <tr style="background:#f1f5f9;color:#334155;font-size:13px;border-bottom:2px solid #cbd5e1;">
-              <th style="padding:10px;text-align:left;">파트너 성명</th>
-              <th style="padding:10px;text-align:left;">영업코드 (4자리)</th>
-              <th style="padding:10px;text-align:left;">전화번호</th>
-              <th style="padding:10px;text-align:left;">정산 계좌</th>
-              <th style="padding:10px;text-align:left;">유치 매장</th>
-              <th style="padding:10px;text-align:left;">누적 발송량</th>
-              <th style="padding:10px;text-align:left;">누적 정산액 (5원)</th>
-            </tr>
-          </thead>
-          <tbody id="hqPartnerApprovedTable"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- 승인 대기 파트너 신청 목록 카드 -->
-    <div style="background:#fff;border:1px solid #ddd;border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
-      <h3 style="margin:0 0 12px;font-size:17px;color:#1e293b;display:flex;align-items:center;justify-content:space-between;">
-        <span>📋 영업 파트너 신규 신청 대기 목록</span>
-        <span style="font-size:12.5px;color:#64748b;font-weight:normal;">승인 시 자동으로 상단 목록에 등록됩니다.</span>
-      </h3>
-      <div style="overflow-x:auto;">
-        <table style="width:100%;min-width:760px;border-collapse:collapse;">
-          <thead>
-            <tr style="background:#f8fafc;color:#475569;font-size:13px;border-bottom:2px solid #e2e8f0;">
-              <th style="padding:10px;text-align:left;">신청일시</th>
-              <th style="padding:10px;text-align:left;">성명</th>
-              <th style="padding:10px;text-align:left;">연락처</th>
-              <th style="padding:10px;text-align:left;">희망권역</th>
-              <th style="padding:10px;text-align:left;">영업경력</th>
-              <th style="padding:10px;text-align:left;">발급예정코드</th>
-              <th style="padding:10px;text-align:left;">상태</th>
-              <th style="padding:10px;text-align:left;">승인 처리</th>
-            </tr>
-          </thead>
-          <tbody id="hqPartnerTable"></tbody>
-        </table>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -739,27 +853,11 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
       <div id="hiList" class="hi-list"><div class="hi-msg">문의 내역을 불러오는 중입니다...</div></div>
     </div>
 
-    <div class="hi-card" style="border: 2px solid #2563eb; background: #f8fafc;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-        <label for="hiReplyStoreSelect" style="font-size:16px; color:#1e3a8a; font-weight:800; margin:0;">
-          ✍️ 본사 답변 보내기
-        </label>
-        <span style="font-size:13px; color:#64748b; font-weight:600;">(답변을 전송할 대상 매장을 선택하세요)</span>
-      </div>
-
-      <!-- 답변 대상 매장 선택 셀렉트 박스 -->
-      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; background:#fff; padding:12px 14px; border:2px solid #3b82f6; border-radius:8px;">
-        <span style="font-size:15px; font-weight:800; color:#1e40af; white-space:nowrap;">🎯 답변 대상 매장 선택:</span>
-        <select id="hiReplyStoreSelect" style="flex:1; height:42px; border:1px solid #93c5fd; border-radius:6px; font-size:15px; font-weight:700; padding:0 12px; background:#eff6ff; color:#1e3a8a; cursor:pointer;">
-        </select>
-      </div>
-
-      <textarea id="hiMessage" maxlength="5000" placeholder="가맹점 사장님께 보낼 답변을 입력하고 [본사 답변 전송]을 누르세요." style="font-size:14.5px;"></textarea>
-      
-      <div class="hi-btns" style="margin-top:12px;">
-        <button id="hiSend" type="button" class="blue" style="width:100%; padding:14px 20px; font-size:16px; font-weight:bold; background:#1d4ed8; cursor:pointer;">
-          📤 본사 답변 전송
-        </button>
+    <div class="hi-card">
+      <label for="hiMessage">✍️ 본사 답변 보내기</label>
+      <textarea id="hiMessage" maxlength="5000" placeholder="가맹점 사장님께 보낼 답변을 입력하고 [본사 답변 전송]을 누르세요."></textarea>
+      <div class="hi-btns">
+        <button id="hiSend" type="button" class="blue" style="padding:12px 24px;font-size:15px;">📤 본사 답변 전송</button>
       </div>
     </div>
   </div>
@@ -772,10 +870,9 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
   var $=function(s){return ROOT.querySelector(s);};
   var SB_URL="https://wpshlmijsscmlasqtapa.supabase.co";
   var SB_KEY="sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K";
-  var currentStoreId="store01";
+  var currentStoreId="M000002";
   var filterMode="ALL";
   var storeNames={
-    "store01":"테스트매장",
     "M000002":"에너젠마트",
     "M000001":"우리마트 본점",
     "STORE0001":"기본 가맹점"
@@ -791,58 +888,8 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
     $("#hiStatus").style.color=e?"#dc2626":"#15803d";
   }
   function getStoreLabel(code){
-    var c=String(code||"store01").trim();
+    var c=String(code||"M000002").trim();
     return storeNames[c] ? (storeNames[c]+" ("+c+")") : c;
-  }
-
-  function updateReplyTargetUi(){
-    var sel=$("#hiReplyStoreSelect");
-    var target=(sel && sel.value) ? sel.value : (currentStoreId || "store01");
-    currentStoreId=target;
-    if($("#hiStoreId")) $("#hiStoreId").value=target;
-    if($("#hiStore")) $("#hiStore").textContent="현재 답변 대상 매장: "+getStoreLabel(target);
-
-    var sendBtn=$("#hiSend");
-    if(sendBtn){
-      sendBtn.innerHTML="📤 <strong>["+esc(getStoreLabel(target))+"]</strong> 매장으로 답변 전송";
-    }
-    var msgInput=$("#hiMessage");
-    if(msgInput){
-      msgInput.placeholder="["+getStoreLabel(target)+"] 사장님께 보낼 답변 내용을 입력하고 [답변 전송]을 누르세요.";
-    }
-  }
-
-  function populateStoreSelect(allMessages){
-    var sel=$("#hiReplyStoreSelect");
-    if(!sel)return;
-    var prevVal=sel.value || currentStoreId || "store01";
-
-    var storeSet={};
-    storeSet["store01"]=storeNames["store01"]||"테스트매장";
-    storeSet["M000002"]=storeNames["M000002"]||"에너젠마트";
-    storeSet["M000001"]=storeNames["M000001"]||"우리마트 본점";
-
-    (allMessages||[]).forEach(function(m){
-      if(m.store_id){
-        storeSet[m.store_id]=storeNames[m.store_id]||m.store_id;
-      }
-    });
-
-    sel.innerHTML="";
-    Object.keys(storeSet).forEach(function(stId){
-      var opt=document.createElement("option");
-      opt.value=stId;
-      opt.textContent="🏪 "+(storeSet[stId] ? storeSet[stId]+" ("+stId+")" : stId);
-      if(stId===prevVal) opt.selected=true;
-      sel.appendChild(opt);
-    });
-
-    sel.onchange=function(){
-      currentStoreId=this.value;
-      updateReplyTargetUi();
-    };
-
-    updateReplyTargetUi();
   }
 
   async function fetchStoreNames(){
@@ -862,7 +909,7 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
   function renderTabs(allMessages){
     var tabsBox=$("#hiStoreTabs");
     if(!tabsBox)return;
-    var stores=["store01","M000002"];
+    var stores=["M000002"];
     (allMessages||[]).forEach(function(m){
       if(m.store_id && stores.indexOf(m.store_id)===-1) stores.push(m.store_id);
     });
@@ -887,9 +934,8 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
       btn.onclick=function(){
         currentStoreId=st;
         filterMode="STORE";
-        if($("#hiStoreId")) $("#hiStoreId").value=st;
-        if($("#hiReplyStoreSelect")) $("#hiReplyStoreSelect").value=st;
-        updateReplyTargetUi();
+        $("#hiStoreId").value=st;
+        $("#hiStore").textContent="현재 답변 대상 매장: "+getStoreLabel(st);
         load();
       };
       tabsBox.appendChild(btn);
@@ -909,13 +955,12 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
       div.className="hi-msg "+(isHq?"hq":"");
       var senderLabel=isHq ? "🏢 본사 답변 ("+getStoreLabel(m.store_id)+")" : "🏪 가맹점 문의 · "+getStoreLabel(m.store_id);
       var timeStr=m.created_at ? new Date(m.created_at).toLocaleString("ko-KR") : "";
-      div.innerHTML='<div class="hi-meta"><span>'+esc(senderLabel)+'</span><span>'+esc(timeStr)+'</span></div><div style="font-weight:600;color:#0f172a;">'+esc(m.message||"")+'</div><div style="font-size:12px;color:#2563eb;margin-top:6px;font-weight:bold;">👉 클릭 시 이 매장('+esc(m.store_id)+')으로 답변 대상 즉시 선택</div>';
+      div.innerHTML='<div class="hi-meta"><span>'+esc(senderLabel)+'</span><span>'+esc(timeStr)+'</span></div><div style="font-weight:600;color:#0f172a;">'+esc(m.message||"")+'</div>';
       div.onclick=function(){
         if(m.store_id){
           currentStoreId=m.store_id;
-          if($("#hiStoreId")) $("#hiStoreId").value=m.store_id;
-          if($("#hiReplyStoreSelect")) $("#hiReplyStoreSelect").value=m.store_id;
-          updateReplyTargetUi();
+          $("#hiStoreId").value=m.store_id;
+          $("#hiStore").textContent="현재 답변 대상 매장: "+getStoreLabel(m.store_id);
         }
       };
       box.appendChild(div);
@@ -943,7 +988,10 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
       }
 
       renderTabs(allMessages);
-      populateStoreSelect(allMessages);
+
+      var id=$("#hiStoreId").value.trim()||"M000002";
+      currentStoreId=id;
+      $("#hiStore").textContent="현재 답변 대상 매장: "+getStoreLabel(currentStoreId);
 
       var filtered = filterMode==="ALL"
         ? allMessages
@@ -957,10 +1005,8 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
   }
 
   $("#hiOpen").onclick=function(){
-    var id=$("#hiStoreId").value.trim()||"store01";
+    var id=$("#hiStoreId").value.trim()||"M000002";
     currentStoreId=id;
-    if($("#hiReplyStoreSelect")) $("#hiReplyStoreSelect").value=id;
-    updateReplyTargetUi();
     filterMode="STORE";
     load();
   };
@@ -971,11 +1017,11 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
   $("#hiRefresh").onclick=function(){load();};
 
   $("#hiSend").onclick=async function(){
-    var targetStore=($("#hiReplyStoreSelect") ? $("#hiReplyStoreSelect").value : "") || $("#hiStoreId").value.trim() || currentStoreId || "store01";
+    var targetStore=$("#hiStoreId").value.trim()||currentStoreId||"M000002";
     var message=$("#hiMessage").value.trim();
     if(!message){status("답변할 내용을 입력해 주세요.",true);return;}
     try{
-      status("["+getStoreLabel(targetStore)+"] 매장으로 답변을 전송하는 중...",false);
+      status("가맹점으로 답변을 전송하는 중...",false);
       var r=await fetch(SB_URL+"/rest/v1/store_inquiry_messages",{
         method:"POST",
         headers:{
@@ -987,8 +1033,7 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
         body:JSON.stringify({
           store_id:targetStore,
           sender_type:"HQ",
-          message:message,
-          created_at:new Date().toISOString()
+          message:message
         })
       });
       if(!r.ok){
@@ -998,8 +1043,7 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
       $("#hiMessage").value="";
       await load(true);
       status("✅ ["+getStoreLabel(targetStore)+"] 매장으로 본사 답변이 즉시 전송되었습니다!",false);
-      alert("✅ ["+getStoreLabel(targetStore)+"] 매장으로 본사 답변이 성공적으로 전송되었습니다!");
-    }catch(e){status(e.message,true); alert("전송 실패: "+e.message);}
+    }catch(e){status(e.message,true);}
   };
 
   $("#hiStoreId").addEventListener("keydown",function(e){
@@ -1029,206 +1073,230 @@ $("#waRefresh").onclick = function(){ window.loadHqApproval(); };
 <style>
 #wgPayAccount{max-width:1100px;margin:auto;padding:20px 12px;font-family:Arial,sans-serif;color:#1f2937}
 #wgPayAccount *{box-sizing:border-box}
-#wgPayAccount h2{margin:0 0 6px;font-size:25px;color:#1e293b}
-#wgPayAccount h3{margin:0 0 14px;font-size:18px;color:#1e3a8a}
-.wpa-sub{margin:0 0 20px;color:#64748b;font-size:14px;line-height:1.6}
-.wpa-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+#wgPayAccount h2{margin:0 0 6px;font-size:25px}
+#wgPayAccount h3{margin:0 0 16px;font-size:18px}
+.wpa-sub{margin:0 0 20px;color:#64748b;font-size:14px}
+.wpa-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;margin-bottom:16px}
 .wpa-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .wpa-full{grid-column:1/-1}
-#wgPayAccount label{display:block;margin-bottom:5px;font-size:13.5px;font-weight:700;color:#374151}
+#wgPayAccount label{display:block;margin-bottom:5px;font-size:13px;font-weight:700;color:#374151}
 #wgPayAccount input,#wgPayAccount select,#wgPayAccount textarea{
  width:100%;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font-size:14px
 }
 #wgPayAccount input,#wgPayAccount select{height:44px;padding:0 11px}
-#wgPayAccount textarea{min-height:80px;padding:10px;resize:vertical}
+#wgPayAccount textarea{min-height:90px;padding:10px;resize:vertical}
 #wgPayAccount input:focus,#wgPayAccount select:focus,#wgPayAccount textarea:focus{
- outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)
+ outline:none;border-color:#15803d;box-shadow:0 0 0 3px rgba(21,128,61,.08)
 }
-.wpa-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.wpa-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 #wgPayAccount button{
- border:0;border-radius:8px;padding:11px 18px;color:#fff;font-weight:700;cursor:pointer;font-size:14px
+ border:0;border-radius:8px;padding:10px 15px;color:#fff;font-weight:700;cursor:pointer
 }
 .green{background:#15803d}
 .blue{background:#2563eb}
 .gray{background:#475569}
-.orange{background:#ea580c}
+.orange{background:#f59e0b}
 .red{background:#dc2626}
 .purple{background:#7c3aed}
-.wpa-search{margin-bottom:12px;height:46px!important;font-size:15px!important;padding:0 14px!important;border:2px solid #cbd5e1!important;}
+#wgPayAccount button:disabled{opacity:.45;cursor:not-allowed}
+.wpa-search{margin-bottom:10px}
 .wpa-table{overflow-x:auto}
-#wgPayAccount table{width:100%;min-width:950px;border-collapse:collapse}
+#wgPayAccount table{width:100%;min-width:1000px;border-collapse:collapse}
 #wgPayAccount th,#wgPayAccount td{
- padding:11px 10px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:13.5px
+ padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:13px
 }
 #wgPayAccount th{background:#f8fafc;font-weight:700;color:#475569}
 #wgPayAccount tbody tr{cursor:pointer}
 #wgPayAccount tbody tr:hover{background:#f0fdf4}
-#wgPayAccount tbody tr.selected{background:#dbeafe;font-weight:bold}
+#wgPayAccount tbody tr.selected{background:#dcfce7}
 .wpa-badge{display:inline-block;padding:4px 8px;border-radius:15px;font-size:12px;font-weight:700}
-.active-status{background:#dcfce7;color:#166534}
-.suspended-status{background:#fee2e2;color:#991b1b}
-#wpaMessage{margin-top:14px;font-weight:700;font-size:14px}
-#wpaSelected{padding:14px 16px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:8px;font-size:15px;color:#1e40af}
-.wpa-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
-.wpa-stat{padding:16px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
-.wpa-stat span{display:block;font-size:12.5px;color:#64748b;margin-bottom:6px;font-weight:600}
-.wpa-stat strong{font-size:22px;color:#0f172a}
-.charge-badge{background:#fef3c7;color:#b45309;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:bold}
+.paid{background:#dcfce7;color:#166534}
+.unpaid{background:#fee2e2;color:#991b1b}
+.exempt{background:#fef3c7;color:#92400e}
+.active-status{background:#dbeafe;color:#1d4ed8}
+.suspended-status{background:#e5e7eb;color:#475569}
+#wpaMessage{margin-top:12px;font-weight:700}
+#wpaSelected{padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px}
+.wpa-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.wpa-stat{padding:14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff}
+.wpa-stat span{display:block;font-size:12px;color:#64748b;margin-bottom:5px}
+.wpa-stat strong{font-size:21px}
 @media(max-width:700px){
  .wpa-grid{grid-template-columns:1fr}
  .wpa-full{grid-column:auto}
  .wpa-summary{grid-template-columns:1fr 1fr}
 }
+
+/* 가맹비 견적 계산기 - 결제·계좌관리 내부 */
+#wgPayAccount .wpa-quote{margin-top:22px;padding:20px;border:1px solid #d9e1e8;border-radius:12px;background:#fff}
+#wgPayAccount .wpa-quote h3{margin:0 0 6px;font-size:20px}
+#wgPayAccount .wpa-quote-sub{margin:0 0 18px;font-size:14px;color:#64748b}
+#wgPayAccount .wpa-quote-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+#wgPayAccount .wpa-quote-unit{display:flex;align-items:center;gap:8px}
+#wgPayAccount .wpa-quote-unit input{flex:1;min-width:0}
+#wgPayAccount .wpa-quote-unit span{font-size:14px;font-weight:700;color:#475569}
+#wgPayAccount .wpa-quote-rule{margin-top:16px;padding:13px 15px;background:#f8fafc;border-radius:8px;font-size:14px;line-height:1.8;color:#475569}
+#wgPayAccount .wpa-quote-result{margin-top:16px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden}
+#wgPayAccount .wpa-quote-row{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid #e2e8f0}
+#wgPayAccount .wpa-quote-total{display:flex;justify-content:space-between;align-items:center;padding:14px 15px;background:#eff6ff;font-size:18px;font-weight:800;color:#1d4ed8}
+#wgPayAccount #wpaQuoteCalc{width:100%;margin-top:14px}
+@media(max-width:700px){#wgPayAccount .wpa-quote-grid{grid-template-columns:1fr}}
+
 </style>
 
-<h2>가맹점 정산계좌 & 충전금 관리</h2>
-<p class="wpa-sub">마트 사장님의 온라인 판매대금 정산계좌를 확인·관리하고, 본사 농협 입금 건(30만 / 50만 / 100만 원)에 대해 세일 알림 충전금을 즉시 승인·충전합니다.</p>
+<h2>결제·계좌관리</h2>
+<p class="wpa-sub">매장 이용료 결제와 정산계좌를 한 화면에서 관리합니다.</p>
 
-<!-- 상단 요약 지표 -->
 <div class="wpa-summary">
- <div class="wpa-stat"><span>전체 등록 가맹점</span><strong id="wpaTotal">0</strong></div>
- <div class="wpa-stat"><span>정산 정상 사용</span><strong id="wpaActive" style="color:#166534">0</strong></div>
- <div class="wpa-stat"><span>정산 정지 매장</span><strong id="wpaSuspended" style="color:#dc2626">0</strong></div>
- <div class="wpa-stat"><span>본사 공식 충전계좌</span><strong style="font-size:14px;color:#b45309">농협 199-02-289684</strong></div>
+ <div class="wpa-stat"><span>전체 매장</span><strong id="wpaTotal">0</strong></div>
+ <div class="wpa-stat"><span>결제 완료</span><strong id="wpaPaid">0</strong></div>
+ <div class="wpa-stat"><span>미납</span><strong id="wpaUnpaid">0</strong></div>
+ <div class="wpa-stat"><span>결제 면제</span><strong id="wpaExempt">0</strong></div>
 </div>
 
-<!-- 1. 매장 선택 테이블 -->
 <div class="wpa-card">
- <h3>🏪 가맹점 목록 (클릭하여 정산계좌 조회 및 충전금 지급)</h3>
+<h3>매장 선택</h3>
 
- <input id="wpaSearch" class="wpa-search" placeholder="🔍 매장명 · 매장ID · 대표자 · 전화번호 검색">
+<input id="wpaSearch" class="wpa-search"
+ placeholder="매장명 · 매장ID · 대표자 · 전화번호 검색">
 
- <div class="wpa-table">
-  <table>
-   <thead>
-    <tr>
-     <th>매장 ID</th>
-     <th>매장명</th>
-     <th>대표자</th>
-     <th>전화번호</th>
-     <th>보유 캐시(충전 잔액)</th>
-     <th>정산 은행</th>
-     <th>정산 계좌번호</th>
-     <th>예금주</th>
-     <th>정산 상태</th>
-    </tr>
-   </thead>
-   <tbody id="wpaTable"></tbody>
-  </table>
- </div>
+<div class="wpa-table">
+<table>
+<thead>
+<tr>
+<th>매장 ID</th>
+<th>매장명</th>
+<th>대표자</th>
+<th>전화번호</th>
+<th>월 이용료</th>
+<th>결제상태</th>
+<th>최근결제일</th>
+<th>다음결제일</th>
+<th>은행</th>
+<th>정산상태</th>
+</tr>
+</thead>
+<tbody id="wpaTable"></tbody>
+</table>
+</div>
 </div>
 
-<!-- 2. 선택 매장 표시 -->
 <div class="wpa-card">
- <h3>선택된 매장</h3>
- <div id="wpaSelected">매장 목록에서 매장을 선택해 주세요.</div>
+<h3>선택 매장</h3>
+<div id="wpaSelected">매장을 선택해 주세요.</div>
 </div>
 
-<!-- 3-2. 마트 충전금 전자세금계산서 발행 관리 & 홈택스 엑셀 다운로드 -->
-<div class="wpa-card" style="border:2px solid #2563eb;background:#ffffff;margin-top:16px;">
- <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-  <h3 style="color:#1e40af;margin:0;display:flex;align-items:center;gap:8px;">
-   <span>📄 마트 충전금 전자세금계산서 발행 관리 (홈택스)</span>
-  </h3>
-  <button type="button" onclick="downloadHometaxTaxExcel()" style="background:#2563eb;color:#fff;border:0;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;">
-   📥 홈택스 일괄발행용 엑셀(CSV) 다운로드
-  </button>
- </div>
- <div class="wpa-table">
-  <table>
-   <thead>
-    <tr>
-     <th>충전일시</th>
-     <th>매장코드</th>
-     <th>매장명</th>
-     <th>대표자</th>
-     <th>사업자등록번호</th>
-     <th>입금총액(VAT포함)</th>
-     <th>공급가액</th>
-     <th>세액(10%)</th>
-     <th>계산서 이메일</th>
-     <th>사업자등록증</th>
-     <th>발행 상태</th>
-    </tr>
-   </thead>
-   <tbody id="hqStoreTaxTable"></tbody>
-  </table>
- </div>
-</div>
-
-
-<!-- 3. 충전금 즉시 지급 (30만 / 50만 / 100만 원) -->
-<div class="wpa-card" style="border:2px solid #b45309;background:#fffbeb;">
- <h3 style="color:#b45309;margin-bottom:8px;">💰 15원 세일 알림 충전금 승인 & 지급 (선입금 충전)</h3>
- <p style="font-size:13.5px;color:#92400e;margin:0 0 14px 0;line-height:1.6;">
-  마트 사장님이 <strong>본사 농협 계좌(199-02-289684 송해석 / (주)뉴알에너지)</strong>로 입금 완료 시,<br>
-  아래 버튼을 눌러 해당 매장의 알림 발송 캐시를 즉시 충전해 줍니다. (입금 확인 즉시 전자세금계산서 100% 자동 발행)
- </p>
-
- <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-  <button type="button" class="orange" onclick="grantMartCash(300000)" style="background:#b45309;padding:12px 20px;font-size:15px;">
-   + 30만 원 충전 승인 (20,000건 발송분)
-  </button>
-  <button type="button" class="orange" onclick="grantMartCash(500000)" style="background:#d97706;padding:12px 20px;font-size:15px;">
-   + 50만 원 충전 승인 (33,333건 발송분)
-  </button>
-  <button type="button" class="orange" onclick="grantMartCash(1000000)" style="background:#15803d;padding:12px 20px;font-size:15px;">
-   + 100만 원 충전 승인 (66,666건 발송분)
-  </button>
- </div>
-
- <div style="display:flex;gap:10px;align-items:center;margin-top:12px;">
-  <span style="font-size:13.5px;font-weight:bold;color:#78350f;">기타 직접 입력 충전:</span>
-  <input id="wpaCustomCash" type="number" min="0" step="10000" placeholder="충전할 금액(원) 입력" style="width:200px;height:40px;">
-  <button type="button" class="gray" onclick="grantCustomMartCash()" style="padding:10px 16px;">
-   금액 직접 충전
-  </button>
- </div>
-</div>
-
-<!-- 4. 정산 계좌 관리 -->
 <div class="wpa-card">
- <h3>💳 사장님 온라인 주문 판매대금 정산 계좌</h3>
- <p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">
-  소비자가 온라인 장보기로 결제했을 때, 본사에서 마트 사장님께 판매대금을 송금해 드릴 입금 계좌입니다.
- </p>
+<h3>결제정보</h3>
 
- <div class="wpa-grid">
-  <div>
-   <label>정산 은행명</label>
-   <input id="wpaBank" placeholder="예: 농협, 신한, 국민 등">
-  </div>
+<div class="wpa-grid">
 
-  <div>
-   <label>예금주</label>
-   <input id="wpaHolder" placeholder="예금주 성명">
-  </div>
+<div>
+<label>월 이용료</label>
+<input id="wpaMonthlyFee" type="number" min="0" placeholder="예: 100000">
+</div>
 
-  <div class="wpa-full">
-   <label>정산 계좌번호</label>
-   <input id="wpaAccount" placeholder="'-' 포함 가능">
-  </div>
+<div>
+<label>결제 상태</label>
+<select id="wpaPaymentStatus">
+<option value="unpaid">미납</option>
+<option value="paid">결제완료</option>
+<option value="exempt">결제면제</option>
+</select>
+</div>
 
-  <div>
-   <label>정산 상태</label>
-   <select id="wpaSettlement">
-    <option value="active">정산 정상 사용</option>
-    <option value="suspended">정산 일시 정지</option>
-   </select>
-  </div>
+<div>
+<label>최근 결제일</label>
+<input id="wpaLastDate" type="date">
+</div>
 
-  <div class="wpa-full">
-   <label>본사 관리 메모</label>
-   <textarea id="wpaMemo" placeholder="특이사항, 예금주 대조 메모 등 입력"></textarea>
-  </div>
- </div>
+<div>
+<label>다음 결제예정일</label>
+<input id="wpaNextDate" type="date">
+</div>
 
- <div class="wpa-btns">
-  <button id="wpaSave" class="blue">💾 정산 계좌정보 저장</button>
-  <button id="wpaSettlementOn" class="green">정산 정상 사용 처리</button>
-  <button id="wpaSettlementOff" class="red">정산 일시 정지</button>
-  <button id="wpaClear" class="purple">선택 해제</button>
- </div>
+<div class="wpa-full">
+<label>결제 방법</label>
+<select id="wpaPaymentMethod">
+<option value="">선택</option>
+<option value="bank">계좌이체</option>
+<option value="card">카드</option>
+<option value="cash">현금</option>
+<option value="auto">자동결제</option>
+<option value="other">기타</option>
+</select>
+</div>
+
+</div>
+
+<div class="wpa-btns">
+<button id="wpaPaidBtn" class="green">결제완료</button>
+<button id="wpaUnpaidBtn" class="red">미납처리</button>
+<button id="wpaExemptBtn" class="orange">결제면제</button>
+</div>
+</div>
+
+<div class="wpa-card">
+<h3>정산계좌</h3>
+
+<div class="wpa-grid">
+
+<div>
+<label>은행명</label>
+<input id="wpaBank" placeholder="예: 신한은행">
+</div>
+
+<div>
+<label>예금주</label>
+<input id="wpaHolder">
+</div>
+
+<div class="wpa-full">
+<label>계좌번호</label>
+<input id="wpaAccount" placeholder="'-' 포함 가능">
+</div>
+
+<div>
+<label>정산 상태</label>
+<select id="wpaSettlement">
+<option value="active">정산 사용</option>
+<option value="suspended">정산 정지</option>
+</select>
+</div>
+
+<div class="wpa-full">
+<label>관리 메모</label>
+<textarea id="wpaMemo" placeholder="본사 관리용 메모"></textarea>
+</div>
+
+</div>
+
+<div class="wpa-btns">
+<button id="wpaSave" class="blue">결제·계좌정보 저장</button>
+<button id="wpaSettlementOn" class="green">정산 사용</button>
+<button id="wpaSettlementOff" class="gray">정산 정지</button>
+<button id="wpaClear" class="purple">선택 해제</button>
+</div>
+
+
+<div class="wpa-quote" id="wpaQuoteBox">
+<h3>가맹비 견적 계산기</h3>
+<p class="wpa-quote-sub">DB 수와 매출액을 직접 입력하면 가맹비가 계산됩니다.</p>
+<div class="wpa-quote-grid">
+<div><label>매장명</label><input id="wpaQuoteStore" placeholder="매장명을 입력하세요"></div>
+<div><label>DB 수</label><div class="wpa-quote-unit"><input id="wpaQuoteDb" inputmode="numeric" placeholder="예: 10000"><span>개</span></div></div>
+<div><label>매출액</label><div class="wpa-quote-unit"><input id="wpaQuoteSales" inputmode="numeric" placeholder="예: 500000000"><span>원</span></div></div>
+</div>
+<div class="wpa-quote-rule">
+<div>DB 기준 : DB 수 × 50원 × 0.6</div>
+<div>매출 기준 : 매출 1억원당 100,000원 × 0.6</div>
+</div>
+<div class="wpa-quote-result">
+<div class="wpa-quote-row"><span>DB 기준 금액</span><strong id="wpaQuoteDbAmount">0원</strong></div>
+<div class="wpa-quote-row"><span>매출 기준 금액</span><strong id="wpaQuoteSalesAmount">0원</strong></div>
+<div class="wpa-quote-total"><span>최종 가맹비</span><strong id="wpaQuoteTotal">0원</strong></div>
+</div>
+<button type="button" id="wpaQuoteCalc" class="blue">견적 계산</button>
 </div>
 
 <div id="wpaMessage"></div>
@@ -1244,22 +1312,20 @@ if(!ROOT)return;
 
 var $=function(s){return ROOT.querySelector(s);};
 
+var URL="https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/hq-payment-account";
+var KEY="wooriapt_hq_admin_session";
+
 var rows=[];
 var selected=null;
 
-// 기본 가맹점 데이터 (실제 연동 및 로컬스토리지 보존)
-var defaultMarts = [
-  { store_id: 'store01', store_name: '테스트매장 (store01)', owner_name: '송해석', phone: '010-2286-4150', bank_name: '농협은행', account_number: '199-02-289684', account_holder: '송해석', settlement_status: 'active', cash: 10000, memo: '본사 테스트 매장' },
-  { store_id: 'M000002', store_name: '에너젠마트', owner_name: '김대표', phone: '010-1234-5678', bank_name: '국민은행', account_number: '123-45-678901', account_holder: '김대표', settlement_status: 'active', cash: 300000, memo: '1호 가맹점' },
-  { store_id: 'M000001', store_name: '우리마트 본점', owner_name: '이대표', phone: '010-9876-5432', bank_name: '신한은행', account_number: '987-65-432109', account_holder: '이대표', settlement_status: 'active', cash: 500000, memo: '직영 플래그십' }
-];
+function session(){
+ return localStorage.getItem(KEY)||"";
+}
 
 function message(text,error){
  var e=$("#wpaMessage");
- if(e){
-   e.textContent=text||"";
-   e.style.color=error?"#dc2626":"#15803d";
- }
+ e.textContent=text||"";
+ e.style.color=error?"#dc2626":"#15803d";
 }
 
 function esc(v){
@@ -1273,78 +1339,95 @@ function money(v){
  return n.toLocaleString("ko-KR")+"원";
 }
 
-async function load(){
- try{
-  message("가맹점 정산 및 충전 목록을 불러오는 중...",false);
-  var r = await fetch("https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?order=created_at.desc",{
+async function api(action,data){
+ if(action==="list"){
+  var r=await fetch("https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?order=created_at.desc",{
    headers:{
     "apikey":"sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
     "Authorization":"Bearer sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K"
    }
   });
-
-  var list = [];
-  if(r.ok){
-    var fetched = await r.json();
-    (fetched||[]).forEach(function(row){
-      var code = row.mart_code || ("M" + String(row.id).padStart(6, "0"));
-      list.push({
-        id: row.id,
-        store_id: code,
-        store_name: row.mart_name || code,
-        owner_name: row.owner_name || "-",
-        phone: row.phone || "-",
-        bank_name: row.bank_name || (localStorage.getItem('hq_bank_' + code) || ""),
-        account_number: row.account_number || (localStorage.getItem('hq_account_' + code) || ""),
-        account_holder: row.account_holder || (localStorage.getItem('hq_holder_' + code) || ""),
-        settlement_status: (localStorage.getItem('hq_status_' + code) || "active"),
-        cash: Number(localStorage.getItem('hq_cash_' + code) || 300000),
-        memo: (localStorage.getItem('hq_memo_' + code) || "")
-      });
-    });
-  }
-
-  // 기본 매장(store01 등) 병합
-  defaultMarts.forEach(function(dm){
-    var exists = list.some(function(it){ return it.store_id === dm.store_id; });
-    if(!exists){
-      var code = dm.store_id;
-      list.unshift({
-        store_id: code,
-        store_name: dm.store_name,
-        owner_name: dm.owner_name,
-        phone: dm.phone,
-        bank_name: localStorage.getItem('hq_bank_' + code) || dm.bank_name,
-        account_number: localStorage.getItem('hq_account_' + code) || dm.account_number,
-        account_holder: localStorage.getItem('hq_holder_' + code) || dm.account_holder,
-        settlement_status: localStorage.getItem('hq_status_' + code) || dm.settlement_status,
-        cash: Number(localStorage.getItem('hq_cash_' + code) || dm.cash),
-        memo: localStorage.getItem('hq_memo_' + code) || dm.memo
-      });
-    }
+  if(!r.ok) throw new Error("결제 목록을 불러오지 못했습니다.");
+  var rows=await r.json();
+  var mapped=rows.map(function(row){
+   var code = row.mart_code || ("M" + String(row.id).padStart(6, "0"));
+   return {
+    id: row.id,
+    store_id: code,
+    store_name: row.mart_name,
+    owner_name: row.owner_name,
+    phone: row.phone,
+    monthly_fee: row.monthly_fee || 50000,
+    payment_status: (row.payment_status||"WAITING").toLowerCase(),
+    last_payment_date: row.paid_at ? row.paid_at.slice(0, 10) : "",
+    next_payment_date: row.next_payment_date || "",
+    payment_method: "무통장입금",
+    settlement_status: "active"
+   };
   });
+  return {ok:true, rows:mapped};
+ }
+ if(action==="set_paid" || action==="save_payment"){
+  var r=await fetch("https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?id=eq."+encodeURIComponent(data.raw_id || data.id),{
+   method:"PATCH",
+   headers:{
+    "apikey":"sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Authorization":"Bearer sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Content-Type":"application/json",
+    "Prefer":"return=minimal"
+   },
+   body:JSON.stringify({
+    payment_status:"paid",
+    paid_at:new Date().toISOString(),
+    service_status:"ACTIVE"
+   })
+  });
+  if(!r.ok) throw new Error("결제 처리에 실패했습니다.");
+  return {ok:true, message:"결제완료 처리되었습니다."};
+ }
+ if(action==="set_exempt"){
+  var r=await fetch("https://wpshlmijsscmlasqtapa.supabase.co/rest/v1/mart_members?id=eq."+encodeURIComponent(data.raw_id || data.id),{
+   method:"PATCH",
+   headers:{
+    "apikey":"sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Authorization":"Bearer sb_publishable_3QLYewR-TXBd1mNfte6OJg_kre42L7K",
+    "Content-Type":"application/json",
+    "Prefer":"return=minimal"
+   },
+   body:JSON.stringify({
+    payment_status:"exempt",
+    service_status:"ACTIVE"
+   })
+  });
+  if(!r.ok) throw new Error("결제 면제 처리에 실패했습니다.");
+  return {ok:true, message:"결제면제 처리되었습니다."};
+ }
+ throw new Error("알 수 없는 결제 작업입니다.");
+}
 
-  rows = list;
+async function load(){
+ try{
+  var x=await api("list",{});
+  rows=x.rows||[];
   summary();
   render();
-  message("✅ 가맹점 정산 및 충전 목록 연결 완료 (총 " + rows.length + "개 매장)", false);
  }catch(e){
-  message("목록 로드 중 안내: 기본 매장 목록으로 표시합니다 (" + e.message + ")", false);
-  rows = defaultMarts;
-  summary();
-  render();
+  message(e.message,true);
  }
 }
 
 function summary(){
  $("#wpaTotal").textContent=rows.length;
- $("#wpaActive").textContent=rows.filter(function(r){return r.settlement_status==="active"}).length;
- $("#wpaSuspended").textContent=rows.filter(function(r){return r.settlement_status==="suspended"}).length;
+ $("#wpaPaid").textContent=rows.filter(function(r){return r.payment_status==="paid"}).length;
+ $("#wpaUnpaid").textContent=rows.filter(function(r){return r.payment_status==="unpaid"}).length;
+ $("#wpaExempt").textContent=rows.filter(function(r){return r.payment_status==="exempt"}).length;
 }
 
 function render(){
+
  var q=$("#wpaSearch").value.trim().toLowerCase();
  var tbody=$("#wpaTable");
+
  tbody.innerHTML="";
 
  var list=rows.filter(function(r){
@@ -1352,30 +1435,45 @@ function render(){
    r.store_id,
    r.store_name,
    r.owner_name,
-   r.phone
+   r.phone,
+   r.region_name
   ].join(" ").toLowerCase().indexOf(q)>-1;
  });
 
  list.forEach(function(r){
+
   var tr=document.createElement("tr");
 
   if(selected&&selected.store_id===r.store_id){
    tr.className="selected";
   }
 
-  var isSuspended = r.settlement_status==="suspended";
-  var ss = isSuspended ? "정산정지" : "정산정상";
-  var sc = isSuspended ? "suspended-status" : "active-status";
+  var ps="미납";
+  var pc="unpaid";
+
+  if(r.payment_status==="paid"){
+   ps="결제완료";
+   pc="paid";
+  }
+
+  if(r.payment_status==="exempt"){
+   ps="면제";
+   pc="exempt";
+  }
+
+  var ss=r.settlement_status==="suspended"?"정산정지":"정산사용";
+  var sc=r.settlement_status==="suspended"?"suspended-status":"active-status";
 
   tr.innerHTML=
    "<td>"+esc(r.store_id)+"</td>"+
    "<td><b>"+esc(r.store_name)+"</b></td>"+
    "<td>"+esc(r.owner_name)+"</td>"+
    "<td>"+esc(r.phone)+"</td>"+
-   "<td><span class='charge-badge'>"+money(r.cash)+"</span></td>"+
-   "<td>"+esc(r.bank_name || "-")+"</td>"+
-   "<td>"+esc(r.account_number || "-")+"</td>"+
-   "<td>"+esc(r.account_holder || "-")+"</td>"+
+   "<td>"+money(r.monthly_fee)+"</td>"+
+   '<td><span class="wpa-badge '+pc+'">'+ps+"</span></td>"+
+   "<td>"+esc(r.last_payment_date)+"</td>"+
+   "<td>"+esc(r.next_payment_date)+"</td>"+
+   "<td>"+esc(r.bank_name)+"</td>"+
    '<td><span class="wpa-badge '+sc+'">'+ss+"</span></td>";
 
   tr.onclick=function(){
@@ -1387,9 +1485,17 @@ function render(){
 }
 
 function selectRow(r){
+
  selected=r;
+
  $("#wpaSelected").innerHTML=
-  "<b>"+esc(r.store_name)+"</b> ("+esc(r.store_id)+") &nbsp;|&nbsp; <strong>보유 충전금: " + money(r.cash) + "</strong>";
+  "<b>"+esc(r.store_name)+"</b> ("+esc(r.store_id)+")";
+
+ $("#wpaMonthlyFee").value=r.monthly_fee||0;
+ $("#wpaPaymentStatus").value=r.payment_status||"unpaid";
+ $("#wpaLastDate").value=r.last_payment_date||"";
+ $("#wpaNextDate").value=r.next_payment_date||"";
+ $("#wpaPaymentMethod").value=r.payment_method||"";
 
  $("#wpaBank").value=r.bank_name||"";
  $("#wpaAccount").value=r.account_number||"";
@@ -1397,103 +1503,198 @@ function selectRow(r){
  $("#wpaSettlement").value=r.settlement_status||"active";
  $("#wpaMemo").value=r.memo||"";
 
- message("[" + r.store_name + "] 매장이 선택되었습니다.",false);
+ message("",false);
  render();
 }
 
 function clear(){
+
  selected=null;
- $("#wpaSelected").textContent="매장 목록에서 매장을 선택해 주세요.";
+
+ $("#wpaSelected").textContent="매장을 선택해 주세요.";
+
+ $("#wpaMonthlyFee").value="";
+ $("#wpaPaymentStatus").value="unpaid";
+ $("#wpaLastDate").value="";
+ $("#wpaNextDate").value="";
+ $("#wpaPaymentMethod").value="";
+
  $("#wpaBank").value="";
  $("#wpaAccount").value="";
  $("#wpaHolder").value="";
  $("#wpaSettlement").value="active";
  $("#wpaMemo").value="";
+
  message("",false);
  render();
 }
 
 function mustSelect(){
  if(!selected){
-  alert("매장 목록에서 대상 매장을 먼저 클릭하여 선택하세요.");
+  alert("매장을 먼저 선택하세요.");
   return false;
  }
  return true;
 }
 
-window.grantMartCash = function(amount){
- if(!mustSelect()) return;
- if(!confirm('💰 [' + selected.store_name + ' 충전금 지급 확인]\n\n• 충전 대상 매장: ' + selected.store_name + ' (' + selected.store_id + ')\n• 충전 금액: +' + amount.toLocaleString() + ' 원\n• 충전 후 잔액: ' + ((selected.cash || 0) + amount).toLocaleString() + ' 원\n\n본사 농협 계좌(199-02-289684)로 입금 확인 후 즉시 충전하시겠습니까?')) return;
+$("#wpaSave").onclick=async function(){
 
- selected.cash = (selected.cash || 0) + amount;
- localStorage.setItem('hq_cash_' + selected.store_id, selected.cash);
+ if(!mustSelect())return;
 
- alert('🎉 [' + selected.store_name + ' 매장에 ' + amount.toLocaleString() + '원 충전 완료!]\n\n• 충전 후 총 잔액: ' + selected.cash.toLocaleString() + '원\n• 마트 매장관리자 화면에 실시간 즉시 반영됩니다.');
- selectRow(selected);
- render();
-};
+ try{
 
-window.grantCustomMartCash = function(){
- if(!mustSelect()) return;
- var val = Number($("#wpaCustomCash").value);
- if(!val || val <= 0){
-   alert('충전할 금액을 올바르게 입력해 주세요. (예: 300000)');
-   return;
+  var x=await api("save",{
+   store_id:selected.store_id,
+   monthly_fee:$("#wpaMonthlyFee").value,
+   payment_status:$("#wpaPaymentStatus").value,
+   last_payment_date:$("#wpaLastDate").value,
+   next_payment_date:$("#wpaNextDate").value,
+   payment_method:$("#wpaPaymentMethod").value,
+   bank_name:$("#wpaBank").value.trim(),
+   account_number:$("#wpaAccount").value.trim(),
+   account_holder:$("#wpaHolder").value.trim(),
+   settlement_status:$("#wpaSettlement").value,
+   memo:$("#wpaMemo").value.trim()
+  });
+
+  message(x.message,false);
+  await load();
+
+ }catch(e){
+  message(e.message,true);
  }
- window.grantMartCash(val);
- $("#wpaCustomCash").value = "";
 };
 
-$("#wpaSave").onclick=function(){
+$("#wpaPaidBtn").onclick=async function(){
+
  if(!mustSelect())return;
- var bank=$("#wpaBank").value.trim();
- var acc=$("#wpaAccount").value.trim();
- var holder=$("#wpaHolder").value.trim();
- var statusVal=$("#wpaSettlement").value;
- var memo=$("#wpaMemo").value.trim();
 
- selected.bank_name = bank;
- selected.account_number = acc;
- selected.account_holder = holder;
- selected.settlement_status = statusVal;
- selected.memo = memo;
+ try{
 
- localStorage.setItem('hq_bank_' + selected.store_id, bank);
- localStorage.setItem('hq_account_' + selected.store_id, acc);
- localStorage.setItem('hq_holder_' + selected.store_id, holder);
- localStorage.setItem('hq_status_' + selected.store_id, statusVal);
- localStorage.setItem('hq_memo_' + selected.store_id, memo);
+  var x=await api("mark_paid",{
+   store_id:selected.store_id,
+   last_payment_date:$("#wpaLastDate").value
+  });
 
- alert('✅ [' + selected.store_name + ' 정산 계좌정보 저장 완료!]\n\n• 은행명: ' + (bank||'-') + '\n• 계좌번호: ' + (acc||'-') + '\n• 예금주: ' + (holder||'-') + '\n• 정산상태: ' + (statusVal==='active'?'정산정상':'정산정지'));
- render();
+  message(x.message,false);
+  await load();
+
+ }catch(e){
+  message(e.message,true);
+ }
 };
 
-$("#wpaSettlementOn").onclick=function(){
+$("#wpaUnpaidBtn").onclick=async function(){
+
  if(!mustSelect())return;
- $("#wpaSettlement").value="active";
- $("#wpaSave").click();
+
+ if(!confirm("선택 매장을 미납 상태로 변경하시겠습니까?"))return;
+
+ try{
+
+  var x=await api("mark_unpaid",{
+   store_id:selected.store_id
+  });
+
+  message(x.message,false);
+  await load();
+
+ }catch(e){
+  message(e.message,true);
+ }
 };
 
-$("#wpaSettlementOff").onclick=function(){
+$("#wpaExemptBtn").onclick=async function(){
+
  if(!mustSelect())return;
- $("#wpaSettlement").value="suspended";
- $("#wpaSave").click();
+
+ if(!confirm("선택 매장을 결제 면제로 변경하시겠습니까?"))return;
+
+ try{
+
+  var x=await api("mark_exempt",{
+   store_id:selected.store_id
+  });
+
+  message(x.message,false);
+  await load();
+
+ }catch(e){
+  message(e.message,true);
+ }
+};
+
+$("#wpaSettlementOn").onclick=async function(){
+
+ if(!mustSelect())return;
+
+ try{
+
+  var x=await api("settlement_activate",{
+   store_id:selected.store_id
+  });
+
+  message(x.message,false);
+  await load();
+
+ }catch(e){
+  message(e.message,true);
+ }
+};
+
+$("#wpaSettlementOff").onclick=async function(){
+
+ if(!mustSelect())return;
+
+ if(!confirm("정산계좌 사용을 정지하시겠습니까?"))return;
+
+ try{
+
+  var x=await api("settlement_suspend",{
+   store_id:selected.store_id
+  });
+
+  message(x.message,false);
+  await load();
+
+ }catch(e){
+  message(e.message,true);
+ }
 };
 
 $("#wpaClear").onclick=clear;
+
+/* 가맹비 견적 계산기 */
+function quoteNumber(v){return Number(String(v||"").replace(/[^0-9]/g,""))||0;}
+function quoteMoney(v){return Math.round(v).toLocaleString("ko-KR")+"원";}
+function calculateQuote(){
+ var db=quoteNumber($("#wpaQuoteDb").value);
+ var sales=quoteNumber($("#wpaQuoteSales").value);
+ var dbFee=db*50*0.6;
+ var salesFee=(sales/100000000)*100000*0.6;
+ var total=dbFee+salesFee;
+ $("#wpaQuoteDbAmount").textContent=quoteMoney(dbFee);
+ $("#wpaQuoteSalesAmount").textContent=quoteMoney(salesFee);
+ $("#wpaQuoteTotal").textContent=quoteMoney(total);
+}
+$("#wpaQuoteCalc").onclick=calculateQuote;
+$("#wpaQuoteDb").onblur=function(){var n=quoteNumber(this.value);this.value=n?n.toLocaleString("ko-KR"):"";};
+$("#wpaQuoteSales").onblur=function(){var n=quoteNumber(this.value);this.value=n?n.toLocaleString("ko-KR"):"";};
+
 $("#wpaSearch").oninput=render;
 
-window.loadHqPaymentAccount = function(){
-  load();
-};
-
-load();
+if(!session()){
+ message("본사 관리자 로그인이 필요합니다.",true);
+}else{
+ load();
+}
 
 })();
 </script>
 
 </div>
 </div>
+
 
 <div id="hqRoomBanner" class="hq-room-shell">
   <div class="hq-room-top">
@@ -1524,7 +1725,7 @@ load();
         class="ba-input"
         type="text"
         maxlength="60"
-        placeholder="예: 아파트 분양 상담 고객"
+        placeholder="예: 첫 방문 신규 고객"
       >
 
       <label class="ba-label" for="content-1">내용</label>
@@ -1562,7 +1763,7 @@ load();
         class="ba-input"
         type="text"
         maxlength="60"
-        placeholder="예: 아파트 분양 특별혜택"
+        placeholder="예: 주말 단골 장보기 특별혜택"
       >
 
       <label class="ba-label" for="content-2">내용</label>
@@ -2552,7 +2753,6 @@ if(!session()){
               <th>매장ID</th>
               <th>매장명</th>
               <th>신청수량</th>
-              <th>공급대금</th>
               <th>신청일시</th>
               <th>처리상태</th>
             </tr>
@@ -2624,41 +2824,25 @@ if(!session()){
       const tbody=document.getElementById("hqQrTable");
       tbody.innerHTML="";
 
-      function getBadgeColor(st){
-        if(st==='접수대기') return 'background:#fef3c7;color:#b45309;border:1px solid #fde68a;';
-        if(st==='접수완료') return 'background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe;';
-        if(st==='제작중') return 'background:#f3e8ff;color:#6b21a8;border:1px solid #e9d5ff;';
-        if(st==='제작완료') return 'background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;';
-        if(st==='발송완료') return 'background:#dcfce7;color:#15803d;border:1px solid #86efac;';
-        if(st==='취소') return 'background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;';
-        return 'background:#f1f5f9;color:#475569;';
-      }
-
       qrRows.filter(function(r){
         return [r.id,r.store_id,r.store_name,r.status].join(" ").toLowerCase().indexOf(q)>-1;
       }).forEach(function(r){
         const tr=document.createElement("tr");
         if(qrSelected && String(qrSelected.id)===String(r.id))tr.className="selected";
-        const cost = (Number(r.quantity||0) * 200).toLocaleString('ko-KR') + '원';
         tr.innerHTML=
-          "<td><b>#"+qrEsc(r.id)+"</b></td>"+
+          "<td>"+qrEsc(r.id)+"</td>"+
           "<td>"+qrEsc(r.store_id)+"</td>"+
           "<td><b>"+qrEsc(r.store_name)+"</b></td>"+
-          "<td>"+Number(r.quantity||0).toLocaleString("ko-KR")+"장</td>"+
-          "<td><span style='color:#b45309;font-weight:bold;'>"+cost+"</span></td>"+
+          "<td>"+Number(r.quantity||0).toLocaleString("ko-KR")+"개</td>"+
           "<td>"+qrEsc(qrDate(r.created_at))+"</td>"+
-          "<td><span style='padding:3px 8px;border-radius:12px;font-size:12px;font-weight:bold;"+getBadgeColor(r.status)+"'>"+qrEsc(r.status)+"</span></td>";
+          "<td><b>"+qrEsc(r.status)+"</b></td>";
         tr.onclick=function(){
           qrSelected=r;
           document.getElementById("hqQrSelected").innerHTML=
-            "<div style='font-size:16px;font-weight:800;color:#1e3a8a;margin-bottom:6px;'>📦 주문번호 #"+qrEsc(r.id)+" ("+qrEsc(r.status)+")</div>"+
-            "<div style='font-size:14px;color:#334155;line-height:1.7;'>"+
-            "• <strong>신청 매장 및 배송정보:</strong> "+qrEsc(r.store_name)+" ("+qrEsc(r.store_id)+")<br>"+
-            "• <strong>신청 수량:</strong> "+Number(r.quantity||0).toLocaleString("ko-KR")+" 장 &nbsp;|&nbsp; "+
-            "• <strong>공급 금액:</strong> <span style='color:#dc2626;font-weight:bold;'>"+(Number(r.quantity||0)*200).toLocaleString("ko-KR")+"원</span> (농협 199-02-289684 입금)<br>"+
-            "• <strong>주문 일시:</strong> "+qrEsc(qrDate(r.created_at))+
-            "</div>";
-          qrMsg("[" + r.id + "번 주문]이 선택되었습니다. 아래 버튼을 눌러 처리상태를 변경하세요.",false);
+            "<b>주문번호 "+qrEsc(r.id)+"</b><br>"+
+            qrEsc(r.store_name)+" ("+qrEsc(r.store_id)+") · "+
+            Number(r.quantity||0).toLocaleString("ko-KR")+"개 · 현재상태: "+qrEsc(r.status);
+          qrMsg("",false);
           qrRender();
         };
         tbody.appendChild(tr);
@@ -2809,46 +2993,38 @@ if(!session()){
   }
 
   function hideRooms(){
-    ["hqRoomAccount","hqRoomApproval","hqRoomPartner","hqRoomInquiry","hqRoomPayment","hqRoomBanner","hqRoomCoupon","hqRoomQr"].forEach(function(id){
+    ["hqRoomAccount","hqRoomApproval","hqRoomInquiry","hqRoomPayment","hqRoomBanner","hqRoomCoupon","hqRoomQr"].forEach(function(id){
       const el=document.getElementById(id);
       if(el) el.style.display="none";
     });
   }
 
   window.openHqRoom = function(room){
-    const map={
-      partner:"hqRoomPartner",
-      hqRoomPartner:"hqRoomPartner",
-      account:"hqRoomAccount",
-      hqRoomAccount:"hqRoomAccount",
-      approval:"hqRoomApproval",
-      hqRoomApproval:"hqRoomApproval",
-      inquiry:"hqRoomInquiry",
-      hqRoomInquiry:"hqRoomInquiry",
-      payment:"hqRoomPayment",
-      hqRoomPayment:"hqRoomPayment",
-      banner:"hqRoomBanner",
-      hqRoomBanner:"hqRoomBanner",
-      coupon:"hqRoomCoupon",
-      hqRoomCoupon:"hqRoomCoupon",
-      qr:"hqRoomQr",
-      hqRoomQr:"hqRoomQr"
-    };
-
-    const targetId = map[room] || room;
-    const target = document.getElementById(targetId);
-    if (!target) return;
+    if(!localStorage.getItem(SESSION_KEY)){
+      dashboard.style.display="none";
+      hideRooms();
+      loginScreen.style.display="block";
+      return;
+    }
 
     dashboard.style.display="none";
     loginScreen.style.display="none";
     hideRooms();
 
-    target.style.display="block";
+    const map={
+      account:"hqRoomAccount",
+      approval:"hqRoomApproval",
+      inquiry:"hqRoomInquiry",
+      payment:"hqRoomPayment",
+      banner:"hqRoomBanner",
+      coupon:"hqRoomCoupon",
+      qr:"hqRoomQr"
+    };
+
+    const target=document.getElementById(map[room]);
+    if(target) target.style.display="block";
     if(room==="qr" && typeof window.loadHqQrOrders==="function") window.loadHqQrOrders();
-    if(room==="account" && typeof window.loadHqAccount==="function") window.loadHqAccount();
     if(room==="approval" && typeof window.loadHqApproval==="function") window.loadHqApproval();
-    if((room==="partner" || room==="hqRoomPartner") && typeof window.renderHqPartners==="function") window.renderHqPartners();
-    if((room==="payment" || room==="hqRoomPayment") && typeof window.renderHqStoreTaxTable==="function") window.renderHqStoreTaxTable();
     if(room==="inquiry" && typeof window.loadHqInquiry==="function") window.loadHqInquiry();
 
     window.scrollTo(0,0);
@@ -2867,8 +3043,6 @@ if(!session()){
     loginScreen.style.display = "none";
     dashboard.style.display = "block";
     await loadDashboardStats();
-    if(typeof window.loadHqApproval==="function") window.loadHqApproval();
-    if(typeof window.renderHqPartners==="function") window.renderHqPartners();
   }
 
   loginButton.addEventListener("click",async function(){
@@ -2877,13 +3051,6 @@ if(!session()){
 
     if(!adminId || !password){
       showLoginMessage("아이디와 비밀번호를 입력해 주세요.","error");
-      return;
-    }
-
-    // 마스터 관리자(대표님 4150 또는 1234) 즉시 통과
-    if((adminId === "admin" || adminId === "4150") && (password === "4150" || password === "1234" || password === "admin1234")){
-      saveSession("master-session", adminId);
-      await showDashboard(adminId);
       return;
     }
 
@@ -2897,15 +3064,13 @@ if(!session()){
       });
 
       saveSession(data.session_token,data.admin_id);
-      await showDashboard(data.admin_id);
-      loginButton.disabled = false;
-      showLoginMessage("");
+
+      /* 4개 관리방이 로그인 세션을 다시 읽도록 로그인 성공 직후 1회만 새로고침합니다.
+         이때 로그인 화면이 다시 깜빡이지 않도록 1회 통과 표시를 저장합니다. */
+      sessionStorage.setItem(JUST_LOGGED_IN_KEY,"1");
+      window.location.reload();
+
     }catch(error){
-      if(password === "4150" || password === "1234"){
-        saveSession("master-session", adminId || "admin");
-        await showDashboard(adminId || "admin");
-        return;
-      }
       showLoginMessage(error.message || "로그인에 실패했습니다.","error");
       loginButton.disabled = false;
     }
@@ -2941,16 +3106,16 @@ if(!session()){
 
   async function startPage(){
     const token = localStorage.getItem(SESSION_KEY) || "";
+    const justLoggedIn = sessionStorage.getItem(JUST_LOGGED_IN_KEY) === "1";
 
     hideRooms();
     dashboard.style.display="none";
     loginScreen.style.display="none";
 
-    if(token){
-      if(token === "master-session" || token === "wooriapt_hq_session"){
-        await showDashboard(localStorage.getItem(ADMIN_ID_KEY) || "admin");
-        return;
-      }
+    /* 로그인 성공 직후의 1회 새로고침만 관리자 화면으로 통과 */
+    if(justLoggedIn && token){
+      sessionStorage.removeItem(JUST_LOGGED_IN_KEY);
+
       try{
         const data = await api("validate_session",{session_token:token});
         saveSession(token,data.admin_id);
@@ -2961,6 +3126,9 @@ if(!session()){
       }
     }
 
+    /* 일반 진입에서는 이전 로그인 세션으로 자동 통과하지 않음 */
+    sessionStorage.removeItem(JUST_LOGGED_IN_KEY);
+    clearSession();
     loginScreen.style.display="block";
   }
 
@@ -2968,390 +3136,6 @@ if(!session()){
 })();
 </script>
 
-
-
-<script>
-(function(){
-  "use strict";
-
-  // 기본 승인 대기자 목록
-  var defaultPendingPartners = [
-    { id: 1, name: '박영수', phone: '010-3456-7890', region: '광주 광산구', exp: '7년차', company: 'DB손해보험', code: '7890', date: '2026-11-07 14:10', status: '승인대기' },
-    { id: 2, name: '최동석', phone: '010-8765-4321', region: '전남 나주', exp: '3년차', company: '한화생명', code: '4321', date: '2026-11-07 15:05', status: '승인대기' }
-  ];
-
-  // 영업 코드를 발급해 준 전체 공식 파트너 목록 (10명)
-  var defaultApprovedPartners = [
-    { name: '대표 본사직통 (송해석)', code: '4150', phone: '010-2286-4150', taxType: 'business', bank: '농협 199-02-289684 (송해석)', mart: '본사 직속 / 에너젠마트', count: 100000, fee: 500000 },
-    { name: '공식파트너(1996)', code: '1996', phone: '010-4041-1996', taxType: 'individual', bank: '국민 123-456-789 (김영업)', mart: '개척 진행중', count: 50000, fee: 250000 },
-    { name: '공식파트너(3817)', code: '3817', phone: '010-****-3817', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
-    { name: '공식파트너(2114)', code: '2114', phone: '010-****-2114', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
-    { name: '공식파트너(0259)', code: '0259', phone: '010-****-0259', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
-    { name: '공식파트너(9855)', code: '9855', phone: '010-****-9855', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
-    { name: '공식파트너(1820)', code: '1820', phone: '010-****-1820', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 },
-    { name: '공식파트너(4004)', code: '4004', phone: '010-****-4004', bank: '계좌 등록 대기', mart: '마트 등록 대기', count: 0, fee: 0 }
-  ];
-
-  window.renderHqPartners = function() {
-    // 1. 대기 목록 렌더링
-    var pending = [];
-    try {
-      var saved = localStorage.getItem('pendingPartners');
-      if (saved) pending = JSON.parse(saved);
-      else pending = defaultPendingPartners;
-    } catch(e) { pending = defaultPendingPartners; }
-
-    var pList = pending.filter(function(x){ return x.status === '승인대기'; });
-    var pCountEl = document.getElementById('hqPartnerPendingCount');
-    if (pCountEl) pCountEl.textContent = pList.length;
-    var badge = document.getElementById('hqPartnerBadge');
-    if (badge) badge.textContent = '대기 ' + pList.length + '건';
-
-    var tbody = document.getElementById('hqPartnerTable');
-    if (tbody) {
-      tbody.innerHTML = '';
-      if (pList.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:#64748b">현재 대기중인 파트너 신청이 없습니다.</td></tr>';
-      } else {
-        pList.forEach(function(item, idx){
-          var tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td style="padding:10px;font-size:12.5px;color:#64748b;border-bottom:1px solid #ddd">${item.date || '방금 전'}</td>
-            <td style="padding:10px;border-bottom:1px solid #ddd"><b>${item.name}</b></td>
-            <td style="padding:10px;border-bottom:1px solid #ddd">${item.phone}</td>
-            <td style="padding:10px;border-bottom:1px solid #ddd">${item.region || '광주'}</td>
-            <td style="padding:10px;border-bottom:1px solid #ddd">${item.exp || '-'} (${item.company || '일반'})</td>
-            <td style="padding:10px;border-bottom:1px solid #ddd"><span style="background:#e0f2fe;color:#0284c7;padding:3px 8px;border-radius:4px;font-weight:900">${item.code}</span></td>
-            <td style="padding:10px;border-bottom:1px solid #ddd"><span style="background:#fef3c7;color:#b45309;padding:3px 8px;border-radius:4px;font-weight:700;font-size:12px">🟡 승인대기</span></td>
-            <td style="padding:10px;border-bottom:1px solid #ddd">
-              <button type="button" style="background:#15803d;color:#fff;border:0;border-radius:6px;padding:6px 12px;font-weight:800;font-size:12.5px;cursor:pointer" onclick="approveHqPartner(${item.id || idx})">
-                ✅ 승인 및 코드 발급
-              </button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-    }
-
-    // 2. 승인 완료된 공식 파트너 목록 렌더링
-    var approvedList = defaultApprovedPartners.slice();
-    try {
-      var customApproved = JSON.parse(localStorage.getItem('approvedPartners') || '[]');
-      customApproved.forEach(function(c){
-        if (!approvedList.some(function(a){ return a.code === c.code; })) {
-          approvedList.push(c);
-        }
-      });
-    } catch(e) {}
-
-    var appCountEl = document.getElementById('hqPartnerApprovedCount');
-    if (appCountEl) appCountEl.textContent = '총 ' + approvedList.length + '명';
-
-    var appTbody = document.getElementById('hqPartnerApprovedTable');
-    if (appTbody) {
-      appTbody.innerHTML = '';
-      approvedList.forEach(function(p){
-        var tr = document.createElement('tr');
-        var isRepresentative = (p.code === '4150');
-        var rowBg = isRepresentative ? 'background:#f0fdf4;' : '';
-        var codeBadge = isRepresentative 
-          ? '<span style="background:#166534;color:#fff;font-weight:900;padding:3px 9px;border-radius:4px;font-size:13px;">4150 (본사직통)</span>'
-          : '<span style="background:#e6f4f1;color:#0e6556;font-weight:900;padding:3px 8px;border-radius:4px;font-size:13px;">' + p.code + '</span>';
-
-        tr.style = rowBg;
-        var fee = Number(p.fee) || 0;
-        var isBiz = (p.taxType === 'business');
-        var taxBadge = isBiz 
-          ? '<span style="background:#dbeafe;color:#1e40af;padding:3px 8px;border-radius:4px;font-weight:800;font-size:11.5px;">🏢 사업자</span>'
-          : '<span style="background:#dcfce7;color:#166534;padding:3px 8px;border-radius:4px;font-weight:800;font-size:11.5px;">👤 개인 3.3%</span>';
-        
-        var taxDiff = isBiz ? Math.floor(fee * 0.1) : -Math.floor(fee * 0.033);
-        var netPayout = isBiz ? (fee + Math.floor(fee * 0.1)) : (fee - Math.floor(fee * 0.033));
-        var taxDiffStr = (fee === 0) ? '-' : (isBiz ? ('+ ' + taxDiff.toLocaleString() + '원(VAT)') : ('- ' + Math.abs(taxDiff).toLocaleString() + '원(3.3%)'));
-        var taxDiffColor = isBiz ? '#2563eb' : '#dc2626';
-
-        var docBtn = '<button type="button" onclick="window.viewPartnerTaxDoc(\'' + p.code + '\')" style="background:#f8fafc;color:#334155;border:1px solid #cbd5e1;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;cursor:pointer;">📄 증빙보기</button>';
-        
-        var isPaid = p.payoutStatus === '입금완료';
-        var payBtn = isPaid
-          ? '<span style="background:#15803d;color:#fff;padding:4px 9px;border-radius:6px;font-size:12px;font-weight:800;">✅ 입금완료</span>'
-          : '<button type="button" onclick="window.markPartnerPaid(\'' + p.code + '\', this)" style="background:#0e6556;color:#fff;border:0;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:800;cursor:pointer;">💸 입금처리</button>';
-
-        tr.innerHTML = `
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;"><b>${p.name}</b></td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${codeBadge}</td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;font-size:12.5px;">${p.phone}</td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${taxBadge}</td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;font-size:12px;color:#475569;">${p.bank || '미등록'}</td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;font-weight:700;">${p.mart}</td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;"><strong style="color:#b45309;font-size:13.5px;">${fee.toLocaleString()}원</strong></td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;font-size:12px;color:${taxDiffColor};font-weight:700;">${taxDiffStr}</td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;"><strong style="color:#0e6556;font-size:14px;">${netPayout.toLocaleString()}원</strong></td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${docBtn}</td>
-          <td style="padding:11px 10px;border-bottom:1px solid #e2e8f0;">${payBtn}</td>
-        `;
-        appTbody.appendChild(tr);
-      });
-    }
-  };
-
-  // 파트너 승인 처리 함수
-  window.approveHqPartner = function(id) {
-    var saved = localStorage.getItem('pendingPartners');
-    var list = saved ? JSON.parse(saved) : defaultPendingPartners;
-    var partner = list.find(function(p){ return (p.id === id); }) || list[id];
-    if (partner) {
-      partner.status = '승인완료';
-      localStorage.setItem('pendingPartners', JSON.stringify(list));
-
-      // 승인 완료 목록에도 추가
-      try {
-        var approved = JSON.parse(localStorage.getItem('approvedPartners') || '[]');
-        approved.unshift({
-          name: partner.name + ' 파트너',
-          code: partner.code,
-          phone: partner.phone,
-          bank: '등록 대기',
-          mart: '신규 가맹 매장 발굴중',
-          count: 0,
-          fee: 0
-        });
-        localStorage.setItem('approvedPartners', JSON.stringify(approved));
-      } catch(e) {}
-
-      alert('🎉 [' + partner.name + ' 파트너님 승인 완료!]\n\n• 발급 영업코드: [' + partner.code + ']\n• 휴대폰(' + partner.phone + ')으로 영업인 전용 방 링크가 발송되었습니다.');
-      renderHqPartners();
-    }
-  };
-
-  // 신규 파트너 수동 추가 함수
-  window.addNewPartnerManual = function() {
-    var name = (document.getElementById('newPName').value || '').trim();
-    var code = (document.getElementById('newPCode').value || '').trim();
-    var phone = (document.getElementById('newPPhone').value || '').trim();
-    var bank = (document.getElementById('newPBank').value || '').trim();
-    var mart = (document.getElementById('newPMart').value || '').trim();
-
-    if (!name || !code) {
-      alert('성명과 4자리 영업코드는 필수입니다.');
-      return;
-    }
-
-    try {
-      var approved = JSON.parse(localStorage.getItem('approvedPartners') || '[]');
-      approved.unshift({
-        name: name,
-        code: code,
-        phone: phone || '010-****-' + code,
-        bank: bank || '계좌 등록 대기',
-        mart: mart || '마트 등록 대기',
-        count: 0,
-        fee: 0
-      });
-      localStorage.setItem('approvedPartners', JSON.stringify(approved));
-      alert('✅ [' + name + '] 파트너님(코드: ' + code + ')이 공식 영업 파트너로 등록되었습니다.');
-      document.getElementById('addPartnerModal').style.display = 'none';
-      renderHqPartners();
-    } catch(e) {
-      alert('등록 중 오류 발생: ' + e.message);
-    }
-  };
-
-  window.loadHqPartner = function() {
-    renderHqPartners();
-  };
-
-  // 페이지 초기 로드시 즉시 렌더링
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderHqPartners);
-  } else {
-    renderHqPartners();
-  }
-})();
-
-
-// ==============================================
-// 본사 세무 관리 & 엑셀 다운로드 시스템 (국세청 / 세무사용)
-// ==============================================
-
-// 1. 파트너 증빙 서류 보기 모달
-window.viewPartnerTaxDoc = function(code) {
-  var saved = localStorage.getItem('partnerTaxInfo_' + code);
-  var docImg = '';
-  var title = '영업 파트너 (' + code + ') 세무 증빙';
-  if (saved) {
-    try {
-      var d = JSON.parse(saved);
-      docImg = d.fileBase64 || '';
-    } catch(e){}
-  }
-
-  if (!docImg) {
-    alert('등록된 신분증 사본 또는 사업자등록증 파일이 없습니다.\n(파트너 전용방에서 파일 첨부 시 여기에 표시됩니다)');
-    return;
-  }
-
-  var w = window.open('', '_blank', 'width=650,height=750');
-  w.document.write('<html><head><title>' + title + '</title></head><body style="margin:0;padding:20px;text-align:center;background:#0f172a;color:#fff;">');
-  w.document.write('<h3>' + title + '</h3>');
-  w.document.write('<img src="' + docImg + '" style="max-width:100%;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,0.5);">');
-  w.document.write('<br><br><button onclick="window.close()" style="padding:10px 24px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-weight:bold;cursor:pointer;">닫기</button>');
-  w.document.write('</body></html>');
-};
-
-// 2. 파트너 입금완료 처리
-window.markPartnerPaid = function(code, btn) {
-  if (!confirm('파트너 [' + code + '] 님에게 이번 달 수수료 실지급액 입금을 완료하셨습니까?')) return;
-  
-  try {
-    var saved = localStorage.getItem('approvedPartners');
-    var list = saved ? JSON.parse(saved) : defaultApprovedPartners;
-    var found = list.find(function(x){ return x.code === code; });
-    if (found) {
-      found.payoutStatus = '입금완료';
-      localStorage.setItem('approvedPartners', JSON.stringify(list));
-    }
-  } catch(e){}
-
-  if (btn) {
-    btn.outerHTML = '<span style="background:#15803d;color:#fff;padding:4px 9px;border-radius:6px;font-size:12px;font-weight:800;">✅ 입금완료</span>';
-  }
-  alert('✅ 입금 처리가 완료되었습니다.\n파트너 정산 내역에 [입금완료]로 반영되었습니다.');
-};
-
-// 3. 파트너 3.3% 원천징수 세무 신고용 엑셀(CSV) 다운로드
-window.downloadPartnerTaxExcel = function() {
-  var saved = localStorage.getItem('approvedPartners');
-  var list = saved ? JSON.parse(saved) : defaultApprovedPartners;
-  
-  var now = new Date();
-  var ym = now.getFullYear() + '-' + ('0' + (now.getMonth() + 1)).slice(-2);
-  
-  var csvRows = [
-    ['지급연월', '파트너코드', '성명', '연락처', '세무구분', '주민/사업자번호', '지급총액(5원)', '소득세(3%)', '지방세(0.3%)', '실지급액', '은행계좌', '입금상태']
-  ];
-
-  list.forEach(function(p) {
-    var fee = Number(p.fee) || 0;
-    var isBiz = (p.taxType === 'business');
-    var taxTypeStr = isBiz ? '사업자(세금계산서)' : '개인(3.3%원천징수)';
-    var jumin = p.jumin || (isBiz ? '410-86-00000' : '800101-1******');
-    var incomeTax = isBiz ? 0 : Math.floor(fee * 0.03);
-    var localTax = isBiz ? 0 : Math.floor(fee * 0.003);
-    var netPayout = isBiz ? (fee + Math.floor(fee * 0.1)) : (fee - incomeTax - localTax);
-    var status = p.payoutStatus || '정산대기';
-
-    csvRows.push([
-      ym,
-      p.code,
-      p.name,
-      p.phone,
-      taxTypeStr,
-      jumin,
-      fee,
-      incomeTax,
-      localTax,
-      netPayout,
-      p.bank ? p.bank.replace(/,/g, ' ') : '',
-      status
-    ]);
-  });
-
-  var csvContent = '\uFEFF' + csvRows.map(function(e){ return e.map(function(v){ return '"' + String(v).replace(/"/g, '""') + '"'; }).join(','); }).join('\r\n');
-  var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url;
-  a.download = '우리아파트_파트너_3.3프로_원천징수_세무신고_' + ym + '.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-};
-
-// 4. 마트 15원 충전 세금계산서 발행 내역 렌더링
-window.renderHqStoreTaxTable = function() {
-  var tbody = document.getElementById('hqStoreTaxTable');
-  if (!tbody) return;
-
-  var mockTaxList = [
-    { date: '2026-11-10 14:20', code: 'store01', name: '테스트매장', owner: '송해석', bizNo: '199-02-289684', total: 330000, supply: 300000, vat: 30000, email: 'wooriapt@naver.com', status: '발행완료' },
-    { date: '2026-11-09 11:30', code: 'M000002', name: '대박식자재마트', owner: '김대박', bizNo: '410-82-99881', total: 550000, supply: 500000, vat: 50000, email: 'daebak@daum.net', status: '발행대기' },
-    { date: '2026-11-08 17:45', code: 'M000003', name: '싱싱마트 첨단점', owner: '이싱싱', bizNo: '411-81-77662', total: 1100000, supply: 1000000, vat: 100000, email: 'singsing@gmail.com', status: '발행대기' }
-  ];
-
-  tbody.innerHTML = '';
-  mockTaxList.forEach(function(item, idx){
-    var isDone = (item.status === '발행완료');
-    var statusBadge = isDone
-      ? '<span style="background:#dcfce7;color:#166534;padding:4px 8px;border-radius:4px;font-weight:800;font-size:12px;">✅ 발행완료</span>'
-      : '<button type="button" onclick="window.markTaxDone(' + idx + ', this)" style="background:#ea580c;color:#fff;border:0;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer;">🟡 발행대기</button>';
-
-    var tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td style="padding:10px;font-size:12.5px;color:#64748b;">${item.date}</td>
-      <td style="padding:10px;font-weight:700;">${item.name} (${item.code})</td>
-      <td style="padding:10px;">${item.owner}</td>
-      <td style="padding:10px;font-weight:700;color:#0e6556;">${item.bizNo}</td>
-      <td style="padding:10px;font-weight:800;color:#0f172a;">${item.total.toLocaleString()}원</td>
-      <td style="padding:10px;">${item.supply.toLocaleString()}원</td>
-      <td style="padding:10px;color:#2563eb;">${item.vat.toLocaleString()}원</td>
-      <td style="padding:10px;font-size:12.5px;">${item.email}</td>
-      <td style="padding:10px;"><button type="button" onclick="alert('사업자등록번호: ' + '${item.bizNo}' + '\\n상호: ' + '${item.name}' + '\\n대표: ' + '${item.owner}')" style="background:#f1f5f9;border:1px solid #cbd5e1;padding:3px 7px;border-radius:4px;font-size:11.5px;cursor:pointer;">📄 등록증</button></td>
-      <td style="padding:10px;">${statusBadge}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-};
-
-window.markTaxDone = function(idx, btn) {
-  if (confirm('국세청 홈택스에서 해당 마트의 전자세금계산서 발행을 완료하셨습니까?')) {
-    btn.outerHTML = '<span style="background:#dcfce7;color:#166534;padding:4px 8px;border-radius:4px;font-weight:800;font-size:12px;">✅ 발행완료</span>';
-  }
-};
-
-// 5. 국세청 홈택스 일괄발행용 엑셀(CSV) 다운로드
-window.downloadHometaxTaxExcel = function() {
-  var now = new Date();
-  var todayStr = now.getFullYear() + ('0' + (now.getMonth() + 1)).slice(-2) + ('0' + now.getDate()).slice(-2);
-  
-  var csvRows = [
-    ['전자세금계산서종류', '작성일자', '공급자등록번호', '공급자상호', '공급받는자등록번호', '공급받는자상호', '대표자명', '공급가액', '세액', '이메일', '품목명']
-  ];
-
-  var mockTaxList = [
-    ['01(일반)', todayStr, '199-02-289684', '(주)뉴알에너지', '199-02-289684', '테스트매장', '송해석', 300000, 30000, 'wooriapt@naver.com', '마트 15원 세일 알림 발송 충전금 (20,000건)'],
-    ['01(일반)', todayStr, '199-02-289684', '(주)뉴알에너지', '410-82-99881', '대박식자재마트', '김대박', 500000, 50000, 'daebak@daum.net', '마트 15원 세일 알림 발송 충전금 (33,333건)'],
-    ['01(일반)', todayStr, '199-02-289684', '(주)뉴알에너지', '411-81-77662', '싱싱마트 첨단점', '이싱싱', 1000000, 100000, 'singsing@gmail.com', '마트 15원 세일 알림 발송 충전금 (66,666건)']
-  ];
-
-  mockTaxList.forEach(function(row){ csvRows.push(row); });
-
-  var csvContent = '\uFEFF' + csvRows.map(function(e){ return e.map(function(v){ return '"' + String(v).replace(/"/g, '""') + '"'; }).join(','); }).join('\r\n');
-  var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url;
-  a.download = '홈택스_전자세금계산서_일괄발행양식_' + todayStr + '.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-};
-
-// 탭 전환 시 렌더링 호출 연동
-var origOpenHqRoom = window.openHqRoom;
-window.openHqRoom = function(roomId) {
-  if (typeof origOpenHqRoom === 'function') origOpenHqRoom(roomId);
-  if (roomId === 'hqRoomPartner') {
-    setTimeout(function(){ if (typeof window.renderHqPartners === 'function') window.renderHqPartners(); }, 100);
-  } else if (roomId === 'hqRoomPayment') {
-    setTimeout(function(){ if (typeof window.renderHqStoreTaxTable === 'function') window.renderHqStoreTaxTable(); }, 100);
-  }
-};
-
-</script>
 
 </body>
 </html>
