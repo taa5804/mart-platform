@@ -2179,7 +2179,7 @@
 
   <div class="product-grid" id="todayList"><div class="empty-box">상품을 불러오는 중입니다.</div></div>
 
-  <div id="mainBannerArea" class="main-banner-area" style="display:none;"></div>
+  
 
 </div>
 
@@ -2803,133 +2803,7 @@ async function loadLiveProducts() {
 /* 오늘의 특가 하단 매장 이벤트 2개 배너 불러오기 */
 
 async function loadMainBanners() {
-
-  const area = document.getElementById('mainBannerArea');
-
-  if (!area) return;
-
-
-
-  try {
-
-    const response = await fetch(
-
-      SUPABASE_URL + '/rest/v1/main_banners?store_id=eq.' + encodeURIComponent(CURRENT_STORE_ID) + '&select=slot,title,content,image_url,enabled&order=slot.asc',
-
-      { method: 'GET', headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY } }
-
-    );
-
-    if (!response.ok) throw new Error('배너 불러오기 실패');
-
-
-
-    const rows = (await response.json()).filter(row => row.enabled === true && row.title && row.content).slice(0, 2);
-
-    if (rows.length === 0) {
-
-      area.innerHTML = '';
-
-      area.style.display = 'none';
-
-      return;
-
-    }
-
-
-
-    const grid = document.createElement('div');
-
-    grid.className = 'main-banner-grid' + (rows.length === 1 ? ' one' : '');
-
-
-
-    rows.forEach(row => {
-
-      const banner = document.createElement('a');
-
-      banner.className = 'main-banner-item ' + (Number(row.slot) === 1 ? 'banner-one' : 'banner-two');
-
-      banner.href = '#';
-
-      banner.target = '_self';
-
-      banner.setAttribute('aria-label', row.title + ' 매장 소식으로 이동');
-
-
-
-      if (row.image_url) {
-
-        banner.style.setProperty('--banner-image', 'url("' + String(row.image_url).replace(/"/g, '%22') + '")');
-
-      } else {
-
-        banner.style.setProperty('--banner-image', 'none');
-
-      }
-
-
-
-      const textBox = document.createElement('div');
-
-      textBox.className = 'main-banner-text';
-
-
-
-      const label = document.createElement('span');
-
-      label.className = 'main-banner-label';
-
-      label.textContent = '매장 이벤트';
-
-
-
-      const title = document.createElement('span');
-
-      title.className = 'main-banner-title';
-
-      title.textContent = row.title;
-
-
-
-      const content = document.createElement('span');
-
-      content.className = 'main-banner-content';
-
-      content.textContent = row.content;
-
-
-
-      textBox.appendChild(label);
-
-      textBox.appendChild(title);
-
-      textBox.appendChild(content);
-
-      banner.appendChild(textBox);
-
-      grid.appendChild(banner);
-
-    });
-
-
-
-    area.innerHTML = '';
-
-    area.appendChild(grid);
-
-    area.style.display = 'block';
-
-  } catch (error) {
-
-    console.error('메인 배너 오류:', error);
-
-    area.innerHTML = '';
-
-    area.style.display = 'none';
-
-  }
-
+  return;
 }
 
 
