@@ -2467,7 +2467,7 @@ if(!session()){
   async function loadDashboardStats(){
     const storeCount = document.getElementById("storeCount");
     const activeStoreCount = document.getElementById("activeStoreCount");
-    const bannerCount = document.getElementById("bannerCount");
+    // bannerCount removed
     const couponCount = document.getElementById("couponCount");
 
     try{
@@ -2487,19 +2487,19 @@ if(!session()){
 
       storeCount.textContent = Number(data.store_count || 0).toLocaleString("ko-KR");
       activeStoreCount.textContent = Number(data.active_store_count || 0).toLocaleString("ko-KR");
-      bannerCount.textContent = Number(data.banner_count || 0).toLocaleString("ko-KR");
+      
       couponCount.textContent = Number(data.coupon_count || 0).toLocaleString("ko-KR");
     }catch(error){
       console.error(error);
       storeCount.textContent = "-";
       activeStoreCount.textContent = "-";
-      bannerCount.textContent = "-";
+      
       couponCount.textContent = "-";
     }
   }
 
   function hideRooms(){
-    ["hqRoomAccount","hqRoomApproval","hqRoomInquiry","hqRoomPayment","hqRoomBanner","hqRoomCoupon","hqRoomQr"].forEach(function(id){
+    ["hqRoomAccount","hqRoomApproval","hqRoomInquiry","hqRoomPayment","hqRoomCoupon","hqRoomQr"].forEach(function(id){
       const el=document.getElementById(id);
       if(el) el.style.display="none";
     });
