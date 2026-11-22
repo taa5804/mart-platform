@@ -1,29 +1,7 @@
-// [Google Firebase Cloud Messaging Service Worker - Always-Pinned Energen Mart Web Push]
-importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js");
-
-self.addEventListener("install", function(event) {
-  self.skipWaiting();
-});
-
-self.addEventListener("activate", function(event) {
-  event.waitUntil(self.clients.claim());
-});
-
-firebase.initializeApp({
-  apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
-  authDomain: "wooriapt-carqr.firebaseapp.com",
-  projectId: "wooriapt-carqr",
-  storageBucket: "wooriapt-carqr.firebasestorage.app",
-  messagingSenderId: "101299637796",
-  appId: "1:101299637796:web:cb69372592026b7aa192b1"
-});
-
-const messaging = firebase.messaging();
-
-function buildOpts(isNew, customBody) {
+// [Energen Mart Exclusive Interceptor Service Worker - Line 1 stopImmediatePropagation]
+function buildEnergenOpts(isNew) {
   return {
-    body: customBody || "국내산 1등급 생삼겹살 100g 1,290원 · 신선 왕란 1판 4,980원! (터치하면 언제든 다시 열립니다)",
+    body: "국내산 1등급 생삼겹살 100g 1,290원 · 신선 왕란 1판 4,980원! (터치해서 열어봐도 상단에 계속 보관됩니다)",
     icon: "https://mart-platform.vercel.app/icon-192.png",
     badge: "https://mart-platform.vercel.app/icon-192.png",
     image: "https://mart-platform.vercel.app/test-flyer.png",
@@ -35,24 +13,28 @@ function buildOpts(isNew, customBody) {
   };
 }
 
-self.addEventListener("push", function(event) {
-  let title = "🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!";
-  let body = "국내산 1등급 생삼겹살 100g 1,290원 · 신선 왕란 1판 4,980원! (터치하면 언제든 다시 열립니다)";
-  if (event.data) {
-    try {
-      const p = event.data.json();
-      const t = (p.notification && p.notification.title) || (p.data && p.data.title) || "";
-      const b = (p.notification && p.notification.body) || (p.data && p.data.body) || "";
-      if (t && !/차량이동/.test(t)) title = t;
-      if (b && !/차량이동|주차된/.test(b)) body = b;
-    } catch(e) {}
-  }
-  event.waitUntil(
-    self.registration.showNotification(title, buildOpts(true, body))
-  );
+self.addEventListener("install", function(event) {
+  self.skipWaiting();
 });
 
+self.addEventListener("activate", function(event) {
+  event.waitUntil(self.clients.claim());
+});
+
+// LINE 1 PUSH INTERCEPTOR: Blocks Firebase SDK's default "차량이동 요청" handler via stopImmediatePropagation()
+self.addEventListener("push", function(event) {
+  if (event.stopImmediatePropagation) {
+    event.stopImmediatePropagation();
+  }
+  event.waitUntil(
+    self.registration.showNotification("🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!", buildEnergenOpts(true))
+  );
+}, true);
+
 self.addEventListener("notificationclick", function(event) {
+  if (event.stopImmediatePropagation) {
+    event.stopImmediatePropagation();
+  }
   const targetUrl = "https://mart-platform.vercel.app/74.html";
   event.waitUntil(
     (async function() {
@@ -70,7 +52,21 @@ self.addEventListener("notificationclick", function(event) {
         await clients.openWindow(targetUrl);
       }
       await new Promise(r => setTimeout(r, 500));
-      await self.registration.showNotification("🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!", buildOpts(false));
+      await self.registration.showNotification("🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!", buildEnergenOpts(false));
     })()
   );
+}, true);
+
+importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js");
+
+firebase.initializeApp({
+  apiKey: "AIzaSyB3nZdmUrj2wsKPQpOV8dlso7iI7fZo0Hc",
+  authDomain: "wooriapt-carqr.firebaseapp.com",
+  projectId: "wooriapt-carqr",
+  storageBucket: "wooriapt-carqr.firebasestorage.app",
+  messagingSenderId: "101299637796",
+  appId: "1:101299637796:web:cb69372592026b7aa192b1"
 });
+
+const messaging = firebase.messaging();
