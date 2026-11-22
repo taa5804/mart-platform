@@ -1,0 +1,2395 @@
+<link rel="preconnect" href="https://dcysjuxyjqtvkihdsjvv.supabase.co" crossorigin>
+<link rel="dns-prefetch" href="https://dcysjuxyjqtvkihdsjvv.supabase.co">
+<script>
+async function s74ShowNativePush(title, body, targetUrl) {
+  if (!('Notification' in window)) return false;
+
+  let perm = Notification.permission;
+  if (perm !== 'granted' && perm !== 'denied') {
+    try { perm = await Notification.requestPermission(); } catch(e){}
+  }
+
+  if (perm !== 'granted') return false;
+
+  if ('serviceWorker' in navigator) {
+    try {
+      let reg = await navigator.serviceWorker.getRegistration();
+      if (!reg) {
+        reg = await navigator.serviceWorker.register('/sw.js');
+      }
+      await navigator.serviceWorker.ready;
+      await reg.showNotification(title, {
+        body: body,
+        icon: 'https://mart-platform.vercel.app/icon-192.png',
+        badge: 'https://mart-platform.vercel.app/icon-192.png',
+        vibrate: [300, 150, 300],
+        tag: 'mart-sale-' + Date.now(),
+        renotify: true,
+        data: { url: targetUrl || location.href }
+      });
+      return true;
+    } catch(swErr) {
+      console.warn('SW notification error:', swErr);
+    }
+  }
+
+  try {
+    new Notification(title, { body: body, icon: 'https://mart-platform.vercel.app/icon-192.png' });
+    return true;
+  } catch(e) {}
+  return false;
+}
+
+(function () {
+  var viewport = document.querySelector('meta[name="viewport"]');
+  if (!viewport) {
+    viewport = document.createElement('meta');
+    viewport.name = 'viewport';
+    document.head.appendChild(viewport);
+  }
+  viewport.content = 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover';
+})();
+</script>
+
+<div id="store74App">
+  <style>
+    #store74App{
+      --green:#178a45;
+      --green-dark:#0f6a34;
+      --green-soft:#eef8f1;
+      --pink:#ff4f9a;
+      --text:#16181d;
+      --muted:#69707a;
+      --line:#e5e7eb;
+      --bg:#ffffff;
+      width:100%;
+      max-width:1120px;
+      margin:0 auto;
+      padding:0 18px 72px;
+      box-sizing:border-box;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial,"Noto Sans KR",sans-serif;
+    }
+
+    #doz_header,
+    #doz_header_wrap,
+    #site_header{
+      display:none!important;
+      height:0!important;
+      min-height:0!important;
+      margin:0!important;
+      padding:0!important;
+      overflow:hidden!important;
+    }
+
+    body{padding-top:0!important}
+
+    #store74App *{box-sizing:border-box}
+
+    #store74App .store-head{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:86px;
+      padding:16px 0 12px;
+    }
+
+    #store74App .store-name{
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:-1.3px;
+      text-align:center;
+      line-height:1.2;
+    }
+
+    #store74App .tabs{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:8px;
+      margin-bottom:14px;
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:#fff;
+      padding:6px 0 10px;
+    }
+
+    #store74App .tab-btn{
+      position:relative;
+      min-height:62px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      color:#20242a;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      padding:9px 5px;
+    }
+
+    #store74App .tab-btn.active{
+      background:var(--green);
+      border-color:var(--green);
+      color:#fff;
+    }
+
+    #store74App .tab-btn .sale-tag{
+      position:absolute;
+      top:-10px;
+      right:8px;
+      padding:2px 6px;
+      border-radius:6px;
+      background:#ffb000;
+      color:#fff;
+      font-size:10px;
+      font-weight:900;
+    }
+
+    #store74App .tab-btn.sale .sale-tag{
+      background:var(--pink);
+    }
+
+    #store74App .section{display:none}
+    #store74App .section.active{display:block}
+
+    #store74App .product-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:16px;
+    }
+    @media (max-width:960px){
+      #store74App .product-grid{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:12px;
+      }
+    }
+    @media (max-width:640px){
+      #store74App .product-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:10px;
+      }
+    }
+
+    #store74App .card{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      overflow:hidden;
+      min-width:0;
+    }
+
+    #store74App .photo-wrap{
+      position:relative;
+      aspect-ratio:4/3;
+      background:#f3f4f6;
+      overflow:hidden;
+    }
+    @media (max-width:640px){
+      #store74App .photo-wrap{
+        aspect-ratio:1/1;
+      }
+    }
+
+    #store74App .photo-wrap img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    #store74App .discount{
+      position:absolute;
+      top:10px;
+      left:10px;
+      min-width:48px;
+      padding:7px 8px;
+      border-radius:10px;
+      background:#e80000;
+      color:#fff;
+      text-align:center;
+      line-height:1;
+      box-shadow:0 2px 6px rgba(0,0,0,.12);
+    }
+
+    #store74App .discount strong{
+      display:block;
+      font-size:18px;
+      font-weight:900;
+    }
+
+    #store74App .discount span{
+      display:block;
+      margin-top:2px;
+      font-size:10px;
+      font-weight:800;
+    }
+
+    #store74App .card-body{
+      padding:13px 12px 14px;
+    }
+
+    #store74App .product-name{
+      min-height:24px;
+      font-size:17px;
+      line-height:1.35;
+      font-weight:900;
+      word-break:keep-all;
+    }
+
+    #store74App .product-desc{
+      min-height:18px;
+      margin-top:5px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    #store74App .price{
+      margin-top:9px;
+      color:#e00000;
+      font-size:22px;
+      line-height:1.2;
+      font-weight:900;
+    }
+
+    #store74App .normal-price{
+      margin-top:7px;
+      color:#8a8f98;
+      font-size:12px;
+      text-decoration:line-through;
+    }
+
+    #store74App .group-price{
+      margin-top:3px;
+      color:#e00000;
+      font-size:20px;
+      font-weight:900;
+    }
+
+    #store74App .group-goal{
+      margin-top:6px;
+      color:#4a5058;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    #store74App .actions{
+      display:grid;
+      grid-template-columns:1fr 46px;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    #store74App .qty{
+      display:grid;
+      grid-template-columns:42px 1fr 42px;
+      border:1px solid #cfe5d6;
+      border-radius:10px;
+      overflow:hidden;
+      background:#f6fbf7;
+    }
+
+    #store74App .qty button,
+    #store74App .cart-btn{
+      border:0;
+      background:transparent;
+      cursor:pointer;
+      font-size:24px;
+      font-weight:900;
+      color:var(--green-dark);
+    }
+
+    #store74App .qty span{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:17px;
+      font-weight:900;
+      border-left:1px solid #dbeee1;
+      border-right:1px solid #dbeee1;
+      background:#fff;
+    }
+
+    #store74App .cart-btn{
+      border:1px solid #cfe5d6;
+      border-radius:10px;
+      background:#edf8f1;
+      font-size:20px;
+    }
+
+    #store74App .join-btn{
+      width:100%;
+      margin-top:9px;
+      padding:11px 12px;
+      border:0;
+      border-radius:9px;
+      background:var(--green);
+      color:#fff;
+      font-size:14px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    #store74App .join-form{
+      display:none;
+      margin-top:10px;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fafafa;
+    }
+
+    #store74App .join-form input,
+    #store74App .join-form select,
+    #store74App .join-form textarea,
+    #store74App .order-form input,
+    #store74App .order-form select,
+    #store74App .order-form textarea{
+      width:100%;
+      margin-top:7px;
+      padding:11px 12px;
+      border:1px solid #d5d8dc;
+      border-radius:8px;
+      background:#fff;
+      font-size:14px;
+    }
+
+    #store74App .join-form textarea,
+    #store74App .order-form textarea{
+      resize:vertical;
+      min-height:78px;
+    }
+
+    #store74App .submit-btn{
+      width:100%;
+      margin-top:9px;
+      padding:11px;
+      border:0;
+      border-radius:8px;
+      background:var(--green-dark);
+      color:#fff;
+      font-size:14px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    #store74App .general-list{
+      display:grid;
+      gap:8px;
+    }
+
+    #store74App .general-row{
+      display:grid;
+      grid-template-columns:1fr auto 44px;
+      align-items:center;
+      gap:8px;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+    }
+
+    #store74App .general-name{
+      font-size:15px;
+      font-weight:900;
+    }
+
+    #store74App .general-price{
+      margin-top:3px;
+      color:#e00000;
+      font-size:15px;
+      font-weight:900;
+    }
+
+    #store74App .general-qty{
+      display:grid;
+      grid-template-columns:34px 34px 34px;
+      align-items:center;
+      border:1px solid #cfe5d6;
+      border-radius:8px;
+      overflow:hidden;
+    }
+
+    #store74App .general-qty button{
+      border:0;
+      height:34px;
+      background:#f6fbf7;
+      color:var(--green-dark);
+      font-size:18px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    #store74App .general-qty b{
+      text-align:center;
+      font-size:14px;
+    }
+
+    #store74App .general-cart{
+      width:44px;
+      height:38px;
+      border:1px solid #cfe5d6;
+      border-radius:8px;
+      background:#edf8f1;
+      color:var(--green-dark);
+      font-size:18px;
+      cursor:pointer;
+    }
+
+    #store74App .empty{
+      grid-column:1/-1;
+      padding:40px 18px;
+      border:1px dashed #d8dadd;
+      border-radius:12px;
+      color:#777;
+      text-align:center;
+      font-size:14px;
+      background:#fafafa;
+    }
+
+    #store74App .order-wrap{
+      padding:4px 0 0;
+    }
+
+    #store74App .store-info{
+      padding:12px 14px;
+      border:1px solid #d5e9da;
+      border-radius:10px;
+      background:#f7fbf8;
+      line-height:1.65;
+      margin-bottom:12px;
+    }
+
+    #store74App .store-info strong{
+      display:block;
+      color:var(--green-dark);
+      font-size:16px;
+    }
+
+    #store74App .store-info span{
+      display:block;
+      color:#565d66;
+      font-size:12px;
+    }
+
+    #store74App .shipping{
+      display:none;
+      margin:10px 0 14px;
+      padding:11px 12px;
+      border-radius:10px;
+      background:#f4faf6;
+      border:1px solid #dcefe2;
+    }
+
+    #store74App .shipping-title{
+      font-size:13px;
+      font-weight:800;
+    }
+
+    #store74App .shipping-bar{
+      height:7px;
+      margin-top:8px;
+      border-radius:999px;
+      background:#e4e8eb;
+      overflow:hidden;
+    }
+
+    #store74App .shipping-bar span{
+      display:block;
+      height:100%;
+      width:0;
+      background:var(--green);
+    }
+
+    #store74App .shipping-meta{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-top:6px;
+      color:#6d747d;
+      font-size:11px;
+    }
+
+    #store74App .cart-list{
+      display:grid;
+      gap:8px;
+    }
+
+    #store74App .cart-row{
+      display:grid;
+      grid-template-columns:70px 1fr;
+      gap:10px;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fff;
+    }
+
+    #store74App .cart-row.no-image{
+      grid-template-columns:1fr;
+    }
+
+    #store74App .cart-thumb{
+      width:70px;
+      height:70px;
+      object-fit:cover;
+      border-radius:8px;
+      background:#f4f4f4;
+    }
+
+    #store74App .cart-name{
+      font-size:14px;
+      font-weight:900;
+    }
+
+    #store74App .cart-price{
+      margin-top:4px;
+      font-size:12px;
+      color:#555;
+    }
+
+    #store74App .cart-actions{
+      display:flex;
+      gap:5px;
+      margin-top:7px;
+    }
+
+    #store74App .cart-actions button{
+      min-width:34px;
+      height:30px;
+      border:1px solid #d9dcdf;
+      border-radius:7px;
+      background:#fff;
+      cursor:pointer;
+      font-weight:900;
+    }
+
+    #store74App .cart-total{
+      margin-top:10px;
+      padding:13px;
+      border-radius:10px;
+      background:#f7f7f7;
+      text-align:right;
+      font-size:16px;
+      font-weight:900;
+    }
+
+    #store74App .primary-btn{
+      width:100%;
+      margin-top:12px;
+      padding:15px;
+      border:0;
+      border-radius:9px;
+      background:var(--green);
+      color:#fff;
+      font-size:17px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    #store74App .secondary-btn{
+      width:100%;
+      margin-top:8px;
+      padding:12px;
+      border:1px solid #aeb3b8;
+      border-radius:9px;
+      background:#fff;
+      color:#555;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    #store74App .order-form{
+      display:none;
+      margin-top:16px;
+      padding-top:16px;
+      border-top:2px solid var(--green);
+    }
+
+    #store74App .order-type-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-bottom:10px;
+    }
+
+    #store74App .order-type-grid button{
+      padding:12px;
+      border:1px solid var(--green);
+      border-radius:8px;
+      background:#fff;
+      color:var(--green);
+      font-size:15px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    #store74App .order-type-grid button.active{
+      background:var(--green);
+      color:#fff;
+    }
+
+    #store74App .order-complete{
+      display:none;
+      margin-top:16px;
+      padding:20px;
+      border:1px solid var(--green);
+      border-radius:9px;
+      background:#eef8f1;
+      text-align:center;
+      font-size:16px;
+      font-weight:900;
+      line-height:1.7;
+    }
+
+    #store74App .banner-area{
+      display:none;
+      margin-top:16px;
+    }
+
+    #store74App .banner-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    #store74App .banner-grid.one{
+      grid-template-columns:1fr;
+    }
+
+    #store74App .banner-item{
+      position:relative;
+      min-height:120px;
+      display:flex;
+      align-items:flex-end;
+      overflow:hidden;
+      border-radius:12px;
+      background:#eef2f3 var(--banner-image,none) center/cover no-repeat;
+      text-decoration:none;
+      color:#fff;
+    }
+
+    #store74App .banner-item::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(to top,rgba(0,0,0,.58),rgba(0,0,0,.08));
+    }
+
+    #store74App .banner-text{
+      position:relative;
+      z-index:1;
+      display:block;
+      width:100%;
+      padding:14px;
+    }
+
+    #store74App .banner-label{
+      display:block;
+      font-size:11px;
+      font-weight:800;
+      opacity:.9;
+    }
+
+    #store74App .banner-title{
+      display:block;
+      margin-top:2px;
+      font-size:18px;
+      font-weight:900;
+    }
+
+    #store74App .banner-content{
+      display:block;
+      margin-top:4px;
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    @media (max-width:640px){
+      #store74App{
+        padding:0 10px 64px;
+      }
+
+      #store74App .store-head{
+        min-height:68px;
+        padding:12px 0 10px;
+      }
+
+      #store74App .store-name{
+        font-size:25px;
+      }
+
+      #store74App .tabs{
+        gap:5px;
+      }
+
+      #store74App .tab-btn{
+        min-height:56px;
+        font-size:11px;
+        padding:8px 2px;
+        border-radius:9px;
+      }
+
+      #store74App .tab-btn .sale-tag{
+        top:-8px;
+        right:3px;
+        font-size:8px;
+        padding:2px 4px;
+      }
+
+      #store74App .product-grid{
+        gap:9px;
+      }
+
+      #store74App .card-body{
+        padding:10px 9px 11px;
+      }
+
+      #store74App .product-name{
+        font-size:14px;
+      }
+
+      #store74App .product-desc{
+        font-size:10px;
+      }
+
+      #store74App .price{
+        font-size:18px;
+      }
+
+      #store74App .actions{
+        grid-template-columns:1fr 40px;
+        gap:6px;
+      }
+
+      #store74App .qty{
+        grid-template-columns:36px 1fr 36px;
+      }
+
+      #store74App .qty button{
+        font-size:20px;
+      }
+
+      #store74App .qty span{
+        font-size:15px;
+      }
+
+      #store74App .general-row{
+        grid-template-columns:1fr;
+      }
+
+      #store74App .general-qty{
+        width:102px;
+      }
+
+      #store74App .general-cart{
+        width:100%;
+      }
+
+      #store74App .banner-grid{
+        grid-template-columns:1fr;
+      }
+    }
+  
+    @keyframes s74Shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .s74-skeleton-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      padding: 10px;
+    }
+    .s74-skeleton-img {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: s74Shimmer 1.5s infinite;
+    }
+    .s74-skeleton-line {
+      height: 16px;
+      margin-top: 10px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: s74Shimmer 1.5s infinite;
+    }
+    .s74-skeleton-line.short {
+      width: 55%;
+      height: 18px;
+    }
+
+    /* [기존 고객 DB 문자 유입 & 단골 특가 알림 배너] */
+    .s74-sms-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 8px 0 12px;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 1.5px solid #86efac;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(22, 163, 74, 0.1);
+    }
+    .s74-sms-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .s74-sms-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .s74-sms-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .s74-sms-text strong {
+      font-size: 13.5px;
+      font-weight: 900;
+      color: #166534;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .s74-sms-text span {
+      font-size: 11px;
+      color: #15803d;
+      margin-top: 2px;
+      line-height: 1.25;
+      word-break: keep-all;
+    }
+    .s74-sms-btn {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border: 0;
+      border-radius: 20px;
+      background: #16a34a;
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .s74-sms-btn:hover {
+      background: #15803d;
+      transform: scale(1.02);
+    }
+    .s74-sms-btn.done {
+      background: #e2e8f0;
+      color: #475569;
+      box-shadow: none;
+      cursor: default;
+    }
+    @media (max-width: 640px) {
+      .s74-sms-banner {
+        padding: 10px 12px;
+        gap: 8px;
+      }
+      .s74-sms-text strong {
+        font-size: 12.5px;
+      }
+      .s74-sms-text span {
+        font-size: 10.5px;
+      }
+      .s74-sms-btn {
+        padding: 7px 11px;
+        font-size: 11.5px;
+      }
+    }
+
+    /* 알림 등록 모달 */
+    .s74-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .s74-modal-card {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      border-radius: 18px;
+      padding: 24px 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      animation: s74ModalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes s74ModalPop {
+      0% { opacity: 0; transform: scale(0.92) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .s74-modal-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #dcfce7;
+      color: #166534;
+      font-size: 11.5px;
+      font-weight: 800;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    .s74-modal-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1.35;
+      letter-spacing: -0.5px;
+    }
+    .s74-modal-sub {
+      font-size: 12.5px;
+      color: #64748b;
+      margin-top: 6px;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+    .s74-modal-body {
+      margin-top: 16px;
+    }
+    .s74-modal-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .s74-modal-input {
+      width: 100%;
+      height: 46px;
+      padding: 0 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      box-sizing: border-box;
+      outline: none;
+      transition: border 0.15s;
+    }
+    .s74-modal-input:focus {
+      border-color: #16a34a;
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+    }
+    .s74-modal-status {
+      min-height: 18px;
+      font-size: 12px;
+      margin-top: 6px;
+      font-weight: 700;
+    }
+    .s74-modal-status.error { color: #dc2626; }
+    .s74-modal-status.ok { color: #16a34a; }
+    .s74-modal-submit {
+      width: 100%;
+      height: 48px;
+      margin-top: 10px;
+      border: 0;
+      border-radius: 10px;
+      background: #16a34a;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(22, 163, 74, 0.25);
+      transition: background 0.15s;
+    }
+    .s74-modal-submit:hover { background: #15803d; }
+    .s74-modal-close {
+      width: 100%;
+      height: 38px;
+      margin-top: 6px;
+      border: 0;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+  
+/* ========================================================
+   [74.html 3열 퀵오더 & 수량 선택 모달 & 하단 고정 바]
+   ======================================================== */
+.s74-sticky-red-search {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #d32f2f;
+  padding: 8px 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  margin: 0 -18px 12px;
+}
+.s74-search-bar-wrap {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+}
+.s74-search-bar-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: #1e293b;
+}
+.s74-search-bar-btn {
+  background: #ffffff;
+  color: #d32f2f;
+  border: none;
+  border-left: 1px solid #f1f5f9;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#store74App .product-grid, #store74App .general-list {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  padding-bottom: 75px !important;
+}
+
+#store74App .s74-col3-card {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+  transition: border-color 0.15s, box-shadow 0.15s !important;
+}
+#store74App .s74-col3-card.selected {
+  border-color: #d32f2f !important;
+  box-shadow: 0 2px 8px rgba(211,47,47,0.2) !important;
+}
+
+#store74App .s74-photo-wrap {
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  overflow: hidden !important;
+  background: #f8fafc !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+#store74App .s74-photo-wrap img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+#store74App .s74-discount-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #d32f2f;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 2px 5px;
+  border-bottom-right-radius: 6px;
+  z-index: 2;
+}
+
+#store74App .s74-card-body {
+  padding: 6px 4px 4px !important;
+  text-align: center !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+#store74App .s74-price {
+  color: #d32f2f !important;
+  font-size: 13.5px !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.3px;
+}
+#store74App .s74-spec {
+  color: #64748b !important;
+  font-size: 10.5px !important;
+  margin-top: 1px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+#store74App .s74-name {
+  color: #1e293b !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  margin-top: 2px !important;
+  height: 31px !important;
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  line-height: 1.3 !important;
+  word-break: keep-all !important;
+}
+
+#store74App .s74-qty-bar {
+  border-top: 1px solid #f1f5f9 !important;
+  padding: 6px 4px !important;
+  background: #fafafa !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  font-size: 12px !important;
+  color: #475569 !important;
+  transition: background 0.15s;
+}
+#store74App .s74-qty-bar:active {
+  background: #f1f5f9 !important;
+}
+#store74App .s74-qty-bar.checked {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+  font-weight: 800 !important;
+}
+#store74App .s74-qty-bar input[type="checkbox"] {
+  width: 15px !important;
+  height: 15px !important;
+  cursor: pointer !important;
+  accent-color: #d32f2f !important;
+  margin: 0 !important;
+}
+
+/* 수량 선택 모달 (Image 2 스타일) */
+.s74-qty-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 10005;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.s74-qty-modal-box {
+  background: #ffffff;
+  width: 100%;
+  max-width: 320px;
+  max-height: 75vh;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  animation: s74ModalPop 0.18s ease-out;
+}
+@keyframes s74ModalPop {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.s74-qty-modal-header {
+  padding: 13px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+}
+.s74-qty-modal-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+.s74-qty-modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #64748b;
+  cursor: pointer;
+  line-height: 1;
+}
+.s74-qty-modal-list {
+  overflow-y: auto;
+  padding: 4px 0;
+  flex: 1 1 auto;
+}
+.s74-qty-modal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 20px;
+  border-bottom: 1px solid #f8fafc;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+}
+.s74-qty-modal-item:active {
+  background: #fee2e2;
+}
+.s74-qty-modal-item.active {
+  color: #d32f2f;
+  font-weight: 800;
+  background: #fef2f2;
+}
+.s74-qty-radio-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.s74-qty-modal-item.active .s74-qty-radio-circle {
+  border-color: #d32f2f;
+  background: #d32f2f;
+}
+.s74-qty-modal-item.active .s74-qty-radio-circle::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+/* 하단 고정 주문 바 (Image 1 스타일) */
+.s74-sticky-order-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  background: #d32f2f;
+  color: #ffffff;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+  cursor: pointer;
+  max-width: 1120px;
+  margin: 0 auto;
+  user-select: none;
+}
+.s74-sticky-order-amount {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+}
+.s74-sticky-order-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 800;
+}
+.s74-sticky-order-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  font-size: 11px;
+}
+
+</style>
+
+  
+  <!-- [74.html 3열 퀵오더 상단 레드 검색 헤더 (Image 1 방식)] -->
+  <div class="s74-sticky-red-search">
+    <div class="s74-search-bar-wrap">
+      <input id="s74SearchInput" class="s74-search-bar-input" type="search" placeholder="상품검색" oninput="s74LiveFilterProducts(this.value)">
+      <button type="button" class="s74-search-bar-btn" onclick="s74LiveFilterProducts(document.getElementById('s74SearchInput').value)">상품검색</button>
+    </div>
+  </div>
+
+  <div class="store-head">
+    <div id="s74StoreName" class="store-name">매장 상품을 불러오는 중입니다.</div>
+  </div>
+
+  <!-- [기존 고객 DB 문자 유입 & 단골 특가 알림 배너] -->
+  <div id="s74SmsPushBanner" class="s74-sms-banner">
+    <div class="s74-sms-left">
+      <span class="s74-sms-icon">📢</span>
+      <div class="s74-sms-text">
+        <strong id="s74SmsBannerTitle">작은 글씨 문자 대신 이 화면으로 특가 발송!</strong>
+        <span id="s74SmsBannerSub">알림 허용 시 매주 파격 할인 전단지를 무료로 보내드립니다.</span>
+      </div>
+    </div>
+    <button type="button" id="s74SmsBannerBtn" class="s74-sms-btn" onclick="s74OpenPushModal()">🔔 특가알림 받기</button>
+  </div>
+
+  <!-- 특가 알림 등록 모달 -->
+  <div id="s74PushModal" class="s74-modal-backdrop" style="display:none" onclick="s74ClosePushModal(event)">
+    <div class="s74-modal-card" onclick="event.stopPropagation()">
+      <div class="s74-modal-header">
+        <div class="s74-modal-badge">단골 전용 혜택</div>
+        <div class="s74-modal-title">앞으로 특가 소식은 디지털 전단지로!</div>
+        <div class="s74-modal-sub">종이 전단지나 작은 글씨 문자 대신, 1초 만에 사진으로 확인하는 디지털 전단지 알림을 무료로 받아보세요.</div>
+      </div>
+      <div class="s74-modal-body">
+        <label class="s74-modal-label">휴대전화번호</label>
+        <input id="s74PushPhone" type="tel" inputmode="numeric" placeholder="010-XXXX-XXXX" maxlength="13" class="s74-modal-input">
+        <div id="s74PushStatus" class="s74-modal-status"></div>
+        <button type="button" id="s74PushSubmitBtn" class="s74-modal-submit" onclick="s74SubmitPushRegistration()">🔔 알림 허용하고 특가 받기 (1초)</button>
+        <button type="button" class="s74-modal-close" onclick="document.getElementById('s74PushModal').style.display='none'">다음에 하기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-section="today" onclick="s74Show('today',this)">오늘특가<span class="sale-tag">SALE</span></button>
+    <button class="tab-btn sale" data-section="sale" onclick="s74Show('sale',this)">행사상품<span class="sale-tag">SALE</span></button>
+    <button class="tab-btn" data-section="group" onclick="s74Show('group',this)">공동구매</button>
+    <button class="tab-btn" data-section="general" onclick="s74Show('general',this)">일반상품</button>
+    <button class="tab-btn" data-section="order" onclick="s74Show('order',this);s74RenderCart()">주문하기</button>
+  </div>
+
+  <section id="s74-today" class="section active">
+    <div id="s74TodayList" class="product-grid">
+      <div class="s74-skeleton-card"><div class="s74-skeleton-img"></div><div class="s74-skeleton-line"></div><div class="s74-skeleton-line short"></div></div>
+      <div class="s74-skeleton-card"><div class="s74-skeleton-img"></div><div class="s74-skeleton-line"></div><div class="s74-skeleton-line short"></div></div>
+      <div class="s74-skeleton-card"><div class="s74-skeleton-img"></div><div class="s74-skeleton-line"></div><div class="s74-skeleton-line short"></div></div>
+      <div class="s74-skeleton-card"><div class="s74-skeleton-img"></div><div class="s74-skeleton-line"></div><div class="s74-skeleton-line short"></div></div>
+    </div>
+    
+  </section>
+
+  <section id="s74-sale" class="section">
+    <div id="s74SaleList" class="product-grid">
+      <div class="s74-skeleton-card"><div class="s74-skeleton-img"></div><div class="s74-skeleton-line"></div><div class="s74-skeleton-line short"></div></div>
+      <div class="s74-skeleton-card"><div class="s74-skeleton-img"></div><div class="s74-skeleton-line"></div><div class="s74-skeleton-line short"></div></div>
+    </div>
+  </section>
+
+  <section id="s74-group" class="section">
+    <div id="s74GroupList" class="product-grid"><div class="empty">상품을 불러오는 중입니다.</div></div>
+  </section>
+
+  <section id="s74-general" class="section">
+    <div id="s74GeneralList" class="general-list"><div class="empty">상품을 불러오는 중입니다.</div></div>
+  </section>
+
+  <section id="s74-order" class="section">
+    <div class="order-wrap">
+      <div class="store-info">
+        <strong id="s74OrderStoreName"></strong>
+        <span id="s74OrderPhone"></span>
+        <span id="s74OrderAddress"></span>
+      </div>
+
+      <div id="s74Shipping" class="shipping"></div>
+      <div id="s74CartList" class="cart-list"></div>
+
+      <button id="s74OrderOpenBtn" class="primary-btn" type="button" style="display:none" onclick="s74OpenOrderForm()">전체 주문하기</button>
+
+      <div id="s74OrderForm" class="order-form">
+        <div style="font-size:17px;font-weight:900;margin-bottom:10px;">주문 방법 선택</div>
+
+        <div class="order-type-grid">
+          <button id="s74VisitBtn" type="button" onclick="s74SelectOrderType('방문')">방문</button>
+          <button id="s74DeliveryBtn" type="button" onclick="s74SelectOrderType('배달')">배달</button>
+        </div>
+
+        <input id="s74OrderType" type="hidden">
+
+        <div id="s74CustomerArea" style="display:none">
+          <input id="s74Name" type="text" placeholder="이름">
+          <input id="s74Phone" type="tel" inputmode="numeric" placeholder="휴대전화번호">
+
+          <div id="s74VisitArea" style="display:none">
+            <input id="s74VisitTime" type="time">
+          </div>
+
+          <div id="s74DeliveryArea" style="display:none">
+            <textarea id="s74Address" placeholder="배달 받을 주��"></textarea>
+            <input id="s74Entrance" type="text" placeholder="공동현관 비밀번호 (선택)">
+          </div>
+
+          <textarea id="s74Request" placeholder="요청사항 (선택)"></textarea>
+
+          <div id="s74OrderSummary" style="margin-top:12px;padding:12px;border-radius:8px;background:#f5f5f5;line-height:1.7"></div>
+        </div>
+
+        <button class="primary-btn" type="button" onclick="s74CompleteOrder()">주문 완료</button>
+        <button class="secondary-btn" type="button" onclick="s74CloseOrderForm()">이전으로</button>
+      </div>
+
+      <div id="s74OrderComplete" class="order-complete">
+        주문이 완료되었습니다.<br>
+        매장에서 주문 내용을 확인합니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- [74.html 하단 고정 주문 바 (Image 1 방식)] -->
+  <div id="s74StickyOrderBar" class="s74-sticky-order-bar" onclick="s74HandleStickyOrderClick()">
+    <div class="s74-sticky-order-amount">주문금액 <span id="s74StickyOrderAmt">0원</span></div>
+    <div class="s74-sticky-order-btn">
+      <span>주문진행</span>
+      <span class="s74-sticky-order-arrow">▲</span>
+    </div>
+  </div>
+
+  <!-- [74.html 수량 선택 팝업 모달 (Image 2 방식)] -->
+  <div id="s74QtyModal" class="s74-qty-modal-backdrop" style="display:none;" onclick="s74CloseQtyModal(event)">
+    <div class="s74-qty-modal-box" onclick="event.stopPropagation()">
+      <div class="s74-qty-modal-header">
+        <div id="s74QtyModalTitle" class="s74-qty-modal-title">수량 선택</div>
+        <button type="button" class="s74-qty-modal-close" onclick="s74CloseQtyModal()">✕</button>
+      </div>
+      <div id="s74QtyModalList" class="s74-qty-modal-list"></div>
+    </div>
+  </div>
+
+  <script>
+    const S74_SUPABASE_URL='https://dcysjuxyjqtvkihdsjvv.supabase.co';
+    const S74_SUPABASE_KEY='sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2';
+    const S74_PARAMS=new URLSearchParams(location.search);
+    const S74_STORE_ID=S74_PARAMS.get('store_id')||S74_PARAMS.get('store')||'store01';
+    const S74_BATCH=6;
+    const S74_CACHE_KEY='wooriapt_s74_cache_'+S74_STORE_ID;
+    const S74_INFO_CACHE_KEY='wooriapt_s74_info_cache_'+S74_STORE_ID;
+
+    let s74Products={today:[],sale:[],group:[],general:[]};
+
+    function s74RestoreCache(){
+      try{
+        const cachedInfo=localStorage.getItem(S74_INFO_CACHE_KEY);
+        if(cachedInfo){
+          const row=JSON.parse(cachedInfo);
+          if(row.store_name){
+            document.getElementById('s74StoreName').textContent=s74CleanStoreName(row.store_name);
+            document.getElementById('s74OrderStoreName').textContent=s74CleanStoreName(row.store_name);
+            if(row.phone)document.getElementById('s74OrderPhone').textContent='☎ '+row.phone;
+            if(row.address)document.getElementById('s74OrderAddress').textContent='📍 '+row.address;
+            s74FreeDelivery=Number(row.free_delivery_amount||0);
+          }
+        }
+        const cached=localStorage.getItem(S74_CACHE_KEY);
+        if(cached){
+          const parsed=JSON.parse(cached);
+          if(parsed&&(parsed.today?.length||parsed.sale?.length||parsed.group?.length||parsed.general?.length)){
+            s74Products=parsed;
+            s74Visible.general=Math.max(200, (s74Products.general||[]).length);
+            s74RenderProducts(); if(typeof s74UpdateStickyBar==='function')s74UpdateStickyBar();
+            return true;
+          }
+        }
+      }catch(e){}
+      return false;
+    }
+    let s74Visible={today:S74_BATCH,sale:S74_BATCH,group:S74_BATCH,general:200};
+    let s74Cart=[];
+    let s74FreeDelivery=0;
+    let s74LoadingMore=false;
+
+    function s74Esc(value){
+      return String(value??'')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+    }
+
+    function s74PriceNumber(value){
+      const n=Number(String(value??'').replace(/[^0-9]/g,''));
+      return Number.isFinite(n)?n:0;
+    }
+
+    function s74Num(value){
+      return s74PriceNumber(value);
+    }
+
+    function s74Won(value){
+      return Number(value||0).toLocaleString('ko-KR')+'원';
+    }
+
+    function s74Discount(row,saleValue,normalValue){
+      const keys=['discount_rate','discount_percent','discount','sale_rate','sale_percent','discountRate'];
+      for(const key of keys){
+        const n=Number(String(row[key]??'').replace(/[^0-9.]/g,''));
+        if(Number.isFinite(n)&&n>0)return Math.round(n);
+      }
+      const sale=s74PriceNumber(saleValue);
+      const normal=s74PriceNumber(normalValue);
+      if(normal>0&&sale>0&&normal>sale){
+        return Math.round(((normal-sale)/normal)*100);
+      }
+      const m=String(row.description||'').match(/(\d{1,2})\s*%/);
+      return m?Number(m[1]):0;
+    }
+
+    function s74Show(type,button){
+      document.querySelectorAll('#store74App .section').forEach(el=>el.classList.remove('active'));
+      document.querySelectorAll('#store74App .tab-btn').forEach(el=>el.classList.remove('active'));
+      const sec = document.getElementById('s74-'+type);
+      if (sec) sec.classList.add('active');
+      const b = button || document.querySelector(`.tab-btn[onclick*="${type}"]`);
+      if (b) b.classList.add('active');
+    }
+
+    function s74ShowSection(type){
+      s74Show(type);
+    }
+
+    function s74FindProduct(type,id){
+      if (type && s74Products[type]) {
+        const found = s74Products[type].find(p=>String(p.id)===String(id));
+        if (found) return found;
+      }
+      for (const k of ['today', 'sale', 'group', 'general']) {
+        const found = (s74Products[k] || []).find(p=>String(p.id)===String(id));
+        if (found) return found;
+      }
+      return null;
+    }
+
+    function s74ChangeQty(type,id,delta){
+      const p=s74FindProduct(type,id);
+      if(!p)return;
+      p.qty=Math.max(1,p.qty+delta);
+      const el=document.getElementById('s74qty-'+type+'-'+id);
+      if(el)el.textContent=p.qty;
+    }
+
+    
+    let s74ActiveQtyProd = null;
+
+    function s74CleanStoreName(raw) {
+      if (!raw || raw === '우리아파트 제휴마트' || raw === 'store01') return '우리아파트 제휴마트';
+      return raw;
+    }
+
+    function s74GetSpecText(p) {
+      if (p.desc && p.desc.trim()) return p.desc.trim();
+      if (p.spec && p.spec.trim()) return p.spec.trim();
+      return '규격없음';
+    }
+
+    function s74GetPriceText(p) {
+      const type = p.type || p.category || 'today';
+      if (type === 'group' && (p.group || p.group_price)) return s74Won(s74PriceNumber(p.group || p.group_price));
+      if (p.price) {
+        const n = s74PriceNumber(p.price);
+        return n > 0 ? s74Won(n) : p.price;
+      }
+      return '가격문의';
+    }
+
+    function s74ProductCard(p) {
+      const type = p.type || p.category || 'today';
+      const spec = s74GetSpecText(p);
+      const priceText = s74GetPriceText(p);
+      const existing = s74Cart.find(it => (it.category === type || it.type === type) && String(it.id) === String(p.id));
+      const isChecked = existing && existing.qty > 0;
+      const qtyLabel = isChecked ? '<b>' + existing.qty + '개</b>' : '수량';
+      const rawImg = p.img || p.image_url;
+      const imgUrl = (rawImg && rawImg.trim()) ? rawImg : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&q=80';
+      const badge = p.discount ? '<span class="s74-discount-badge">' + p.discount + '%</span>' : '';
+
+      return `
+        <article class="s74-col3-card${isChecked ? ' selected' : ''}" id="s74card-${type}-${p.id}">
+          <div class="s74-photo-wrap">
+            <img src="${s74Esc(imgUrl)}" alt="${s74Esc(p.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&q=80'">
+            ${badge}
+          </div>
+          <div class="s74-card-body">
+            <div class="s74-price">${s74Esc(priceText)}</div>
+            <div class="s74-spec">${s74Esc(spec)}</div>
+            <div class="s74-name" title="${s74Esc(p.name)}">${s74Esc(p.name)}</div>
+          </div>
+          <div class="s74-qty-bar${isChecked ? ' checked' : ''}" id="s74qtybar-${type}-${p.id}" onclick="s74OpenQtyModal('${type}','${p.id}')">
+            <input type="checkbox" id="s74chk-${type}-${p.id}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); s74ToggleCheck('${type}','${p.id}')">
+            <span id="s74lbl-${type}-${p.id}">${qtyLabel}</span>
+          </div>
+        </article>`;
+    }
+
+    function s74GeneralRow(p) {
+      return s74ProductCard(p);
+    }
+
+    function s74GroupCard(p) {
+      return s74ProductCard(p);
+    }
+
+    function s74OpenQtyModal(type, id) {
+      const p = s74FindProduct(type, id);
+      if (!p) return;
+      s74ActiveQtyProd = { type: type, id: id, product: p };
+
+      const titleEl = document.getElementById('s74QtyModalTitle');
+      if (titleEl) titleEl.textContent = p.name + ' - 수량 선택';
+
+      const existing = s74Cart.find(it => (it.category === type || it.type === type) && String(it.id) === String(id));
+      const currentQty = existing ? Number(existing.qty) : 1;
+
+      let listHtml = '';
+      for (let i = 1; i <= 15; i++) {
+        const isAct = (i === currentQty);
+        listHtml += `<div class="s74-qty-modal-item${isAct ? ' active' : ''}" onclick="s74SelectQty(${i})">
+          <span>${i}개</span>
+          <span class="s74-qty-radio-circle"></span>
+        </div>`;
+      }
+      const listEl = document.getElementById('s74QtyModalList');
+      if (listEl) listEl.innerHTML = listHtml;
+
+      const modal = document.getElementById('s74QtyModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function s74CloseQtyModal(e) {
+      if (e && e.target && e.target !== e.currentTarget) return;
+      const modal = document.getElementById('s74QtyModal');
+      if (modal) modal.style.display = 'none';
+      s74ActiveQtyProd = null;
+    }
+
+    function s74SelectQty(qty) {
+      if (!s74ActiveQtyProd) return;
+      const { type, id, product: p } = s74ActiveQtyProd;
+      const priceText = (type === 'group') ? (p.group || p.group_price || p.price) : p.price;
+      const unitPrice = s74PriceNumber(priceText);
+      const chosenQty = Number(qty) || 1;
+
+      const existing = s74Cart.find(it => (it.category === type || it.type === type) && String(it.id) === String(id));
+      if (existing) {
+        existing.qty = chosenQty;
+        existing.unitPrice = unitPrice;
+      } else {
+        s74Cart.push({
+          category: type,
+          type: type,
+          id: id,
+          name: p.name,
+          qty: chosenQty,
+          unitPrice: unitPrice,
+          unitPriceText: priceText || '',
+          img: p.img || p.image_url || '',
+          image_url: p.img || p.image_url || ''
+        });
+      }
+
+      s74UpdateCardState(type, id, chosenQty);
+      s74UpdateStickyBar();
+      s74CloseQtyModal();
+      try { s74RenderCart(); } catch(e){}
+    }
+
+    function s74ToggleCheck(type, id) {
+      const existingIdx = s74Cart.findIndex(it => (it.category === type || it.type === type) && String(it.id) === String(id));
+      if (existingIdx >= 0) {
+        s74Cart.splice(existingIdx, 1);
+        s74UpdateCardState(type, id, 0);
+        s74UpdateStickyBar();
+        try { s74RenderCart(); } catch(e){}
+      } else {
+        s74OpenQtyModal(type, id);
+      }
+    }
+
+    function s74UpdateCardState(type, id, qty) {
+      const card = document.getElementById('s74card-' + type + '-' + id);
+      const chk = document.getElementById('s74chk-' + type + '-' + id);
+      const lbl = document.getElementById('s74lbl-' + type + '-' + id);
+      const bar = document.getElementById('s74qtybar-' + type + '-' + id);
+
+      if (qty > 0) {
+        if (card) card.classList.add('selected');
+        if (chk) chk.checked = true;
+        if (lbl) lbl.innerHTML = '<b>' + qty + '개</b>';
+        if (bar) bar.classList.add('checked');
+      } else {
+        if (card) card.classList.remove('selected');
+        if (chk) chk.checked = false;
+        if (lbl) lbl.textContent = '수량';
+        if (bar) bar.classList.remove('checked');
+      }
+    }
+
+    function s74UpdateStickyBar() {
+      const total = s74CartTotal();
+      const amtEl = document.getElementById('s74StickyOrderAmt');
+      if (amtEl) amtEl.textContent = s74Won(total);
+    }
+
+    function s74HandleStickyOrderClick() {
+      const total = s74CartTotal();
+      if (total <= 0) {
+        alert('주문하실 상품의 [수량]을 먼저 체크해 주세요!');
+        return;
+      }
+      s74ShowSection('order');
+      s74RenderCart();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function s74LiveFilterProducts(query) {
+      const q = (query || '').trim().toLowerCase();
+      const allCards = document.querySelectorAll('#store74App .s74-col3-card');
+      allCards.forEach(card => {
+        const nameEl = card.querySelector('.s74-name');
+        const name = nameEl ? nameEl.textContent.toLowerCase() : '';
+        if (!q || name.includes(q)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+
+    function s74RenderType(type){
+      const map={
+        today:'s74TodayList',
+        sale:'s74SaleList',
+        group:'s74GroupList',
+        general:'s74GeneralList'
+      };
+      const target=document.getElementById(map[type]);
+      const products=s74Products[type];
+      const visible=products.slice(0,s74Visible[type]);
+
+      if(!visible.length){
+        const text={
+          today:'등록된 오늘특가 상품이 없습니다.',
+          sale:'등록된 행사상품이 없습니다.',
+          group:'등록된 공동구매 상품이 없습니다.',
+          general:'등록된 일반상품이 없습니다.'
+        };
+        target.innerHTML=`<div class="empty">${text[type]}</div>`;
+        return;
+      }
+
+      if(type==='group'){
+        target.innerHTML=visible.map(s74GroupCard).join('');
+      }else if(type==='general'){
+        target.innerHTML=visible.map(s74GeneralRow).join('');
+      }else{
+        target.innerHTML=visible.map(s74ProductCard).join('');
+      }
+    }
+
+    function s74RenderProducts(){
+      s74RenderType('today');
+      s74RenderType('sale');
+      s74RenderType('group');
+      s74RenderType('general');
+    }
+
+    async function s74LoadStoreInfo(){
+      try{
+        const res=await fetch(
+          `${S74_SUPABASE_URL}/rest/v1/store_info?store_id=eq.${encodeURIComponent(S74_STORE_ID)}&select=store_name,phone,address,free_delivery_amount`,
+          {headers:{apikey:S74_SUPABASE_KEY,Authorization:'Bearer '+S74_SUPABASE_KEY}}
+        );
+        if(!res.ok)throw new Error(await res.text());
+
+        const rows=await res.json();
+        const row=rows[0]||{};
+        try{localStorage.setItem(S74_INFO_CACHE_KEY,JSON.stringify(row));}catch(e){}
+
+        document.getElementById('s74StoreName').textContent=s74CleanStoreName(row.store_name);
+        document.getElementById('s74OrderStoreName').textContent=s74CleanStoreName(row.store_name);
+        document.getElementById('s74OrderPhone').textContent=row.phone?'☎ '+row.phone:'';
+        document.getElementById('s74OrderAddress').textContent=row.address?'📍 '+row.address:'';
+
+        s74FreeDelivery=Number(row.free_delivery_amount||0);
+        s74RenderCart();
+      }catch(error){
+        document.getElementById('s74StoreName').textContent=S74_STORE_ID;
+        document.getElementById('s74OrderStoreName').textContent=S74_STORE_ID;
+      }
+    }
+
+    async function s74LoadProducts(){
+      try{
+        const res=await fetch(
+          `${S74_SUPABASE_URL}/rest/v1/store_products_live?store_id=eq.${encodeURIComponent(S74_STORE_ID)}&select=product_no,category,product_name,price,normal_price,group_price,image_url,description,join_count,target_count&order=category.asc,product_no.asc&limit=1000`,
+          {headers:{apikey:S74_SUPABASE_KEY,Authorization:'Bearer '+S74_SUPABASE_KEY}}
+        );
+        if(!res.ok)throw new Error(await res.text());
+
+        const rows=await res.json();
+
+        s74Products.today=rows
+          .filter(r=>r.category==='today'&&(r.image_url||r.product_name||r.price||r.description))
+          .map(r=>({
+            type:'today',
+            id:Number(r.product_no),
+            name:r.product_name||'상품명 없음',
+            price:r.price||'',
+            desc:r.description||'',
+            img:r.image_url||'',
+            discount:s74Discount(r,r.price,r.normal_price||r.original_price||r.regular_price||r.base_price),
+            qty:1
+          }));
+
+        s74Products.sale=rows
+          .filter(r=>r.category==='sale'&&(r.image_url||r.product_name||r.price||r.description))
+          .map(r=>({
+            type:'sale',
+            id:Number(r.product_no),
+            name:r.product_name||'상품명 없음',
+            price:r.price||'',
+            desc:r.description||'',
+            img:r.image_url||'',
+            discount:s74Discount(r,r.price,r.normal_price||r.original_price||r.regular_price||r.base_price),
+            qty:1
+          }));
+
+        s74Products.group=rows
+          .filter(r=>r.category==='group'&&(r.image_url||r.product_name||r.group_price||r.normal_price))
+          .map(r=>({
+            type:'group',
+            id:Number(r.product_no),
+            name:r.product_name||'상품명 없음',
+            normal:r.normal_price||'',
+            group:r.group_price||'',
+            join:Number(r.join_count)||0,
+            goal:Number(r.target_count)||0,
+            img:r.image_url||'',
+            discount:s74Discount(r,r.group_price,r.normal_price),
+            qty:1
+          }));
+
+        s74Products.general=rows
+          .filter(r=>r.category==='general'&&(r.product_name||r.price))
+          .map(r=>({
+            type:'general',
+            id:Number(r.product_no),
+            name:r.product_name||'상품명 없음',
+            price:r.price||'',
+            desc:r.description||'',
+            img:r.image_url||'',
+            image_url:r.image_url||'',
+            qty:1
+          }));
+
+        s74Visible={today:S74_BATCH,sale:S74_BATCH,group:S74_BATCH,general:Math.max(200, s74Products.general.length)};
+        s74RenderProducts(); if(typeof s74UpdateStickyBar==='function')s74UpdateStickyBar();
+        try{localStorage.setItem(S74_CACHE_KEY,JSON.stringify(s74Products));}catch(e){}
+      }catch(error){
+        ['s74TodayList','s74SaleList','s74GroupList','s74GeneralList'].forEach(id=>{
+          document.getElementById(id).innerHTML='<div class="empty">상품을 불러오지 못했습니다.</div>';
+        });
+      }
+    }
+
+    function s74AddCart(type,id){
+      const p=s74FindProduct(type,id);
+      if(!p)return;
+
+      const priceText=type==='group'?(p.group||p.group_price):p.price;
+      const price=s74PriceNumber(priceText);
+      const existing=s74Cart.find(item=>(item.category===type||item.type===type)&&String(item.id)===String(id));
+
+      if(existing){
+        existing.qty+=p.qty;
+      }else{
+        s74Cart.push({
+          type,
+          category:type,
+          id,
+          name:p.name,
+          qty:p.qty,
+          unitPrice:price,
+          img:p.img||p.image_url||''
+        });
+      }
+
+      s74UpdateCardState(type, id, existing ? existing.qty : p.qty);
+      s74UpdateStickyBar();
+      s74RenderCart();
+      alert(`${p.name} ${p.qty}개를 장바구니에 담았습니다.`);
+    }
+
+    function s74CartTotal(){
+      return s74Cart.reduce((sum,item)=>sum+(s74PriceNumber(item.unitPrice)*(Number(item.qty)||1)),0);
+    }
+
+    function s74RenderShipping(total){
+      const box=document.getElementById('s74Shipping');
+
+      if(s74FreeDelivery<=0){
+        box.style.display='none';
+        box.innerHTML='';
+        return;
+      }
+
+      const remaining=Math.max(0,s74FreeDelivery-total);
+      const percent=Math.min(100,Math.round((total/s74FreeDelivery)*100));
+      const text=remaining>0
+        ? `무료배송까지 <b>${s74Won(remaining)}</b> 남았습니다.`
+        : '<b>무료배송이 적용되었습니다.</b>';
+
+      box.innerHTML=`
+        <div class="shipping-title">🚚 ${text}</div>
+        <div class="shipping-bar"><span style="width:${percent}%"></span></div>
+        <div class="shipping-meta">
+          <span>현재 ${s74Won(total)}</span>
+          <span>기준 ${s74Won(s74FreeDelivery)}</span>
+        </div>`;
+      box.style.display='block';
+    }
+
+    function s74RenderCart(){
+      const list=document.getElementById('s74CartList');
+      const openBtn=document.getElementById('s74OrderOpenBtn');
+      const form=document.getElementById('s74OrderForm');
+
+      if(!s74Cart.length){
+        list.innerHTML='<div class="empty">장바구니가 비어 있습니다.</div>';
+        openBtn.style.display='none';
+        form.style.display='none';
+        s74RenderShipping(0);
+        return;
+      }
+
+      const rows=s74Cart.map((item,index)=>{
+        const lineTotal=item.unitPrice*item.qty;
+        const image=(item.img||item.image_url)
+          ? `<img class="cart-thumb" src="${s74Esc(item.img||item.image_url)}" alt="${s74Esc(item.name)}">`
+          : '';
+
+        return `
+          <div class="cart-row ${(item.img||item.image_url)?'':'no-image'}">
+            ${image}
+            <div>
+              <div class="cart-name">${s74Esc(item.name)}</div>
+              <div class="cart-price">${s74Won(item.unitPrice)} × ${item.qty}개 = <b>${s74Won(lineTotal)}</b></div>
+              <div class="cart-actions">
+                <button type="button" onclick="s74CartMinus(${index})">−</button>
+                <button type="button" onclick="s74CartPlus(${index})">＋</button>
+                <button type="button" onclick="s74CartRemove(${index})">삭제</button>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+
+      const total=s74CartTotal();
+      list.innerHTML=rows+`<div class="cart-total">총 주문금액 ${s74Won(total)}</div>`;
+      openBtn.style.display='block';
+      s74RenderShipping(total);
+      s74UpdateOrderSummary();
+    }
+
+    function s74CartMinus(index){
+      const item=s74Cart[index];
+      if(!item)return;
+      const cat = item.category || item.type;
+      const id = item.id;
+      if(item.qty>1){
+        item.qty--;
+        s74UpdateCardState(cat, id, item.qty);
+      } else {
+        s74Cart.splice(index,1);
+        s74UpdateCardState(cat, id, 0);
+      }
+      s74UpdateStickyBar();
+      s74RenderCart();
+    }
+
+    function s74CartPlus(index){
+      if(!s74Cart[index])return;
+      s74Cart[index].qty++;
+      s74UpdateCardState(s74Cart[index].category || s74Cart[index].type, s74Cart[index].id, s74Cart[index].qty);
+      s74UpdateStickyBar();
+      s74RenderCart();
+    }
+
+    function s74CartRemove(index){
+      if(!s74Cart[index])return;
+      const cat = s74Cart[index].category || s74Cart[index].type;
+      const id = s74Cart[index].id;
+      s74Cart.splice(index,1);
+      s74UpdateCardState(cat, id, 0);
+      s74UpdateStickyBar();
+      s74RenderCart();
+    }
+
+    function s74OpenOrderForm(){
+      if(!s74Cart.length){
+        alert('장바구니가 비어 있습니다.');
+        return;
+      }
+      document.getElementById('s74OrderOpenBtn').style.display='none';
+      document.getElementById('s74OrderForm').style.display='block';
+      document.getElementById('s74OrderComplete').style.display='none';
+      s74UpdateOrderSummary();
+    }
+
+    function s74CloseOrderForm(){
+      document.getElementById('s74OrderForm').style.display='none';
+      document.getElementById('s74OrderOpenBtn').style.display=s74Cart.length?'block':'none';
+    }
+
+    function s74SelectOrderType(type){
+      document.getElementById('s74OrderType').value=type;
+      document.getElementById('s74CustomerArea').style.display='block';
+      document.getElementById('s74VisitArea').style.display=type==='방문'?'block':'none';
+      document.getElementById('s74DeliveryArea').style.display=type==='배달'?'block':'none';
+      document.getElementById('s74VisitBtn').classList.toggle('active',type==='방문');
+      document.getElementById('s74DeliveryBtn').classList.toggle('active',type==='배달');
+      s74UpdateOrderSummary();
+    }
+
+    function s74UpdateOrderSummary(){
+      const box=document.getElementById('s74OrderSummary');
+      if(!box)return;
+
+      const type=document.getElementById('s74OrderType').value||'선택 전';
+      const qty=s74Cart.reduce((sum,item)=>sum+item.qty,0);
+
+      box.innerHTML=`
+        <b>최종 주문 내용</b><br>
+        주문 상품: ${s74Cart.length}종 / 총 ${qty}개<br>
+        주문 방법: ${s74Esc(type)}<br>
+        총 주문금액: <b>${s74Won(s74CartTotal())}</b>`;
+    }
+
+    function s74CompleteOrder(){
+      if(!s74Cart.length){
+        alert('장바구니가 비어 있습니다.');
+        return;
+      }
+
+      const type=document.getElementById('s74OrderType').value;
+      const name=document.getElementById('s74Name').value.trim();
+      const phone=document.getElementById('s74Phone').value.replace(/[^0-9]/g,'');
+      const address=document.getElementById('s74Address').value.trim();
+      const visitTime=document.getElementById('s74VisitTime').value;
+      const entrance=document.getElementById('s74Entrance').value.trim();
+      const request=document.getElementById('s74Request').value.trim();
+
+      if(!type){alert('방문 또는 배달을 선택하세요.');return;}
+      if(!name){alert('이름을 입력하세요.');return;}
+      if(phone.length<10){alert('휴대전화번호를 정확히 입력하세요.');return;}
+      if(type==='배달'&&!address){alert('배달 주소를 입력하세요.');return;}
+
+      const order={
+        store_id:S74_STORE_ID,
+        order_type:type,
+        customer_name:name,
+        customer_phone:phone,
+        delivery_address:type==='배달'?address:'',
+        visit_time:type==='방문'?visitTime:'',
+        entrance_password:type==='배달'?entrance:'',
+        request_message:request,
+        items:s74Cart.map(item=>({
+          id:item.id,
+          type:item.type,
+          name:item.name,
+          quantity:item.qty,
+          unit_price:item.unitPrice,
+          line_total:item.unitPrice*item.qty
+        })),
+        total_amount:s74CartTotal(),
+        ordered_at:new Date().toISOString()
+      };
+
+      try{
+        const saved=JSON.parse(localStorage.getItem('mart_orders')||'[]');
+        saved.push(order);
+        localStorage.setItem('mart_orders',JSON.stringify(saved));
+      }catch(e){}
+
+      s74Cart=[];
+      s74RenderCart();
+      document.getElementById('s74OrderForm').style.display='none';
+      document.getElementById('s74OrderComplete').style.display='block';
+
+      document.getElementById('s74OrderType').value='';
+      document.getElementById('s74Name').value='';
+      document.getElementById('s74Phone').value='';
+      document.getElementById('s74Address').value='';
+      document.getElementById('s74VisitTime').value='';
+      document.getElementById('s74Entrance').value='';
+      document.getElementById('s74Request').value='';
+      document.getElementById('s74CustomerArea').style.display='none';
+      document.getElementById('s74VisitArea').style.display='none';
+      document.getElementById('s74DeliveryArea').style.display='none';
+      document.getElementById('s74VisitBtn').classList.remove('active');
+      document.getElementById('s74DeliveryBtn').classList.remove('active');
+    }
+
+    function s74OpenJoin(id){
+      const box=document.getElementById('s74JoinForm'+id);
+      if(box)box.style.display='block';
+    }
+
+    function s74ToggleJoinAddress(id){
+      const type=document.getElementById('s74ReceiveType'+id).value;
+      document.getElementById('s74JoinAddress'+id).style.display=type==='배달'?'block':'none';
+    }
+
+    function s74CompleteJoin(id){
+      const name=document.getElementById('s74JoinName'+id).value.trim();
+      const phone=document.getElementById('s74JoinPhone'+id).value.trim();
+      const type=document.getElementById('s74ReceiveType'+id).value;
+      const address=document.getElementById('s74JoinAddress'+id).value.trim();
+
+      if(!name){alert('이름을 입력하세요.');return;}
+      if(!phone){alert('전화번호를 입력하세요.');return;}
+      if(!type){alert('방문 또는 배달을 선택하세요.');return;}
+      if(type==='배달'&&!address){alert('배달주소를 입력하세요.');return;}
+
+      const p=s74FindProduct('group',id);
+      if(p){
+        p.join++;
+        const count=document.getElementById('s74JoinCount'+id);
+        if(count)count.textContent=p.join;
+      }
+
+      document.getElementById('s74JoinForm'+id).style.display='none';
+      alert('공���구매 참여가 완료되었습니다.');
+    }
+
+    async function s74LoadBanners(){
+      return;
+    }
+
+    function s74ActiveProductType(){
+      const section=document.querySelector('#store74App .section.active');
+      if(!section)return '';
+      const type=section.id.replace('s74-','');
+      return ['today','sale','group','general'].includes(type)?type:'';
+    }
+
+    function s74LoadNextSix(){
+      if(s74LoadingMore)return;
+
+      const type=s74ActiveProductType();
+      if(!type)return;
+
+      if(s74Visible[type]>=s74Products[type].length)return;
+
+      const scrollTop=window.pageYOffset||document.documentElement.scrollTop||0;
+      const viewport=window.innerHeight||document.documentElement.clientHeight||0;
+      const pageHeight=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight);
+
+      if(scrollTop+viewport>=pageHeight-420){
+        s74LoadingMore=true;
+        s74Visible[type]=Math.min(s74Visible[type]+S74_BATCH,s74Products[type].length);
+        s74RenderType(type);
+        setTimeout(()=>{s74LoadingMore=false;},80);
+      }
+    }
+
+    window.addEventListener('scroll',s74LoadNextSix,{passive:true});
+
+    /* [기존 고객 DB 문자 유입 & 단골 특가 알림 등록 스크립트] */
+    function s74CheckSubscribed() {
+      try {
+        const isSub = localStorage.getItem('wooriapt_mart_push_subscribed_' + S74_STORE_ID) || localStorage.getItem('wooriapt_mart_push_token');
+        const btn = document.getElementById('s74SmsBannerBtn');
+        const sub = document.getElementById('s74SmsBannerSub');
+        if (isSub && btn) {
+          btn.textContent = '✅ 알림 수신중';
+          btn.classList.add('done');
+          btn.onclick = () => alert('이미 우리 마트 특가 알림을 받고 계십니다. 매주 파격 할인 소식을 전해드립니다!');
+          if (sub) sub.textContent = '이미 단골 알림 등록이 완료되었습니다. 이번 주 특가를 확인해보세요!';
+        }
+      } catch(e) {}
+    }
+
+    function s74OpenPushModal() {
+      const modal = document.getElementById('s74PushModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        const input = document.getElementById('s74PushPhone');
+        if (input) {
+          const savedPhone = localStorage.getItem('wooriapt_customer_phone') || '';
+          if (savedPhone) input.value = savedPhone;
+          setTimeout(() => input.focus(), 100);
+        }
+      }
+    }
+
+    function s74ClosePushModal(e) {
+      if (e && e.target && e.target.id === 's74PushModal') {
+        document.getElementById('s74PushModal').style.display = 'none';
+      }
+    }
+
+    async function s74SubmitPushRegistration() {
+      const input = document.getElementById('s74PushPhone');
+      const status = document.getElementById('s74PushStatus');
+      const submitBtn = document.getElementById('s74PushSubmitBtn');
+      const phone = String(input.value || '').replace(/[^0-9]/g, '');
+
+      if (!/^01[016789][0-9]{7,8}$/.test(phone)) {
+        status.textContent = '올바른 010 휴대전화번호를 입력해주세요.';
+        status.className = 's74-modal-status error';
+        input.focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '알림 권한 확인 중...';
+      status.textContent = '브라우저 알림 허용 창이 뜨면 [허용]을 눌러주세요.';
+      status.className = 's74-modal-status ok';
+
+      try {
+        let perm = 'granted';
+        if ('Notification' in window) {
+          perm = await Notification.requestPermission();
+          if (perm !== 'granted') {
+            status.textContent = '알림 허용이 필요합니다. 브라우저 주소창 자물쇠 아이콘에서 알림을 허용해주세요.';
+            status.className = 's74-modal-status error';
+            submitBtn.disabled = false;
+            submitBtn.textContent = '🔔 알림 허용하고 특가 받기 (1초)';
+            return;
+          }
+        }
+
+        // Supabase에 고객 단골 등록 (store_customers 테이블에 안전하게 적립)
+        try {
+          await fetch(S74_SUPABASE_URL + '/rest/v1/store_customers', {
+            method: 'POST',
+            headers: {
+              apikey: S74_SUPABASE_KEY,
+              Authorization: 'Bearer ' + S74_SUPABASE_KEY,
+              'Content-Type': 'application/json',
+              Prefer: 'resolution=merge-duplicates'
+            },
+            body: JSON.stringify({
+              store_id: S74_STORE_ID,
+              phone: phone,
+              subscribed_at: new Date().toISOString(),
+              channel: 'sms_link'
+            })
+          });
+        } catch(saveErr) {
+          console.warn('store_customers save log:', saveErr);
+        }
+
+        localStorage.setItem('wooriapt_mart_push_subscribed_' + S74_STORE_ID, 'true');
+        localStorage.setItem('wooriapt_customer_phone', phone);
+
+        status.textContent = '✅ 특가 알림 등록이 완료되었습니다!';
+        status.className = 's74-modal-status ok';
+
+        setTimeout(() => {
+          document.getElementById('s74PushModal').style.display = 'none';
+          s74CheckSubscribed();
+          alert('🎉 단골 등록 및 특가 알림 설정이 완료되었습니다!\n앞으로 우리 마트의 파격 할인 소식을 실시간 디지털 전단지로 전해드립니다.');
+        }, 500);
+
+      } catch (err) {
+        status.textContent = err.message || '등록 중 오류가 발생했습니다.';
+        status.className = 's74-modal-status error';
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🔔 알림 허용하고 특가 받기 (1초)';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const pIn = document.getElementById('s74PushPhone');
+      if (pIn) {
+        pIn.addEventListener('input', (e) => {
+          const raw = e.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+          if (raw.length <= 3) e.target.value = raw;
+          else if (raw.length <= 7) e.target.value = raw.slice(0, 3) + '-' + raw.slice(3);
+          else e.target.value = raw.slice(0, 3) + '-' + raw.slice(3, 7) + '-' + raw.slice(7);
+        });
+      }
+      s74CheckSubscribed();
+    });
+
+    s74RenderCart();
+    s74RestoreCache();
+    s74LoadStoreInfo();
+    s74LoadProducts();
+    s74LoadBanners();
+    
+    // [서비스워커 및 실시간 웹푸시 리스너 등록]
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then((reg) => {
+        console.log('ServiceWorker registered:', reg);
+      }).catch(err => console.warn('ServiceWorker error:', err));
+    }
+
+    // 웹푸시 브로드캐스트 실시간 감지 및 푸시 팝업 표시
+    let s74LastPushBroadcastId = parseInt(localStorage.getItem('s74_last_push_id') || '0', 10);
+    
+    function s74ShowPushFloatingBanner(b) {
+      try {
+        var existing = document.getElementById('s74PushBannerAlert');
+        if (existing) existing.remove();
+        var box = document.createElement('div');
+        box.id = 's74PushBannerAlert';
+        box.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);width:92%;max-width:440px;background:linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);color:#ffffff;padding:14px 18px;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.35);z-index:999999;display:flex;align-items:flex-start;gap:12px;border:1.5px solid #60a5fa;';
+        box.innerHTML = '<span style="font-size:24px;line-height:1;">📢</span>' +
+          '<div style="flex:1;">' +
+          '<div style="font-size:14.5px;font-weight:800;color:#fde047;margin-bottom:4px;">' + (b.product_name || '실시간 세일 알림!') + '</div>' +
+          '<div style="font-size:13px;line-height:1.45;color:#f1f5f9;">' + (b.description || '') + '</div>' +
+          '</div>' +
+          '<button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:#94a3b8;font-size:18px;cursor:pointer;padding:0 4px;font-weight:bold;">✕</button>';
+        document.body.appendChild(box);
+        setTimeout(function() { if (box && box.parentElement) box.remove(); }, 12000);
+      } catch(e) { console.warn('Banner error:', e); }
+    }
+
+    async function s74CheckWebPushBroadcasts() {
+      try {
+        const res = await fetch(S74_SUPABASE_URL + '/rest/v1/store_products_live?store_id=eq.' + encodeURIComponent(S74_STORE_ID) + '&category=eq.push_broadcast&order=id.desc&limit=1', {
+          headers: { apikey: S74_SUPABASE_KEY, Authorization: 'Bearer ' + S74_SUPABASE_KEY }
+        });
+        if (!res.ok) return;
+        const rows = await res.json();
+        if (!rows || !rows.length) return;
+        const b = rows[0];
+        if (b.id > s74LastPushBroadcastId) {
+          s74LastPushBroadcastId = b.id;
+          localStorage.setItem('s74_last_push_id', String(b.id));
+
+          // 1. 화면 내 상단 실시간 플로팅 알림 배너 표시
+          s74ShowPushFloatingBanner(b);
+
+          // 2. OS 시스템 네이티브 푸시 알림 배너 팝업!
+          await s74ShowNativePush(
+            b.product_name || '📢 [우리아파트 제휴마트] 파격 세일 알림!',
+            b.description || '오늘의 세일 전단지가 도착했습니다. 터치하여 확인하세요!',
+            location.href
+          );
+        }
+      } catch (e) {
+        console.warn('Check push broadcasts error:', e);
+      }
+    }
+
+    // 5초 주기로 신규 웹푸시 확인
+    setInterval(s74CheckWebPushBroadcasts, 5000);
+    setTimeout(s74CheckWebPushBroadcasts, 1000);
+
+    s74CheckSubscribed();
+  </script>
+</div>

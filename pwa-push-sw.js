@@ -1,4 +1,4 @@
-// [Google Firebase Cloud Messaging Service Worker - Persistent Energen Mart Web Push]
+// [Google Firebase Cloud Messaging Service Worker - Always-Pinned Energen Mart Web Push]
 importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js");
 
@@ -19,65 +19,47 @@ firebase.initializeApp({
   appId: "1:101299637796:web:cb69372592026b7aa192b1"
 });
 
-const messaging = firebase.messaging();
-
-function getEnergenNotification() {
-  const title = "🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!";
-  const body = "국내산 1등급 생삼겹살 100g 1,290원 · 신선 왕란 1판 4,980원! (이 알림은 터치해서 열어봐도 상단에 계속 보관됩니다)";
-  const targetUrl = "https://mart-platform.vercel.app/store.html?store=store01";
-
-  const options = {
-    body: body,
+function buildOpts(isNew) {
+  return {
+    body: "국내산 1등급 생삼겹살 100g 1,290원 · 신선 왕란 1판 4,980원! (터치하면 언제든 다시 열립니다)",
     icon: "https://mart-platform.vercel.app/icon-192.png",
     badge: "https://mart-platform.vercel.app/icon-192.png",
     image: "https://mart-platform.vercel.app/test-flyer.png",
-    vibrate: [400, 150, 400],
+    vibrate: isNew ? [400, 150, 400] : undefined,
     requireInteraction: true,
-    renotify: false,
-    tag: "energen-persistent-sale",
-    data: {
-      url: targetUrl,
-      keepAlive: true
-    }
+    renotify: isNew,
+    tag: "energen-pin-" + Date.now(),
+    data: { url: "https://mart-platform.vercel.app/74.html" }
   };
-  return { title, options };
 }
 
 self.addEventListener("push", function(event) {
-  const { title, options } = getEnergenNotification();
-  options.renotify = true;
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    self.registration.showNotification("🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!", buildOpts(true))
+  );
 });
 
-try {
-  messaging.onBackgroundMessage(function(payload) {
-    const { title, options } = getEnergenNotification();
-    options.renotify = true;
-    return self.registration.showNotification(title, options);
-  });
-} catch(e) {}
-
-// 핵심: 알림을 터치해서 열어도 event.notification.close()를 호출하지 않고,
-// 안드로이드 OS가 자동 닫기를 시도하더라도 즉시 상단 알림창에 재고정(Re-pin)하여 절대 사라지지 않게 유지!
 self.addEventListener("notificationclick", function(event) {
-  const { title, options } = getEnergenNotification();
-  options.renotify = false; // 다시 고정할 때는 진동 없이 조용히 상단바에 그대로 유지
-  const targetUrl = "https://mart-platform.vercel.app/store.html?store=store01";
-
+  const targetUrl = "https://mart-platform.vercel.app/74.html";
   event.waitUntil(
-    Promise.all([
-      self.registration.showNotification(title, options),
-      clients.matchAll({ type: "window", includeUncontrolled: true }).then(function(clientList) {
-        for (let client of clientList) {
-          if ("focus" in client) {
-            client.navigate(targetUrl);
-            return client.focus();
-          }
+    (async function() {
+      // 1. 매장 화면 열기
+      const clientList = await clients.matchAll({ type: "window", includeUncontrolled: true });
+      let opened = false;
+      for (let client of clientList) {
+        if ("focus" in client) {
+          await client.navigate(targetUrl);
+          await client.focus();
+          opened = true;
+          break;
         }
-        if (clients.openWindow) {
-          return clients.openWindow(targetUrl);
-        }
-      })
-    ])
+      }
+      if (!opened && clients.openWindow) {
+        await clients.openWindow(targetUrl);
+      }
+      // 2. 안드로이드 OS가 클릭된 알림을 닫은 직후(500ms 뒤) 새 고유 태그로 상단바에 즉시 복원!
+      await new Promise(r => setTimeout(r, 500));
+      await self.registration.showNotification("🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!", buildOpts(false));
+    })()
   );
 });

@@ -1574,5 +1574,38 @@ checkSmsSubscribed();
 
 </script>
 
+
+<script>
+(function(){
+  async function keepEnergenNotificationPinned() {
+    if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
+    if (Notification.permission !== 'granted') return;
+    try {
+      const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+      await reg.update();
+      const existing = await reg.getNotifications();
+      // 상단 알림창에 에너젠마트 알림이 하나도 없으면(방금 클릭해서 닫혔으면) 즉시 새 태그로 다시 상단바에 꽂아 넣음!
+      if (!existing || existing.length === 0) {
+        await reg.showNotification('🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!', {
+          body: '국내산 1등급 생삼겹살 100g 1,290원 · 신선 왕란 1판 4,980원! (터치하면 언제든 다시 열립니다)',
+          icon: 'https://mart-platform.vercel.app/icon-192.png',
+          badge: 'https://mart-platform.vercel.app/icon-192.png',
+          image: 'https://mart-platform.vercel.app/test-flyer.png',
+          requireInteraction: true,
+          renotify: false,
+          tag: 'energen-keep-' + Date.now(),
+          data: { url: 'https://mart-platform.vercel.app/74.html' }
+        });
+      }
+    } catch(e) {}
+  }
+  // 페이지 열리는 즉시(0.4초, 1.5초, 3초) 및 화면 전환 시마다 상단 알림창에 에너젠마트 알림이 있는지 체크하여 항상 유지!
+  setTimeout(keepEnergenNotificationPinned, 400);
+  setTimeout(keepEnergenNotificationPinned, 1500);
+  setTimeout(keepEnergenNotificationPinned, 3000);
+  document.addEventListener('visibilitychange', keepEnergenNotificationPinned);
+})();
+</script>
+
 </body>
 </html>
