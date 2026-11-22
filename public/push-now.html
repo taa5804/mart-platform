@@ -63,6 +63,43 @@ if (!firebase.apps.length) {
   firebase.initializeApp(FIREBASE_CONFIG);
 }
 
+async function saveTokenToDb(cat, val) {
+  try {
+    await fetch(SUPABASE_URL + "/rest/v1/store_products_live", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + SUPABASE_KEY
+      },
+      body: JSON.stringify({
+        store_id: "store01",
+        category: cat,
+        product_no: Math.floor(Date.now() / 1000) % 900000,
+        product_name: "010-6700-9855",
+        description: val
+      })
+    });
+  } catch(e) {}
+}
+
+async function showEnergenNotif(reg, title, body) {
+  await reg.showNotification(title || "🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!", {
+    body: body || "국내산 1등급 생삼겹살 100g 1,290원 · 신선 왕란 1판 4,980원! (이 알림은 터치해서 열어봐도 상단에 계속 보관됩니다)",
+    icon: "https://mart-platform.vercel.app/icon-192.png",
+    badge: "https://mart-platform.vercel.app/icon-192.png",
+    image: "https://mart-platform.vercel.app/test-flyer.png",
+    vibrate: [400, 150, 400],
+    requireInteraction: true,
+    renotify: true,
+    tag: "energen-pin-" + Date.now(),
+    data: {
+      url: "https://mart-platform.vercel.app/74.html",
+      keepAlive: true
+    }
+  });
+}
+
 async function fireEnergenOnly() {
   const st = document.getElementById("statusBox");
   st.textContent = "⏳ 에너젠마트 세일 웹푸시 발송 중...";
@@ -81,53 +118,49 @@ async function fireEnergenOnly() {
     const reg = await navigator.serviceWorker.ready;
     await reg.update();
 
-    // 1. 오직 에너젠마트 초특가 세일 웹푸시만 발송 (눌러도 사라지지 않는 상단 고정형!)
-    await reg.showNotification("🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!", {
-      body: "국내산 1등급 생삼겹살 100g 1,290원 · 신선 왕란 1판 4,980원! (이 알림은 터치해서 열어봐도 상단에 계속 보관됩니다)",
-      icon: "https://mart-platform.vercel.app/icon-192.png",
-      badge: "https://mart-platform.vercel.app/icon-192.png",
-      image: "https://mart-platform.vercel.app/test-flyer.png",
-      vibrate: [400, 150, 400],
-      requireInteraction: true,
-      renotify: true,
-      tag: "energen-persistent-sale",
-      data: {
-        url: "https://mart-platform.vercel.app/store.html?store=store01",
-        keepAlive: true
-      }
-    });
+    await showEnergenNotif(reg);
 
-    // 2. 마트 전용 FCM 토큰 저장 (차량이동 서버 호출 일절 없음!)
+    st.innerHTML = "✅ <b>[에너젠마트 주말 초특가 세일]</b> 웹푸시가 상단에 떴습니다!<br><br>👆 지금 위쪽 알림을 눌러서 열어보셔도, 상단 알림창에서 사라지지 않고 계속 남아있습니다!";
+
     try {
       const messaging = firebase.messaging();
       const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
       if (token) {
-        await fetch(SUPABASE_URL + "/rest/v1/store_products_live", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: SUPABASE_KEY,
-            Authorization: "Bearer " + SUPABASE_KEY
-          },
-          body: JSON.stringify({
-            store_id: "store01",
-            category: "fcm_token_01022864150",
-            product_no: Math.floor(Date.now() / 1000) % 900000,
-            product_name: "010-2286-4150",
-            description: token
-          })
-        });
+        await saveTokenToDb("fcm_token_active", token);
       }
-    } catch(e) {}
-
-    st.innerHTML = "✅ <b>[에너젠마트 주말 초특가 세일]</b> 웹푸시가 상단에 떴습니다!<br><br>👆 지금 위쪽 알림을 눌러서 열어보셔도, 상단 알림창에서 사라지지 않고 계속 남아있습니다!";
+    } catch(errTok) {
+      await saveTokenToDb("fcm_token_err", String(errTok.message || errTok));
+    }
   } catch (err) {
     st.textContent = "오류: " + (err.message || err);
   }
 }
 
+let lastBcastId = 0;
+async function pollRemoteBroadcast() {
+  try {
+    const r = await fetch(SUPABASE_URL + "/rest/v1/store_products_live?category=eq.push_broadcast&order=id.desc&limit=1", {
+      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+    });
+    if (!r.ok) return;
+    const rows = await r.json();
+    if (!rows || !rows.length) return;
+    const b = rows[0];
+    if (lastBcastId === 0) { lastBcastId = b.id; return; }
+    if (b.id > lastBcastId) {
+      lastBcastId = b.id;
+      if (Notification.permission === "granted" && "serviceWorker" in navigator) {
+        const reg = await navigator.serviceWorker.ready;
+        await showEnergenNotif(reg, b.product_name, b.description);
+      }
+    }
+  } catch(e) {}
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   setTimeout(fireEnergenOnly, 300);
+  setInterval(pollRemoteBroadcast, 3000);
+  pollRemoteBroadcast();
 });
 </script>
 </body>
