@@ -341,6 +341,26 @@ window.addEventListener('DOMContentLoaded', () => {
     if (navigator.vibrate) { try { navigator.vibrate([150, 80, 150]); } catch(e) {} }
   }, 700);
 });
+
+// [핵심] 안드로이드 OS가 알림 클릭 시 상단 알림을 자동 삭제하더라도,
+// 전단지 페이지가 열리는 즉시 상단 알림창에 다시 고정(Auto Re-Pin)하여 몇 번을 열어봐도 상단에 계속 남아있게 유지!
+if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === 'granted') {
+  navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' }).then(reg => {
+    setTimeout(() => {
+      reg.showNotification('🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!', {
+        body: '국내산 1등급 생삼겹살 100g 1,290원 · 신선 왕란 1판 4,980원! (언제든 상단 알림창에서 다시 터치해 열어보실 수 있습니다)',
+        icon: 'https://mart-platform.vercel.app/icon-192.png',
+        badge: 'https://mart-platform.vercel.app/icon-192.png',
+        image: 'https://mart-platform.vercel.app/test-flyer.png',
+        requireInteraction: true,
+        silent: true,
+        tag: 'energen-pinned-sale',
+        data: { url: 'https://mart-platform.vercel.app/store.html?store=store01' }
+      });
+    }, 500);
+  }).catch(() => {});
+}
+
 </script>
 </body>
 </html>
