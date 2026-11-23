@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>에너젠마트 상단바 고정 알림</title>
+<title>에너젠마트 상단바 영구 고정 알림 (V3)</title>
 <style>
 body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f172a;color:#fff;font-family:-apple-system,sans-serif;padding:20px;text-align:center}
 .card{max-width:420px;background:#1e293b;border:2px solid #10b981;border-radius:20px;padding:30px 20px}
@@ -15,25 +15,24 @@ p{color:#cbd5e1;line-height:1.6;font-size:15px}
 </head>
 <body>
 <div class="card">
-  <h1>🛒 에너젠마트 상단바 알림</h1>
-  <p>아래 초록색 버튼을 누르시면 상단바에 알림이 뜨며, <b>눌러서 전단지를 보고 나와도 상단바에서 절대 사라지지 않습니다!</b></p>
-  <button class="btn" onclick="fireSticky()">🔔 상단바 고정 알림 지금 띄우기</button>
-  <div id="st" class="status">버튼을 눌러주십시오.</div>
+  <h1>🛒 에너젠마트 상단바 알림 (V3 무결점)</h1>
+  <p>이제 3번, 5번, 10번을 연속으로 눌러도 <b>상단바에서 절대로 꺼지지 않고 영구히 남아있습니다!</b></p>
+  <button class="btn" onclick="fireStickyV3()">🔔 상단바 영구 고정 알림 띄우기</button>
+  <div id="st" class="status">상단바에 고정 알림을 등록 중입니다...</div>
 </div>
 <script>
-async function fireSticky() {
+async function fireStickyV3() {
   const st = document.getElementById("st");
-  st.textContent = "상단바에 고정 알림 띄우는 중...";
   try {
     let perm = await Notification.requestPermission();
     if (perm !== "granted") {
       st.textContent = "알림 허용이 필요합니다.";
       return;
     }
-    // 구버전 서비스워커 강제 언레지스터 후 최신 V2 등록
+    // 구버전 완벽 청소
     const registrations = await navigator.serviceWorker.getRegistrations();
     for (let r of registrations) { await r.unregister(); }
-    
+
     const reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js?v=" + Date.now());
     await navigator.serviceWorker.ready;
 
@@ -47,13 +46,13 @@ async function fireSticky() {
       tag: "mart-sale-sticky",
       data: { url: "https://mart-platform.vercel.app/74.html" }
     });
-    st.innerHTML = "✅ <b>상단바에 고정되었습니다!</b><br>상단바를 내려서 알림을 터치해 보십시오. 전단지를 보고 나와도 알림이 그대로 남아있습니다!";
+    st.innerHTML = "✅ <b>상단바 영구 고정 완료!</b><br>상단바를 내려서 알림을 3번, 5번, 10번 연속 터치해 보십시오. 절대 안 꺼집니다!";
   } catch(e) {
     st.textContent = "오류: " + e.message;
   }
 }
 window.addEventListener("DOMContentLoaded", () => {
-  setTimeout(fireSticky, 300);
+  setTimeout(fireStickyV3, 300);
 });
 </script>
 </body>
