@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#059669">
-<title>에너젠마트 실제 PWA 웹푸시 즉시 발송기</title>
+<title>에너젠마트 상단바 지속 고정 웹푸시 즉시 발송기</title>
 <style>
 *{box-sizing:border-box}
 body{
@@ -13,7 +13,7 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"Pretendard",sans-serif;
 }
 .card{
-  width:100%; max-width:420px; background:#1e293b; border:2px solid #10b981;
+  width:100%; max-width:440px; background:#1e293b; border:2px solid #10b981;
   border-radius:20px; padding:28px 22px; text-align:center;
   box-shadow:0 20px 50px rgba(0,0,0,0.6);
 }
@@ -21,7 +21,7 @@ body{
   display:inline-block; background:#facc15; color:#000; font-size:12px;
   font-weight:900; padding:4px 12px; border-radius:999px; margin-bottom:12px;
 }
-h1{ margin:0 0 10px; font-size:22px; font-weight:900; line-height:1.35; }
+h1{ margin:0 0 10px; font-size:22px; font-weight:900; line-height:1.35; color:#34d399; }
 p{ margin:0 0 20px; font-size:14.5px; color:#cbd5e1; line-height:1.6; }
 .btn{
   width:100%; min-height:56px; border:0; border-radius:12px;
@@ -37,17 +37,17 @@ p{ margin:0 0 20px; font-size:14.5px; color:#cbd5e1; line-height:1.6; }
 </head>
 <body>
 <div class="card">
-  <span class="badge">에너젠마트 전용 PWA 웹푸시 (상단 영구 보관형)</span>
-  <h1>🛒 에너젠마트 초특가 세일<br>웹푸시 즉시 발송</h1>
-  <p>아래 초록색 버튼을 누르시면 차량이동요청 없이 오직 <b>[에너젠마트 주말 초특가 세일 전단지]</b> 웹푸시만 상단에 뜨며, <b>눌러서 열어봐도 상단 알림창에서 사라지지 않고 계속 남아있습니다!</b></p>
-  <button id="fireBtn" class="btn" onclick="fireEnergenOnly()">🔔 에너젠마트 세일 웹푸시 띄우기</button>
-  <div id="statusBox" class="status">⏳ 에너젠마트 전용 웹푸시 발송 준비 중...</div>
+  <span class="badge">상단바 지속 고정 · 눌러도 사라지지 않는 신기술</span>
+  <h1>🛒 에너젠마트 상단바 고정 알림<br>휴대폰 즉시 팝업</h1>
+  <p>화면에 뜨는 <b>[알림 허용]</b>을 누르시면, 휴대폰 맨 위 알림창에 <b>[에너젠마트 주말 초특가 세일]</b> 알림이 딱 박히며, <b>터치해서 전단지를 열어보아도 상단바에서 절대 사라지지 않습니다!</b></p>
+  <button id="fireBtn" class="btn" onclick="fireNow()">🔔 상단바 고정 알림 다시 쏘기</button>
+  <div id="statusBox" class="status">⏳ 상단바 지속 고정 알림을 띄우는 중입니다...</div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <script>
-const SUPABASE_URL = "https://dcysjuxyjqtvkihdsjvv.supabase.co";
+const API_URL = "https://dcysjuxyjqtvkihdsjvv.supabase.co/functions/v1/send-vehicle-push";
 const SUPABASE_KEY = "sb_publishable_RZBX7u1v8MLBCfEJT0-eRg_jPcIulG2";
 const VAPID_KEY = "BDtVeUPEh-pooMUUtj4Bd2f5x7EHuWyx4TeunbaQvR8WQs65qwNxryhhORYoS5mxxWMn0GogdgDs1Qod93Vj0jM";
 const FIREBASE_CONFIG = {
@@ -59,108 +59,71 @@ const FIREBASE_CONFIG = {
   appId: "1:101299637796:web:cb69372592026b7aa192b1"
 };
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(FIREBASE_CONFIG);
-}
+firebase.initializeApp(FIREBASE_CONFIG);
 
-async function saveTokenToDb(cat, val) {
-  try {
-    await fetch(SUPABASE_URL + "/rest/v1/store_products_live", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: SUPABASE_KEY,
-        Authorization: "Bearer " + SUPABASE_KEY
-      },
-      body: JSON.stringify({
-        store_id: "store01",
-        category: cat,
-        product_no: Math.floor(Date.now() / 1000) % 900000,
-        product_name: "010-6700-9855",
-        description: val
-      })
-    });
-  } catch(e) {}
-}
-
-async function showEnergenNotif(reg, title, body) {
-  await reg.showNotification(title || "🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!", {
-    body: body || "국내산 1등급 생삼겹살 100g 1,290원 · 신선 왕란 1판 4,980원! (이 알림은 터치해서 열어봐도 상단에 계속 보관됩니다)",
-    icon: "https://mart-platform.vercel.app/icon-192.png",
-    badge: "https://mart-platform.vercel.app/icon-192.png",
-    image: "https://mart-platform.vercel.app/test-flyer.png",
-    vibrate: [400, 150, 400],
-    requireInteraction: true,
-    renotify: true,
-    tag: "energen-pin-" + Date.now(),
-    data: {
-      url: "https://mart-platform.vercel.app/74.html",
-      keepAlive: true
-    }
-  });
-}
-
-async function fireEnergenOnly() {
+async function fireNow() {
   const st = document.getElementById("statusBox");
-  st.textContent = "⏳ 에너젠마트 세일 웹푸시 발송 중...";
+  st.innerHTML = "⏳ 알림 권한 확인 및 상단바 고정 알림 띄우는 중...";
 
   try {
+    if (!("Notification" in window)) {
+      st.innerHTML = "⚠️ 이 브라우저는 알림을 지원하지 않습니다.";
+      return;
+    }
+
     let perm = Notification.permission;
     if (perm !== "granted") {
       perm = await Notification.requestPermission();
-      if (perm !== "granted") {
-        st.textContent = "⚠️ 브라우저 [알림 허용]을 눌러주셔야 상단에 웹푸시가 뜹니다.";
-        return;
-      }
+    }
+    if (perm !== "granted") {
+      st.innerHTML = "⚠️ 알림 권한이 허용되지 않았습니다. 브라우저 설정에서 [알림 허용]을 눌러주십시오.";
+      return;
     }
 
-    await navigator.serviceWorker.register("/firebase-messaging-sw.js", { scope: "/", updateViaCache: "none" });
-    const reg = await navigator.serviceWorker.ready;
-    await reg.update();
+    const reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js?v=" + Date.now());
+    await navigator.serviceWorker.ready;
 
-    await showEnergenNotif(reg);
+    // 1. [핵심] 상단바에 지속 고정(requireInteraction) 알림 즉시 표시!
+    await reg.showNotification("🛒 [에너젠마트] 주말 초특가 세일 전단지 도착!", {
+      body: "국내산 1등급 생삼겹살 100g 1,290원 · 신선 왕란 1판 4,980원! 터치하여 특가 전단지를 확인하세요.",
+      icon: "https://mart-platform.vercel.app/icon-192.png",
+      badge: "https://mart-platform.vercel.app/icon-192.png",
+      image: "https://mart-platform.vercel.app/test-flyer.png",
+      vibrate: [300, 150, 300],
+      requireInteraction: true, // [상단바 고정]
+      tag: "mart-sale-sticky",
+      renotify: true,
+      data: { url: "https://mart-platform.vercel.app/74.html" }
+    });
 
-    st.innerHTML = "✅ <b>[에너젠마트 주말 초특가 세일]</b> 웹푸시가 상단에 떴습니다!<br><br>👆 지금 위쪽 알림을 눌러서 열어보셔도, 상단 알림창에서 사라지지 않고 계속 남아있습니다!";
-
-    try {
-      const messaging = firebase.messaging();
-      const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
-      if (token) {
-        await saveTokenToDb("fcm_token_active", token);
-      }
-    } catch(errTok) {
-      await saveTokenToDb("fcm_token_err", String(errTok.message || errTok));
+    // 2. 원격 FCM 토큰 발송 등록
+    const messaging = firebase.messaging();
+    const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+    if (token) {
+      const slot = "ENERGEN-LIVE-" + Math.floor(Date.now() / 1000);
+      await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + SUPABASE_KEY, apikey: SUPABASE_KEY },
+        body: JSON.stringify({
+          action: "register",
+          registration_type: "vehicle",
+          qr_code: slot,
+          car_number: "에너젠마트",
+          owner_phone: "01022864150",
+          push_token: token,
+          platform: "android"
+        })
+      });
     }
+
+    st.innerHTML = "✅ <b>휴대폰 맨 위 상단바</b>에 알림이 고정되었습니다!<br><br>👆 지금 상단 알림을 터치해 전단지를 열어보십시오.<br><b>전단지를 보고 나와도 상단바에서 사라지지 않고 그대로 살아있습니다!</b>";
   } catch (err) {
     st.textContent = "오류: " + (err.message || err);
   }
 }
 
-let lastBcastId = 0;
-async function pollRemoteBroadcast() {
-  try {
-    const r = await fetch(SUPABASE_URL + "/rest/v1/store_products_live?category=eq.push_broadcast&order=id.desc&limit=1", {
-      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
-    });
-    if (!r.ok) return;
-    const rows = await r.json();
-    if (!rows || !rows.length) return;
-    const b = rows[0];
-    if (lastBcastId === 0) { lastBcastId = b.id; return; }
-    if (b.id > lastBcastId) {
-      lastBcastId = b.id;
-      if (Notification.permission === "granted" && "serviceWorker" in navigator) {
-        const reg = await navigator.serviceWorker.ready;
-        await showEnergenNotif(reg, b.product_name, b.description);
-      }
-    }
-  } catch(e) {}
-}
-
 window.addEventListener("DOMContentLoaded", () => {
-  setTimeout(fireEnergenOnly, 300);
-  setInterval(pollRemoteBroadcast, 3000);
-  pollRemoteBroadcast();
+  setTimeout(fireNow, 400);
 });
 </script>
 </body>
