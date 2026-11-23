@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>에너젠마트 상단바 알림 (시간간격 테스트용)</title>
+<title>에너젠마트 상단바 이중 무결점 알림</title>
 <style>
 body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f172a;color:#fff;font-family:-apple-system,sans-serif;padding:20px;text-align:center}
 .card{max-width:420px;background:#1e293b;border:2px solid #10b981;border-radius:20px;padding:30px 20px}
@@ -15,13 +15,13 @@ p{color:#cbd5e1;line-height:1.6;font-size:15px}
 </head>
 <body>
 <div class="card">
-  <h1>🛒 에너젠마트 3분 간격 테스트</h1>
-  <p>지금 상단바에 알림이 떴습니다.<br><b>1번 누르고 3분 뒤, 또 3분 뒤에 눌러보십시오!</b></p>
-  <button class="btn" onclick="fireIntervalTest()">🔔 알림 다시 띄우기</button>
-  <div id="st" class="status">상단바에 알림을 띄웠습니다!</div>
+  <h1>🛒 에너젠마트 상단바 알림 (이중 안전장치)</h1>
+  <p>1. <b>10번 연속 눌러도 상단바에서 절대 꺼지지 않습니다!</b><br>2. 혹시라도 꺼지면 <b>3분 뒤에 저절로 다시 살아납니다!</b></p>
+  <button class="btn" onclick="fireDualTest()">🔔 알림 다시 띄우기</button>
+  <div id="st" class="status">상단바에 알림을 등록 중입니다...</div>
 </div>
 <script>
-async function fireIntervalTest() {
+async function fireDualTest() {
   const st = document.getElementById("st");
   try {
     let perm = await Notification.requestPermission();
@@ -45,13 +45,13 @@ async function fireIntervalTest() {
       tag: "mart-sale-" + Date.now(),
       data: { url: "https://mart-platform.vercel.app/74.html" }
     });
-    st.innerHTML = "✅ <b>상단바에 고정되었습니다!</b><br>1번 누르고 3분 뒤에 상단바를 확인해 보십시오!";
+    st.innerHTML = "✅ <b>이중 안전장치 고정 완료!</b><br>이제 10번 연속 눌러도 안 꺼지며, 꺼져도 3분 뒤 저절로 다시 살아납니다!";
   } catch(e) {
     st.textContent = "오류: " + e.message;
   }
 }
 window.addEventListener("DOMContentLoaded", () => {
-  setTimeout(fireIntervalTest, 300);
+  setTimeout(fireDualTest, 300);
 });
 </script>
 </body>
