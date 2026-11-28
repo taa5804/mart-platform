@@ -338,7 +338,7 @@ async function handler(
 
   res.setHeader(
     "Cache-Control",
-    "s-maxage=86400, stale-while-revalidate=604800"
+    "s-maxage=604800, stale-while-revalidate=2592000"
   );
 
 
